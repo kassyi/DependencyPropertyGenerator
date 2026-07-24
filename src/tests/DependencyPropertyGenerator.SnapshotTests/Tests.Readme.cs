@@ -1,10 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
 
+
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+// ReSharper disable once CheckNamespace
 namespace H.Generators.SnapshotTests;
 
 public partial class Tests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -12,23 +14,25 @@ public partial class Tests
     [DataRow(Framework.Avalonia)]
     public Task ReadmeExample(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""IsSpinning"", DefaultValue = true, Category = ""Category"", Description = ""Description"")]
-public partial class MyControl : UserControl
-{
-    // Optional
-    partial void OnIsSpinningChanged(bool oldValue, bool newValue)
-    {
-    }
-}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-[AttachedDependencyProperty<object, TreeView>(""SelectedItem"", DefaultBindingMode = DefaultBindingMode.TwoWay)]
-public static partial class TreeViewExtensions
-{
-    // Optional
-    static partial void OnSelectedItemChanged(TreeView sender, object? oldValue, object? newValue)
-    {
-    }
-}", framework, additionalGenerators: new IIncrementalGenerator[]{ new AttachedDependencyPropertyGenerator(), new StaticConstructorGenerator() });
+            [DependencyProperty<bool>("IsSpinning", DefaultValue = true, Category = "Category", Description = "Description")]
+            public partial class MyControl : UserControl
+            {
+                // Optional
+                partial void OnIsSpinningChanged(bool oldValue, bool newValue)
+                {
+                }
+            }
+
+            [AttachedDependencyProperty<object, TreeView>("SelectedItem", DefaultBindingMode = DefaultBindingMode.TwoWay)]
+            public static partial class TreeViewExtensions
+            {
+                // Optional
+                static partial void OnSelectedItemChanged(TreeView sender, object? oldValue, object? newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: [new AttachedDependencyPropertyGenerator(), new StaticConstructorGenerator()]);
     }
 }

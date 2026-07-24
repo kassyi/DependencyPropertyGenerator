@@ -1,8 +1,9 @@
-﻿namespace H.Generators.SnapshotTests;
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+namespace H.Generators.SnapshotTests;
 
 public partial class Tests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -10,24 +11,26 @@ public partial class Tests
     [DataRow(Framework.Avalonia)]
     public Task OverrideMetadata(Framework framework)
     {
-        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + @"
-[DependencyProperty<Uri>(""AquariumGraphic"", AffectsRender = true,
-    DefaultValueExpression = ""new System.Uri(\""http://www.contoso.com/aquarium-graphic.jpg\"")"")]
-public partial class Aquarium : UIElement
-{
-}
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
 
-[OverrideMetadata<Uri>(""AquariumGraphic"",
-    DefaultValueExpression = ""new System.Uri(\""http://www.contoso.com/tropical-aquarium-graphic.jpg\"")"")]
-public partial class TropicalAquarium : Aquarium
-{
-    partial void OnAquariumGraphicChanged()
-    {
-    }
-}", framework, additionalGenerators: new DependencyPropertyGenerator());
+            [DependencyProperty<Uri>("AquariumGraphic", AffectsRender = true,
+                DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/aquarium-graphic.jpg\")")]
+            public partial class Aquarium : UIElement
+            {
+            }
+
+            [OverrideMetadata<Uri>("AquariumGraphic",
+                DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/tropical-aquarium-graphic.jpg\")")]
+            public partial class TropicalAquarium : Aquarium
+            {
+                partial void OnAquariumGraphicChanged()
+                {
+                }
+            }
+            """, framework, additionalGenerators: new DependencyPropertyGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -35,20 +38,22 @@ public partial class TropicalAquarium : Aquarium
     [DataRow(Framework.Avalonia)]
     public Task OverrideMetadataForReadOnlyProperty(Framework framework)
     {
-        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + @"
-[DependencyProperty<Uri>(""AquariumGraphic"", IsReadOnly = true,
-    DefaultValueExpression = ""new System.Uri(\""http://www.contoso.com/aquarium-graphic.jpg\"")"")]
-public partial class Aquarium : UIElement
-{
-}
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
 
-[OverrideMetadata<Uri>(""AquariumGraphic"", IsReadOnly = true,
-    DefaultValueExpression = ""new System.Uri(\""http://www.contoso.com/tropical-aquarium-graphic.jpg\"")"")]
-public partial class TropicalAquarium : Aquarium
-{
-    partial void OnAquariumGraphicChanged()
-    {
-    }
-}", framework, additionalGenerators: new DependencyPropertyGenerator());
+            [DependencyProperty<Uri>("AquariumGraphic", IsReadOnly = true,
+                DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/aquarium-graphic.jpg\")")]
+            public partial class Aquarium : UIElement
+            {
+            }
+
+            [OverrideMetadata<Uri>("AquariumGraphic", IsReadOnly = true,
+                DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/tropical-aquarium-graphic.jpg\")")]
+            public partial class TropicalAquarium : Aquarium
+            {
+                partial void OnAquariumGraphicChanged()
+                {
+                }
+            }
+            """, framework, additionalGenerators: new DependencyPropertyGenerator());
     }
 }

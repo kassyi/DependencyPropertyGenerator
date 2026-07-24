@@ -1,9 +1,9 @@
-﻿namespace H.Generators.SnapshotTests;
+namespace H.Generators.SnapshotTests;
 
 [TestClass]
 public partial class Tests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -11,19 +11,21 @@ public partial class Tests
     [DataRow(Framework.Avalonia)]
     public Task NonGenericAttributes(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty(""Text"", typeof(string))]
-public partial class MyControl : UserControl
-{
-}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-[AttachedDependencyProperty(""AttachedProperty"", typeof(object), BrowsableForType = typeof(Grid))]
-public static partial class GridExtensions
-{
-}", framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
+            [DependencyProperty("Text", typeof(string))]
+            public partial class MyControl : UserControl
+            {
+            }
+
+            [AttachedDependencyProperty("AttachedProperty", typeof(object), BrowsableForType = typeof(Grid))]
+            public static partial class GridExtensions
+            {
+            }
+            """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -31,27 +33,29 @@ public static partial class GridExtensions
     [DataRow(Framework.Avalonia)]
     public Task MultipleClassDeclarations(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""IsSpinning"")]
-public partial class MyControl : UserControl
-{
-    // Optional
-    partial void OnIsSpinningChanged()
-    {
-    }
-}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-[DependencyProperty<bool>(""IsSpinning2"")]
-public partial class MyControl : UserControl
-{
-    // Optional
-    partial void OnIsSpinning2Changed(bool newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+            [DependencyProperty<bool>("IsSpinning")]
+            public partial class MyControl : UserControl
+            {
+                // Optional
+                partial void OnIsSpinningChanged()
+                {
+                }
+            }
+
+            [DependencyProperty<bool>("IsSpinning2")]
+            public partial class MyControl : UserControl
+            {
+                // Optional
+                partial void OnIsSpinning2Changed(bool newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -60,21 +64,23 @@ public partial class MyControl : UserControl
     public Task Attributes(Framework framework)
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.ComponentModel") +
-                                                             @"
-[DependencyProperty<string>(""AttributedProperty"",
-    Category = ""Category"",
-    Description = ""Description"",
-    TypeConverter = typeof(EnumConverter),
-    Bindable = true,
-    DesignerSerializationVisibility = DesignerSerializationVisibility.Hidden,
-    ClsCompliant = false,
-    Localizability = Localizability.Text)]
-public partial class MyControl : UserControl
-{
-}", framework);
+                                                             """
+
+                                                             [DependencyProperty<string>("AttributedProperty",
+                                                                 Category = "Category",
+                                                                 Description = "Description",
+                                                                 TypeConverter = typeof(EnumConverter),
+                                                                 Bindable = true,
+                                                                 DesignerSerializationVisibility = DesignerSerializationVisibility.Hidden,
+                                                                 ClsCompliant = false,
+                                                                 Localizability = Localizability.Text)]
+                                                             public partial class MyControl : UserControl
+                                                             {
+                                                             }
+                                                             """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -82,22 +88,24 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task WithOtherAttributes(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + @"
-[CLSCompliant(false)]
-public partial class MyControl : UserControl
-{
-}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + """
 
-[DependencyProperty<bool>(""IsSpinning5"")]
-public partial class MyControl : UserControl
-{   
-    partial void OnIsSpinning5Changed(bool oldValue, bool newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+            [CLSCompliant(false)]
+            public partial class MyControl : UserControl
+            {
+            }
+
+            [DependencyProperty<bool>("IsSpinning5")]
+            public partial class MyControl : UserControl
+            {   
+                partial void OnIsSpinning5Changed(bool oldValue, bool newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -105,18 +113,20 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task WithOtherAttributes2(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<string>(""Text"")]
-[System.ComponentModel.DesignTimeVisible(false)]
-public partial class Generatable : FrameworkElement
-{
-    partial void OnTextChanged(string? oldValue, string? newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<string>("Text")]
+            [System.ComponentModel.DesignTimeVisible(false)]
+            public partial class Generatable : FrameworkElement
+            {
+                partial void OnTextChanged(string? oldValue, string? newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -124,17 +134,19 @@ public partial class Generatable : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task NullableDisable(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: false, @namespace: true, string.Empty) + @"
-[DependencyProperty<string>(""Text"")]
-public partial class Generatable : FrameworkElement
-{
-    partial void OnTextChanged(string oldValue, string newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: false, @namespace: true, string.Empty) + """
+
+            [DependencyProperty<string>("Text")]
+            public partial class Generatable : FrameworkElement
+            {
+                partial void OnTextChanged(string oldValue, string newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -142,14 +154,16 @@ public partial class Generatable : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task FloatLiterals(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<float>(""FloatProperty"", DefaultValue = 42)]
-public partial class MyControl : UserControl
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<float>("FloatProperty", DefaultValue = 42)]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -157,28 +171,34 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task ValidateAndCoerce(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $@"
-[DependencyProperty<string>(""NotNullStringProperty"", DefaultValue = """", Validate = true, Coerce = true)]
-public partial class MyControl : UserControl
-{{
-    private partial string CoerceNotNullStringProperty(string? value)
-    {{
-        return value ?? string.Empty;
-    }}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
-{(framework == Framework.Maui ? @"
-    private static partial bool IsNotNullStringPropertyValid(MyControl sender, string? value)
-    {
-        return value != null;
-    }" : @"
-    private static partial bool IsNotNullStringPropertyValid(string? value)
-    {
-        return value != null;
-    }")}
-}}", framework);
+              [DependencyProperty<string>("NotNullStringProperty", DefaultValue = "", Validate = true, Coerce = true)]
+              public partial class MyControl : UserControl
+              {
+                  private partial string CoerceNotNullStringProperty(string? value)
+                  {
+                      return value ?? string.Empty;
+                  }
+
+              {{(framework == Framework.Maui ? """
+
+                                                   private static partial bool IsNotNullStringPropertyValid(MyControl sender, string? value)
+                                                   {
+                                                       return value != null;
+                                                   }
+                                               """ : """
+
+                                                         private static partial bool IsNotNullStringPropertyValid(string? value)
+                                                         {
+                                                             return value != null;
+                                                         }
+                                                     """)}}
+              }
+              """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -186,11 +206,13 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public async Task NullableValueTypeWithCoerce_DoesNotDoubleNullableSuffix(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + @"
-[DependencyProperty<double?>(""Value"", Coerce = true)]
-public partial class MyControl : UserControl
-{
-}";
+        var source = GetHeader(framework, "Controls") + """
+
+                                                        [DependencyProperty<double?>("Value", Coerce = true)]
+                                                        public partial class MyControl : UserControl
+                                                        {
+                                                        }
+                                                        """;
         var generated = await GenerateSourceAsync<DependencyPropertyGenerator>(source, framework);
 
         generated.Should().NotContain("double??");
@@ -200,14 +222,16 @@ public partial class MyControl : UserControl
     [TestMethod]
     public Task AvaloniaAffectsFlags()
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(Framework.Avalonia, "Controls", "Media") + @"
-[DependencyProperty<Brush>(""Fill"", AffectsRender = true, AffectsMeasure = true, AffectsArrange = true)]
-public partial class MyControl : Control
-{
-}", Framework.Avalonia, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(Framework.Avalonia, "Controls", "Media") + """
+
+            [DependencyProperty<Brush>("Fill", AffectsRender = true, AffectsMeasure = true, AffectsArrange = true)]
+            public partial class MyControl : Control
+            {
+            }
+            """, Framework.Avalonia, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -215,18 +239,20 @@ public partial class MyControl : Control
     [DataRow(Framework.Avalonia)]
     public Task CreateDefaultValueCallback(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<string>(""SomeProperty"", CreateDefaultValueCallback = true)]
-public partial class MyGrid : Grid
-{
-    private static partial string GetSomePropertyDefaultValue()
-    {
-        return ""Hello, world"";
-    }
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<string>("SomeProperty", CreateDefaultValueCallback = true)]
+            public partial class MyGrid : Grid
+            {
+                private static partial string GetSomePropertyDefaultValue()
+                {
+                    return "Hello, world";
+                }
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -234,14 +260,16 @@ public partial class MyGrid : Grid
     [DataRow(Framework.Avalonia)]
     public Task DefaultUpdateSourceTrigger(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""ExplicitUpdateSourceTriggerProperty"", DefaultUpdateSourceTrigger = SourceTrigger.Explicit)]
-public partial class MyControl : UserControl
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<bool>("ExplicitUpdateSourceTriggerProperty", DefaultUpdateSourceTrigger = SourceTrigger.Explicit)]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -249,14 +277,16 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task ReadOnlyProperty(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""ReadOnlyProperty"", IsReadOnly = true)]
-public partial class MyControl : UserControl
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<bool>("ReadOnlyProperty", IsReadOnly = true)]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -264,14 +294,16 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task DefaultBindingMode(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""IsSpinning"", DefaultBindingMode = DefaultBindingMode.OneTime)]
-public partial class MyGrid : Grid
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<bool>("IsSpinning", DefaultBindingMode = DefaultBindingMode.OneTime)]
+            public partial class MyGrid : Grid
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -279,14 +311,16 @@ public partial class MyGrid : Grid
     [DataRow(Framework.Avalonia)]
     public Task Direct(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""IsSpinning"", IsDirect = true)]
-public partial class MyGrid : Grid
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<bool>("IsSpinning", IsDirect = true)]
+            public partial class MyGrid : Grid
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -294,14 +328,16 @@ public partial class MyGrid : Grid
     [DataRow(Framework.Avalonia)]
     public Task DirectReadOnly(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[DependencyProperty<bool>(""IsSpinning"", IsDirect = true, IsReadOnly = true, EnableDataValidation = true)]
-public partial class MyGrid : Grid
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<bool>("IsSpinning", IsDirect = true, IsReadOnly = true, EnableDataValidation = true)]
+            public partial class MyGrid : Grid
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -309,22 +345,24 @@ public partial class MyGrid : Grid
     [DataRow(Framework.Avalonia)]
     public Task BindEvents(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + @"
-[DependencyProperty<object>(""BindEventsProperty"",
-    BindEvents = new[] { nameof(UIElement.PointerEntered), nameof(UIElement.PointerExited) })]
-public partial class MyUIElement : UIElement
-{
-    private static void OnBindEventsPropertyChanged_PointerEntered(object? sender, PointerRoutedEventArgs args)
-    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + """
+
+            [DependencyProperty<object>("BindEventsProperty",
+                BindEvents = new[] { nameof(UIElement.PointerEntered), nameof(UIElement.PointerExited) })]
+            public partial class MyUIElement : UIElement
+            {
+                private static void OnBindEventsPropertyChanged_PointerEntered(object? sender, PointerRoutedEventArgs args)
+                {
+                }
+
+                private static void OnBindEventsPropertyChanged_PointerExited(object? sender, PointerRoutedEventArgs args)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    private static void OnBindEventsPropertyChanged_PointerExited(object? sender, PointerRoutedEventArgs args)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
-    }
-
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -332,17 +370,19 @@ public partial class MyUIElement : UIElement
     [DataRow(Framework.Avalonia)]
     public Task CustomOnChanged(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<string>(""Text"", OnChanged = nameof(OnMyTextChanged))]
-public partial class Generatable : FrameworkElement
-{
-    protected virtual void OnMyTextChanged(string? value)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<string>("Text", OnChanged = nameof(OnMyTextChanged))]
+            public partial class Generatable : FrameworkElement
+            {
+                protected virtual void OnMyTextChanged(string? value)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -350,14 +390,16 @@ public partial class Generatable : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task NullableValueType(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<int?>(""Property"")]
-public partial class Generatable : FrameworkElement
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<int?>("Property")]
+            public partial class Generatable : FrameworkElement
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -365,14 +407,16 @@ public partial class Generatable : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task Dictionary(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<System.Collections.Generic.Dictionary<string, string>>(""Headers"", DefaultBindingMode = DefaultBindingMode.TwoWay)]
-public partial class Generatable : FrameworkElement
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<System.Collections.Generic.Dictionary<string, string>>("Headers", DefaultBindingMode = DefaultBindingMode.TwoWay)]
+            public partial class Generatable : FrameworkElement
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -380,27 +424,29 @@ public partial class Generatable : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task SameNameDifferentNamespaces(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, string.Empty) + @"
-namespace Namespace1
-{
-    [DependencyProperty<int>(""MyProperty"")]
-    public partial class MyControl : FrameworkElement
-    {
-        public int MyPropertySqrt => MyProperty * MyProperty;
-    }
-}
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, string.Empty) + """
 
-namespace Namespace2
-{
-    [DependencyProperty<int>(""MyProperty"")]
-    public partial class MyControl : FrameworkElement
-    {
-        public int MyPropertySqrt => MyProperty * MyProperty;
-    }
-}", framework);
+            namespace Namespace1
+            {
+                [DependencyProperty<int>("MyProperty")]
+                public partial class MyControl : FrameworkElement
+                {
+                    public int MyPropertySqrt => MyProperty * MyProperty;
+                }
+            }
+
+            namespace Namespace2
+            {
+                [DependencyProperty<int>("MyProperty")]
+                public partial class MyControl : FrameworkElement
+                {
+                    public int MyPropertySqrt => MyProperty * MyProperty;
+                }
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -408,14 +454,16 @@ namespace Namespace2
     [DataRow(Framework.Avalonia)]
     public Task PrimitiveTypeArray(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<double[]>(""Values"")]
-public partial class MyControl : FrameworkElement
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<double[]>("Values")]
+            public partial class MyControl : FrameworkElement
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -423,14 +471,16 @@ public partial class MyControl : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task MultidimensionalArray(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<int[,,]>(""Values3"")]
-public partial class MyControl : FrameworkElement
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<int[,,]>("Values3")]
+            public partial class MyControl : FrameworkElement
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -438,19 +488,21 @@ public partial class MyControl : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task Tuples(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<(int, string)>(""TypeIntString"")]
-[DependencyProperty<(FrameworkElement, int)>(""TypeControlInt"")]
-[DependencyProperty<(int, FrameworkElement)>(""TypeIntControl"")]
-[DependencyProperty<System.Tuple<int, string>>(""TupleIntString"")]
-[DependencyProperty<System.Tuple<FrameworkElement, int>>(""TupleControlInt"")]
-[DependencyProperty<System.Tuple<int, FrameworkElement>>(""TupleIntControl"")]
-public partial class MyControl : FrameworkElement
-{
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<(int, string)>("TypeIntString")]
+            [DependencyProperty<(FrameworkElement, int)>("TypeControlInt")]
+            [DependencyProperty<(int, FrameworkElement)>("TypeIntControl")]
+            [DependencyProperty<System.Tuple<int, string>>("TupleIntString")]
+            [DependencyProperty<System.Tuple<FrameworkElement, int>>("TupleControlInt")]
+            [DependencyProperty<System.Tuple<int, FrameworkElement>>("TupleIntControl")]
+            public partial class MyControl : FrameworkElement
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -458,39 +510,41 @@ public partial class MyControl : FrameworkElement
     [DataRow(Framework.Avalonia)]
     public Task MultiTypesInOne(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + @"
-[DependencyProperty<int>(""MyProperty"")]
-public partial class MyControl : FrameworkElement
-{
-    partial void OnMyPropertyChanged()
-    {
-    }
-}
-[DependencyProperty<int>(""MyProperty2"")]
-[DependencyProperty(""MyProperty3"", typeof(int))]
-public partial class MyControl 
-{
-    partial void OnMyProperty2Changed()
-    {
-    }
-    partial void OnMyProperty3Changed()
-    {
-    }
-}
-[DependencyProperty<int>(""MyProperty"")]
-[DependencyProperty<(int, string)>(""MyProperty2"")]
-[DependencyProperty(""MyProperty3"", typeof(int))]
-public partial class AnotherControl : FrameworkElement
-{
-    partial void OnMyPropertyChanged()
-    {
-    }
-    partial void OnMyProperty2Changed()
-    {
-    }
-    partial void OnMyProperty3Changed()
-    {
-    }
-}", framework);
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<int>("MyProperty")]
+            public partial class MyControl : FrameworkElement
+            {
+                partial void OnMyPropertyChanged()
+                {
+                }
+            }
+            [DependencyProperty<int>("MyProperty2")]
+            [DependencyProperty("MyProperty3", typeof(int))]
+            public partial class MyControl 
+            {
+                partial void OnMyProperty2Changed()
+                {
+                }
+                partial void OnMyProperty3Changed()
+                {
+                }
+            }
+            [DependencyProperty<int>("MyProperty")]
+            [DependencyProperty<(int, string)>("MyProperty2")]
+            [DependencyProperty("MyProperty3", typeof(int))]
+            public partial class AnotherControl : FrameworkElement
+            {
+                partial void OnMyPropertyChanged()
+                {
+                }
+                partial void OnMyProperty2Changed()
+                {
+                }
+                partial void OnMyProperty3Changed()
+                {
+                }
+            }
+            """, framework);
     }
 }

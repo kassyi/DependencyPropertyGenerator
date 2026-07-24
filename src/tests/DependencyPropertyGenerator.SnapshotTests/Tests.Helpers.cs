@@ -1,9 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using H.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace H.Generators.SnapshotTests;
 
 public partial class Tests : VerifyBase
@@ -16,11 +17,11 @@ public partial class Tests : VerifyBase
     {
         var prefix = framework switch
         {
-            Framework.WinUi or Framework.UnoWinUi => @"Microsoft.UI.Xaml",
-            Framework.Uwp or Framework.Uno => @"Windows.UI.Xaml",
-            Framework.Avalonia => @"Avalonia",
-            Framework.Maui => @"Microsoft.Maui",
-            _ => @"System.Windows",
+            Framework.WinUi or Framework.UnoWinUi => "Microsoft.UI.Xaml",
+            Framework.Uwp or Framework.Uno => "Windows.UI.Xaml",
+            Framework.Avalonia => "Avalonia",
+            Framework.Maui => "Microsoft.Maui",
+            _ => "System.Windows",
         };
         var usings = string.Join(
             Environment.NewLine,
@@ -30,13 +31,15 @@ public partial class Tests : VerifyBase
                     ? $"using {value};"
                     : $"using {prefix}.{value};"));
 
-        return @$"{usings}
-using DependencyPropertyGenerator;
+        return $"""
+                {usings}
+                using DependencyPropertyGenerator;
 
-#nullable {(nullable ? "enable" : "disable")}
+                #nullable {(nullable ? "enable" : "disable")}
 
-{(@namespace ? "namespace H.Generators.IntegrationTests;" : string.Empty)}
-";
+                {(@namespace ? "namespace H.Generators.IntegrationTests;" : string.Empty)}
+
+                """;
     }
 
     private static string GetHeader(
@@ -63,19 +66,19 @@ using DependencyPropertyGenerator;
         }
         else if (framework == Framework.Uwp)
         {
-            globalOptions.Add($"build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
         }
         else if (framework == Framework.Uno)
         {
-            globalOptions.Add($"build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
         }
         else if (framework == Framework.UnoWinUi)
         {
-            globalOptions.Add($"build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
         }
         else if (framework == Framework.Avalonia)
         {
-            globalOptions.Add($"build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
         }
         globalOptions.Add("build_property.RecognizeFramework_Version", "0.0.0.0");
 
@@ -131,8 +134,10 @@ using DependencyPropertyGenerator;
                 .Replace("PointerEntered", "Loaded")
                 .Replace("PointerExited", "Unloaded")
                 .Replace("PointerRoutedEventArgs", "global::System.EventArgs");
-            source = @$"using Microsoft.Maui.Controls;
-{source}";
+            source = $"""
+                      using Microsoft.Maui.Controls;
+                      {source}
+                      """;
         }
 
         return source;
@@ -163,30 +168,24 @@ using DependencyPropertyGenerator;
         var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
         var compilation = (Compilation)CSharpCompilation.Create(
             assemblyName: "Tests",
-            syntaxTrees: new[]
-            {
+            syntaxTrees: [
                 CSharpSyntaxTree.ParseText(source, options: new CSharpParseOptions(LanguageVersion.Preview),
                     cancellationToken: cancellationToken),
-            },
+            ],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         var generator = new T();
         if (generator is not (WeakEventGenerator or RoutedEventGenerator or StaticConstructorGenerator) &&
             !additionalGenerators.Any(static x => x is StaticConstructorGenerator))
         {
-            additionalGenerators = additionalGenerators
-                .Concat(new[] { new StaticConstructorGenerator() })
-                .ToArray();
+            additionalGenerators = [.. additionalGenerators, new StaticConstructorGenerator()];
         }
         GeneratorDriver driver = additionalGenerators.Any()
             ? CSharpGeneratorDriver.Create(
-                generators: new IIncrementalGenerator[] { generator }
-                    .Concat(additionalGenerators)
-                    .Select(GeneratorExtensions.AsSourceGenerator)
-                    .ToArray(),
+                generators: [generator.AsSourceGenerator(), .. additionalGenerators.Select(GeneratorExtensions.AsSourceGenerator)],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview))
             : CSharpGeneratorDriver.Create(
-                generators: new[]{ generator.AsSourceGenerator() },
+                generators: [generator.AsSourceGenerator()],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
         driver = driver
             .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)))
@@ -226,15 +225,14 @@ using DependencyPropertyGenerator;
         var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
         var compilation = (Compilation)CSharpCompilation.Create(
             assemblyName: "Tests",
-            syntaxTrees: new[]
-            {
+            syntaxTrees: [
                 CSharpSyntaxTree.ParseText(source, options: new CSharpParseOptions(LanguageVersion.Preview),
                     cancellationToken: cancellationToken),
-            },
+            ],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: new[] { new T().AsSourceGenerator() },
+            generators: [new T().AsSourceGenerator()],
             parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
         driver = driver
             .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)))
@@ -252,15 +250,14 @@ internal static class DiagnosticExtensions
 {
     internal static IReadOnlyList<DiagnosticSnapshot> ToSnapshotModels(this IEnumerable<Diagnostic> diagnostics)
     {
-        return diagnostics
+        return [.. diagnostics
             .Select(static diagnostic => new DiagnosticSnapshot(
                 Id: diagnostic.Id,
                 Severity: diagnostic.Severity.ToString(),
                 WarningLevel: diagnostic.WarningLevel is 0 ? null : diagnostic.WarningLevel,
                 Location: GetLocation(diagnostic.Location),
                 Span: GetSpan(diagnostic.Location),
-                MessageFormat: diagnostic.Descriptor.MessageFormat.ToString()))
-            .ToArray();
+                MessageFormat: diagnostic.Descriptor.MessageFormat.ToString(System.Globalization.CultureInfo.InvariantCulture)))];
     }
 
     private static string? GetLocation(Location location)

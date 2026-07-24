@@ -1,8 +1,8 @@
-﻿namespace H.Generators.SnapshotTests;
+namespace H.Generators.SnapshotTests;
 
 public partial class Tests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -10,14 +10,16 @@ public partial class Tests
     [DataRow(Framework.Avalonia)]
     public Task RoutedEvent(Framework framework)
     {
-        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + @"
-[RoutedEvent(""TrayLeftMouseDown"", RoutedEventStrategy.Bubble, WinRtEvents = true)]
-public partial class MyControl : UserControl
-{
-}", framework);
+        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + """
+
+            [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, WinRtEvents = true)]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -25,62 +27,70 @@ public partial class MyControl : UserControl
     [DataRow(Framework.Avalonia)]
     public Task AttachedRoutedEvent(Framework framework)
     {
-        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + @"
-[RoutedEvent(""TrayLeftMouseDown"", RoutedEventStrategy.Bubble, IsAttached = true)]
-public partial class MyControl : UserControl
-{
-}", framework);
+        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + """
+
+            [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, IsAttached = true)]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
     }
 
     [TestMethod]
     public async Task AttachedRoutedEvent_StaticClass_DoesNotDuplicatePublicModifier()
     {
         const Framework framework = Framework.Wpf;
-        var source = GetHeader(framework, "Controls") + @"
-[RoutedEvent(""MouseDoubleClickEvent"", RoutedEventStrategy.Bubble, IsAttached = true)]
-public static partial class ImageRoutedEvents
-{
-}";
+        var source = GetHeader(framework, "Controls") + """
+
+                                                        [RoutedEvent("MouseDoubleClickEvent", RoutedEventStrategy.Bubble, IsAttached = true)]
+                                                        public static partial class ImageRoutedEvents
+                                                        {
+                                                        }
+                                                        """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
 
         generated.Should().NotContain("publicpublic");
         generated.Should().Contain("public static partial class ImageRoutedEvents");
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
     [DataRow(Framework.Avalonia)]
     public async Task RoutedEvent_WithGenericHandlerType_DoesNotProduceDuplicateGlobalPrefix(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + @"
-public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
+        var source = GetHeader(framework, "Controls") + """
 
-[RoutedEvent<MyRoutedEventHandler>(""TrayLeftMouseDown"", RoutedEventStrategy.Bubble, WinRtEvents = true)]
-public partial class MyControl : UserControl
-{
-}";
+                                                        public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
+
+                                                        [RoutedEvent<MyRoutedEventHandler>("TrayLeftMouseDown", RoutedEventStrategy.Bubble, WinRtEvents = true)]
+                                                        public partial class MyControl : UserControl
+                                                        {
+                                                        }
+                                                        """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
 
         generated.Should().NotContain("global::global::");
         generated.Should().Contain("global::H.Generators.IntegrationTests.MyRoutedEventHandler");
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
     [DataRow(Framework.Avalonia)]
     public async Task RoutedEvent_WithTypeNamedArgument_DoesNotProduceDuplicateGlobalPrefix(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + @"
-public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
+        var source = GetHeader(framework, "Controls") + """
 
-[RoutedEvent(""TrayLeftMouseDown"", RoutedEventStrategy.Bubble, Type = typeof(MyRoutedEventHandler), WinRtEvents = true)]
-public partial class MyControl : UserControl
-{
-}";
+                                                        public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
+
+                                                        [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, Type = typeof(MyRoutedEventHandler), WinRtEvents = true)]
+                                                        public partial class MyControl : UserControl
+                                                        {
+                                                        }
+                                                        """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
 
         generated.Should().NotContain("global::global::");
@@ -97,23 +107,25 @@ public partial class MyControl : UserControl
 
         var projectA = CreateCompilation(
             assemblyName: "ProjectA",
-            source: @"
-using System.Runtime.CompilerServices;
-using DependencyPropertyGenerator;
-using System.Windows.Controls;
+            source: """
 
-[assembly: InternalsVisibleTo(""ProjectB"")]
+                    using System.Runtime.CompilerServices;
+                    using DependencyPropertyGenerator;
+                    using System.Windows.Controls;
 
-namespace ProjectA;
+                    [assembly: InternalsVisibleTo("ProjectB")]
 
-internal sealed class SharedType
-{
-}
+                    namespace ProjectA;
 
-[RoutedEvent(""Opened"", RoutedEventStrategy.Bubble)]
-internal partial class ProjectAControl : Control
-{
-}",
+                    internal sealed class SharedType
+                    {
+                    }
+
+                    [RoutedEvent("Opened", RoutedEventStrategy.Bubble)]
+                    internal partial class ProjectAControl : Control
+                    {
+                    }
+                    """,
             references,
             parseOptions);
         projectA = RunRoutedEventGenerator(projectA, parseOptions);
@@ -125,25 +137,27 @@ internal partial class ProjectAControl : Control
 
         var projectB = CreateCompilation(
             assemblyName: "ProjectB",
-            source: @"
-using DependencyPropertyGenerator;
-using System.Windows.Controls;
+            source: """
 
-namespace ProjectA
-{
-    internal sealed class SharedType
-    {
-    }
-}
+                    using DependencyPropertyGenerator;
+                    using System.Windows.Controls;
 
-namespace ProjectB
-{
-    [RoutedEvent(""Closed"", RoutedEventStrategy.Bubble)]
-    internal partial class ProjectBControl : Control
-    {
-        private ProjectA.SharedType? SharedType { get; set; }
-    }
-}",
+                    namespace ProjectA
+                    {
+                        internal sealed class SharedType
+                        {
+                        }
+                    }
+
+                    namespace ProjectB
+                    {
+                        [RoutedEvent("Closed", RoutedEventStrategy.Bubble)]
+                        internal partial class ProjectBControl : Control
+                        {
+                            private ProjectA.SharedType? SharedType { get; set; }
+                        }
+                    }
+                    """,
             references.Concat(new[] { global::Microsoft.CodeAnalysis.MetadataReference.CreateFromStream(projectAAssembly) }).ToArray(),
             parseOptions);
         projectB = RunRoutedEventGenerator(projectB, parseOptions);
