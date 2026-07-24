@@ -1,8 +1,8 @@
-﻿namespace H.Generators.SnapshotTests;
+namespace H.Generators.SnapshotTests;
 
 public partial class Tests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -10,23 +10,25 @@ public partial class Tests
     [DataRow(Framework.Avalonia)]
     public Task Enum(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-public enum Mode
-{
-    Mode1,
-    Mode2,
-}
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-[AttachedDependencyProperty<Mode, TreeView>(""Mode"", DefaultValue = Mode.Mode2)]
-public static partial class TreeViewExtensions
-{
-    static partial void OnModeChanged(TreeView sender, Mode oldValue, Mode newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+            public enum Mode
+            {
+                Mode1,
+                Mode2,
+            }
+
+            [AttachedDependencyProperty<Mode, TreeView>("Mode", DefaultValue = Mode.Mode2)]
+            public static partial class TreeViewExtensions
+            {
+                static partial void OnModeChanged(TreeView sender, Mode oldValue, Mode newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -34,28 +36,32 @@ public static partial class TreeViewExtensions
     [DataRow(Framework.Avalonia)]
     public Task AttachedReadOnlyProperty(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[AttachedDependencyProperty<object, Grid>(""AttachedReadOnlyProperty"", IsReadOnly = true)]
-public static partial class GridExtensions
-{
-}", framework);
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [AttachedDependencyProperty<object, Grid>("AttachedReadOnlyProperty", IsReadOnly = true)]
+            public static partial class GridExtensions
+            {
+            }
+            """, framework);
     }
 
     [TestMethod]
     public async Task AttachedPropertyAccessors_UseBrowsableForType()
     {
-        var source = GetHeader(Framework.Wpf, "Controls") + @"
-[AttachedDependencyProperty<bool, Grid>(""GeneratedTest"")]
-public static partial class TestProps
-{
-}";
+        var source = GetHeader(Framework.Wpf, "Controls") + """
+
+                                                            [AttachedDependencyProperty<bool, Grid>("GeneratedTest")]
+                                                            public static partial class TestProps
+                                                            {
+                                                            }
+                                                            """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, Framework.Wpf);
 
         generated.Should().Contain("SetGeneratedTest(global::System.Windows.Controls.Grid element, bool value)");
         generated.Should().Contain("GetGeneratedTest(global::System.Windows.Controls.Grid element)");
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -63,17 +69,19 @@ public static partial class TestProps
     [DataRow(Framework.Avalonia)]
     public Task BindEvent(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + @"
-[AttachedDependencyProperty<object, UIElement>(""BindEventProperty"", BindEvent = nameof(UIElement.KeyUp))]
-public static partial class UIElementExtensions
-{
-    private static void OnBindEventPropertyChanged_KeyUp(object? sender, KeyEventArgs args)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + """
+
+            [AttachedDependencyProperty<object, UIElement>("BindEventProperty", BindEvent = nameof(UIElement.KeyUp))]
+            public static partial class UIElementExtensions
+            {
+                private static void OnBindEventPropertyChanged_KeyUp(object? sender, KeyEventArgs args)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -81,14 +89,16 @@ public static partial class UIElementExtensions
     [DataRow(Framework.Avalonia)]
     public Task AttachedPropertyWithoutSecondType(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework) + @"
-[AttachedDependencyProperty<object>(""SomeProperty"")]
-public static partial class GridExtensions
-{
-}", framework);
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework) + """
+
+            [AttachedDependencyProperty<object>("SomeProperty")]
+            public static partial class GridExtensions
+            {
+            }
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -96,17 +106,19 @@ public static partial class GridExtensions
     [DataRow(Framework.Avalonia)]
     public Task MultilineDescription(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[AttachedDependencyProperty<string, Grid>(""UserAgentSuffix"",
-	Description = @""A suffix that is added to the default user agent, surrounded by square brackets.
-Can be used to identify the web view as belonging to a certain app/version on the server side."")]
-public static partial class GridExtensions
-{
-}
-", framework);
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [AttachedDependencyProperty<string, Grid>("UserAgentSuffix",
+            	Description = @"A suffix that is added to the default user agent, surrounded by square brackets.
+            Can be used to identify the web view as belonging to a certain app/version on the server side.")]
+            public static partial class GridExtensions
+            {
+            }
+
+            """, framework);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -114,17 +126,19 @@ public static partial class GridExtensions
     [DataRow(Framework.Avalonia)]
     public Task CustomOnChangedAttached(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[AttachedDependencyProperty<int, Grid>(""RowCount"", OnChanged = nameof(OnRowCountChanged), DefaultValue = -1)]
-public static partial class GridHelpers
-{
-    static void OnRowCountChanged(Grid grid, int newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [AttachedDependencyProperty<int, Grid>("RowCount", OnChanged = nameof(OnRowCountChanged), DefaultValue = -1)]
+            public static partial class GridHelpers
+            {
+                static void OnRowCountChanged(Grid grid, int newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -132,17 +146,19 @@ public static partial class GridHelpers
     [DataRow(Framework.Avalonia)]
     public Task SameClassAsTypeParameter(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + @"
-[AttachedDependencyProperty<Test, Grid>(""TestProp"", OnChanged = nameof(TestChanged))]
-public partial class Test
-{
-    private static void TestChanged(Grid grid, Test? newValue)
-    {
-    }
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [AttachedDependencyProperty<Test, Grid>("TestProp", OnChanged = nameof(TestChanged))]
+            public partial class Test
+            {
+                private static void TestChanged(Grid grid, Test? newValue)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -150,10 +166,51 @@ public partial class Test
     [DataRow(Framework.Avalonia)]
     public Task InheritClass(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Controls") + @"
-[AttachedDependencyProperty<int, FrameworkElement>(""MyColumn"")]
-public partial class MyGird : Grid
-{
-}", framework, additionalGenerators: new StaticConstructorGenerator());
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Controls") + """
+
+            [AttachedDependencyProperty<int, FrameworkElement>("MyColumn")]
+            public partial class MyGird : Grid
+            {
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
+    }
+
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public async Task AttachedOnChangedWithEventArgs(Framework framework)
+    {
+        var source = GetHeader(framework, "Controls") + """
+
+                                                        [AttachedDependencyProperty<string>("Test", OnChanged = nameof(OnTestChanged))]
+                                                        public static partial class TestHelper
+                                                        {
+                                                            private static void OnTestChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+                                                            {
+                                                            }
+                                                        }
+                                                        """;
+        var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
+
+        generated.Should().Contain("propertyChangedCallback: static (sender, args) =>");
+        generated.Should().Contain("OnTestChanged(");
+        generated.Should().Contain("(global::System.Windows.DependencyObject)sender,");
+        generated.Should().Contain("args);");
+    }
+
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public async Task AttachedCustomOnChangedNotFound(Framework framework)
+    {
+        var source = GetHeader(framework, "Controls") + """
+
+                                                        [AttachedDependencyProperty<string>("Test", OnChanged = "NonExistentMethod")]
+                                                        public static partial class TestHelper
+                                                        {
+                                                        }
+                                                        """;
+        var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
+
+        generated.Should().Contain("#error DPG0001: The specified OnChanged method 'NonExistentMethod' was not found or has an unsupported signature on 'H.Generators.IntegrationTests.TestHelper'.");
+        generated.Should().Contain("propertyChangedCallback: null");
     }
 }
