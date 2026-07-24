@@ -1,5 +1,7 @@
-﻿using H.Generators.Extensions;
+using H.Generators.Extensions;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+// ReSharper disable once CheckNamespace
 namespace H.Generators;
 
 internal static partial class Sources
@@ -9,7 +11,7 @@ internal static partial class Sources
         var value = property.Type;
         if ((canBeNull ||
              property is { IsValueType: false, DefaultValue: null }) &&
-            !value.EndsWith("?"))
+            !value.EndsWith("?", StringComparison.Ordinal))
         {
             value += "?";
         }
@@ -123,13 +125,16 @@ internal static partial class Sources
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
-            return $@" 
-        private static partial bool Is{property.Name}Valid(
-            {senderType} sender,
-            {GenerateType(property, canBeNull: true)} value);".RemoveBlankLinesWhereOnlyWhitespaces();
+            return $"""
+                private static partial bool Is{property.Name}Valid(
+                    {senderType} sender,
+                    {GenerateType(property, canBeNull: true)} value);
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
         }
-        
-        return $"        private static partial bool Is{property.Name}Valid({GenerateType(property, canBeNull: true)} value);";
+
+        return $"""
+                private static partial bool Is{property.Name}Valid({GenerateType(property, canBeNull: true)} value);
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 
     private static string GenerateCreateDefaultValueCallbackPartialMethod(DependencyPropertyData property)
@@ -139,29 +144,36 @@ internal static partial class Sources
             return " ";
         }
 
-        return $"        private static partial {GenerateType(property)} Get{property.Name}DefaultValue();";
+        return $"""
+                private static partial {GenerateType(property)} Get{property.Name}DefaultValue();
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 
     private static string GenerateOnChangedMethodDeclaration(string name, DependencyPropertyData property)
     {
         var modifiers = property.IsAttached ? "static " : string.Empty;
+        var targetParameter = property.IsAttached
+            ? $"\n            {GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)},"
+            : string.Empty;
 
-        return $@" 
-        {modifiers}partial void {name}(
-{(property.IsAttached ? @$" 
-            {GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}," : " ")}
-            {GenerateType(property)} oldValue,
-            {GenerateType(property)} newValue)".RemoveBlankLinesWhereOnlyWhitespaces();
+        return $"""
+                {modifiers}partial void {name}({targetParameter}
+                    {GenerateType(property)} oldValue,
+                    {GenerateType(property)} newValue)
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 
     private static string GenerateOnChangedMethodCall(string name, DependencyPropertyData property)
     {
-        return $@" 
-            {name}(
-{(property.IsAttached ? @$" 
-                {GenerateBrowsableForTypeParameterName(property)}," : " ")}
-                oldValue,
-                newValue);".RemoveBlankLinesWhereOnlyWhitespaces();
+        var targetArgument = property.IsAttached
+            ? $"\n                {GenerateBrowsableForTypeParameterName(property)},"
+            : string.Empty;
+
+        return $"""
+                    {name}({targetArgument}
+                        oldValue,
+                        newValue);
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 
     private static string GenerateBindEventMethod(DependencyPropertyData property)
@@ -174,96 +186,73 @@ internal static partial class Sources
         var type = property.Type;
         var sender = property.IsAttached ? GenerateBrowsableForTypeParameterName(property) : "this";
 
-        return $@"
-{GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_BeforeBind", property)};
-{GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_AfterBind", property)};
+        var unbindEvents = property.BindEvents
+            .Select(@event => $"                {sender}.{@event} -= On{property.Name}Changed_{@event};\n")
+            .Inject();
+        var bindEvents = property.BindEvents
+            .Select(@event => $"                {sender}.{@event} += On{property.Name}Changed_{@event};\n")
+            .Inject();
 
-{GenerateOnChangedMethodDeclaration($"On{property.Name}Changed", property)}
-        {{
-{GenerateOnChangedMethodCall($"On{property.Name}Changed_BeforeBind", property)}
+        var beforeBindDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_BeforeBind", property);
+        var afterBindDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_AfterBind", property);
+        var onChangedDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed", property);
+        var beforeBindCall = GenerateOnChangedMethodCall($"On{property.Name}Changed_BeforeBind", property);
+        var afterBindCall = GenerateOnChangedMethodCall($"On{property.Name}Changed_AfterBind", property);
 
-            if (oldValue is not default({type}))
-            {{
-{property.BindEvents.Select(@event => $@" 
-                {sender}.{@event} -= On{property.Name}Changed_{@event};
- ").Inject()}
-            }}
-            if (newValue is not default({type}))
-            {{
-{property.BindEvents.Select(@event => $@" 
-                {sender}.{@event} += On{property.Name}Changed_{@event};
- ").Inject()}
-            }}
+        return $$"""
 
-{GenerateOnChangedMethodCall($"On{property.Name}Changed_AfterBind", property)}
-        }}".RemoveBlankLinesWhereOnlyWhitespaces();
+        {{beforeBindDecl}};
+        {{afterBindDecl}};
+
+        {{onChangedDecl}}
+                {
+        {{beforeBindCall}}
+
+                    if (oldValue is not default({{type}}))
+                    {
+        {{unbindEvents}}
+                    }
+                    if (newValue is not default({{type}}))
+                    {
+        {{bindEvents}}
+                    }
+
+        {{afterBindCall}}
+                }
+        """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
+
+    private const string OptionsPrefix = "global::System.Windows.FrameworkPropertyMetadataOptions.";
+
+    private static readonly (Func<DependencyPropertyData, bool> Condition, string Name)[] OptionMappings =
+    [
+        (static p => p.AffectsMeasure, OptionsPrefix + nameof(DependencyPropertyData.AffectsMeasure)),
+        (static p => p.AffectsArrange, OptionsPrefix + nameof(DependencyPropertyData.AffectsArrange)),
+        (static p => p.AffectsParentMeasure, OptionsPrefix + nameof(DependencyPropertyData.AffectsParentMeasure)),
+        (static p => p.AffectsParentArrange, OptionsPrefix + nameof(DependencyPropertyData.AffectsParentArrange)),
+        (static p => p.AffectsRender, OptionsPrefix + nameof(DependencyPropertyData.AffectsRender)),
+        (static p => p.Inherits, OptionsPrefix + nameof(DependencyPropertyData.Inherits)),
+        (static p => p.OverridesInheritanceBehavior, OptionsPrefix + nameof(DependencyPropertyData.OverridesInheritanceBehavior)),
+        (static p => p.NotDataBindable, OptionsPrefix + nameof(DependencyPropertyData.NotDataBindable)),
+        (static p => p.DefaultBindingMode == "TwoWay", OptionsPrefix + "BindsTwoWayByDefault"),
+        (static p => p.Journal, OptionsPrefix + nameof(DependencyPropertyData.Journal)),
+        (static p => p.SubPropertiesDoNotAffectRender, OptionsPrefix + nameof(DependencyPropertyData.SubPropertiesDoNotAffectRender)),
+    ];
 
     private static string GenerateOptions(DependencyPropertyData property)
     {
-        var values = new List<string>();
-        if (property.AffectsMeasure)
+        var values = new List<string>(capacity: OptionMappings.Length);
+        foreach (var (condition, name) in OptionMappings)
         {
-            values.Add(nameof(property.AffectsMeasure));
+            if (condition(property))
+            {
+                values.Add(name);
+            }
         }
 
-        if (property.AffectsArrange)
-        {
-            values.Add(nameof(property.AffectsArrange));
-        }
-
-        if (property.AffectsParentMeasure)
-        {
-            values.Add(nameof(property.AffectsParentMeasure));
-        }
-
-        if (property.AffectsParentArrange)
-        {
-            values.Add(nameof(property.AffectsParentArrange));
-        }
-
-        if (property.AffectsRender)
-        {
-            values.Add(nameof(property.AffectsRender));
-        }
-
-        if (property.Inherits)
-        {
-            values.Add(nameof(property.Inherits));
-        }
-
-        if (property.OverridesInheritanceBehavior)
-        {
-            values.Add(nameof(property.OverridesInheritanceBehavior));
-        }
-
-        if (property.NotDataBindable)
-        {
-            values.Add(nameof(property.NotDataBindable));
-        }
-
-        if (property.DefaultBindingMode == "TwoWay")
-        {
-            values.Add("BindsTwoWayByDefault");
-        }
-
-        if (property.Journal)
-        {
-            values.Add(nameof(property.Journal));
-        }
-
-        if (property.SubPropertiesDoNotAffectRender)
-        {
-            values.Add(nameof(property.SubPropertiesDoNotAffectRender));
-        }
-
-        if (values.Count == 0)
-        {
-            values.Add("None");
-        }
-
-        return string.Join(" | ", values
-            .Select(static value => $"global::System.Windows.FrameworkPropertyMetadataOptions.{value}"));
+        return values.Count == 0
+            ? "global::System.Windows.FrameworkPropertyMetadataOptions.None"
+            : string.Join(" | ", values);
     }
 
     private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
@@ -292,21 +281,11 @@ internal static partial class Sources
                         $"StyledProperty<{GenerateType(property)}>");
         }
 
-        if (property is { IsReadOnly: true, Framework: Framework.Wpf })
-        {
-            return GenerateTypeByPlatform(property.Framework, "DependencyPropertyKey");
-        }
-
-        return GenerateTypeByPlatform(property.Framework, "DependencyProperty");
+        return GenerateTypeByPlatform(property.Framework, property is { IsReadOnly: true, Framework: Framework.Wpf } ? "DependencyPropertyKey" : "DependencyProperty");
     }
     
     private static string GenerateEventArgsType(EventData @event)
     {
-        if (string.IsNullOrWhiteSpace(@event.Type))
-        {
-            return "global::System.EventArgs";
-        }
-
-        return GenerateType(@event);
+        return string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
     }
 }

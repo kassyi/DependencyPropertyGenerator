@@ -26,19 +26,23 @@ internal static partial class Sources
         var body = isProperty
             ? property.Description != null ? $"{SecurityElement.Escape(property.Description)}<br/>" : " "
             : $"Identifies the {name} dependency property.<br/>";
-        value ??= @$"<summary>
-{body}
-Default value: {property.DefaultValueDocumentation?.ExtractSimpleName() ?? $"default({WebUtility.HtmlEncode(property.ShortType)})"}
-</summary>".RemoveBlankLinesWhereOnlyWhitespaces();
+        value ??= $"""
+                   <summary>
+                   {body}
+                   Default value: {property.DefaultValueDocumentation?.ExtractSimpleName() ?? $"default({WebUtility.HtmlEncode(property.ShortType)})"}
+                   </summary>
+                   """.RemoveBlankLinesWhereOnlyWhitespaces();
 
         return GenerateXmlDocumentationFrom(value);
     }
 
     private static string GenerateXmlDocumentationFrom(string? value, EventData @event)
     {
-        value ??= @$"<summary>
-{(@event.Description != null ? $"{@event.Description}" : " ")}
-</summary>".RemoveBlankLinesWhereOnlyWhitespaces();
+        value ??= $"""
+                   <summary>
+                   {(@event.Description != null ? $"{@event.Description}" : " ")}
+                   </summary>
+                   """.RemoveBlankLinesWhereOnlyWhitespaces();
 
         return GenerateXmlDocumentationFrom(value);
     }

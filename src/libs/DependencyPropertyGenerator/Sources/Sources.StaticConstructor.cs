@@ -1,4 +1,4 @@
-﻿using H.Generators.Extensions;
+using H.Generators.Extensions;
 
 namespace H.Generators;
 
@@ -28,49 +28,68 @@ internal static partial class Sources
                 return string.Empty;
             }
 
-            return @$"#nullable enable
+            return $$"""
+                     #nullable enable
 
-namespace {@class.Namespace}
-{{
-    {GenerateModifiers(@class)}partial class {@class.Name}
-    {{
-        static {@class.Name}()
-        {{
-{generatedAffects}
-{generatedProperties}
-{generatedAttachedProperties}
-        }}
-    }}
-}}".RemoveBlankLinesWhereOnlyWhitespaces();
+                     namespace {{@class.Namespace}}
+                     {
+                         {{GenerateModifiers(@class)}}partial class {{@class.Name}}
+                         {
+                             static {{@class.Name}}()
+                             {
+                     {{generatedAffects}}
+                     {{generatedProperties}}
+                     {{generatedAttachedProperties}}
+                             }
+                         }
+                     }
+                     """.RemoveBlankLinesWhereOnlyWhitespaces();
         }
 
         if (@class.Framework == Framework.Wpf)
         {
-            return @$" 
-#nullable enable
+            var readOnlyProperties = properties
+                .Where(static property => property.IsReadOnly)
+                .Select(property => $"""
 
-namespace {@class.Namespace}
-{{
-    {GenerateModifiers(@class)}partial class {@class.Name}
-    {{
-        static {@class.Name}()
-        {{
-{properties.Where(static property => property.IsReadOnly).Select(property => @$"
-            {property.Name}Property.OverrideMetadata(
-                forType: typeof({@class.Type}),
-                {GeneratePropertyMetadata(@class, property)},
-                key: {property.Name}PropertyKey);
-").Inject()}
-{properties.Where(static property => !property.IsReadOnly).Select(property => @$"
-            {property.Name}Property.OverrideMetadata(
-                forType: typeof({@class.Type}),
-                {GeneratePropertyMetadata(@class, property)});
-").Inject()}
-        }}
+                         {property.Name}Property.OverrideMetadata(
+                             forType: typeof({@class.Type}),
+                             {GeneratePropertyMetadata(@class, property)},
+                             key: {property.Name}PropertyKey);
 
-{properties.Select(GenerateOnChangedMethods).Inject()}
-    }}
-}}".RemoveBlankLinesWhereOnlyWhitespaces();
+             """).Inject();
+
+            var readWriteProperties = properties
+                .Where(static property => !property.IsReadOnly)
+                .Select(property => $"""
+
+                         {property.Name}Property.OverrideMetadata(
+                             forType: typeof({@class.Type}),
+                             {GeneratePropertyMetadata(@class, property)});
+
+             """).Inject();
+
+            var onChangedMethods = properties
+                .Select(property => GenerateOnChangedMethods(@class, property))
+                .Inject();
+
+            return $$"""
+                     #nullable enable
+
+                     namespace {{@class.Namespace}}
+                     {
+                         {{GenerateModifiers(@class)}}partial class {{@class.Name}}
+                         {
+                             static {{@class.Name}}()
+                             {
+                     {{readOnlyProperties}}
+                     {{readWriteProperties}}
+                             }
+
+                     {{onChangedMethods}}
+                         }
+                     }
+                     """.RemoveBlankLinesWhereOnlyWhitespaces();
         }
 
         return string.Empty;
@@ -80,52 +99,88 @@ namespace {@class.Namespace}
         ClassData @class,
         DependencyPropertyData property)
     {
-        return @$"
-            {(property.AffectsRender ? $"AffectsRender<{@class.Type}>({property.Name}Property);" : string.Empty)}
-            {(property.AffectsMeasure ? $"AffectsMeasure<{@class.Type}>({property.Name}Property);" : string.Empty)}
-            {(property.AffectsArrange ? $"AffectsArrange<{@class.Type}>({property.Name}Property);" : string.Empty)}
-".RemoveBlankLinesWhereOnlyWhitespaces();
+        return $"""
+
+                            {(property.AffectsRender ? $"AffectsRender<{@class.Type}>({property.Name}Property);" : string.Empty)}
+                            {(property.AffectsMeasure ? $"AffectsMeasure<{@class.Type}>({property.Name}Property);" : string.Empty)}
+                            {(property.AffectsArrange ? $"AffectsArrange<{@class.Type}>({property.Name}Property);" : string.Empty)}
+
+                """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
     
     private static string GenerateAvaloniaStaticConstructorPropertyChanged(
         ClassData @class,
         DependencyPropertyData property)
     {
-        var (name, isChanged0, isChanged1, isChanged2, isChanged3) = CheckOnChangedMethods(@class, property);
+        var (name, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) = CheckOnChangedMethods(@class, property);
         if (!isChanged0 &&
             !isChanged1 &&
             !isChanged2 &&
-            !isChanged3)
+            !isChanged3 &&
+            !isChangedArgs1 &&
+            !isChangedArgs2)
         {
             return string.Empty;
         }
 
         return property.IsAttached
-            ? @$"
-            {property.Name}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{GenerateType(property)}>>(static x =>
-            {{
-                {(isChanged0 ? @$"{name}();" : "")}
-                {(isChanged1 ? @$"{name}(
-                    ({GenerateBrowsableForType(property)})x.Sender);" : "")}
-                {(isChanged2 ? @$"{name}(
-                    ({GenerateBrowsableForType(property)})x.Sender,
-                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());" : "")}
-                {(isChanged3 ? @$"{name}(
-                    ({GenerateBrowsableForType(property)})x.Sender,
-                    ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());" : "")}
-            }}));
-".RemoveBlankLinesWhereOnlyWhitespaces()
-            : @$"
-            {property.Name}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{GenerateType(property)}>>(static x =>
-            {{
-                {(isChanged0 ? @$"(({@class.Type})x.Sender).{name}();" : "")}
-                {(isChanged1 ? @$"(({@class.Type})x.Sender).{name}(
-                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());" : "")}
-                {(isChanged2 ? @$"(({@class.Type})x.Sender).{name}(
-                    ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());" : "")}
-            }}));
-".RemoveBlankLinesWhereOnlyWhitespaces();
+            ? $$"""
+
+                            {{property.Name}}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{{GenerateType(property)}}>>(static x =>
+                            {
+                                {{(isChanged0 ? $"{name}();" : "")}}
+                                {{(isChanged1 ? $"""
+                                                 {name}(
+                                                                     ({GenerateBrowsableForType(property)})x.Sender);
+                                                 """ : "")}}
+                                {{(isChanged2 ? $"""
+                                                 {name}(
+                                                                     ({GenerateBrowsableForType(property)})x.Sender,
+                                                                     ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                                                 """ : "")}}
+                                {{(isChanged3 ? $"""
+                                                 {name}(
+                                                                     ({GenerateBrowsableForType(property)})x.Sender,
+                                                                     ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
+                                                                     ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                                                 """ : "")}}
+                                {{(isChangedArgs1 ? $"""
+                                                     {name}(
+                                                                         x);
+                                                     """ : "")}}
+                                {{(isChangedArgs2 ? $"""
+                                                     {name}(
+                                                                         ({GenerateBrowsableForType(property)})x.Sender,
+                                                                         x);
+                                                     """ : "")}}
+                            }));
+
+                """.RemoveBlankLinesWhereOnlyWhitespaces()
+            : $$"""
+
+                            {{property.Name}}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{{GenerateType(property)}}>>(static x =>
+                            {
+                                {{(isChanged0 ? $"(({@class.Type})x.Sender).{name}();" : "")}}
+                                {{(isChanged1 ? $"""
+                                                 (({@class.Type})x.Sender).{name}(
+                                                                     ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                                                 """ : "")}}
+                                {{(isChanged2 ? $"""
+                                                 (({@class.Type})x.Sender).{name}(
+                                                                     ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
+                                                                     ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                                                 """ : "")}}
+                                {{(isChangedArgs1 ? $"""
+                                                     (({@class.Type})x.Sender).{name}(
+                                                                         x);
+                                                     """ : "")}}
+                                {{(isChangedArgs2 ? $"""
+                                                     {name}(
+                                                                         (({@class.Type})x.Sender),
+                                                                         x);
+                                                     """ : "")}}
+                            }));
+
+                """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 }

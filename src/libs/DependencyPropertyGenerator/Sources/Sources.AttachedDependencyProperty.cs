@@ -1,4 +1,4 @@
-﻿using H.Generators.Extensions;
+using H.Generators.Extensions;
 
 namespace H.Generators;
 
@@ -6,65 +6,103 @@ internal static partial class Sources
 {
     public static string GenerateAttachedDependencyProperty(ClassData @class, DependencyPropertyData property)
     {
-        return @$"
-#nullable enable
+        var modifiers = GenerateModifiers(@class);
+        var xmlDocumentation = GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false);
+        var generatedCodeAttribute = GenerateGeneratedCodeAttribute(@class.Version);
+        var propertyModifier = GeneratePropertyModifier(property);
+        var propertyType = GeneratePropertyType(@class, property);
+        var dependencyPropertyName = GenerateDependencyPropertyName(property);
+        var managerType = GenerateManagerType(@class);
+        var registerMethod = GenerateRegisterMethod(@class, property);
+        var registerAttachedMethodArguments = GenerateRegisterAttachedMethodArguments(@class, property);
 
-namespace {@class.Namespace}
-{{
-    {GenerateModifiers(@class)}partial class {@class.Name}
-    {{
-{GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false)}
-{GenerateGeneratedCodeAttribute(@class.Version)}
-        {GeneratePropertyModifier(property)} static readonly {GeneratePropertyType(@class, property)} {GenerateDependencyPropertyName(property)} =
-            {GenerateManagerType(@class)}.{GenerateRegisterMethod(@class, property)}(
-                {GenerateRegisterAttachedMethodArguments(@class, property)});
+        var additionalPropertyForReadOnlyProperties = GenerateAdditionalPropertyForReadOnlyProperties(property);
+        var setterXmlDocumentation = GenerateXmlDocumentationFrom(property.SetterXmlDocumentation, property, isProperty: true);
+        var categoryAttribute = GenerateCategoryAttribute(property.Category);
+        var descriptionAttribute = GenerateDescriptionAttribute(property.Description);
+        var typeConverterAttribute = GenerateTypeConverterAttribute(property.TypeConverter);
+        var bindableAttribute = GenerateBindableAttribute(property.Bindable);
+        var browsableAttribute = GenerateBrowsableAttribute(property.Browsable);
+        var designerSerializationVisibilityAttribute = GenerateDesignerSerializationVisibilityAttribute(property.DesignerSerializationVisibility);
+        var clsCompliantAttribute = GenerateClsCompliantAttribute(property.ClsCompliant);
+        var localizabilityAttribute = GenerateLocalizabilityAttribute(property.Localizability, @class.Framework);
+        var excludeFromCodeCoverageAttribute = GenerateExcludeFromCodeCoverageAttribute();
+        
+        var setterVisibility = property.IsReadOnly ? "internal" : "public";
+        var browsableForType = GenerateBrowsableForType(property);
+        var type = GenerateType(property);
 
-{GenerateAdditionalPropertyForReadOnlyProperties(property)}
-{GenerateXmlDocumentationFrom(property.SetterXmlDocumentation, property, isProperty: true)}
-{GenerateCategoryAttribute(property.Category)}
-{GenerateDescriptionAttribute(property.Description)}
-{GenerateTypeConverterAttribute(property.TypeConverter)}
-{GenerateBindableAttribute(property.Bindable)}
-{GenerateBrowsableAttribute(property.Browsable)}
-{GenerateDesignerSerializationVisibilityAttribute(property.DesignerSerializationVisibility)}
-{GenerateClsCompliantAttribute(property.ClsCompliant)}
-{GenerateLocalizabilityAttribute(property.Localizability, @class.Framework)}
-{GenerateGeneratedCodeAttribute(@class.Version)}
-{GenerateExcludeFromCodeCoverageAttribute()}
-        {(property.IsReadOnly ? "internal" : "public")} static void Set{property.Name}({GenerateBrowsableForType(property)} element, {GenerateType(property)} value)
-        {{
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+        var getterXmlDocumentation = GenerateXmlDocumentationFrom(property.GetterXmlDocumentation, property, isProperty: true);
+        var browsableForTypeAttribute = GenerateBrowsableForTypeAttribute(property);
 
-            element.SetValue({GenerateDependencyPropertyName(property)}, value);
-        }}
+        var onChangedMethods = GenerateOnChangedMethods(@class, property);
+        var onChangingMethods = GenerateOnChangingMethods(property);
+        var coercePartialMethod = GenerateCoercePartialMethod(property);
+        var validatePartialMethod = GenerateValidatePartialMethod(@class, property);
+        var createDefaultValueCallbackPartialMethod = GenerateCreateDefaultValueCallbackPartialMethod(property);
+        var bindEventMethod = GenerateBindEventMethod(property);
 
-{GenerateXmlDocumentationFrom(property.GetterXmlDocumentation, property, isProperty: true)}
-{GenerateCategoryAttribute(property.Category)}
-{GenerateDescriptionAttribute(property.Description)}
-{GenerateTypeConverterAttribute(property.TypeConverter)}
-{GenerateBindableAttribute(property.Bindable)}
-{GenerateBrowsableAttribute(property.Browsable)}
-{GenerateDesignerSerializationVisibilityAttribute(property.DesignerSerializationVisibility)}
-{GenerateBrowsableForTypeAttribute(property)}
-{GenerateClsCompliantAttribute(property.ClsCompliant)}
-{GenerateLocalizabilityAttribute(property.Localizability, @class.Framework)}
-{GenerateGeneratedCodeAttribute(@class.Version)}
-{GenerateExcludeFromCodeCoverageAttribute()}
-        public static {GenerateType(property)} Get{property.Name}({GenerateBrowsableForType(property)} element)
-        {{
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+        return $$"""
 
-            return ({GenerateType(property)})element.GetValue({property.Name}Property);
-        }}
+            #nullable enable
 
-{GenerateOnChangedMethods(property)}
-{GenerateOnChangingMethods(property)}
-{GenerateCoercePartialMethod(property)}
-{GenerateValidatePartialMethod(@class, property)}
-{GenerateCreateDefaultValueCallbackPartialMethod(property)}
-{GenerateBindEventMethod(property)}
-    }}
-}}".RemoveBlankLinesWhereOnlyWhitespaces();
+            namespace {{@class.Namespace}}
+            {
+                {{modifiers}}partial class {{@class.Name}}
+                {
+            {{xmlDocumentation}}
+            {{generatedCodeAttribute}}
+                    {{propertyModifier}} static readonly {{propertyType}} {{dependencyPropertyName}} =
+                        {{managerType}}.{{registerMethod}}(
+                            {{registerAttachedMethodArguments}});
+
+            {{additionalPropertyForReadOnlyProperties}}
+            {{setterXmlDocumentation}}
+            {{categoryAttribute}}
+            {{descriptionAttribute}}
+            {{typeConverterAttribute}}
+            {{bindableAttribute}}
+            {{browsableAttribute}}
+            {{designerSerializationVisibilityAttribute}}
+            {{clsCompliantAttribute}}
+            {{localizabilityAttribute}}
+            {{generatedCodeAttribute}}
+            {{excludeFromCodeCoverageAttribute}}
+                    {{setterVisibility}} static void Set{{property.Name}}({{browsableForType}} element, {{type}} value)
+                    {
+                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+
+                        element.SetValue({{dependencyPropertyName}}, value);
+                    }
+
+            {{getterXmlDocumentation}}
+            {{categoryAttribute}}
+            {{descriptionAttribute}}
+            {{typeConverterAttribute}}
+            {{bindableAttribute}}
+            {{browsableAttribute}}
+            {{designerSerializationVisibilityAttribute}}
+            {{browsableForTypeAttribute}}
+            {{clsCompliantAttribute}}
+            {{localizabilityAttribute}}
+            {{generatedCodeAttribute}}
+            {{excludeFromCodeCoverageAttribute}}
+                    public static {{type}} Get{{property.Name}}({{browsableForType}} element)
+                    {
+                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+
+                        return ({{type}})element.GetValue({{property.Name}}Property);
+                    }
+
+            {{onChangedMethods}}
+            {{onChangingMethods}}
+            {{coercePartialMethod}}
+            {{validatePartialMethod}}
+            {{createDefaultValueCallbackPartialMethod}}
+            {{bindEventMethod}}
+                }
+            }
+            """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
     
     private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)
@@ -81,19 +119,23 @@ namespace {@class.Namespace}
 
         if (@class.Framework == Framework.Wpf)
         {
-            return @$"
-                name: ""{property.Name}"",
-                propertyType: typeof({property.Type}),
-                ownerType: typeof({@class.Type}),
-                {GeneratePropertyMetadata(@class, property)},
-                validateValueCallback: {GenerateValidateValueCallback(@class, property)}";
+            return $"""
+
+                                    name: "{property.Name}",
+                                    propertyType: typeof({property.Type}),
+                                    ownerType: typeof({@class.Type}),
+                                    {GeneratePropertyMetadata(@class, property)},
+                                    validateValueCallback: {GenerateValidateValueCallback(@class, property)}
+                    """;
         }
 
-        return @$"
-                name: ""{property.Name}"",
-                propertyType: typeof({property.Type}),
-                ownerType: typeof({@class.Type}),
-                {GeneratePropertyMetadata(@class, property)}";
+        return $"""
+
+                                name: "{property.Name}",
+                                propertyType: typeof({property.Type}),
+                                ownerType: typeof({@class.Type}),
+                                {GeneratePropertyMetadata(@class, property)}
+                """;
     }
 
     private static string GenerateModifiers(ClassData @class)

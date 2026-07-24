@@ -8,22 +8,23 @@ internal static partial class Sources
     {
         if (@class.Framework == Framework.Avalonia)
         {
-            if (property.IsDirect)
-            {
-                return @$"
-            {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
-                {GenerateAvaloniaRegisterMethodArguments(@class, property)});";
-            }
+            return property.IsDirect ? $"""
 
-            return @$"
-            {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
-                {GeneratePropertyMetadata(@class, property)});";
+                                                    {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
+                                                        {GenerateAvaloniaRegisterMethodArguments(@class, property)});
+                                        """ : $"""
+
+                                                           {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
+                                                               {GeneratePropertyMetadata(@class, property)});
+                                               """;
         }
 
-        return @$"
-            {property.FromType}.{property.Name}Property.AddOwner(
-                ownerType: typeof({@class.Type}),
-                {GeneratePropertyMetadata(@class, property)});
-    ".RemoveBlankLinesWhereOnlyWhitespaces();
+        return $"""
+
+                            {property.FromType}.{property.Name}Property.AddOwner(
+                                ownerType: typeof({@class.Type}),
+                                {GeneratePropertyMetadata(@class, property)});
+                    
+                """.RemoveBlankLinesWhereOnlyWhitespaces();
     }
 }
