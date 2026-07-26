@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -60,7 +60,7 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
 
         var classData = classSymbol.GetClassData(framework, version);
         var overrideMetadata = attributes
-            .Select(attribute => attribute.GetDependencyPropertyData(framework, version))
+            .Select(attribute => attribute.GetDependencyPropertyData(framework, version, classSymbol))
             .ToImmutableArray()
             .AsEquatableArray();
 

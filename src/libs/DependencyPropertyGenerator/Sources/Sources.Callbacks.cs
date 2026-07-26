@@ -283,77 +283,6 @@ internal static partial class Sources
                 """;
     }
 
-    private static bool IsMethodExists(ClassData @class, string signature)
-    {
-        return @class.Methods.Contains($"{@class.FullName}.{signature}");
-    }
-
-    private static bool IsEventArgsType(string typeName)
-    {
-        return typeName.EndsWith("EventArgs", StringComparison.Ordinal) ||
-               typeName.EndsWith("EventArgs>", StringComparison.Ordinal) ||
-               typeName.Contains("DependencyPropertyChangedEventArgs") ||
-               typeName.Contains("ValueChangedEventArgs");
-    }
-    
-    private static (bool IsChanged0, bool IsChanged1, bool IsChanged2, bool IsChanged3, bool IsChangedArgs1, bool IsChangedArgs2) CheckMethods(
-        string name,
-        ClassData @class,
-        DependencyPropertyData property)
-    {
-        var type = GenerateType(property)
-            .Replace("global::", string.Empty)
-            .Replace("?", string.Empty);
-        var senderType = (property.IsAttached
-                ? GenerateBrowsableForType(property)
-                : @class.Type)
-            .Replace("global::", string.Empty);
-
-        var isChanged0 =
-            IsMethodExists(@class, $"{name}()");
-        var isChanged1 =
-            IsMethodExists(@class, $"{name}({type})") ||
-            IsMethodExists(@class, $"{name}({senderType})");
-        var isChanged2 =
-            IsMethodExists(@class, $"{name}({type}, {type})") ||
-            IsMethodExists(@class, $"{name}({senderType}, {type})");
-        var isChanged3 =
-            IsMethodExists(@class, $"{name}({senderType}, {type}, {type})");
-
-        var prefix = $"{@class.FullName}.{name}(";
-        var isChangedArgs1 = false;
-        var isChangedArgs2 = false;
-
-        foreach (var method in @class.Methods)
-        {
-            if (!method.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            var parametersStr = method.Substring(prefix.Length).TrimEnd(')');
-            if (string.IsNullOrWhiteSpace(parametersStr))
-            {
-                continue;
-            }
-
-            var parameters = parametersStr.Split([','], StringSplitOptions.RemoveEmptyEntries)
-                .Select(static s => s.Trim())
-                .ToArray();
-
-            if (parameters.Length == 1 && IsEventArgsType(parameters[0]))
-            {
-                isChangedArgs1 = true;
-            }
-            else if (parameters.Length == 2 && IsEventArgsType(parameters[1]))
-            {
-                isChangedArgs2 = true;
-            }
-        }
-
-        return (isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2);
-    }
-    
     private static (string Name, bool IsChanged0, bool IsChanged1, bool IsChanged2, bool IsChanged3, bool IsChangedArgs1, bool IsChangedArgs2)
         CheckOnChangedMethods(
             ClassData @class,
@@ -364,21 +293,15 @@ internal static partial class Sources
             ? property.OnChanged
             : $"On{property.Name}Changed";
 
-        var (isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) = CheckMethods(name, @class, property);
-        isChanged2 |= !isCustom && property is { IsAttached: false, BindEvents.IsEmpty: false };
-        isChanged3 |= !isCustom && property is { IsAttached: true, BindEvents.IsEmpty: false };
-
-        return (name, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2);
+        return (name, property.IsChanged0, property.IsChanged1, property.IsChanged2, property.IsChanged3, property.IsChangedArgs1, property.IsChangedArgs2);
     }
 
     private static string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
     {
-        var (isChanging0, isChanging1, isChanging2, isChanging3, _, _) =
-            CheckMethods($"On{property.Name}Changing", @class, property);
-        if (!isChanging0 &&
-            !isChanging1 &&
-            !isChanging2 &&
-            !isChanging3)
+        if (!property.IsChanging0 &&
+            !property.IsChanging1 &&
+            !property.IsChanging2 &&
+            !property.IsChanging3)
         {
             return "null";
         }
@@ -392,17 +315,17 @@ internal static partial class Sources
                 ? $$"""
                     static (sender, oldValue, newValue) =>
                                     {
-                                        {{(isChanging0 ? @$"On{property.Name}Changing();" : "")}}
-                                        {{(isChanging1 ? $"""
+                                        {{(property.IsChanging0 ? @$"On{property.Name}Changing();" : "")}}
+                                        {{(property.IsChanging1 ? $"""
                                                           On{property.Name}Changing(
                                                                                   ({senderType})sender);
                                                           """ : "")}}
-                                        {{(isChanging2 ? $"""
+                                        {{(property.IsChanging2 ? $"""
                                                           On{property.Name}Changing(
                                                                                   ({senderType})sender,
                                                                                   ({GenerateType(property)})newValue);
                                                           """ : "")}}
-                                        {{(isChanging3 ? $"""
+                                        {{(property.IsChanging3 ? $"""
                                                           On{property.Name}Changing(
                                                                                   ({senderType})sender,
                                                                                   ({GenerateType(property)})oldValue,
@@ -413,12 +336,12 @@ internal static partial class Sources
                 : $$"""
                     static (sender, oldValue, newValue) =>
                                     {
-                                        {{(isChanging0 ? @$"(({senderType})sender).On{property.Name}Changing();" : "")}}
-                                        {{(isChanging1 ? $"""
+                                        {{(property.IsChanging0 ? @$"(({senderType})sender).On{property.Name}Changing();" : "")}}
+                                        {{(property.IsChanging1 ? $"""
                                                           (({senderType})sender).On{property.Name}Changing(
                                                                                   ({GenerateType(property)})newValue);
                                                           """ : "")}}
-                                        {{(isChanging2 ? $"""
+                                        {{(property.IsChanging2 ? $"""
                                                           (({senderType})sender).On{property.Name}Changing(
                                                                                   ({GenerateType(property)})oldValue,
                                                                                   ({GenerateType(property)})newValue);
@@ -431,17 +354,17 @@ internal static partial class Sources
             ? $$"""
                 static (sender, args) =>
                                     {
-                                        {{(isChanging0 ? @$"On{property.Name}Changing();" : "")}}
-                                        {{(isChanging1 ? $"""
+                                        {{(property.IsChanging0 ? @$"On{property.Name}Changing();" : "")}}
+                                        {{(property.IsChanging1 ? $"""
                                                           On{property.Name}Changing(
                                                                                       ({senderType})sender);
                                                           """ : "")}}
-                                        {{(isChanging2 ? $"""
+                                        {{(property.IsChanging2 ? $"""
                                                           On{property.Name}Changing(
                                                                                       ({senderType})sender,
                                                                                       ({GenerateType(property)})args.NewValue);
                                                           """ : "")}}
-                                        {{(isChanging3 ? $"""
+                                        {{(property.IsChanging3 ? $"""
                                                           On{property.Name}Changing(
                                                                                       ({senderType})sender,
                                                                                       ({GenerateType(property)})args.OldValue,
@@ -452,12 +375,12 @@ internal static partial class Sources
             : $$"""
                 static (sender, args) =>
                                     {
-                                        {{(isChanging0 ? @$"(({senderType})sender).On{property.Name}Changing();" : "")}}
-                                        {{(isChanging1 ? $"""
+                                        {{(property.IsChanging0 ? @$"(({senderType})sender).On{property.Name}Changing();" : "")}}
+                                        {{(property.IsChanging1 ? $"""
                                                           (({senderType})sender).On{property.Name}Changing(
                                                                                       ({GenerateType(property)})args.NewValue);
                                                           """ : "")}}
-                                        {{(isChanging2 ? $"""
+                                        {{(property.IsChanging2 ? $"""
                                                           (({senderType})sender).On{property.Name}Changing(
                                                                                       ({GenerateType(property)})args.OldValue,
                                                                                       ({GenerateType(property)})args.NewValue);

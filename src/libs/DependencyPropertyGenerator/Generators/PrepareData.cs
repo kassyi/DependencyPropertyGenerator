@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using DependencyPropertyGenerator;
 using H.Generators.Extensions;
@@ -13,6 +13,7 @@ public static class PrepareData
         this AttributeData attribute,
         Framework framework,
         string version,
+        INamedTypeSymbol? classSymbol = null,
         AttributeSyntax? attributeSyntax = null,
         bool isAddOwner = false,
         bool isAttached = false)
@@ -103,6 +104,38 @@ public static class PrepareData
         var createDefaultValueCallback = attribute
             .GetNamedArgument(nameof(DependencyPropertyAttribute.CreateDefaultValueCallback)).ToBoolean();
 
+        var isCustomOnChanged = !string.IsNullOrWhiteSpace(onChanged);
+        var onChangedName = isCustomOnChanged ? onChanged! : $"On{name}Changed";
+        var onChangingName = $"On{name}Changing";
+
+        var targetType = type.Replace("global::", string.Empty).Replace("?", string.Empty);
+        var targetSenderType = classSymbol != null
+            ? (isAttached
+                ? (browsableForType ?? GenerateDependencyObjectType(framework))
+                : classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+                .Replace("global::", string.Empty).Replace("?", string.Empty)
+            : string.Empty;
+
+        var (c0, c1, c2, c3, ca1, ca2) = classSymbol != null
+            ? CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
+            : (false, false, false, false, false, false);
+
+        var (ch0, ch1, ch2, ch3, _, _) = classSymbol != null
+            ? CheckMethodsDirectly(classSymbol, onChangingName, targetType, targetSenderType)
+            : (false, false, false, false, false, false);
+
+        var bindEventsArray = (bindEvent != null
+            ? new[] { bindEvent }
+            : bindEvents.Kind == TypedConstantKind.Array
+                ? bindEvents.Values
+                    .Select(static value => value.Value?.ToString() ?? string.Empty)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .ToArray()
+                : Array.Empty<string>()).ToImmutableArray().AsEquatableArray();
+
+        c2 |= !isCustomOnChanged && !isAttached && !bindEventsArray.IsEmpty;
+        c3 |= !isCustomOnChanged && isAttached && !bindEventsArray.IsEmpty;
+
         return new DependencyPropertyData(
             Name: name,
             Type: type,
@@ -130,14 +163,7 @@ public static class PrepareData
             XmlDocumentation: xmlDocumentation,
             GetterXmlDocumentation: getterXmlDocumentation ?? propertyXmlDocumentation,
             SetterXmlDocumentation: setterXmlDocumentation,
-            BindEvents: (bindEvent != null
-                ? new[] { bindEvent }
-                : bindEvents.Kind == TypedConstantKind.Array
-                    ? bindEvents.Values
-                        .Select(static value => value.Value?.ToString() ?? string.Empty)
-                        .Where(value => !string.IsNullOrWhiteSpace(value))
-                        .ToArray()
-                    : Array.Empty<string>()).ToImmutableArray().AsEquatableArray(),
+            BindEvents: bindEventsArray,
             OnChanged: onChanged ?? string.Empty,
             AffectsMeasure: affectsMeasure,
             AffectsArrange: affectsArrange,
@@ -155,8 +181,65 @@ public static class PrepareData
             EnableDataValidation: enableDataValidation,
             Coerce: coerce,
             Validate: validate,
-            CreateDefaultValueCallback: createDefaultValueCallback);
+            CreateDefaultValueCallback: createDefaultValueCallback,
+            IsChanged0: c0,
+            IsChanged1: c1,
+            IsChanged2: c2,
+            IsChanged3: c3,
+            IsChangedArgs1: ca1,
+            IsChangedArgs2: ca2,
+            IsChanging0: ch0,
+            IsChanging1: ch1,
+            IsChanging2: ch2,
+            IsChanging3: ch3);
     }
+
+    private static (bool, bool, bool, bool, bool, bool) CheckMethodsDirectly(
+        INamedTypeSymbol classSymbol, string methodName, string targetType, string senderType)
+    {
+        bool has0 = false, has1 = false, has2 = false, has3 = false, hasArgs1 = false, hasArgs2 = false;
+
+        foreach (var member in classSymbol.GetMembers(methodName))
+        {
+            if (member is not IMethodSymbol method) continue;
+            var p = method.Parameters;
+            if (p.Length == 0) has0 = true;
+            else if (p.Length == 1)
+            {
+                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                if (p0 == targetType || p0 == senderType) has1 = true;
+                if (IsEventArgsType(p[0].Type.Name)) hasArgs1 = true;
+            }
+            else if (p.Length == 2)
+            {
+                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                var p1 = p[1].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                if ((p0 == targetType && p1 == targetType) || (p0 == senderType && p1 == targetType)) has2 = true;
+                if (IsEventArgsType(p[1].Type.Name)) hasArgs2 = true;
+            }
+            else if (p.Length == 3)
+            {
+                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                var p1 = p[1].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                var p2 = p[2].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
+                if (p0 == senderType && p1 == targetType && p2 == targetType) has3 = true;
+            }
+        }
+        return (has0, has1, has2, has3, hasArgs1, hasArgs2);
+    }
+
+    private static bool IsEventArgsType(string typeName) =>
+        typeName.EndsWith("EventArgs", StringComparison.Ordinal) ||
+        typeName.EndsWith("EventArgs>", StringComparison.Ordinal) ||
+        typeName.Contains("DependencyPropertyChangedEventArgs") ||
+        typeName.Contains("ValueChangedEventArgs");
+
+    private static string GenerateDependencyObjectType(Framework framework) =>
+        framework == Framework.Maui ? "Microsoft.Maui.Controls.BindableObject" :
+        framework == Framework.Avalonia ? "Avalonia.AvaloniaObject" :
+        framework == Framework.Wpf ? "System.Windows.DependencyObject" :
+        framework == Framework.Uwp || framework == Framework.Uno ? "Windows.UI.Xaml.DependencyObject" :
+        "Microsoft.UI.Xaml.DependencyObject";
 
     public static EventData GetEventData(this AttributeData attribute, bool isStaticClass)
     {
@@ -212,28 +295,16 @@ public static class PrepareData
         var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
         var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
-        var isStaticClass = classSymbol.IsStatic;
-        var classModifiers = classSymbol.IsStatic ? "public static " : string.Empty;
-        var methods = classSymbol
-            .GetMembers()
-            .OfType<IMethodSymbol>()
-            // Roslyn bug?
-            //.Where(static value => value.PartialImplementationPart != null)
-            .Select(static value => value.ToDisplayString()
-                .Replace("?", string.Empty)
-                .TrimStart('.'))
-            .ToArray();
 
         return new ClassData(
             Namespace: @namespace,
             Name: className,
             FullName: fullClassName,
             Type: type,
-            Modifiers: classModifiers,
+            Modifiers: classSymbol.IsStatic ? "public static " : string.Empty,
             Version: version,
-            IsStatic: isStaticClass,
-            Framework: framework,
-            Methods: methods.ToImmutableArray().AsEquatableArray());
+            IsStatic: classSymbol.IsStatic,
+            Framework: framework);
     }
 
     private static bool? IsSpecialType(this ITypeSymbol? symbol)
@@ -266,7 +337,7 @@ public static class PrepareData
             .Expression
             .ToFullString();
     }
-    
+
     private static string RemoveNameof(this string value)
     {
         value = value ?? throw new ArgumentNullException(nameof(value));
@@ -288,11 +359,11 @@ public static class PrepareData
             .FirstOrDefault(
                 x => x.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"').RemoveNameof() == name);
     }
-    
+
     public static ITypeSymbol? GetGenericTypeArgumentOrNamed(this AttributeData attribute, int position, string name)
     {
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
-        
+
         return attribute.GetGenericTypeArgument(position) ??
                attribute.GetNamedArgument(name).Value as ITypeSymbol;
     }

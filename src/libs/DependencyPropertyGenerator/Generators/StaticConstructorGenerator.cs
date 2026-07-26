@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -77,12 +77,17 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: true), context, Id)
             .WhereNotNull()
             .CollectAsEquatableArray();
-        // A type can have only one static constructor, so combined all four attributes.
-        // Is there a better performance way?
-        dp1.Combine(dp2.Combine(adp1.Combine(adp2.Combine(adp3)))).Select((x, _) =>
-        {
-            return x.Left.AsImmutableArray().AddRange(x.Right.Left).AddRange(x.Right.Right.Left).AddRange(x.Right.Right.Right.Left).AddRange(x.Right.Right.Right.Right).AsEquatableArray();
-        }).SelectAndReportExceptions(GetSourceCode, context, Id)
+
+        dp1
+            .Combine(dp2)
+            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
+            .Combine(adp1)
+            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
+            .Combine(adp2)
+            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
+            .Combine(adp3)
+            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
+            .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
     }
 
@@ -97,9 +102,9 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         {
             return null;
         }
-        
+
         var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version, isAttached: isAttached);
+        var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version, classSymbol, isAttached: isAttached);
 
         return (classData, dependencyPropertyData);
     }
@@ -112,23 +117,25 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             return ImmutableArray<FileWithName>.Empty.AsEquatableArray();
         }
 
-        return values.Where(x => x.Class.Framework is Framework.Avalonia).GroupBy(x => x.Class, x => x.DependencyProperty).Select(a =>
-        {
-            var text = Sources.GenerateStaticConstructor(
-                a.Key,
-                a.Where(static property => !property.IsDirect)
-                    .ToArray());
-            if (!string.IsNullOrWhiteSpace(text))
+        return values
+            .Where(static x => x.Class.Framework is Framework.Avalonia)
+            .GroupBy(static x => x.Class, static x => x.DependencyProperty)
+            .Select(static g =>
             {
-                return new FileWithName(
-                    Name: $"{a.Key.FullName}.StaticConstructor.g.cs",
-                    Text: text);
-            }
-            else
-            {
+                var text = Sources.GenerateStaticConstructor(
+                    g.Key,
+                    g.Where(static property => !property.IsDirect).ToArray());
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    return new FileWithName(
+                        Name: $"{g.Key.FullName}.StaticConstructor.g.cs",
+                        Text: text);
+                }
                 return FileWithName.Empty;
-            }
-        }).ToImmutableArray().AsEquatableArray();
+            })
+            .Where(static f => !string.IsNullOrWhiteSpace(f.Text))
+            .ToImmutableArray()
+            .AsEquatableArray();
     }
 
     #endregion

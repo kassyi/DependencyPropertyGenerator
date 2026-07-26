@@ -1,4 +1,4 @@
-﻿using H.Generators.Extensions;
+using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace H.Generators;
@@ -59,7 +59,7 @@ public class DependencyPropertyGenerator : IIncrementalGenerator
         
         var classData = classSymbol.GetClassData(framework, version);
         var dependencyPropertyData =
-            attribute.GetDependencyPropertyData(framework, version, classSyntax.TryFindAttributeSyntax(attribute));
+            attribute.GetDependencyPropertyData(framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute));
 
         return (classData, dependencyPropertyData);
     }
