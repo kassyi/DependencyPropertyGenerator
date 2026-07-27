@@ -19,6 +19,58 @@
   - 展開後: `new global::MyNamespace.MyProfile(1.5, 48.0)`
 - これにより、他の名前空間にある型をデフォルト値としてインスタンス化する際にも、属性の文字列内で手動で冗長な完全修飾名を書く必要がなくなり、コードの保守性と視認性が向上します。
 
+### コールバックメソッド (`OnChanged` / `OnChanging`) の解決規則と制約
+
+#### 1. サポートされるシグネチャ（最大3引数）
+プロパティ変更時にフレームワークから渡される情報は最大3つ（`sender`, `oldValue`, `newValue` または `EventArgs`）のため、以下のシグネチャのみサポートされます。
+
+```csharp
+// ✅ 0引数
+partial void OnTextChanged();
+
+// ✅ 1引数 (新値 または EventArgs)
+partial void OnTextChanged(string newValue);
+partial void OnTextChanged(DependencyPropertyChangedEventArgs e);
+
+// ✅ 2引数 (旧値・新値 / sender・新値 / sender・EventArgs)
+partial void OnTextChanged(string oldValue, string newValue);
+partial void OnTextChanged(MyControl sender, string newValue);
+partial void OnTextChanged(MyControl sender, DependencyPropertyChangedEventArgs e);
+
+// ✅ 3引数 (sender・旧値・新値)
+partial void OnTextChanged(MyControl sender, string oldValue, string newValue);
+
+// ❌ 4引数以上はサポート外 (渡せるデータが存在しないため無視される)
+void OnTextChanged(MyControl sender, string oldValue, string newValue, object extra);
+```
+
+#### 2. エラー判定と挙動の差異
+
+```csharp
+// ----------------------------------------------------------------------------
+// 方式 A: [DependencyProperty] の OnChanged パラメータで明示指定する場合
+// ----------------------------------------------------------------------------
+[DependencyProperty<string>("Text", OnChanged = nameof(OnTextChanged))]
+public partial class MyControl : UserControl
+{
+    // 🚨 未対応のシグネチャ（例: 4引数など）や未定義の場合:
+    // ジェネレーターが #error DPG0001 を出力し、明示的にコンパイルエラー（ビルド停止）を報告する
+    private void OnTextChanged(MyControl sender, string oldValue, string newValue, object extra) { }
+}
+
+// ----------------------------------------------------------------------------
+// 方式 B: 属性指定なしで partial void On...Changed() の自動一致に頼る場合
+// ----------------------------------------------------------------------------
+[DependencyProperty<string>("Text")]
+public partial class MyControl : UserControl
+{
+    // ⚠️ 未対応のシグネチャ（例: 4引数や (DependencyObject, DependencyPropertyChangedEventArgs)）の場合:
+    // 無関係なプライベートメソッドとして無視され、propertyChangedCallback: null が生成される。
+    // 💡 サイレント無視を防ぐため、重要な処理は 方式 A (OnChanged = nameof(...)) での明示指定を推奨。
+    private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
+}
+```
+
 ---
 
 ## Ⅱ. パフォーマンス最適化ルール (Dos & Don'ts)
