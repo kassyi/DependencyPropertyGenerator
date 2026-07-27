@@ -13,6 +13,12 @@
   - プロパティ変更時のコールバックメソッドの実装 (`propertyChangedCallback`)
   - XMLドキュメントコメント
 
+### デフォルト値式 (`DefaultValueExpression`) の自動補完ルール
+- `[DependencyProperty<T>("Name", DefaultValueExpression = "...")]` において、`DefaultValueExpression` に指定された文字列が `new(...)` または `new (...)`（C# 9.0+ の target-typed `new` 構文）で始まる場合、ジェネレーター抽出処理（`PrepareData`）時にプロパティの型 `T` の完全修飾型名（`global::...`）へと自動的に置換・展開します。
+  - 入力例: `[DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]`
+  - 展開後: `new global::MyNamespace.MyProfile(1.5, 48.0)`
+- これにより、他の名前空間にある型をデフォルト値としてインスタンス化する際にも、属性の文字列内で手動で冗長な完全修飾名を書く必要がなくなり、コードの保守性と視認性が向上します。
+
 ---
 
 ## Ⅱ. パフォーマンス最適化ルール (Dos & Don'ts)
