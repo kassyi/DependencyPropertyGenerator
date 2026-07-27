@@ -57,27 +57,43 @@ public partial class Tests
 
     [TestMethod]
     [DataRow(Framework.Wpf)]
+    public Task TargetTypedNewDefaultValueExpression(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            public record struct MyProfile(double A, double B);
+
+            [DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
     [DataRow(Framework.Maui)]
     [DataRow(Framework.Avalonia)]
     public Task Attributes(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.ComponentModel") +
-                                                             """
+        return CheckSourceAsync<DependencyPropertyGenerator>(
+            GetHeader(framework, "Controls", "System.ComponentModel") +
+                    """
 
-                                                             [DependencyProperty<string>("AttributedProperty",
-                                                                 Category = "Category",
-                                                                 Description = "Description",
-                                                                 TypeConverter = typeof(EnumConverter),
-                                                                 Bindable = true,
-                                                                 DesignerSerializationVisibility = DesignerSerializationVisibility.Hidden,
-                                                                 ClsCompliant = false,
-                                                                 Localizability = Localizability.Text)]
-                                                             public partial class MyControl : UserControl
-                                                             {
-                                                             }
-                                                             """, framework);
+                    [DependencyProperty<string>("AttributedProperty",
+                        Category = "Category",
+                        Description = "Description",
+                        TypeConverter = typeof(EnumConverter),
+                        Bindable = true,
+                        DesignerSerializationVisibility = DesignerSerializationVisibility.Hidden,
+                        ClsCompliant = false,
+                        Localizability = Localizability.Text)]
+                    public partial class MyControl : UserControl
+                    {
+                    }
+                    """, framework);
     }
 
     [TestMethod]
@@ -181,19 +197,21 @@ public partial class Tests
                       return value ?? string.Empty;
                   }
 
-              {{(framework == Framework.Maui ? """
+              {{(framework == Framework.Maui ?
+                """
 
-                                                   private static partial bool IsNotNullStringPropertyValid(MyControl sender, string? value)
-                                                   {
-                                                       return value != null;
-                                                   }
-                                               """ : """
+                    private static partial bool IsNotNullStringPropertyValid(MyControl sender, string? value)
+                    {
+                        return value != null;
+                    }
+                """ :
+                """
 
-                                                         private static partial bool IsNotNullStringPropertyValid(string? value)
-                                                         {
-                                                             return value != null;
-                                                         }
-                                                     """)}}
+                    private static partial bool IsNotNullStringPropertyValid(string? value)
+                    {
+                        return value != null;
+                    }
+                """)}}
               }
               """, framework);
     }
