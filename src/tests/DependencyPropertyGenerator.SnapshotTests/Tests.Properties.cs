@@ -64,6 +64,23 @@ public partial class Tests
             public record struct MyProfile(double A, double B);
 
             [DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]
+            [DependencyProperty<MyProfile?>("NullableProfile", DefaultValueExpression = "new      (1.5, 48.0)")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task InvalidDefaultValueExpression(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            public record struct MyProfile(double A, double B);
+
+            [DependencyProperty<MyProfile>("BrokenProfile1", DefaultValueExpression = "new(1.5, 48.0")]
+            [DependencyProperty<MyProfile>("BrokenProfile2", DefaultValueExpression = "new(???")]
             public partial class MyControl : UserControl
             {
             }

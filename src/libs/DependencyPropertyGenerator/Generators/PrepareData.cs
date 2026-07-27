@@ -3,6 +3,7 @@ using System.ComponentModel;
 using DependencyPropertyGenerator;
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace H.Generators;
@@ -128,7 +129,7 @@ public static class PrepareData
             : (false, false, false, false, false, false);
 
         var bindEventsArray = (bindEvent != null
-            ? new[] { bindEvent }
+            ? [bindEvent]
             : bindEvents.Kind == TypedConstantKind.Array
                 ? bindEvents.Values
                     .Select(static value => value.Value?.ToString() ?? string.Empty)
@@ -197,7 +198,7 @@ public static class PrepareData
             IsChanging3: ch3);
     }
 
-    private static (bool, bool, bool, bool, bool, bool) CheckMethodsDirectly(
+    private static (bool Has0, bool Has1, bool Has2, bool Has3, bool HasArgs1, bool HasArgs2) CheckMethodsDirectly(
         INamedTypeSymbol classSymbol, string methodName, string targetType, string senderType)
     {
         bool has0 = false, has1 = false, has2 = false, has3 = false, hasArgs1 = false, hasArgs2 = false;
@@ -205,31 +206,43 @@ public static class PrepareData
         foreach (var member in classSymbol.GetMembers(methodName))
         {
             if (member is not IMethodSymbol method) continue;
+
             var p = method.Parameters;
-            if (p.Length == 0) has0 = true;
-            else if (p.Length == 1)
+            switch (p.Length)
             {
-                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                if (p0 == targetType || p0 == senderType) has1 = true;
-                if (IsEventArgsType(p[0].Type.Name)) hasArgs1 = true;
-            }
-            else if (p.Length == 2)
-            {
-                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                var p1 = p[1].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                if ((p0 == targetType && p1 == targetType) || (p0 == senderType && p1 == targetType)) has2 = true;
-                if (IsEventArgsType(p[1].Type.Name)) hasArgs2 = true;
-            }
-            else if (p.Length == 3)
-            {
-                var p0 = p[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                var p1 = p[1].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                var p2 = p[2].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", string.Empty).Replace("?", string.Empty);
-                if (p0 == senderType && p1 == targetType && p2 == targetType) has3 = true;
+                case 0:
+                    has0 = true;
+                    break;
+
+                case 1:
+                    var type0 = GetNormalizedTypeName(p[0].Type);
+                    if (type0 == targetType || type0 == senderType) has1 = true;
+                    if (IsEventArgsType(p[0].Type.Name)) hasArgs1 = true;
+                    break;
+
+                case 2:
+                    var type0_2 = GetNormalizedTypeName(p[0].Type);
+                    var type1_2 = GetNormalizedTypeName(p[1].Type);
+                    if ((type0_2 == targetType && type1_2 == targetType) || (type0_2 == senderType && type1_2 == targetType)) has2 = true;
+                    if (IsEventArgsType(p[1].Type.Name)) hasArgs2 = true;
+                    break;
+
+                case 3:
+                    var type0_3 = GetNormalizedTypeName(p[0].Type);
+                    var type1_3 = GetNormalizedTypeName(p[1].Type);
+                    var type2_3 = GetNormalizedTypeName(p[2].Type);
+                    if (type0_3 == senderType && type1_3 == targetType && type2_3 == targetType) has3 = true;
+                    break;
             }
         }
+
         return (has0, has1, has2, has3, hasArgs1, hasArgs2);
     }
+
+    private static string GetNormalizedTypeName(ITypeSymbol typeSymbol) =>
+        typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            .Replace("global::", string.Empty)
+            .TrimEnd('?');
 
     private static bool IsEventArgsType(string typeName) =>
         typeName.EndsWith("EventArgs", StringComparison.Ordinal) ||
@@ -373,22 +386,25 @@ public static class PrepareData
 
     private static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
     {
-        if (string.IsNullOrWhiteSpace(defaultValue) || typeSymbol == null)
+        if (typeSymbol == null ||
+            defaultValue is not { Length: > 0 } ||
+            !defaultValue.Trim().StartsWith("new", StringComparison.Ordinal))
         {
             return defaultValue;
         }
 
-        var trimmed = defaultValue!.Trim();
-        var fullType = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        var targetSymbol = typeSymbol is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } nullableType
+            ? nullableType.TypeArguments[0]
+            : typeSymbol;
 
-        // Target-typed new: new(...) or new (...)
-        if (trimmed.StartsWith("new(", StringComparison.Ordinal) ||
-            trimmed.StartsWith("new (", StringComparison.Ordinal))
+        return SyntaxFactory.ParseExpression(defaultValue) switch
         {
-            var openParenIndex = trimmed.IndexOf('(');
-            return $"new {fullType}{trimmed.Substring(openParenIndex)}";
-        }
-
-        return defaultValue;
+            ImplicitObjectCreationExpressionSyntax implicitNew => SyntaxFactory.ObjectCreationExpression(
+                SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
+                SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
+                implicitNew.ArgumentList,
+                implicitNew.Initializer).ToFullString(),
+            _ => defaultValue,
+        };
     }
 }
