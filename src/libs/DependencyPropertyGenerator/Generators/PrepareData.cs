@@ -36,6 +36,9 @@ public static class PrepareData
         var defaultValueDocumentation =
             attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
             attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
+
+        defaultValue = ExpandDefaultValueExpression(defaultValue, typeSymbol);
+        defaultValueDocumentation = ExpandDefaultValueExpression(defaultValueDocumentation, typeSymbol);
         var browsableForType =
             attribute.GetGenericTypeArgumentOrNamed(position: 1, nameof(AttachedDependencyPropertyAttribute.BrowsableForType))?
                 .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -366,5 +369,26 @@ public static class PrepareData
 
         return attribute.GetGenericTypeArgument(position) ??
                attribute.GetNamedArgument(name).Value as ITypeSymbol;
+    }
+
+    private static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
+    {
+        if (string.IsNullOrWhiteSpace(defaultValue) || typeSymbol == null)
+        {
+            return defaultValue;
+        }
+
+        var trimmed = defaultValue!.Trim();
+        var fullType = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        // Target-typed new: new(...) or new (...)
+        if (trimmed.StartsWith("new(", StringComparison.Ordinal) ||
+            trimmed.StartsWith("new (", StringComparison.Ordinal))
+        {
+            var openParenIndex = trimmed.IndexOf('(');
+            return $"new {fullType}{trimmed.Substring(openParenIndex)}";
+        }
+
+        return defaultValue;
     }
 }
