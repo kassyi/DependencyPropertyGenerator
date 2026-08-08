@@ -1,9 +1,0 @@
-﻿[
-  {
-    Id: CS8019,
-    Severity: Hidden,
-    WarningLevel: 1,
-    Span: (1,1)-(1,31),
-    MessageFormat: Unnecessary using directive.
-  }
-]

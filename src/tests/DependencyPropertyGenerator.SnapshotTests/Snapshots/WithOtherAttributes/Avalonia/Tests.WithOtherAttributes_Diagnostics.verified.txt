@@ -1,9 +1,0 @@
-﻿[
-  {
-    Id: CS3021,
-    Severity: Warning,
-    WarningLevel: 2,
-    Span: (10,22)-(10,31),
-    MessageFormat: '{0}' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
-  }
-]

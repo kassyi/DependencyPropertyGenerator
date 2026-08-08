@@ -1,9 +1,0 @@
-﻿[
-  {
-    Id: CS1503,
-    Severity: Error,
-    Location: DependencyPropertyGenerator\H.Generators.WeakEventGenerator\H.Generators.IntegrationTests.MyControl.WeakEvents.UrlChanged.g.cs,
-    Span: (63,38)-(63,42),
-    MessageFormat: Argument {0}: cannot convert from '{1}' to '{2}'
-  }
-]
