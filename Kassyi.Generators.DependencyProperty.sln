@@ -1,47 +1,40 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty", "src\libs\Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.csproj", "{CCF65923-145A-42D0-A270-17C4AB5949AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty", "src\Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.csproj", "{CCF65923-145A-42D0-A270-17C4AB5949AF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{13016EFF-BA69-4819-99BB-9873F598D0EA}"
-	ProjectSection(SolutionItems) = preProject
-		src\libs\Directory.Build.props = src\libs\Directory.Build.props
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.IntegrationTests", "tests\Kassyi.Generators.DependencyProperty.IntegrationTests\Kassyi.Generators.DependencyProperty.IntegrationTests.csproj", "{1FE5FA56-ADBE-4FDC-8F04-0461ECB4A695}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D072B855-2517-4D9E-91E6-00640704B30C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.IntegrationTests", "src\tests\Kassyi.Generators.DependencyProperty.IntegrationTests\Kassyi.Generators.DependencyProperty.IntegrationTests.csproj", "{1FE5FA56-ADBE-4FDC-8F04-0461ECB4A695}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.SnapshotTests", "src\tests\Kassyi.Generators.DependencyProperty.SnapshotTests\Kassyi.Generators.DependencyProperty.SnapshotTests.csproj", "{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.SnapshotTests", "tests\Kassyi.Generators.DependencyProperty.SnapshotTests\Kassyi.Generators.DependencyProperty.SnapshotTests.csproj", "{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D2B8069-3085-4E7D-AC96-F271C5084456}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.github\ISSUE_TEMPLATE\bug-report.yaml = .github\ISSUE_TEMPLATE\bug-report.yaml
+		Directory.Build.props = Directory.Build.props
 		src\Directory.Build.props = src\Directory.Build.props
+		tests\Directory.Build.props = tests\Directory.Build.props
 		LICENSE = LICENSE
 		README.md = README.md
-		src\Directory.Packages.props = src\Directory.Packages.props
+		Directory.Packages.props = Directory.Packages.props
 		.github\workflows\main.yml = .github\workflows\main.yml
 		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 		.github\dependabot.yml = .github\dependabot.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.Attributes", "src\libs\Kassyi.Generators.DependencyProperty.Attributes\Kassyi.Generators.DependencyProperty.Attributes.csproj", "{90F8AD3B-1C24-447B-99A3-2FBF5066FECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.Attributes", "src\Kassyi.Generators.DependencyProperty.Attributes\Kassyi.Generators.DependencyProperty.Attributes.csproj", "{90F8AD3B-1C24-447B-99A3-2FBF5066FECA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CEA09484-30F6-4D44-02F6-822E06DBC57C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.DependencyProperty.Benchmarks", "src\tests\Kassyi.Generators.DependencyProperty.Benchmarks\Kassyi.Generators.DependencyProperty.Benchmarks.csproj", "{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.DependencyProperty.Benchmarks", "tests\Kassyi.Generators.DependencyProperty.Benchmarks\Kassyi.Generators.DependencyProperty.Benchmarks.csproj", "{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{E431C0EF-0A07-9D2C-3EA9-2C750D5184D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Extensions", "src\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj", "{A78BBFDB-B522-4B30-A48C-266AF60C61A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Extensions", "src\libs\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj", "{A78BBFDB-B522-4B30-A48C-266AF60C61A2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Tests.Extensions", "src\tests\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj", "{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Tests.Extensions", "tests\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj", "{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -142,14 +135,12 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CCF65923-145A-42D0-A270-17C4AB5949AF} = {13016EFF-BA69-4819-99BB-9873F598D0EA}
-		{1FE5FA56-ADBE-4FDC-8F04-0461ECB4A695} = {D072B855-2517-4D9E-91E6-00640704B30C}
-		{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079} = {D072B855-2517-4D9E-91E6-00640704B30C}
-		{90F8AD3B-1C24-447B-99A3-2FBF5066FECA} = {13016EFF-BA69-4819-99BB-9873F598D0EA}
-		{CEA09484-30F6-4D44-02F6-822E06DBC57C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{CCF65923-145A-42D0-A270-17C4AB5949AF} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{90F8AD3B-1C24-447B-99A3-2FBF5066FECA} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{A78BBFDB-B522-4B30-A48C-266AF60C61A2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
-		{E431C0EF-0A07-9D2C-3EA9-2C750D5184D2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{A78BBFDB-B522-4B30-A48C-266AF60C61A2} = {E431C0EF-0A07-9D2C-3EA9-2C750D5184D2}
+		{1FE5FA56-ADBE-4FDC-8F04-0461ECB4A695} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
+		{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
 		{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

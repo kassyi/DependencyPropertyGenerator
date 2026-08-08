@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
-    <ProjectReference Include="..\..\libs\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj" />
     <ProjectReference Include="..\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.csproj" />
+    <ProjectReference Include="..\..\src\Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.csproj" />
   </ItemGroup>
 
 </Project>

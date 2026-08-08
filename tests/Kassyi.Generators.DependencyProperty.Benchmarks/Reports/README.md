@@ -15,5 +15,5 @@
 ## 測定の再現方法
 
 ```bash
-dotnet run -c Release --project src\tests\DependencyPropertyGenerator.Benchmarks
+dotnet run -c Release --project tests\Kassyi.Generators.DependencyProperty.Benchmarks
 ```
