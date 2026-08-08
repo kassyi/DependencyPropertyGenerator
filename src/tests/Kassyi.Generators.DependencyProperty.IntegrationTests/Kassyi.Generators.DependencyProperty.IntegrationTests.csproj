@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <NoWarn>$(NoWarn);CS3021</NoWarn>
+        <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants>
+    </PropertyGroup>
+
+    <Import Project="../../libs/Kassyi.Generators.DependencyProperty/Kassyi.Generators.DependencyProperty.props" />
+
+    <ItemGroup>
+        <PackageReference Include="GitHubActionsTestLogger">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Avalonia" />
+    </ItemGroup>
+
+    <ItemGroup Label="GlobalUsings">
+        <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+        <Using Include="FluentAssertions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\Kassyi.Generators.DependencyProperty.Attributes\Kassyi.Generators.DependencyProperty.Attributes.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\libs\Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.csproj"
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\libs\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj"
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
+</Project>
