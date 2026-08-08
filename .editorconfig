@@ -1,0 +1,37 @@
+root = true
+
+[*]
+end_of_line = linefeed
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.cs]
+# Common C# settings
+
+[src/libs/Kassyi.Generators.DependencyProperty.Attributes/**/*.cs]
+# Attributes are public APIs for source generator consumers
+resharper_redundant_name_qualifier_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+
+[src/libs/Kassyi.Generators.Extensions/**/*.cs]
+resharper_member_can_be_private_global_highlighting = none
+resharper_unused_member_global_highlighting = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CS0809.severity = none
+dotnet_diagnostic.CA1000.severity = none
+
+[src/tests/**/*.cs]
+# Test helper / dummy test code settings
+resharper_member_can_be_private_global_highlighting = none
+resharper_unused_member_global_highlighting = none
+resharper_unused_parameter_in_partial_method_highlighting = none
+resharper_redundant_extends_list_entry_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_identifier_typo_highlighting = none
+resharper_empty_type_declaration_highlighting = none
+resharper_class_never_instantiated_global_highlighting = none
+resharper_event_never_subscribed_to_global_highlighting = none
+resharper_partial_type_with_single_part_highlighting = none
