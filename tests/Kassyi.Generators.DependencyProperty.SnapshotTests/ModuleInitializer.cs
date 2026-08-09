@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Kassyi.Generators.DependencyProperty.Generators;
 
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;

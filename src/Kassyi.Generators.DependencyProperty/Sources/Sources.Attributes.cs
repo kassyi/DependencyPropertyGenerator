@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Models;
+﻿using Kassyi.Generators.DependencyProperty.Models;
 using System.ComponentModel;
 using System.Security;
 using Kassyi.Generators.Extensions;

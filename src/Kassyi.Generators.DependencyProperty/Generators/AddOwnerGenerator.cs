@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Sources;
+﻿using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;

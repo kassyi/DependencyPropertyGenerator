@@ -1,4 +1,4 @@
-namespace Kassyi.Generators.DependencyProperty.Models;
+﻿namespace Kassyi.Generators.DependencyProperty.Models;
 
 public readonly record struct EventData(
     string Name,

@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Sources;
+﻿using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.DependencyProperty.Models;
 using System.Collections.Immutable;
 using Kassyi.Generators.Extensions;

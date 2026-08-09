@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis;

@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Generators;
+﻿using Kassyi.Generators.DependencyProperty.Generators;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;

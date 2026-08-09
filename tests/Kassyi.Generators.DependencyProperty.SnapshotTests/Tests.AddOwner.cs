@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Generators;
+﻿using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 public partial class Tests
