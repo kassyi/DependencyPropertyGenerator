@@ -37,23 +37,17 @@ internal static partial class SourceGenerationHelper
 
     private static string GenerateDescriptionAttribute(string? value)
     {
-        switch (value)
-        {
-            case null:
-                return " ";
-            default:
-            {
-                var isMultilineString =
-                    value.Contains('\r') ||
-                    value.Contains('\n');
+        if (value == null) return " ";
 
-                return GenerateComponentModelAttribute(
-                    nameof(DependencyPropertyData.Description),
-                    isMultilineString
-                        ? $"@\"{SecurityElement.Escape(value)}\""
-                        : $"\"{SecurityElement.Escape(value)}\"");
-            }
-        }
+        var isMultilineString =
+            value.Contains('\r') ||
+            value.Contains('\n');
+
+        return GenerateComponentModelAttribute(
+            nameof(DependencyPropertyData.Description),
+            isMultilineString
+                ? $"@\"{SecurityElement.Escape(value)}\""
+                : $"\"{SecurityElement.Escape(value)}\"");
     }
 
     private static string GenerateTypeConverterAttribute(string? value)

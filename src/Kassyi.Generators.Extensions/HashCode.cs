@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -144,30 +144,18 @@ internal struct HashCode : IEquatable<HashCode>
 
         hash += length * 4;
 
-        switch (position)
+        if (position > 0)
         {
-            case > 0:
+            hash = QueueRound(hash, this.queue1);
+
+            if (position > 1)
             {
-                hash = QueueRound(hash, this.queue1);
+                hash = QueueRound(hash, this.queue2);
 
-                switch (position)
+                if (position > 2)
                 {
-                    case > 1:
-                    {
-                        hash = QueueRound(hash, this.queue2);
-
-                        switch (position)
-                        {
-                            case > 2:
-                                hash = QueueRound(hash, this.queue3);
-                                break;
-                        }
-
-                        break;
-                    }
+                    hash = QueueRound(hash, this.queue3);
                 }
-
-                break;
             }
         }
 
