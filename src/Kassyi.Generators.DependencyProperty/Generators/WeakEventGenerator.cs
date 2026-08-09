@@ -1,8 +1,7 @@
-﻿using Kassyi.Generators.DependencyProperty.Sources;
-using Kassyi.Generators.DependencyProperty.Models;
+﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
@@ -40,7 +39,8 @@ public class WeakEventGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.WeakEventAttribute`1")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.WeakEventAttribute`1")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)

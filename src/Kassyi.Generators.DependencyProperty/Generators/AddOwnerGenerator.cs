@@ -1,8 +1,7 @@
-﻿using Kassyi.Generators.DependencyProperty.Sources;
-using Kassyi.Generators.DependencyProperty.Models;
+﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
@@ -33,7 +32,7 @@ public class AddOwnerGenerator : IIncrementalGenerator
         context.SyntaxProvider
             .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AddOwnerAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)            
+            .Combine(framework)
             .Combine(version)
             .SelectAndReportExceptions(PrepareData, context, Id)
             .WhereNotNull()
@@ -52,8 +51,8 @@ public class AddOwnerGenerator : IIncrementalGenerator
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
         ((ClassWithAttributesContext context,
-        Framework framework) left,
-        string version) tuple)
+            Framework framework) left,
+            string version) tuple)
     {
         var (((_, attributes, _, classSymbol), framework), version) = tuple;
         if (framework is not (Framework.Avalonia or Framework.Wpf) ||
@@ -63,7 +62,8 @@ public class AddOwnerGenerator : IIncrementalGenerator
         }
 
         var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version, classSymbol, isAddOwner: true);
+        var dependencyPropertyData =
+            attribute.GetDependencyPropertyData(framework, version, classSymbol, isAddOwner: true);
 
         return (classData, dependencyPropertyData);
     }

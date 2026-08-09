@@ -1,6 +1,6 @@
-﻿using Kassyi.Generators.DependencyProperty.Sources;
+﻿using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
-using System.Collections.Immutable;
+using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -129,13 +129,11 @@ public class StaticConstructorGenerator : IIncrementalGenerator
                 var text = SourceGenerationHelper.GenerateStaticConstructor(
                     g.Key,
                     g.Where(static property => !property.IsDirect).ToArray());
-                if (!string.IsNullOrWhiteSpace(text))
+                return string.IsNullOrWhiteSpace(text) switch
                 {
-                    return new FileWithName(
-                        Name: $"{g.Key.FullName}.StaticConstructor.g.cs",
-                        Text: text);
-                }
-                return FileWithName.Empty;
+                    false => new FileWithName(Name: $"{g.Key.FullName}.StaticConstructor.g.cs", Text: text),
+                    _ => FileWithName.Empty
+                };
             })
             .Where(static f => !string.IsNullOrWhiteSpace(f.Text))
             .ToImmutableArray()

@@ -32,7 +32,7 @@ internal struct HashCode : IEquatable<HashCode>
     /// <returns>A random seed.</returns>
     private static uint GenerateGlobalSeed()
     {
-        byte[] bytes = new byte[4];
+        var bytes = new byte[4];
 
         using (var generator = RandomNumberGenerator.Create())
         {
@@ -99,33 +99,36 @@ internal struct HashCode : IEquatable<HashCode>
 
     private void Add(int value)
     {
-        uint val = (uint)value;
-        uint previousLength = this.length++;
-        uint position = previousLength % 4;
+        var val = (uint)value;
+        var previousLength = this.length++;
+        var position = previousLength % 4;
 
-        if (position == 0)
+        switch (position)
         {
-            this.queue1 = val;
-        }
-        else if (position == 1)
-        {
-            this.queue2 = val;
-        }
-        else if (position == 2)
-        {
-            this.queue3 = val;
-        }
-        else
-        {
-            if (previousLength == 3)
+            case 0:
+                this.queue1 = val;
+                break;
+            case 1:
+                this.queue2 = val;
+                break;
+            case 2:
+                this.queue3 = val;
+                break;
+            default:
             {
-                Initialize(out this.v1, out this.v2, out this.v3, out this.v4);
-            }
+                switch (previousLength)
+                {
+                    case 3:
+                        Initialize(out this.v1, out this.v2, out this.v3, out this.v4);
+                        break;
+                }
 
-            this.v1 = Round(this.v1, this.queue1);
-            this.v2 = Round(this.v2, this.queue2);
-            this.v3 = Round(this.v3, this.queue3);
-            this.v4 = Round(this.v4, val);
+                this.v1 = Round(this.v1, this.queue1);
+                this.v2 = Round(this.v2, this.queue2);
+                this.v3 = Round(this.v3, this.queue3);
+                this.v4 = Round(this.v4, val);
+                break;
+            }
         }
     }
 
@@ -135,24 +138,36 @@ internal struct HashCode : IEquatable<HashCode>
     /// <returns>The resulting hashcode from the current instance.</returns>
     public int ToHashCode()
     {
-        uint length = this.length;
-        uint position = length % 4;
-        uint hash = length < 4 ? MixEmptyState() : MixState(this.v1, this.v2, this.v3, this.v4);
+        var length = this.length;
+        var position = length % 4;
+        var hash = length < 4 ? MixEmptyState() : MixState(this.v1, this.v2, this.v3, this.v4);
 
         hash += length * 4;
 
-        if (position > 0)
+        switch (position)
         {
-            hash = QueueRound(hash, this.queue1);
-
-            if (position > 1)
+            case > 0:
             {
-                hash = QueueRound(hash, this.queue2);
+                hash = QueueRound(hash, this.queue1);
 
-                if (position > 2)
+                switch (position)
                 {
-                    hash = QueueRound(hash, this.queue3);
+                    case > 1:
+                    {
+                        hash = QueueRound(hash, this.queue2);
+
+                        switch (position)
+                        {
+                            case > 2:
+                                hash = QueueRound(hash, this.queue3);
+                                break;
+                        }
+
+                        break;
+                    }
                 }
+
+                break;
             }
         }
 

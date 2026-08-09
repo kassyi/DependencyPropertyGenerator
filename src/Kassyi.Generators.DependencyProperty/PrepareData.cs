@@ -1,6 +1,6 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.ComponentModel;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -327,17 +327,13 @@ public static class PrepareData
 
     private static bool? IsSpecialType(this ITypeSymbol? symbol)
     {
-        if (symbol == null)
+        return symbol switch
         {
-            return null;
-        }
-
-        return
-            symbol is IArrayTypeSymbol ||
-            symbol.SpecialType != SpecialType.None ||
-            (symbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T &&
-             symbol.BaseType != null &&
-             symbol.BaseType.SpecialType != SpecialType.None);
+            null => null,
+            _ => symbol is IArrayTypeSymbol || symbol.SpecialType != SpecialType.None ||
+                 (symbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T && symbol.BaseType != null &&
+                  symbol.BaseType.SpecialType != SpecialType.None)
+        };
     }
 
     private static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name)

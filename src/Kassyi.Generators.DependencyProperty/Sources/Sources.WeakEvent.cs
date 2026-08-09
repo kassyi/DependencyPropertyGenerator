@@ -33,93 +33,93 @@ internal static partial class SourceGenerationHelper
                 var eventXmlDoc = GenerateXmlDocumentationFrom(@event.EventXmlDocumentation, @event);
 
                 return $$"""
-            #nullable enable
+                         #nullable enable
 
-            namespace {{@class.Namespace}}
-            {
-                {{@class.Modifiers}}partial class {{@class.Name}}
-                {
-            {{generatedCodeAttr}}
-            {{excludeFromCoverageAttr}}
-                    private class {{@event.Name}}WeakEventManager : global::System.Windows.WeakEventManager
-                    {
-                        private {{@event.Name}}WeakEventManager()
-                        {
-                        }
+                         namespace {{@class.Namespace}}
+                         {
+                             {{@class.Modifiers}}partial class {{@class.Name}}
+                             {
+                         {{generatedCodeAttr}}
+                         {{excludeFromCoverageAttr}}
+                                 private class {{@event.Name}}WeakEventManager : global::System.Windows.WeakEventManager
+                                 {
+                                     private {{@event.Name}}WeakEventManager()
+                                     {
+                                     }
 
-                        public static void AddHandler(object? source, {{eventHandlerType}} handler)
-                        {
-                            if (source == null)
-                                throw new global::System.ArgumentNullException(nameof(source));
-                            if (handler == null)
-                                throw new global::System.ArgumentNullException(nameof(handler));
+                                     public static void AddHandler(object? source, {{eventHandlerType}} handler)
+                                     {
+                                         if (source == null)
+                                             throw new global::System.ArgumentNullException(nameof(source));
+                                         if (handler == null)
+                                             throw new global::System.ArgumentNullException(nameof(handler));
 
-                            CurrentManager.ProtectedAddHandler(source, handler);
-                        }
+                                         CurrentManager.ProtectedAddHandler(source, handler);
+                                     }
 
-                        public static void RemoveHandler(object? source, {{eventHandlerType}} handler)
-                        {
-                            if (source == null)
-                                throw new global::System.ArgumentNullException(nameof(source));
-                            if (handler == null)
-                                throw new global::System.ArgumentNullException(nameof(handler));
+                                     public static void RemoveHandler(object? source, {{eventHandlerType}} handler)
+                                     {
+                                         if (source == null)
+                                             throw new global::System.ArgumentNullException(nameof(source));
+                                         if (handler == null)
+                                             throw new global::System.ArgumentNullException(nameof(handler));
 
-                            CurrentManager.ProtectedRemoveHandler(source, handler);
-                        }
+                                         CurrentManager.ProtectedRemoveHandler(source, handler);
+                                     }
 
-                        internal static {{@event.Name}}WeakEventManager CurrentManager
-                        {
-                            get
-                            {
-                                var managerType = typeof({{@event.Name}}WeakEventManager);
-                                var manager = ({{@event.Name}}WeakEventManager)GetCurrentManager(managerType);
-                                if (manager == null)
-                                {
-                                    manager = new {{@event.Name}}WeakEventManager();
-                                    SetCurrentManager(managerType, manager);
-                                }
+                                     internal static {{@event.Name}}WeakEventManager CurrentManager
+                                     {
+                                         get
+                                         {
+                                             var managerType = typeof({{@event.Name}}WeakEventManager);
+                                             var manager = ({{@event.Name}}WeakEventManager)GetCurrentManager(managerType);
+                                             if (manager == null)
+                                             {
+                                                 manager = new {{@event.Name}}WeakEventManager();
+                                                 SetCurrentManager(managerType, manager);
+                                             }
 
-                                return manager;
-                            }
-                        }
+                                             return manager;
+                                         }
+                                     }
 
-                        protected override void StartListening(object? source)
-                        {
-                            {{source}}.{{@event.Name}} += On{{@event.Name}};
-                        }
+                                     protected override void StartListening(object? source)
+                                     {
+                                         {{source}}.{{@event.Name}} += On{{@event.Name}};
+                                     }
 
-                        protected override void StopListening(object? source)
-                        {
-                            {{source}}.{{@event.Name}} -= On{{@event.Name}};
-                        }
+                                     protected override void StopListening(object? source)
+                                     {
+                                         {{source}}.{{@event.Name}} -= On{{@event.Name}};
+                                     }
 
-                        internal void On{{@event.Name}}(object? sender, {{eventArgsType}} args)
-                        {
-                            DeliverEvent(sender, args);
-                        }
-                    }
+                                     internal void On{{@event.Name}}(object? sender, {{eventArgsType}} args)
+                                     {
+                                         DeliverEvent(sender, args);
+                                     }
+                                 }
 
-            {{eventXmlDoc}}
-            {{generatedCodeAttr}}
-            {{excludeFromCoverageAttr}}
-                    public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
-                    {
-                        add => {{@event.Name}}WeakEventManager.AddHandler(null, value);
-                        remove => {{@event.Name}}WeakEventManager.RemoveHandler(null, value);
-                    }
+                         {{eventXmlDoc}}
+                         {{generatedCodeAttr}}
+                         {{excludeFromCoverageAttr}}
+                                 public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
+                                 {
+                                     add => {{@event.Name}}WeakEventManager.AddHandler(null, value);
+                                     remove => {{@event.Name}}WeakEventManager.RemoveHandler(null, value);
+                                 }
 
-                    /// <summary>
-                    /// A helper method to raise the {{@event.Name}} event.
-                    /// </summary>
-            {{generatedCodeAttr}}
-            {{excludeFromCoverageAttr}}
-                    internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
-                    {
-                        {{@event.Name}}WeakEventManager.CurrentManager.On{{@event.Name}}(sender, {{args}});
-                    }
-                }
-            }
-            """.RemoveBlankLinesWhereOnlyWhitespaces();
+                                 /// <summary>
+                                 /// A helper method to raise the {{@event.Name}} event.
+                                 /// </summary>
+                         {{generatedCodeAttr}}
+                         {{excludeFromCoverageAttr}}
+                                 internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
+                                 {
+                                     {{@event.Name}}WeakEventManager.CurrentManager.On{{@event.Name}}(sender, {{args}});
+                                 }
+                             }
+                         }
+                         """.RemoveBlankLinesWhereOnlyWhitespaces();
             }
 
             // https://github.com/dotnet/maui/issues/2703
@@ -132,31 +132,31 @@ internal static partial class SourceGenerationHelper
                 var eventHandlerType = GenerateEventHandlerType(@event, nullable: nullable, nullableType: nullable);
 
                 return $$"""
-            #nullable enable
+                         #nullable enable
 
-            namespace {{@class.Namespace}}
-            {
-                {{@class.Modifiers}}partial class {{@class.Name}}
-                {
-                    private{{modifiers}} global::Microsoft.Maui.WeakEventManager {{@event.Name}}WeakEventManager { get; } = new global::Microsoft.Maui.WeakEventManager();
-                    
-            {{eventXmlDoc}}
-                    public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
-                    {
-                        add => {{@event.Name}}WeakEventManager.AddEventHandler(value);
-                        remove => {{@event.Name}}WeakEventManager.RemoveEventHandler(value);
-                    }
+                         namespace {{@class.Namespace}}
+                         {
+                             {{@class.Modifiers}}partial class {{@class.Name}}
+                             {
+                                 private{{modifiers}} global::Microsoft.Maui.WeakEventManager {{@event.Name}}WeakEventManager { get; } = new global::Microsoft.Maui.WeakEventManager();
+                                 
+                         {{eventXmlDoc}}
+                                 public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
+                                 {
+                                     add => {{@event.Name}}WeakEventManager.AddEventHandler(value);
+                                     remove => {{@event.Name}}WeakEventManager.RemoveEventHandler(value);
+                                 }
 
-                    /// <summary>
-                    /// A helper method to raise the {{@event.Name}} event.
-                    /// </summary>
-                    internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
-                    {
-                        {{@event.Name}}WeakEventManager.HandleEvent(sender!, {{args}}!, eventName: nameof({{@event.Name}}));
-                    }
-                }
-            }
-            """.RemoveBlankLinesWhereOnlyWhitespaces();
+                                 /// <summary>
+                                 /// A helper method to raise the {{@event.Name}} event.
+                                 /// </summary>
+                                 internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
+                                 {
+                                     {{@event.Name}}WeakEventManager.HandleEvent(sender!, {{args}}!, eventName: nameof({{@event.Name}}));
+                                 }
+                             }
+                         }
+                         """.RemoveBlankLinesWhereOnlyWhitespaces();
             }
 
             case Framework.Uwp:
@@ -174,10 +174,7 @@ internal static partial class SourceGenerationHelper
         var eventHandler = (string.IsNullOrWhiteSpace(@event.Type)
             ? "System.EventHandler"
             : $"System.EventHandler<{GenerateType(@event, nullable: nullableType)}>").WithGlobalPrefix();
-        if (nullable)
-        {
-            eventHandler += "?";
-        }
+        if (nullable) eventHandler += "?";
 
         return eventHandler;
     }

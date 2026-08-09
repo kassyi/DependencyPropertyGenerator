@@ -89,7 +89,7 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
 
         HashCode hashCode = default;
 
-        foreach (T item in other)
+        foreach (var item in other)
         {
             hashCode.Add(item);
         }

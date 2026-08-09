@@ -7,26 +7,27 @@ internal static partial class SourceGenerationHelper
 {
     private static string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property)
     {
-        if (@class.Framework == Framework.Avalonia)
+        return @class.Framework switch
         {
-            return property.IsDirect ? $"""
+            Framework.Avalonia => property.IsDirect
+                ? $"""
 
-                                                    {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
-                                                        {GenerateAvaloniaRegisterMethodArguments(@class, property)});
-                                        """ : $"""
+                               {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
+                                   {GenerateAvaloniaRegisterMethodArguments(@class, property)});
+                   """
+                : $"""
 
-                                                           {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
-                                                               {GeneratePropertyMetadata(@class, property)});
-                                               """;
-        }
+                               {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
+                                   {GeneratePropertyMetadata(@class, property)});
+                   """,
+            _ => $"""
 
-        return $"""
-
-                            {property.FromType}.{property.Name}Property.AddOwner(
-                                ownerType: typeof({@class.Type}),
-                                {GeneratePropertyMetadata(@class, property)});
-                    
-                """.RemoveBlankLinesWhereOnlyWhitespaces();
+                              {property.FromType}.{property.Name}Property.AddOwner(
+                                  ownerType: typeof({@class.Type}),
+                                  {GeneratePropertyMetadata(@class, property)});
+                      
+                  """.RemoveBlankLinesWhereOnlyWhitespaces()
+        };
     }
 }
 
