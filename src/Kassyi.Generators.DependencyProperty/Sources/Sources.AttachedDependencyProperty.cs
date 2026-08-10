@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Models;
+﻿using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
@@ -108,45 +108,35 @@ internal static partial class SourceGenerationHelper
     
     private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)
     {
-        if (@class.Framework == Framework.Maui)
+        return @class.Framework switch
         {
-            return GenerateMauiRegisterMethodArguments(@class, property);
-        }
+            Framework.Maui => GenerateMauiRegisterMethodArguments(@class, property),
+            Framework.Avalonia => GenerateAvaloniaRegisterMethodArguments(@class, property),
+            Framework.Wpf => $"""
 
-        if (@class.Framework == Framework.Avalonia)
-        {
-            return GenerateAvaloniaRegisterMethodArguments(@class, property);
-        }
+                                              name: "{property.Name}",
+                                              propertyType: typeof({property.Type}),
+                                              ownerType: typeof({@class.Type}),
+                                              {GeneratePropertyMetadata(@class, property)},
+                                              validateValueCallback: {GenerateValidateValueCallback(@class, property)}
+                              """,
+            _ => $"""
 
-        if (@class.Framework == Framework.Wpf)
-        {
-            return $"""
-
-                                    name: "{property.Name}",
-                                    propertyType: typeof({property.Type}),
-                                    ownerType: typeof({@class.Type}),
-                                    {GeneratePropertyMetadata(@class, property)},
-                                    validateValueCallback: {GenerateValidateValueCallback(@class, property)}
-                    """;
-        }
-
-        return $"""
-
-                                name: "{property.Name}",
-                                propertyType: typeof({property.Type}),
-                                ownerType: typeof({@class.Type}),
-                                {GeneratePropertyMetadata(@class, property)}
-                """;
+                                  name: "{property.Name}",
+                                  propertyType: typeof({property.Type}),
+                                  ownerType: typeof({@class.Type}),
+                                  {GeneratePropertyMetadata(@class, property)}
+                  """
+        };
     }
 
     private static string GenerateModifiers(ClassData @class)
     {
-        if (@class.Framework == Framework.Avalonia)
+        return @class.Framework switch
         {
-            return string.Empty;
-        }
-
-        return @class.Modifiers;
+            Framework.Avalonia => string.Empty,
+            _ => @class.Modifiers
+        };
     }
 }
 

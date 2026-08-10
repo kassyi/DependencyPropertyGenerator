@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
@@ -19,14 +19,16 @@ public static class IncrementalValuesProviderExtensions
     {
         context.RegisterSourceOutput(source, static (context, file) =>
         {
-            if (file.IsEmpty)
+            switch (file.IsEmpty)
             {
-                return;
+                case true:
+                    return;
+                default:
+                    context.AddSource(
+                        hintName: file.Name,
+                        source: file.Text);
+                    break;
             }
-
-            context.AddSource(
-                hintName: file.Name,
-                source: file.Text);
         });
     }
 
@@ -41,14 +43,16 @@ public static class IncrementalValuesProviderExtensions
     {
         context.RegisterSourceOutput(source, static (context, file) =>
         {
-            if (file.IsEmpty)
+            switch (file.IsEmpty)
             {
-                return;
+                case true:
+                    return;
+                default:
+                    context.AddSource(
+                        hintName: file.Name,
+                        source: file.Text);
+                    break;
             }
-
-            context.AddSource(
-                hintName: file.Name,
-                source: file.Text);
         });
     }
 
@@ -127,12 +131,14 @@ public static class IncrementalValuesProviderExtensions
         initializationContext.RegisterSourceOutput(outputWithErrors,
             (context, tuple) =>
             {
-                if (tuple.Exception is null)
+                switch (tuple.Exception)
                 {
-                    return;
+                    case null:
+                        return;
+                    default:
+                        context.ReportException(id: id, exception: tuple.Exception);
+                        break;
                 }
-
-                context.ReportException(id: id, exception: tuple.Exception);
             });
 
         return outputWithErrors
@@ -327,12 +333,14 @@ public static class IncrementalValuesProviderExtensions
             frameworkWithDiagnostic,
             static (sourceProductionContext, tuple) =>
             {
-                if (tuple.Diagnostic == null)
+                switch (tuple.Diagnostic)
                 {
-                    return;
+                    case null:
+                        return;
+                    default:
+                        sourceProductionContext.ReportDiagnostic(tuple.Diagnostic);
+                        break;
                 }
-
-                sourceProductionContext.ReportDiagnostic(tuple.Diagnostic);
             });
 
         return frameworkWithDiagnostic

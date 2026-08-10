@@ -1,4 +1,4 @@
-namespace Kassyi.Generators.Extensions;
+﻿namespace Kassyi.Generators.Extensions;
 
 /// <summary>
 /// Framework enumeration for generators that are platform specific.

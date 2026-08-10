@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
 

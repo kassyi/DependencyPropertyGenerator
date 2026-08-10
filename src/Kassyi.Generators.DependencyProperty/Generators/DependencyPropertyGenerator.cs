@@ -1,8 +1,7 @@
+﻿using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
-using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
@@ -31,7 +30,8 @@ public class DependencyPropertyGenerator : IIncrementalGenerator
         var version = context.DetectVersion();
 
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
@@ -40,7 +40,8 @@ public class DependencyPropertyGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute`1")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute`1")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
@@ -60,10 +61,11 @@ public class DependencyPropertyGenerator : IIncrementalGenerator
         {
             return null;
         }
-        
+
         var classData = classSymbol.GetClassData(framework, version);
         var dependencyPropertyData =
-            attribute.GetDependencyPropertyData(framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute));
+            attribute.GetDependencyPropertyData(framework, version, classSymbol,
+                classSyntax.TryFindAttributeSyntax(attribute));
 
         return (classData, dependencyPropertyData);
     }

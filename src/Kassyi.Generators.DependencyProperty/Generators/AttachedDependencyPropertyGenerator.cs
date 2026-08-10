@@ -1,8 +1,7 @@
+﻿using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
-using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
@@ -31,7 +30,8 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
         var version = context.DetectVersion();
 
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
@@ -40,7 +40,8 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`1")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`1")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
@@ -49,7 +50,8 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`2")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`2")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
@@ -69,7 +71,7 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
         {
             return null;
         }
-        
+
         var classData = classSymbol.GetClassData(framework, version);
         var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version,
             classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAttached: true);

@@ -1,14 +1,14 @@
+﻿using System.Net;
+using System.Security;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
-using System.Net;
-using System.Security;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
     private readonly static char[] Separator = { '\r', '\n' };
-    
+
     private static string GenerateXmlDocumentationFrom(string value)
     {
         var lines = value.Split(Separator, StringSplitOptions.RemoveEmptyEntries);

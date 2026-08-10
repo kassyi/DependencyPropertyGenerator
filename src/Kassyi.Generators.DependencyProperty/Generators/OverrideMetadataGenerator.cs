@@ -1,9 +1,8 @@
-using Kassyi.Generators.DependencyProperty.Sources;
+﻿using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
-using System.Collections.Immutable;
+using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
@@ -32,7 +31,8 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
         var version = context.DetectVersion();
 
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.OverrideMetadataAttribute")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.OverrideMetadataAttribute")
             .SelectAllAttributes()
             .Combine(framework)
             .Combine(version)
@@ -41,7 +41,8 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.OverrideMetadataAttribute`1")
+            .ForAttributeWithMetadataNameOfClassesAndRecords(
+                "Kassyi.Generators.DependencyProperty.OverrideMetadataAttribute`1")
             .SelectAllAttributes()
             .Combine(framework)
             .Combine(version)

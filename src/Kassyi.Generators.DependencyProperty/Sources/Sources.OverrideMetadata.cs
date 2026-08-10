@@ -1,4 +1,4 @@
-using Kassyi.Generators.DependencyProperty.Models;
+﻿using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
@@ -16,12 +16,13 @@ internal static partial class SourceGenerationHelper
                 : @class.Type;
 
             var (name, isChanged0, isChanged1, isChanged2, isChanged3, _, _) = CheckOnChangedMethods(@class, property);
-            if (!isChanged0 &&
-                !isChanged1 &&
-                !isChanged2 &&
-                !isChanged3)
+            switch (isChanged0)
             {
-                return " ";
+                case false when
+                    !isChanged1 &&
+                    !isChanged2 &&
+                    !isChanged3:
+                    return " ";
             }
 
             var type = GenerateType(property);
