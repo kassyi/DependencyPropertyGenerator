@@ -28,11 +28,11 @@ Dependency property, routed event and weak event source generator for WPF/UWP/Wi
 - Common extensions: .cs (1134), .txt (222), .props (4), .csproj (4), [no extension] (2), .sln (1), .dotsettings (1), .md (1)
 
 ### Manifests And Commands
-- DependencyPropertyGenerator.sln
+- Kassyi.Generators.DependencyProperty.sln
 - .github/workflows
 
 Suggested commands:
-- dotnet build DependencyPropertyGenerator.sln
+- dotnet build Kassyi.Generators.DependencyProperty.sln
 - dotnet test
 
 Testing signal:

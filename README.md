@@ -5,9 +5,40 @@
 [![License: MIT](https://img.shields.io/github/license/HavenDV/DependencyPropertyGenerator)](https://github.com/HavenDV/DependencyPropertyGenerator/blob/main/LICENSE.txt)
 [![Discord](https://img.shields.io/discord/988253265550532680?label=Discord&logo=discord&logoColor=white&color=d82679)](https://discord.gg/g8u2t9dKgE)
 
-Dependency property, routed event and weak event source generator for WPF/UWP/WinUI/Uno/Avalonia/MAUI platforms.  
+Dependency property, routed event and weak event source generator for WPF/UWP/WinUI/Uno/Avalonia/MAUI platforms.
+
+## Fork Improvements & Motivation
+
+This repository is a custom fork of [`HavenDV/DependencyPropertyGenerator`](https://github.com/HavenDV/DependencyPropertyGenerator), independently extended and maintained.  
+Since commit [`6758690d299c`](https://github.com/HavenDV/DependencyPropertyGenerator/commit/6758690d299c8777133e8351350d91126f44d314), the following critical bug fixes, feature enhancements, and performance optimizations have been implemented.
+
+### 1. Why Forking Was Necessary
+
+- **Resolution of Silent Callback Suppression / Silent Failure Bug**:
+    - In the upstream (original) repository, specifying an unsupported signature for an `OnChanged` callback (such as WPF's standard signature `(DependencyObject d, DependencyPropertyChangedEventArgs e)` or mismatched parameter counts/types) or misspelling the method name caused the generator to **silently emit `propertyChangedCallback: null` without raising any compilation errors or warnings**.
+    - As a result, code would compile successfully, but property change callbacks would **silently fail to execute at runtime**, creating severe and hard-to-detect silent bugs.
+    - In this fork, failure to resolve an explicitly specified callback signature has been strictly escalated from a silent fallback/warning to a **`#error DPG0001` compile-time error**, ensuring issues are caught and resolved immediately at build time.
+
+### 2. Key Improvements Since Commit `6758690d299c`
+
+1. **Promotion of Unresolved Callbacks to Compile Errors (`#error DPG0001`)**
+    - Mismatched or non-existent callback method declarations are flagged with a compile error (`#error DPG0001`) instead of being silently ignored.
+2. **Automatic Target-Typed `new(...)` Expansion in `DefaultValueExpression`**
+    - Added support for C# 9.0+ `DefaultValueExpression = "new(...)"` syntax.
+    - Parses expressions via Roslyn AST (`SyntaxFactory` / `ImplicitObjectCreationExpressionSyntax`) and automatically expands target-typed `new(...)` expressions into fully-qualified constructor calls based on the property type. Eliminates the need to write verbose fully-qualified type names when referencing types from external namespaces.
+3. **Incremental Source Generator (ISG) Pipeline Optimization & Allocation Reduction**
+    - Streamlined `ClassData` DTO by removing heavy method string lists and replacing them with pre-calculated boolean flags (`IsChanged0`–`IsChanged3`).
+    - Replaced temporary `List<string>` allocations and `string.Join` calls during code generation with `StringBuilder` and `stackalloc Span<char>` to eliminate intermediate heap allocations. Significantly reduces GC overhead and prevents IDE typing lags.
+    - Introduced `DependencyPropertyGenerator.Benchmarks` (using BenchmarkDotNet) to continuously profile execution time and memory allocations across optimization phases.
+4. **Modernization of Tests, Documentation, and Project Structure**
+    - Modernized snapshot test fixtures (`Tests.*.cs`) using C# 11 Raw String Literals and unified MSTest attributes.
+    - Reorganized project layout into standard C# `src/` and `tests/` directories.
+    - Expanded architectural and generator specification documents in `spec/`.
+5. **Solution and Package Renaming (`Kassyi.Generators.DependencyProperty`)**
+    - Renamed the solution, project files, and NuGet package targets to `Kassyi.Generators.DependencyProperty` to prevent namespace collisions and clearly distinguish this custom fork from the original upstream package.
 
 ## Usage
+
 ```cs
 using DependencyPropertyGenerator;
 using System.Windows.Controls;
@@ -34,7 +65,9 @@ public static partial class TreeViewExtensions
     }
 }
 ```
+
 will generate:
+
 ```cs
 //HintName: MyControl.Properties.IsSpinning.generated.cs
 
@@ -84,6 +117,7 @@ namespace H.Generators.IntegrationTests
     }
 }
 ```
+
 ```cs
 //HintName: TreeViewExtensions.AttachedProperties.SelectedItem.generated.cs
 
@@ -145,26 +179,35 @@ namespace H.Generators.IntegrationTests
 ```
 
 ## Advanced usage
-### new object/struct() expressions in DefaultValue
-While it's [generally not recommended](https://devblogs.microsoft.com/oldnewthing/20191002-00/?p=102950) 
-to use new expressions in properties, a generator provides this capability:
-```cs
-public readonly record struct Data();
 
-[AttachedDependencyProperty<object, TreeView>("SelectedItem", DefaultValueExpression = "new Data()")]
+### Target-typed `new(...)` / `new()` expressions in DefaultValue
+
+While it's [generally not recommended](https://devblogs.microsoft.com/oldnewthing/20191002-00/?p=102950)
+to use new expressions in properties, the generator supports C# 9.0+ target-typed `new(...)` and `new()` expressions:
+
+```cs
+public readonly record struct Data(int Value);
+
+// Target-typed new() syntax is automatically expanded to the property type:
+[AttachedDependencyProperty<Data, TreeView>("SelectedItem", DefaultValueExpression = "new(42)")]
+// Or default constructor:
+[AttachedDependencyProperty<Data, TreeView>("SelectedItem", DefaultValueExpression = "new()")]
 ```
-If your type is declared outside the namespace of an attribute declaration, 
-you will need to specify the full name of the type, including the namespace.
+
+Target-typed `new(...)` expressions are automatically expanded by the generator to the property type (e.g. `new global::MyNamespace.Data(...)`), eliminating the need to write verbose fully-qualified type names even when referencing types from external namespaces.
 
 ### XML documentation
+
 The easiest way to add documentation is the `Description` parameter.
 It will add a `System.ComponentModel.Description` attribute to the property and will also be used in the xml documentation.  
-If for some reason you need to save raw xml documentation for your properties, 
-there is an option to specify raw xml text for both DependencyProperty and getter/setter 
+If for some reason you need to save raw xml documentation for your properties,
+there is an option to specify raw xml text for both DependencyProperty and getter/setter
 via `XmlDocumentation`/`PropertyXmlDocumentation` attribute properties.
 
 ### Platform detection
+
 For some platforms there is no automatic detection. In these cases, the generator needs a little help by adding:
+
 ```xml
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);HAS_UNO</DefineConstants>
@@ -172,12 +215,15 @@ For some platforms there is no automatic detection. In these cases, the generato
     <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants>
   </PropertyGroup>
 ```
+
 Automatic detection of Uno [was added in Uno 4.5](https://github.com/unoplatform/uno/pull/9443).
 
 ### Bind event
-The generator can automatically control properties that depend on events:
+
+The generator can automatically control properties that depend on events (and supports `DefaultValueExpression = "new()"`):
+
 ```cs
-[AttachedDependencyProperty<object, Grid>("BindEventProperty", BindEvent = nameof(Grid.MouseWheel))]
+[AttachedDependencyProperty<object, Grid>("BindEventProperty", BindEvent = nameof(Grid.MouseWheel), DefaultValueExpression = "new()")]
 public static partial class GridExtensions
 {
     private static void OnBindEventPropertyChanged_MouseWheel(object? sender, System.Windows.Input.MouseWheelEventArgs args)
@@ -185,7 +231,9 @@ public static partial class GridExtensions
     }
 }
 ```
+
 will generate additional code:
+
 ```cs
 static partial void OnBindEventPropertyChanged_BeforeBind(
     global::System.Windows.Controls.Grid sender,
@@ -223,20 +271,26 @@ static partial void OnBindEventPropertyChanged(
 ```
 
 ### Override metadata
-For UWP/WinUI/Uno, a special `RegisterPropertyChangedCallbacks()` method will be created, 
+
+For UWP/WinUI/Uno, a special `RegisterPropertyChangedCallbacks()` method will be created,
 which you will need to call in the constructor to register property change callbacks.
 
 ## Notes
+
 To use generic attributes, you need to set up `LangVersion` in your .csproj:
+
 ```xml
 <LangVersion>preview</LangVersion>
 ```
+
 There are also non-Generic attributes here.
 
 ## Possible features
+
 - [Mutable default values in constructor](https://devblogs.microsoft.com/oldnewthing/20191003-00/?p=102959)
 
 ## Support
+
 Priority place for bugs: https://github.com/HavenDV/DependencyPropertyGenerator/issues  
 Priority place for ideas and general questions: https://github.com/HavenDV/DependencyPropertyGenerator/discussions  
 I also have a Discord support channel:  
