@@ -82,7 +82,7 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
     /// <sinheritdoc/>
     public override int GetHashCode()
     {
-        if (this.array is not { } other)
+        if (array is not { } other)
         {
             return 0;
         }
@@ -104,7 +104,7 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ImmutableArray<T> AsImmutableArray()
     {
-        return Unsafe.As<T[]?, ImmutableArray<T>>(ref Unsafe.AsRef(in this.array));
+        return Unsafe.As<T[]?, ImmutableArray<T>>(ref Unsafe.AsRef(in array));
     }
 
     /// <summary>

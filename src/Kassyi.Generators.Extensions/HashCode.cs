@@ -100,33 +100,33 @@ internal struct HashCode : IEquatable<HashCode>
     private void Add(int value)
     {
         var val = (uint)value;
-        var previousLength = this.length++;
+        var previousLength = length++;
         var position = previousLength % 4;
 
         switch (position)
         {
             case 0:
-                this.queue1 = val;
+                queue1 = val;
                 break;
             case 1:
-                this.queue2 = val;
+                queue2 = val;
                 break;
             case 2:
-                this.queue3 = val;
+                queue3 = val;
                 break;
             default:
             {
                 switch (previousLength)
                 {
                     case 3:
-                        Initialize(out this.v1, out this.v2, out this.v3, out this.v4);
+                        Initialize(out v1, out v2, out v3, out v4);
                         break;
                 }
 
-                this.v1 = Round(this.v1, this.queue1);
-                this.v2 = Round(this.v2, this.queue2);
-                this.v3 = Round(this.v3, this.queue3);
-                this.v4 = Round(this.v4, val);
+                v1 = Round(v1, queue1);
+                v2 = Round(v2, queue2);
+                v3 = Round(v3, queue3);
+                v4 = Round(v4, val);
                 break;
             }
         }
@@ -140,21 +140,21 @@ internal struct HashCode : IEquatable<HashCode>
     {
         var length = this.length;
         var position = length % 4;
-        var hash = length < 4 ? MixEmptyState() : MixState(this.v1, this.v2, this.v3, this.v4);
+        var hash = length < 4 ? MixEmptyState() : MixState(v1, v2, v3, v4);
 
         hash += length * 4;
 
         if (position > 0)
         {
-            hash = QueueRound(hash, this.queue1);
+            hash = QueueRound(hash, queue1);
 
             if (position > 1)
             {
-                hash = QueueRound(hash, this.queue2);
+                hash = QueueRound(hash, queue2);
 
                 if (position > 2)
                 {
-                    hash = QueueRound(hash, this.queue3);
+                    hash = QueueRound(hash, queue3);
                 }
             }
         }

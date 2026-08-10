@@ -1,6 +1,6 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+﻿using System.Text;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
-using System.Text;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
