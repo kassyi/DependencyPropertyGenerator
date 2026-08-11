@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Kassyi.Generators.Extensions;
 
@@ -35,9 +35,11 @@ public static class StringExtensions
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "C# identifier and camelCase parameter normalization requires lowercase string comparison.")]
     public static string ToParameterName(this string input)
     {
         input = input ?? throw new ArgumentNullException(nameof(input));
+#pragma warning disable CA1308 // [WHY] C#識別子・キーワード退避のため小文字化処理（ToLowerInvariant）が不可欠です
         return input.ToLowerInvariant() switch
 #pragma warning restore CA1308
         {

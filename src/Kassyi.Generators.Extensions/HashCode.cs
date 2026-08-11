@@ -165,6 +165,7 @@ internal struct HashCode : IEquatable<HashCode>
     }
 
     /// <inheritdoc/>
+#pragma warning disable CS0809 // [WHY] HashCode 構造体の比較を抑止するための意図的な Obsolete オーバーライド
     [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.", error: true)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public override int GetHashCode() => 0;
@@ -173,6 +174,7 @@ internal struct HashCode : IEquatable<HashCode>
     [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes.", error: true)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public override bool Equals(object? obj) => false;
+#pragma warning restore CS0809
 
     /// <summary>
     /// Rotates the specified value left by the specified number of bits.

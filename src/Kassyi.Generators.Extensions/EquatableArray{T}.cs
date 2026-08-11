@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -112,11 +112,9 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
     /// </summary>
     /// <param name="array">The input <see cref="ImmutableArray{T}"/> instance.</param>
     /// <returns>An <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</returns>
-    public static EquatableArray<T> FromImmutableArray(ImmutableArray<T> array)
-#pragma warning restore CA1000
-    {
-        return new(array);
-    }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1000:Do not declare static members on generic types",
+        Justification = "Factory method pattern for EquatableArray<T> struct.")]
+    public static EquatableArray<T> FromImmutableArray(ImmutableArray<T> array) => [with(array)];
 
     /// <summary>
     /// Returns a <see cref="ReadOnlySpan{T}"/> wrapping the current items.
