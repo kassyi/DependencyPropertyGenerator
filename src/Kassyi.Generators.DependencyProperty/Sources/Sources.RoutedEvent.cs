@@ -1,23 +1,21 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static string GenerateRoutedEvent(ClassData @class, EventData @event)
+    public static void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
     {
         switch (@event.IsAttached)
         {
             case true:
-                return GenerateAttachedRoutedEvent(@class, @event);
+                GenerateAttachedRoutedEvent(ref writer, @class, @event);
+                return;
         }
 
-        var categoryAttr = GenerateCategoryAttribute(@event.Category);
-        var descriptionAttr = GenerateDescriptionAttribute(@event.Description);
         var routedEventArgsType = GenerateRoutedEventArgsType(@class);
         var routerEventType = GenerateRouterEventType(@class, @event);
-        var eventXmlDoc = GenerateXmlDocumentationFrom(@event.EventXmlDocumentation, @event);
 
         switch (@class.Framework)
         {
@@ -25,173 +23,177 @@ internal static partial class SourceGenerationHelper
             case Framework.Wpf:
             case Framework.Avalonia:
             {
-                var fieldXmlDoc = GenerateXmlDocumentationFrom(@event.XmlDocumentation, @event);
-                var generatedCodeAttr = GenerateGeneratedCodeAttribute(@class.Version);
                 var routedEventType = GenerateRoutedEventType(@class);
                 var eventManagerType = GenerateEventManagerType(@class);
                 var registerMethod = GenerateRegisterMethod(@class);
                 var registerArgs = GenerateRegisterRoutedEventMethodArguments(@class, @event);
-                var excludeFromCoverageAttr = GenerateExcludeFromCodeCoverageAttribute();
 
-                return $$"""
-                         #nullable enable
-
-                         namespace {{@class.Namespace}}
-                         {
-                             {{@class.Modifiers}}partial class {{@class.Name}}
-                             {
-                         {{fieldXmlDoc}}
-                         {{generatedCodeAttr}}
-                                 public static readonly {{routedEventType}} {{@event.Name}}Event =
-                                     {{eventManagerType}}.{{registerMethod}}(
-                                         {{registerArgs}});
-
-                         {{eventXmlDoc}}
-                         {{categoryAttr}}
-                         {{descriptionAttr}}
-                         {{generatedCodeAttr}}
-                         {{excludeFromCoverageAttr}}
-                                 public event {{routerEventType}} {{@event.Name}}
-                                 {
-                                     add => AddHandler({{@event.Name}}Event, value);
-                                     remove => RemoveHandler({{@event.Name}}Event, value);
-                                 }
-
-                                 /// <summary>
-                                 /// A helper method to raise the {{@event.Name}} event.
-                                 /// </summary>
-                         {{generatedCodeAttr}}
-                         {{excludeFromCoverageAttr}}
-                                 protected {{routedEventArgsType}} On{{@event.Name}}()
-                                 {
-                                     var args = new {{routedEventArgsType}}({{@event.Name}}Event);
-                                     this.RaiseEvent(args);
-
-                                     return args;
-                                 }
-                             }
-                         }
-                         """.RemoveBlankLinesWhereOnlyWhitespaces();
+                writer.AppendLine("#nullable enable");
+                writer.AppendLine();
+                writer.AppendLine($"namespace {@class.Namespace}");
+                writer.AppendLine("{");
+                writer.AppendLine($"    {@class.Modifiers}partial class {@class.Name}");
+                writer.AppendLine("    {");
+                GenerateXmlDocumentationFrom(ref writer, @event.XmlDocumentation, @event);
+                GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+                writer.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
+                writer.AppendLine($"            {eventManagerType}.{registerMethod}(");
+                writer.AppendLine($"                {registerArgs});");
+                writer.AppendLine();
+                GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
+                GenerateCategoryAttribute(ref writer, @event.Category);
+                GenerateDescriptionAttribute(ref writer, @event.Description);
+                GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+                GenerateExcludeFromCodeCoverageAttribute(ref writer);
+                writer.AppendLine($"        public event {routerEventType} {@event.Name}");
+                writer.AppendLine("        {");
+                writer.AppendLine($"            add => AddHandler({@event.Name}Event, value);");
+                writer.AppendLine($"            remove => RemoveHandler({@event.Name}Event, value);");
+                writer.AppendLine("        }");
+                writer.AppendLine();
+                writer.AppendLine("        /// <summary>");
+                writer.AppendLine($"        /// A helper method to raise the {@event.Name} event.");
+                writer.AppendLine("        /// </summary>");
+                GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+                GenerateExcludeFromCodeCoverageAttribute(ref writer);
+                writer.AppendLine($"        protected {routedEventArgsType} On{@event.Name}()");
+                writer.AppendLine("        {");
+                writer.AppendLine($"            var args = new {routedEventArgsType}({@event.Name}Event);");
+                writer.AppendLine("            this.RaiseEvent(args);");
+                writer.AppendLine();
+                writer.AppendLine("            return args;");
+                writer.AppendLine("        }");
+                writer.AppendLine("    }");
+                writer.AppendLine("}");
+                break;
             }
             default:
-                return @event.WinRtEvents switch
+                writer.AppendLine("#nullable enable");
+                writer.AppendLine();
+                writer.AppendLine($"namespace {@class.Namespace}");
+                writer.AppendLine("{");
+                writer.AppendLine($"    {@class.Modifiers}partial class {@class.Name}");
+                writer.AppendLine("    {");
+                
+                if (!@event.WinRtEvents)
                 {
-                    false => $$"""
-                               #nullable enable
-
-                               namespace {{@class.Namespace}}
-                               {
-                                   {{@class.Modifiers}}partial class {{@class.Name}}
-                                   {
-                                       /// <summary>
-                                       /// A helper method to raise the {{@event.Name}} event. <br/>
-                                       /// WinRT events are disabled by default due to a series of issues with them in Windows 10:
-                                       /// https://github.com/HavenDV/H.NotifyIcon/issues/36
-                                       /// https://github.com/HavenDV/H.NotifyIcon/issues/31
-                                       /// Use the WinRTEvents = true option to enable them.
-                                       /// </summary>
-                                       protected {{routedEventArgsType}}? On{{@event.Name}}()
-                                       {
-                                           return null;
-                                       }
-                                   }
-                               }
-                               """.RemoveBlankLinesWhereOnlyWhitespaces(),
-                    _ => $$"""
-                           #nullable enable
-
-                           namespace {{@class.Namespace}}
-                           {
-                               {{@class.Modifiers}}partial class {{@class.Name}}
-                               {
-                           {{eventXmlDoc}}
-                           {{categoryAttr}}
-                           {{descriptionAttr}}
-                                   public event {{routerEventType}}? {{@event.Name}};
-
-                                   /// <summary>
-                                   /// A helper method to raise the {{@event.Name}} event.
-                                   /// </summary>
-                                   protected {{routedEventArgsType}} On{{@event.Name}}()
-                                   {
-                                       var args = new {{routedEventArgsType}}();
-                                       {{@event.Name}}?.Invoke(this, args);
-
-                                       return args;
-                                   }
-                               }
-                           }
-                           """.RemoveBlankLinesWhereOnlyWhitespaces()
-                };
+                    writer.AppendLine("        /// <summary>");
+                    writer.AppendLine($"        /// A helper method to raise the {@event.Name} event. <br/>");
+                    writer.AppendLine("        /// WinRT events are disabled by default due to a series of issues with them in Windows 10:");
+                    writer.AppendLine("        /// https://github.com/HavenDV/H.NotifyIcon/issues/36");
+                    writer.AppendLine("        /// https://github.com/HavenDV/H.NotifyIcon/issues/31");
+                    writer.AppendLine("        /// Use the WinRTEvents = true option to enable them.");
+                    writer.AppendLine("        /// </summary>");
+                    writer.AppendLine($"        protected {routedEventArgsType}? On{@event.Name}()");
+                    writer.AppendLine("        {");
+                    writer.AppendLine("            return null;");
+                    writer.AppendLine("        }");
+                }
+                else
+                {
+                    GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
+                    GenerateCategoryAttribute(ref writer, @event.Category);
+                    GenerateDescriptionAttribute(ref writer, @event.Description);
+                    writer.AppendLine($"        public event {routerEventType}? {@event.Name};");
+                    writer.AppendLine();
+                    writer.AppendLine("        /// <summary>");
+                    writer.AppendLine($"        /// A helper method to raise the {@event.Name} event.");
+                    writer.AppendLine("        /// </summary>");
+                    writer.AppendLine($"        protected {routedEventArgsType} On{@event.Name}()");
+                    writer.AppendLine("        {");
+                    writer.AppendLine($"            var args = new {routedEventArgsType}();");
+                    writer.AppendLine($"            {@event.Name}?.Invoke(this, args);");
+                    writer.AppendLine();
+                    writer.AppendLine("            return args;");
+                    writer.AppendLine("        }");
+                }
+                
+                writer.AppendLine("    }");
+                writer.AppendLine("}");
+                break;
         }
     }
     
-    public static string GenerateAttachedRoutedEvent(ClassData @class, EventData @event)
+    public static void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
     {
-        var xmlDoc = GenerateXmlDocumentationFrom(@event.XmlDocumentation, @event);
         var routedEventType = GenerateRoutedEventType(@class);
         var eventManagerType = GenerateEventManagerType(@class);
         var registerMethod = GenerateRegisterMethod(@class);
         var registerArgs = GenerateRegisterRoutedEventMethodArguments(@class, @event);
-
-        var eventXmlDoc = GenerateXmlDocumentationFrom(@event.EventXmlDocumentation, @event);
-        var categoryAttr = GenerateCategoryAttribute(@event.Category);
-        var descriptionAttr = GenerateDescriptionAttribute(@event.Description);
         
         var dependencyObjectType = GenerateDependencyObjectType(@class.Framework);
         var routedEventHandlerType = GenerateRoutedEventHandlerType(@class);
         var uiElementType = GenerateTypeByPlatform(@class.Framework, "UIElement");
         var contentElementType = GenerateTypeByPlatform(@class.Framework, "ContentElement");
 
-        return $$"""
-
-            #nullable enable
-
-            namespace {{@class.Namespace}}
-            {
-                {{@class.Modifiers}}partial class {{@class.Name}}
-                {
-            {{xmlDoc}}
-                    public static readonly {{routedEventType}} {{@event.Name}}Event =
-                        {{eventManagerType}}.{{registerMethod}}(
-                            {{registerArgs}});
-
-            {{eventXmlDoc}}
-            {{categoryAttr}}
-            {{descriptionAttr}}
-                    public static void Add{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
-                    {
-                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-                        if (element is {{uiElementType}} uiElement)
-                        {
-                            uiElement.AddHandler({{@event.Name}}Event, handler);
-                        }
-                        else if (element is {{contentElementType}} contentElement)
-                        {
-                            contentElement.AddHandler({{@event.Name}}Event, handler);
-                        }
-                    }
-
-            {{eventXmlDoc}}
-            {{categoryAttr}}
-            {{descriptionAttr}}
-                    public static void Remove{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
-                    {
-                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-                        if (element is {{uiElementType}} uiElement)
-                        {
-                            uiElement.RemoveHandler({{@event.Name}}Event, handler);
-                        }
-                        else if (element is {{contentElementType}} contentElement)
-                        {
-                            contentElement.RemoveHandler({{@event.Name}}Event, handler);
-                        }
-                    }
-                }
-            }
-            """.RemoveBlankLinesWhereOnlyWhitespaces();
+        writer.AppendLine();
+        writer.AppendLine("#nullable enable");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {@class.Namespace}");
+        writer.AppendLine("{");
+        writer.AppendLine($"    {@class.Modifiers}partial class {@class.Name}");
+        writer.AppendLine("    {");
+        
+        GenerateXmlDocumentationFrom(ref writer, @event.XmlDocumentation, @event);
+        writer.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
+        writer.AppendLine($"            {eventManagerType}.{registerMethod}(");
+        writer.AppendLine($"                {registerArgs});");
+        writer.AppendLine();
+        GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
+        GenerateCategoryAttribute(ref writer, @event.Category);
+        GenerateDescriptionAttribute(ref writer, @event.Description);
+        writer.AppendLine($"        public static void Add{@event.Name}Handler({dependencyObjectType} element, {routedEventHandlerType} handler)");
+        writer.AppendLine("        {");
+        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+        writer.AppendLine();
+        if (@class.Framework == Framework.Avalonia)
+        {
+            writer.AppendLine($"            if (element is {uiElementType} uiElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                uiElement.AddHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+        }
+        else
+        {
+            writer.AppendLine($"            if (element is {uiElementType} uiElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                uiElement.AddHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+            writer.AppendLine($"            else if (element is {contentElementType} contentElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                contentElement.AddHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+        }
+        writer.AppendLine("        }");
+        writer.AppendLine();
+        GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
+        GenerateCategoryAttribute(ref writer, @event.Category);
+        GenerateDescriptionAttribute(ref writer, @event.Description);
+        writer.AppendLine($"        public static void Remove{@event.Name}Handler({dependencyObjectType} element, {routedEventHandlerType} handler)");
+        writer.AppendLine("        {");
+        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+        writer.AppendLine();
+        if (@class.Framework == Framework.Avalonia)
+        {
+            writer.AppendLine($"            if (element is {uiElementType} uiElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                uiElement.RemoveHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+        }
+        else
+        {
+            writer.AppendLine($"            if (element is {uiElementType} uiElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                uiElement.RemoveHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+            writer.AppendLine($"            else if (element is {contentElementType} contentElement)");
+            writer.AppendLine("            {");
+            writer.AppendLine($"                contentElement.RemoveHandler({@event.Name}Event, handler);");
+            writer.AppendLine("            }");
+        }
+        writer.AppendLine("        }");
+        writer.AppendLine("    }");
+        writer.AppendLine("}");
     }
 
     private static string GenerateRouterEventType(ClassData @class, EventData @event)

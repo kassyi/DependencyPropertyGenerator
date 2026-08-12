@@ -1,6 +1,5 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
-using System.Text;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
@@ -93,7 +92,10 @@ internal static partial class SourceGenerationHelper
         int startIndex = lastDot >= 0 ? lastDot + 1 : 0;
         int length = typeName.Length - startIndex;
         
-        if (length <= 0) return string.Empty;
+        if (length <= 0)
+        {
+            return string.Empty;
+        }
 
         Span<char> span = stackalloc char[length];
         typeName.AsSpan(startIndex).CopyTo(span);
@@ -101,45 +103,54 @@ internal static partial class SourceGenerationHelper
         return span.ToString();
     }
 
-    private static string ToLowerFirstChar(string name)
-    {
-        if (string.IsNullOrEmpty(name)) return string.Empty;
-        Span<char> span = stackalloc char[name.Length];
-        name.AsSpan().CopyTo(span);
-        span[0] = char.ToLowerInvariant(span[0]);
-        return span.ToString();
-    }
-
     private const string OptionsPrefix = "global::System.Windows.FrameworkPropertyMetadataOptions.";
     private static string GenerateOptions(DependencyPropertyData property)
     {
-        var sb = new StringBuilder();
-        void AppendOption(bool condition, string name)
+        var writer = new SourceWriter();
+        try
+        {
+            GenerateOptions(ref writer, property);
+            return writer.ToString();
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
+    private static void GenerateOptions(ref SourceWriter writer, DependencyPropertyData property)
+    {
+        bool hasOption = false;
+        static void AppendOption(ref SourceWriter w, ref bool ho, bool condition, string name)
         {
             if (condition)
             {
-                if (sb.Length > 0)
+                if (ho)
                 {
-                    _ = sb.Append(" | ");
+                    w.Append(" | ");
                 }
-                _ = sb.Append(OptionsPrefix);
-                _ = sb.Append(name);
+                w.Append(OptionsPrefix);
+                w.Append(name);
+                ho = true;
             }
         }
 
-        AppendOption(property.AffectsMeasure, nameof(DependencyPropertyData.AffectsMeasure));
-        AppendOption(property.AffectsArrange, nameof(DependencyPropertyData.AffectsArrange));
-        AppendOption(property.AffectsParentMeasure, nameof(DependencyPropertyData.AffectsParentMeasure));
-        AppendOption(property.AffectsParentArrange, nameof(DependencyPropertyData.AffectsParentArrange));
-        AppendOption(property.AffectsRender, nameof(DependencyPropertyData.AffectsRender));
-        AppendOption(property.Inherits, nameof(DependencyPropertyData.Inherits));
-        AppendOption(property.OverridesInheritanceBehavior, nameof(DependencyPropertyData.OverridesInheritanceBehavior));
-        AppendOption(property.NotDataBindable, nameof(DependencyPropertyData.NotDataBindable));
-        AppendOption(property.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault");
-        AppendOption(property.Journal, nameof(DependencyPropertyData.Journal));
-        AppendOption(property.SubPropertiesDoNotAffectRender, nameof(DependencyPropertyData.SubPropertiesDoNotAffectRender));
+        AppendOption(ref writer, ref hasOption, property.AffectsMeasure, nameof(DependencyPropertyData.AffectsMeasure));
+        AppendOption(ref writer, ref hasOption, property.AffectsArrange, nameof(DependencyPropertyData.AffectsArrange));
+        AppendOption(ref writer, ref hasOption, property.AffectsParentMeasure, nameof(DependencyPropertyData.AffectsParentMeasure));
+        AppendOption(ref writer, ref hasOption, property.AffectsParentArrange, nameof(DependencyPropertyData.AffectsParentArrange));
+        AppendOption(ref writer, ref hasOption, property.AffectsRender, nameof(DependencyPropertyData.AffectsRender));
+        AppendOption(ref writer, ref hasOption, property.Inherits, nameof(DependencyPropertyData.Inherits));
+        AppendOption(ref writer, ref hasOption, property.OverridesInheritanceBehavior, nameof(DependencyPropertyData.OverridesInheritanceBehavior));
+        AppendOption(ref writer, ref hasOption, property.NotDataBindable, nameof(DependencyPropertyData.NotDataBindable));
+        AppendOption(ref writer, ref hasOption, property.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault");
+        AppendOption(ref writer, ref hasOption, property.Journal, nameof(DependencyPropertyData.Journal));
+        AppendOption(ref writer, ref hasOption, property.SubPropertiesDoNotAffectRender, nameof(DependencyPropertyData.SubPropertiesDoNotAffectRender));
 
-        return sb.Length == 0 ? "global::System.Windows.FrameworkPropertyMetadataOptions.None" : sb.ToString();
+        if (!hasOption)
+        {
+            writer.Append("global::System.Windows.FrameworkPropertyMetadataOptions.None");
+        }
     }
 
     private static string GenerateAdditionalSetterModifier(DependencyPropertyData property)
@@ -161,11 +172,12 @@ internal static partial class SourceGenerationHelper
         return "public";
     }
 
-    private static string GenerateValidatePartialMethod(ClassData @class, DependencyPropertyData property)
+    private static void GenerateValidatePartialMethod(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         if (!property.Validate)
         {
-            return " ";
+            writer.Append(" ");
+            return;
         }
 
         if (property.Framework == Framework.Maui)
@@ -174,101 +186,100 @@ internal static partial class SourceGenerationHelper
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
-            return $"""
+            writer.Append($"""
                 private static partial bool Is{property.Name}Valid(
                     {senderType} sender,
                     {GenerateType(property, canBeNull: true)} value);
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        """);
+            return;
         }
 
-        return $"""
+        writer.Append($"""
                 private static partial bool Is{property.Name}Valid({GenerateType(property, canBeNull: true)} value);
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        """);
     }
 
-    private static string GenerateCreateDefaultValueCallbackPartialMethod(DependencyPropertyData property)
+    private static void GenerateCreateDefaultValueCallbackPartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
         if (!property.CreateDefaultValueCallback)
         {
-            return " ";
+            writer.Append(" ");
+            return;
         }
 
-        return $"""
+        writer.Append($"""
                 private static partial {GenerateType(property)} Get{property.Name}DefaultValue();
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        """);
     }
 
-    private static string GenerateOnChangedMethodDeclaration(string name, DependencyPropertyData property)
+    private static void GenerateOnChangedMethodDeclaration(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
         var modifiers = property.IsAttached ? "static " : string.Empty;
         var targetParameter = property.IsAttached
             ? $"\n            {GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)},"
             : string.Empty;
 
-        return $"""
+        writer.Append($"""
                 {modifiers}partial void {name}({targetParameter}
                     {GenerateType(property)} oldValue,
                     {GenerateType(property)} newValue)
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        """);
     }
 
-    private static string GenerateOnChangedMethodCall(string name, DependencyPropertyData property)
+    private static void GenerateOnChangedMethodCall(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
         var targetArgument = property.IsAttached
             ? $"\n                {GenerateBrowsableForTypeParameterName(property)},"
             : string.Empty;
 
-        return $"""
+        writer.Append($"""
                     {name}({targetArgument}
                         oldValue,
                         newValue);
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        """);
     }
 
-    private static string GenerateBindEventMethod(DependencyPropertyData property)
+    private static void GenerateBindEventMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
         if (property.BindEvents.IsEmpty)
         {
-            return " ";
+            writer.Append(" ");
+            return;
         }
 
         var type = property.Type;
         var sender = property.IsAttached ? GenerateBrowsableForTypeParameterName(property) : "this";
 
-        var unbindEvents = property.BindEvents
-            .Select(@event => $"                {sender}.{@event} -= On{property.Name}Changed_{@event};\n")
-            .Inject();
-        var bindEvents = property.BindEvents
-            .Select(@event => $"                {sender}.{@event} += On{property.Name}Changed_{@event};\n")
-            .Inject();
-
-        var beforeBindDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_BeforeBind", property);
-        var afterBindDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_AfterBind", property);
-        var onChangedDecl = GenerateOnChangedMethodDeclaration($"On{property.Name}Changed", property);
-        var beforeBindCall = GenerateOnChangedMethodCall($"On{property.Name}Changed_BeforeBind", property);
-        var afterBindCall = GenerateOnChangedMethodCall($"On{property.Name}Changed_AfterBind", property);
-
-        return $$"""
-
-        {{beforeBindDecl}};
-        {{afterBindDecl}};
-
-        {{onChangedDecl}}
-                {
-        {{beforeBindCall}}
-
-                    if (oldValue is not default({{type}}))
-                    {
-        {{unbindEvents}}
-                    }
-                    if (newValue is not default({{type}}))
-                    {
-        {{bindEvents}}
-                    }
-
-        {{afterBindCall}}
-                }
-        """.RemoveBlankLinesWhereOnlyWhitespaces();
+        writer.AppendLine();
+        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed_BeforeBind", property);
+        writer.AppendLine(";");
+        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed_AfterBind", property);
+        writer.AppendLine(";");
+        writer.AppendLine();
+        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed", property);
+        writer.AppendLine();
+        writer.AppendLine("        {");
+        GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_BeforeBind", property);
+        writer.AppendLine();
+        writer.AppendLine();
+        writer.AppendLine($"            if (oldValue is not default({type}))");
+        writer.AppendLine("            {");
+        foreach (var @event in property.BindEvents)
+        {
+            writer.AppendLine($"                {sender}.{@event} -= On{property.Name}Changed_{@event};");
+        }
+        writer.AppendLine("            }");
+        writer.AppendLine($"            if (newValue is not default({type}))");
+        writer.AppendLine("            {");
+        foreach (var @event in property.BindEvents)
+        {
+            writer.AppendLine($"                {sender}.{@event} += On{property.Name}Changed_{@event};");
+        }
+        writer.AppendLine("            }");
+        writer.AppendLine();
+        GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_AfterBind", property);
+        writer.AppendLine();
+        writer.Append("        }");
     }
 
     private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)

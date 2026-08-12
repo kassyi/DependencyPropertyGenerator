@@ -207,7 +207,10 @@ public static class PrepareData
 
         foreach (var member in classSymbol.GetMembers(methodName))
         {
-            if (member is not IMethodSymbol method) continue;
+            if (member is not IMethodSymbol method)
+            {
+                continue;
+            }
 
             var p = method.Parameters;
             switch (p.Length)
@@ -218,22 +221,42 @@ public static class PrepareData
 
                 case 1:
                     var type0 = GetNormalizedTypeName(p[0].Type);
-                    if (type0 == targetType || type0 == senderType) has1 = true;
-                    if (IsEventArgsType(p[0].Type.Name)) hasArgs1 = true;
+                    if (type0 == targetType || type0 == senderType)
+                    {
+                        has1 = true;
+                    }
+
+                    if (IsEventArgsType(p[0].Type.Name))
+                    {
+                        hasArgs1 = true;
+                    }
+
                     break;
 
                 case 2:
                     var type02 = GetNormalizedTypeName(p[0].Type);
                     var type12 = GetNormalizedTypeName(p[1].Type);
-                    if ((type02 == targetType && type12 == targetType) || (type02 == senderType && type12 == targetType)) has2 = true;
-                    if (IsEventArgsType(p[1].Type.Name)) hasArgs2 = true;
+                    if ((type02 == targetType && type12 == targetType) || (type02 == senderType && type12 == targetType))
+                    {
+                        has2 = true;
+                    }
+
+                    if (IsEventArgsType(p[1].Type.Name))
+                    {
+                        hasArgs2 = true;
+                    }
+
                     break;
 
                 case 3:
                     var type03 = GetNormalizedTypeName(p[0].Type);
                     var type13 = GetNormalizedTypeName(p[1].Type);
                     var type23 = GetNormalizedTypeName(p[2].Type);
-                    if (type03 == senderType && type13 == targetType && type23 == targetType) has3 = true;
+                    if (type03 == senderType && type13 == targetType && type23 == targetType)
+                    {
+                        has3 = true;
+                    }
+
                     break;
             }
         }

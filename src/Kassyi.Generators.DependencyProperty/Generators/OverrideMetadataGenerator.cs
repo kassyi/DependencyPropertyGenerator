@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
@@ -78,14 +78,27 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
         var name = data.Class.Framework is Framework.Wpf
             ? $"{data.Class.FullName}.StaticConstructor.g.cs"
             : $"{data.Class.FullName}.Methods.RegisterPropertyChangedCallbacks.g.cs";
-        var text = data.Class.Framework is Framework.Wpf
-            ? SourceGenerationHelper.GenerateStaticConstructor(data.Class, data.OverrideMetada.AsImmutableArray())
-            : SourceGenerationHelper.GenerateRegisterPropertyChangedCallbacksMethod(data.Class,
-                data.OverrideMetada.AsImmutableArray());
 
-        return new FileWithName(
-            Name: name,
-            Text: text);
+        var writer = new SourceWriter();
+        try
+        {
+            if (data.Class.Framework is Framework.Wpf)
+            {
+                SourceGenerationHelper.GenerateStaticConstructor(ref writer, data.Class, data.OverrideMetada.AsImmutableArray());
+            }
+            else
+            {
+                SourceGenerationHelper.GenerateRegisterPropertyChangedCallbacksMethod(ref writer, data.Class, data.OverrideMetada.AsImmutableArray());
+            }
+
+            return new FileWithName(
+                Name: name,
+                Text: writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     #endregion

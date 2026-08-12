@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Security;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
@@ -7,16 +7,20 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    private readonly static char[] Separator = { '\r', '\n' };
+    private static readonly char[] Separator = ['\r', '\n'];
 
-    private static string GenerateXmlDocumentationFrom(string value)
+    private static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string value)
     {
         var lines = value.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
 
-        return string.Join("\n", lines.Select(static line => $"        /// {line}"));
+        foreach (var line in lines)
+        {
+            writer.AppendLine($"        /// {line}");
+        }
     }
 
-    private static string GenerateXmlDocumentationFrom(
+    private static void GenerateXmlDocumentationFrom(
+        ref SourceWriter writer,
         string? value,
         DependencyPropertyData property,
         bool isProperty)
@@ -25,27 +29,33 @@ internal static partial class SourceGenerationHelper
             ? property.Name
             : $"<see cref=\"{property.Name}\"/>";
         var body = isProperty
-            ? property.Description != null ? $"{SecurityElement.Escape(property.Description)}<br/>" : " "
+            ? property.Description != null ? $"{SecurityElement.Escape(property.Description)}<br/>" : ""
             : $"Identifies the {name} dependency property.<br/>";
-        value ??= $"""
-                   <summary>
-                   {body}
-                   Default value: {property.DefaultValueDocumentation?.ExtractSimpleName() ?? $"default({WebUtility.HtmlEncode(property.ShortType)})"}
-                   </summary>
-                   """.RemoveBlankLinesWhereOnlyWhitespaces();
+            
+        if (value != null)
+        {
+            GenerateXmlDocumentationFrom(ref writer, value);
+            return;
+        }
 
-        return GenerateXmlDocumentationFrom(value);
+        writer.AppendLine("        /// <summary>");
+        writer.LineIf(body.Length > 0, $"        /// {body}");
+        var defaultDoc = property.DefaultValueDocumentation?.ExtractSimpleName() ?? $"default({WebUtility.HtmlEncode(property.ShortType)})";
+        writer.AppendLine($"        /// Default value: {defaultDoc}");
+        writer.AppendLine("        /// </summary>");
     }
 
-    private static string GenerateXmlDocumentationFrom(string? value, EventData @event)
+    private static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string? value, EventData @event)
     {
-        value ??= $"""
-                   <summary>
-                   {(@event.Description != null ? $"{@event.Description}" : " ")}
-                   </summary>
-                   """.RemoveBlankLinesWhereOnlyWhitespaces();
+        if (value != null)
+        {
+            GenerateXmlDocumentationFrom(ref writer, value);
+            return;
+        }
 
-        return GenerateXmlDocumentationFrom(value);
+        writer.AppendLine("        /// <summary>");
+        writer.LineIf(!string.IsNullOrWhiteSpace(@event.Description), $"        /// {@event.Description}");
+        writer.AppendLine("        /// </summary>");
     }
 }
 

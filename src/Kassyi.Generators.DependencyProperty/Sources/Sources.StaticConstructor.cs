@@ -1,11 +1,12 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static string GenerateStaticConstructor(
+    public static void GenerateStaticConstructor(
+        ref SourceWriter writer,
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> properties)
     {
@@ -13,172 +14,172 @@ internal static partial class SourceGenerationHelper
         {
             case Framework.Avalonia:
             {
-                var generatedAffects = properties
-                    .Select(property => GenerateAvaloniaStaticConstructorAffects(@class, property))
-                    .Inject();
-                var generatedProperties = properties
-                    .Where(static property => !property.IsAttached)
-                    .Select(property => GenerateAvaloniaStaticConstructorPropertyChanged(@class, property))
-                    .Inject();
-                var generatedAttachedProperties = properties
-                    .Where(static property => property.IsAttached)
-                    .Select(property => GenerateAvaloniaStaticConstructorPropertyChanged(@class, property))
-                    .Inject();
-                if (string.IsNullOrWhiteSpace(generatedAffects) &&
-                    string.IsNullOrWhiteSpace(generatedProperties) &&
-                    string.IsNullOrWhiteSpace(generatedAttachedProperties))
+                var tempWriter = new SourceWriter();
+                try
                 {
-                    return string.Empty;
+                    foreach (var property in properties)
+                    {
+                        GenerateAvaloniaStaticConstructorAffects(ref tempWriter, @class, property);
+                    }
+                    foreach (var property in properties.Where(static p => !p.IsAttached))
+                    {
+                        GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
+                    }
+                    foreach (var property in properties.Where(static p => p.IsAttached))
+                    {
+                        GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
+                    }
+
+                    if (tempWriter.Length == 0)
+                    {
+                        return;
+                    }
+
+                    writer.AppendLine();
+                    writer.AppendLine("#nullable enable");
+                    writer.AppendLine();
+                    writer.AppendLine($"namespace {@class.Namespace}");
+                    writer.AppendLine("{");
+                    writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
+                    writer.AppendLine("    {");
+                    writer.AppendLine($"        static {@class.Name}()");
+                    writer.AppendLine("        {");
+                    
+                    writer.Append(tempWriter.ToString());
+
+                    writer.AppendLine("        }");
                 }
-
-                return $$"""
-                         #nullable enable
-
-                         namespace {{@class.Namespace}}
-                         {
-                             {{GenerateModifiers(@class)}}partial class {{@class.Name}}
-                             {
-                                 static {{@class.Name}}()
-                                 {
-                         {{generatedAffects}}
-                         {{generatedProperties}}
-                         {{generatedAttachedProperties}}
-                                 }
-                             }
-                         }
-                         """.RemoveBlankLinesWhereOnlyWhitespaces();
+                finally
+                {
+                    tempWriter.Dispose();
+                }
+                writer.AppendLine("    }");
+                writer.AppendLine("}");
+                break;
             }
             case Framework.Wpf:
             {
-                var readOnlyProperties = properties
-                    .Where(static property => property.IsReadOnly)
-                    .Select(property => $"""
+                writer.AppendLine();
+                writer.AppendLine("#nullable enable");
+                writer.AppendLine();
+                writer.AppendLine($"namespace {@class.Namespace}");
+                writer.AppendLine("{");
+                writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
+                writer.AppendLine("    {");
+                writer.AppendLine($"        static {@class.Name}()");
+                writer.AppendLine("        {");
 
-                                                     {property.Name}Property.OverrideMetadata(
-                                                         forType: typeof({@class.Type}),
-                                                         {GeneratePropertyMetadata(@class, property)},
-                                                         key: {property.Name}PropertyKey);
+                foreach (var property in properties)
+                {
+                    if (property.IsReadOnly)
+                    {
+                        writer.AppendLine($"            {property.Name}Property.OverrideMetadata(");
+                        writer.AppendLine($"                forType: typeof({@class.Type}),");
+                        writer.AppendLine($"                {GeneratePropertyMetadata(@class, property)},");
+                        writer.AppendLine($"                key: {property.Name}PropertyKey);");
+                        writer.AppendLine();
+                    }
+                    else
+                    {
+                        writer.AppendLine($"            {property.Name}Property.OverrideMetadata(");
+                        writer.AppendLine($"                forType: typeof({@class.Type}),");
+                        writer.AppendLine($"                {GeneratePropertyMetadata(@class, property)});");
+                        writer.AppendLine();
+                    }
+                }
+                
+                writer.AppendLine("        }");
+                writer.AppendLine();
 
-                                         """).Inject();
+                foreach (var property in properties)
+                {
+                    GenerateOnChangedMethods(ref writer, @class, property);
+                }
 
-                var readWriteProperties = properties
-                    .Where(static property => !property.IsReadOnly)
-                    .Select(property => $"""
-
-                                                     {property.Name}Property.OverrideMetadata(
-                                                         forType: typeof({@class.Type}),
-                                                         {GeneratePropertyMetadata(@class, property)});
-
-                                         """).Inject();
-
-                var onChangedMethods = properties
-                    .Select(property => GenerateOnChangedMethods(@class, property))
-                    .Inject();
-
-                return $$"""
-                         #nullable enable
-
-                         namespace {{@class.Namespace}}
-                         {
-                             {{GenerateModifiers(@class)}}partial class {{@class.Name}}
-                             {
-                                 static {{@class.Name}}()
-                                 {
-                         {{readOnlyProperties}}
-                         {{readWriteProperties}}
-                                 }
-
-                         {{onChangedMethods}}
-                             }
-                         }
-                         """.RemoveBlankLinesWhereOnlyWhitespaces();
+                writer.AppendLine("    }");
+                writer.AppendLine("}");
+                break;
             }
-            default:
-                return string.Empty;
         }
     }
 
-    private static string GenerateAvaloniaStaticConstructorAffects(
+    private static void GenerateAvaloniaStaticConstructorAffects(
+        ref SourceWriter writer,
         ClassData @class,
         DependencyPropertyData property)
     {
-        return $"""
-
-                            {(property.AffectsRender ? $"AffectsRender<{@class.Type}>({property.Name}Property);" : string.Empty)}
-                            {(property.AffectsMeasure ? $"AffectsMeasure<{@class.Type}>({property.Name}Property);" : string.Empty)}
-                            {(property.AffectsArrange ? $"AffectsArrange<{@class.Type}>({property.Name}Property);" : string.Empty)}
-
-                """.RemoveBlankLinesWhereOnlyWhitespaces();
+        writer.LineIf(property.AffectsRender, $"            AffectsRender<{@class.Type}>({property.Name}Property);");
+        writer.LineIf(property.AffectsMeasure, $"            AffectsMeasure<{@class.Type}>({property.Name}Property);");
+        writer.LineIf(property.AffectsArrange, $"            AffectsArrange<{@class.Type}>({property.Name}Property);");
     }
-    
-    private static string GenerateAvaloniaStaticConstructorPropertyChanged(
+
+    private static void GenerateAvaloniaStaticConstructorPropertyChanged(
+        ref SourceWriter writer,
         ClassData @class,
         DependencyPropertyData property)
     {
         var (name, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) = CheckOnChangedMethods(@class, property);
-        return isChanged0 switch
+        
+        if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2)
         {
-            false when !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2 => string.Empty,
-            _ => property.IsAttached
-                ? $$"""
+            return;
+        }
+        
+        writer.AppendLine($"            {property.Name}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{GenerateType(property)}>>(static x =>");
+        writer.AppendLine("            {");
+        
+        if (property.IsAttached)
+        {
+            writer.LineIf(isChanged0, $"                {name}();");
+            writer.LineIf(isChanged1, $"""
+                                {name}(
+                                    ({GenerateBrowsableForType(property)})x.Sender);
+                """);
+            writer.LineIf(isChanged2, $"""
+                                {name}(
+                                    ({GenerateBrowsableForType(property)})x.Sender,
+                                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                """);
+            writer.LineIf(isChanged3, $"""
+                                {name}(
+                                    ({GenerateBrowsableForType(property)})x.Sender,
+                                    ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
+                                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                """);
+            writer.LineIf(isChangedArgs1, $"""
+                                {name}(
+                                    x);
+                """);
+            writer.LineIf(isChangedArgs2, $"""
+                                {name}(
+                                    ({GenerateBrowsableForType(property)})x.Sender,
+                                    x);
+                """);
+        }
+        else
+        {
+            writer.LineIf(isChanged0, $"                (({@class.Type})x.Sender).{name}();");
+            writer.LineIf(isChanged1, $"""
+                                (({@class.Type})x.Sender).{name}(
+                                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                """);
+            writer.LineIf(isChanged2, $"""
+                                (({@class.Type})x.Sender).{name}(
+                                    ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
+                                    ({GenerateType(property)})x.NewValue.GetValueOrDefault());
+                """);
+            writer.LineIf(isChangedArgs1, $"""
+                                (({@class.Type})x.Sender).{name}(
+                                    x);
+                """);
+            writer.LineIf(isChangedArgs2, $"""
+                                {name}(
+                                    (({@class.Type})x.Sender),
+                                    x);
+                """);
+        }
 
-                                {{property.Name}}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{{GenerateType(property)}}>>(static x =>
-                                {
-                                    {{(isChanged0 ? $"{name}();" : "")}}
-                                    {{(isChanged1 ? $"""
-                                                     {name}(
-                                                                         ({GenerateBrowsableForType(property)})x.Sender);
-                                                     """ : "")}}
-                                    {{(isChanged2 ? $"""
-                                                     {name}(
-                                                                         ({GenerateBrowsableForType(property)})x.Sender,
-                                                                         ({GenerateType(property)})x.NewValue.GetValueOrDefault());
-                                                     """ : "")}}
-                                    {{(isChanged3 ? $"""
-                                                     {name}(
-                                                                         ({GenerateBrowsableForType(property)})x.Sender,
-                                                                         ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                                                                         ({GenerateType(property)})x.NewValue.GetValueOrDefault());
-                                                     """ : "")}}
-                                    {{(isChangedArgs1 ? $"""
-                                                         {name}(
-                                                                             x);
-                                                         """ : "")}}
-                                    {{(isChangedArgs2 ? $"""
-                                                         {name}(
-                                                                             ({GenerateBrowsableForType(property)})x.Sender,
-                                                                             x);
-                                                         """ : "")}}
-                                }));
-
-                    """.RemoveBlankLinesWhereOnlyWhitespaces()
-                : $$"""
-
-                                {{property.Name}}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{{GenerateType(property)}}>>(static x =>
-                                {
-                                    {{(isChanged0 ? $"(({@class.Type})x.Sender).{name}();" : "")}}
-                                    {{(isChanged1 ? $"""
-                                                     (({@class.Type})x.Sender).{name}(
-                                                                         ({GenerateType(property)})x.NewValue.GetValueOrDefault());
-                                                     """ : "")}}
-                                    {{(isChanged2 ? $"""
-                                                     (({@class.Type})x.Sender).{name}(
-                                                                         ({GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                                                                         ({GenerateType(property)})x.NewValue.GetValueOrDefault());
-                                                     """ : "")}}
-                                    {{(isChangedArgs1 ? $"""
-                                                         (({@class.Type})x.Sender).{name}(
-                                                                             x);
-                                                         """ : "")}}
-                                    {{(isChangedArgs2 ? $"""
-                                                         {name}(
-                                                                             (({@class.Type})x.Sender),
-                                                                             x);
-                                                         """ : "")}}
-                                }));
-
-                    """.RemoveBlankLinesWhereOnlyWhitespaces()
-        };
+        writer.AppendLine("            }));");
     }
 }
 

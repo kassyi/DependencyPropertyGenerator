@@ -1,4 +1,4 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
@@ -6,84 +6,80 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 internal static partial class SourceGenerationHelper
 {
 
-    private static string GenerateOnChangedMethods(ClassData @class, DependencyPropertyData property)
+    private static void GenerateOnChangedMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         switch (string.IsNullOrWhiteSpace(property.OnChanged))
         {
             case false:
                 var (_, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) = CheckOnChangedMethods(@class, property);
-                return isChanged0 switch
+                if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2)
                 {
-                    false when !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2 => $"""
-                         #error DPG0001: The specified OnChanged method '{property.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.
-                         """,
-                    _ => " "
-                };
+                    writer.AppendLine($"#error DPG0001: The specified OnChanged method '{property.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.");
+                }
+                return;
         }
 
-        var attr = GenerateGeneratedCodeAttribute(property.Version);
         var type = GenerateType(property);
         var browsable = GenerateBrowsableForType(property);
         var browsableName = GenerateBrowsableForTypeParameterName(property);
         var name = property.Name;
 
-        return property.IsAttached
-            ? $$"""
-                
-               {{attr}}
-                       static partial void On{{name}}Changed();
-               {{attr}}
-                       static partial void On{{name}}Changed({{browsable}} {{browsableName}});
-               {{attr}}
-                       static partial void On{{name}}Changed({{browsable}} {{browsableName}}, {{type}} newValue);
-               {{attr}}
-                       static partial void On{{name}}Changed({{browsable}} {{browsableName}}, {{type}} oldValue, {{type}} newValue);
-               """
-            : $$"""
-                
-               {{attr}}
-                       partial void On{{name}}Changed();
-               {{attr}}
-                       partial void On{{name}}Changed({{type}} newValue);
-               {{attr}}
-                       partial void On{{name}}Changed({{type}} oldValue, {{type}} newValue);
-               """;
+        writer.AppendLine();
+        if (property.IsAttached)
+        {
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changed();");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changed({browsable} {browsableName});");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changed({browsable} {browsableName}, {type} newValue);");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changed({browsable} {browsableName}, {type} oldValue, {type} newValue);");
+        }
+        else
+        {
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changed();");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changed({type} newValue);");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changed({type} oldValue, {type} newValue);");
+        }
     }
 
-    private static string GenerateOnChangingMethods(DependencyPropertyData property)
+    private static void GenerateOnChangingMethods(ref SourceWriter writer, DependencyPropertyData property)
     {
         if (property.Framework != Framework.Maui)
         {
-            return " ";
+            return;
         }
 
-        var attr = GenerateGeneratedCodeAttribute(property.Version);
         var type = GenerateType(property);
         var browsable = GenerateBrowsableForType(property);
         var browsableName = GenerateBrowsableForTypeParameterName(property);
         var name = property.Name;
 
-        return property.IsAttached
-            ? $$"""
-                
-               {{attr}}
-                       static partial void On{{name}}Changing();
-               {{attr}}
-                       static partial void On{{name}}Changing({{browsable}} {{browsableName}});
-               {{attr}}
-                       static partial void On{{name}}Changing({{browsable}} {{browsableName}}, {{type}} newValue);
-               {{attr}}
-                       static partial void On{{name}}Changing({{browsable}} {{browsableName}}, {{type}} oldValue, {{type}} newValue);
-               """
-            : $$"""
-                
-               {{attr}}
-                       partial void On{{name}}Changing();
-               {{attr}}
-                       partial void On{{name}}Changing({{type}} newValue);
-               {{attr}}
-                       partial void On{{name}}Changing({{type}} oldValue, {{type}} newValue);
-               """;
+        writer.AppendLine();
+        if (property.IsAttached)
+        {
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changing();");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changing({browsable} {browsableName});");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changing({browsable} {browsableName}, {type} newValue);");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        static partial void On{name}Changing({browsable} {browsableName}, {type} oldValue, {type} newValue);");
+        }
+        else
+        {
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changing();");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changing({type} newValue);");
+            GenerateGeneratedCodeAttribute(ref writer, property.Version);
+            writer.AppendLine($"        partial void On{name}Changing({type} oldValue, {type} newValue);");
+        }
     }
     
     private static string GenerateValidateValueCallback(ClassData @class, DependencyPropertyData property)
@@ -292,7 +288,7 @@ internal static partial class SourceGenerationHelper
 
     private static (string Name, bool IsChanged0, bool IsChanged1, bool IsChanged2, bool IsChanged3, bool IsChangedArgs1, bool IsChangedArgs2)
         CheckOnChangedMethods(
-            ClassData @class,
+            ClassData _,
             DependencyPropertyData property)
     {
         var isCustom = !string.IsNullOrWhiteSpace(property.OnChanged);
@@ -305,18 +301,14 @@ internal static partial class SourceGenerationHelper
 
     private static string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
     {
-        switch (property.IsChanging0)
+        if (!property.IsChanging0 && !property.IsChanging1 && !property.IsChanging2 && !property.IsChanging3)
         {
-            case false when
-                !property.IsChanging1 &&
-                !property.IsChanging2 &&
-                !property.IsChanging3:
-                return "null";
-            default:
-            {
-                var senderType = property.IsAttached
-                    ? GenerateBrowsableForType(property)
-                    : @class.Type;
+            return "null";
+        }
+
+        var senderType = property.IsAttached
+            ? GenerateBrowsableForType(property)
+            : @class.Type;
                 return property.Framework switch
                 {
                     Framework.Maui => property.IsAttached
@@ -394,8 +386,6 @@ internal static partial class SourceGenerationHelper
                                                 }
                             """
                 };
-            }
-        }
     }
 }
 

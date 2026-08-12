@@ -1,4 +1,4 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
@@ -81,9 +81,18 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
 
     private static FileWithName GetSourceCode((ClassData Class, DependencyPropertyData DependencyProperty) data)
     {
-        return new FileWithName(
-            Name: $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs",
-            Text: SourceGenerationHelper.GenerateAttachedDependencyProperty(data.Class, data.DependencyProperty));
+        var writer = new SourceWriter();
+        try
+        {
+            SourceGenerationHelper.GenerateAttachedDependencyProperty(ref writer, data.Class, data.DependencyProperty);
+            return new FileWithName(
+                Name: $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs",
+                Text: writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     #endregion

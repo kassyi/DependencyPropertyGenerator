@@ -1,4 +1,4 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
@@ -82,9 +82,18 @@ public class RoutedEventGenerator : IIncrementalGenerator
             ? "AttachedEvents"
             : "Events";
 
-        return new FileWithName(
-            Name: $"{data.Class.FullName}.{category}.{data.Event.Name}.g.cs",
-            Text: SourceGenerationHelper.GenerateRoutedEvent(data.Class, data.Event));
+        var writer = new SourceWriter();
+        try
+        {
+            SourceGenerationHelper.GenerateRoutedEvent(ref writer, data.Class, data.Event);
+            return new FileWithName(
+                Name: $"{data.Class.FullName}.{category}.{data.Event.Name}.g.cs",
+                Text: writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     #endregion

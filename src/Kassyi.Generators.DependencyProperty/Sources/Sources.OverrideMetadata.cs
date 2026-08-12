@@ -1,75 +1,68 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static string GenerateRegisterPropertyChangedCallbacksMethod(
+    public static void GenerateRegisterPropertyChangedCallbacksMethod(
+        ref SourceWriter writer,
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> overrideMetadata)
     {
-        var registerCallbacks = overrideMetadata.Select(property =>
+        writer.AppendLine();
+        writer.AppendLine("#nullable enable");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {@class.Namespace}");
+        writer.AppendLine("{");
+        writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
+        writer.AppendLine("    {");
+        writer.AppendLine("        private void RegisterPropertyChangedCallbacks()");
+        writer.AppendLine("        {");
+
+        foreach (var property in overrideMetadata)
         {
             var senderType = property.IsAttached
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
             var (name, isChanged0, isChanged1, isChanged2, isChanged3, _, _) = CheckOnChangedMethods(@class, property);
-            switch (isChanged0)
+            if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3)
             {
-                case false when
-                    !isChanged1 &&
-                    !isChanged2 &&
-                    !isChanged3:
-                    return " ";
+                continue;
             }
 
             var type = GenerateType(property);
-            var changed0 = isChanged0 ? $"(({senderType})sender).{name}();" : string.Empty;
-            var changed1 = isChanged1 ? $"""
-                                             (({senderType})sender).{name}(
-                                                                     ({type})sender.GetValue(dependencyProperty));
-                             """ : string.Empty;
-            var changed2 = isChanged2 ? $"""
-                                             (({senderType})sender).{name}(
-                                                                     ({type})sender.GetValue(dependencyProperty),
-                                                                     ({type})sender.GetValue(dependencyProperty));
-                             """ : string.Empty;
+            
+            writer.AppendLine("            _ = this.RegisterPropertyChangedCallback(");
+            writer.AppendLine($"                dp: {property.Name}Property,");
+            writer.AppendLine("                callback: static (sender, dependencyProperty) =>");
+            writer.AppendLine("                {");
+            if (isChanged0) writer.AppendLine($"                    (({senderType})sender).{name}();");
+            if (isChanged1)
+            {
+                writer.AppendLine($"                    (({senderType})sender).{name}(");
+                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty));");
+            }
+            if (isChanged2)
+            {
+                writer.AppendLine($"                    (({senderType})sender).{name}(");
+                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty),");
+                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty));");
+            }
+            writer.AppendLine("                });");
+            writer.AppendLine();
+        }
 
-            return $$"""
-                                 _ = this.RegisterPropertyChangedCallback(
-                                     dp: {{property.Name}}Property,
-                                     callback: static (sender, dependencyProperty) =>
-                                     {
-                                         {{changed0}}
-                                         {{changed1}}
-                                         {{changed2}}
-                                     });
+        writer.AppendLine("        }");
 
-                     """;
-        }).Inject();
+        foreach (var property in overrideMetadata)
+        {
+            GenerateOnChangedMethods(ref writer, @class, property);
+        }
 
-        var onChangedMethods = overrideMetadata
-            .Select(property => GenerateOnChangedMethods(@class, property))
-            .Inject();
-
-        return $$"""
-                 #nullable enable
-
-                 namespace {{@class.Namespace}}
-                 {
-                     {{GenerateModifiers(@class)}}partial class {{@class.Name}}
-                     {
-                         private void RegisterPropertyChangedCallbacks()
-                         {
-                 {{registerCallbacks}}
-                         }
-
-                 {{onChangedMethods}}
-                     }
-                 }
-                 """.RemoveBlankLinesWhereOnlyWhitespaces();
+        writer.AppendLine("    }");
+        writer.AppendLine("}");
     }
 }
 

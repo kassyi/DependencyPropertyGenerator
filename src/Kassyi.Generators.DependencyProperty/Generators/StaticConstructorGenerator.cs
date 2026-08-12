@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
@@ -126,14 +126,24 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .GroupBy(static x => x.Class, static x => x.DependencyProperty)
             .Select(static g =>
             {
-                var text = SourceGenerationHelper.GenerateStaticConstructor(
-                    g.Key,
-                    g.Where(static property => !property.IsDirect).ToArray());
-                return string.IsNullOrWhiteSpace(text) switch
+                var writer = new SourceWriter();
+                try
                 {
-                    false => new FileWithName(Name: $"{g.Key.FullName}.StaticConstructor.g.cs", Text: text),
-                    _ => FileWithName.Empty
-                };
+                    SourceGenerationHelper.GenerateStaticConstructor(
+                        ref writer,
+                        g.Key,
+                        g.Where(static property => !property.IsDirect).ToArray());
+                    var text = writer.ToString();
+                    return string.IsNullOrWhiteSpace(text) switch
+                    {
+                        false => new FileWithName(Name: $"{g.Key.FullName}.StaticConstructor.g.cs", Text: text),
+                        _ => FileWithName.Empty
+                    };
+                }
+                finally
+                {
+                    writer.Dispose();
+                }
             })
             .Where(static f => !string.IsNullOrWhiteSpace(f.Text))
             .ToImmutableArray()

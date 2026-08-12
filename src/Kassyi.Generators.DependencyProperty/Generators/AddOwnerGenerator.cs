@@ -1,4 +1,4 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
@@ -70,9 +70,18 @@ public class AddOwnerGenerator : IIncrementalGenerator
 
     private static FileWithName GetSourceCode((ClassData Class, DependencyPropertyData DependencyProperty) data)
     {
-        return new FileWithName(
-            Name: $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs",
-            Text: SourceGenerationHelper.GenerateDependencyProperty(data.Class, data.DependencyProperty));
+        var writer = new SourceWriter();
+        try
+        {
+            SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
+            return new FileWithName(
+                Name: $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs",
+                Text: writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     #endregion

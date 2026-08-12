@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
@@ -6,158 +6,164 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static string GenerateDependencyProperty(ClassData @class, DependencyPropertyData property)
+    public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        var xmlDocumentation = GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false);
-        var generatedCodeAttribute = GenerateGeneratedCodeAttribute(@class.Version);
+        writer.AppendLine();
+        writer.AppendLine("#nullable enable");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {@class.Namespace}");
+        writer.AppendLine("{");
+        writer.AppendLine($"    {@class.Modifiers}partial class {@class.Name}");
+        writer.AppendLine("    {");
+
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+
         var propertyModifier = GeneratePropertyModifier(property);
         var propertyType = GeneratePropertyType(@class, property);
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
-        var dependencyPropertyCreateCall = GenerateDependencyPropertyCreateCall(@class, property);
 
-        var additionalFieldForDirectProperties = GenerateAdditionalFieldForDirectProperties(property);
-        var additionalPropertyForReadOnlyProperties = GenerateAdditionalPropertyForReadOnlyProperties(property);
-        var getterXmlDocumentation = GenerateXmlDocumentationFrom(property.GetterXmlDocumentation, property, isProperty: true);
-        var categoryAttribute = GenerateCategoryAttribute(property.Category);
-        var descriptionAttribute = GenerateDescriptionAttribute(property.Description);
-        var typeConverterAttribute = GenerateTypeConverterAttribute(property.TypeConverter);
-        var bindableAttribute = GenerateBindableAttribute(property.Bindable);
-        var browsableAttribute = GenerateBrowsableAttribute(property.Browsable);
-        var designerSerializationVisibilityAttribute = GenerateDesignerSerializationVisibilityAttribute(property.DesignerSerializationVisibility);
-        var clsCompliantAttribute = GenerateClsCompliantAttribute(property.ClsCompliant);
-        var localizabilityAttribute = GenerateLocalizabilityAttribute(property.Localizability, @class.Framework);
-        var excludeFromCodeCoverageAttribute = GenerateExcludeFromCodeCoverageAttribute();
+        writer.Append($"        {propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
+        GenerateDependencyPropertyCreateCall(ref writer, @class, property);
+        writer.AppendLine();
 
-        var type = GenerateType(property);
-        var getter = GenerateGetter(property);
-        var setter = GenerateSetter(property);
+        GenerateAdditionalFieldForDirectProperties(ref writer, property);
+        GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
+        GenerateXmlDocumentationFrom(ref writer, property.GetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.Category);
+        GenerateDescriptionAttribute(ref writer, property.Description);
+        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
+        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+        GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        var onChangedMethods = GenerateOnChangedMethods(@class, property);
-        var onChangingMethods = GenerateOnChangingMethods(property);
-        var coercePartialMethod = GenerateCoercePartialMethod(property);
-        var validatePartialMethod = GenerateValidatePartialMethod(@class, property);
-        var createDefaultValueCallbackPartialMethod = GenerateCreateDefaultValueCallbackPartialMethod(property);
-        var bindEventMethod = GenerateBindEventMethod(property);
-
-        return $$"""
-
-            #nullable enable
-
-            namespace {{@class.Namespace}}
-            {
-                {{@class.Modifiers}}partial class {{@class.Name}}
-                {
-            {{xmlDocumentation}}
-            {{generatedCodeAttribute}}
-                    {{propertyModifier}} static readonly {{propertyType}} {{dependencyPropertyName}} =
-                        {{dependencyPropertyCreateCall}}
-
-            {{additionalFieldForDirectProperties}}
-            {{additionalPropertyForReadOnlyProperties}}
-            {{getterXmlDocumentation}}
-            {{categoryAttribute}}
-            {{descriptionAttribute}}
-            {{typeConverterAttribute}}
-            {{bindableAttribute}}
-            {{browsableAttribute}}
-            {{designerSerializationVisibilityAttribute}}
-            {{clsCompliantAttribute}}
-            {{localizabilityAttribute}}
-            {{generatedCodeAttribute}}
-            {{excludeFromCodeCoverageAttribute}}
-                    public {{type}} {{property.Name}}
-                    {
-                        {{getter}}
-                        {{setter}}
-                    }
-
-            {{onChangedMethods}}
-            {{onChangingMethods}}
-            {{coercePartialMethod}}
-            {{validatePartialMethod}}
-            {{createDefaultValueCallbackPartialMethod}}
-            {{bindEventMethod}}
-                }
-            }
-            """.RemoveBlankLinesWhereOnlyWhitespaces();
-    }
-    
-    private static string GenerateGetter(DependencyPropertyData property)
-    {
-        return property switch
+        writer.AppendLine($"        public {GenerateType(property)} {property.Name}");
+        writer.AppendLine("        {");
+        writer.Append("            ");
+        GenerateGetter(ref writer, property);
+        writer.AppendLine();
+        if (!property.IsReadOnly)
         {
-            { IsDirect: true, Framework: Framework.Avalonia } => @$"get => _{property.Name.ToParameterName()};",
-            _ => @$"get => ({GenerateType(property)})GetValue({property.Name}Property);"
-        };
+            writer.Append("            ");
+            GenerateSetter(ref writer, property);
+            writer.AppendLine();
+        }
+        writer.AppendLine("        }");
+
+        GenerateOnChangedMethods(ref writer, @class, property);
+        GenerateOnChangingMethods(ref writer, property);
+        GenerateCoercePartialMethod(ref writer, property);
+        GenerateValidatePartialMethod(ref writer, @class, property);
+        GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
+        GenerateBindEventMethod(ref writer, property);
+
+        writer.AppendLine("    }");
+        writer.AppendLine("}");
+    }
+    private static void GenerateGetter(ref SourceWriter writer, DependencyPropertyData property)
+    {
+        if (property is { IsDirect: true, Framework: Framework.Avalonia })
+        {
+            writer.Append($"get => _{property.Name.ToParameterName()};");
+        }
+        else
+        {
+            writer.Append($"get => ({GenerateType(property)})GetValue({property.Name}Property);");
+        }
     }
 
-    private static string GenerateSetter(DependencyPropertyData property)
+    private static void GenerateSetter(ref SourceWriter writer, DependencyPropertyData property)
     {
-        return property switch
+        if (property is { IsDirect: true, Framework: Framework.Avalonia })
         {
-            { IsDirect: true, Framework: Framework.Avalonia } => $$"""
-                                                                   private set
-                                                                               {
-                                                                                   var oldValue = _{{property.Name.ToParameterName()}};
-                                                                                   SetAndRaise({{property.Name}}Property, ref _{{property.Name.ToParameterName()}}, value);
-                                                                                   On{{property.Name}}Changed();
-                                                                                   On{{property.Name}}Changed(
-                                                                                       ({{GenerateType(property)}})value);
-                                                                                   On{{property.Name}}Changed(
-                                                                                       ({{GenerateType(property)}})oldValue,
-                                                                                       ({{GenerateType(property)}})value);
-                                                                               }
-                                                                   """,
-            _ =>
-                @$"{GenerateAdditionalSetterModifier(property)}set => SetValue({GenerateDependencyPropertyName(property)}, value);"
-        };
+            writer.Append($$"""
+            private set
+                        {
+                            var oldValue = _{{property.Name.ToParameterName()}};
+                            SetAndRaise({{property.Name}}Property, ref _{{property.Name.ToParameterName()}}, value);
+                            On{{property.Name}}Changed();
+                            On{{property.Name}}Changed(
+                                ({{GenerateType(property)}})value);
+                            On{{property.Name}}Changed(
+                                ({{GenerateType(property)}})oldValue,
+                                ({{GenerateType(property)}})value);
+                        }
+            """);
+        }
+        else
+        {
+            writer.Append($"{GenerateAdditionalSetterModifier(property)}set => SetValue({GenerateDependencyPropertyName(property)}, value);");
+        }
     }
-    
-    private static string GenerateDependencyPropertyCreateCall(ClassData @class, DependencyPropertyData property)
-    {
-        return property.IsAddOwner switch
-        {
-            true => GenerateAddOwnerCreateCall(@class, property),
-            _ => $"""
 
+    private static void GenerateDependencyPropertyCreateCall(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        if (property.IsAddOwner)
+        {
+            GenerateAddOwnerCreateCall(ref writer, @class, property);
+        }
+        else
+        {
+            writer.AppendLine();
+            writer.Append($"""
                               {GenerateManagerType(@class)}.{GenerateRegisterMethod(@class, property)}(
                                   {GenerateRegisterMethodArguments(@class, property)});
-                   
-                  """.RemoveBlankLinesWhereOnlyWhitespaces()
-        };
+                  """);
+        }
     }
 
-    // https://docs.avaloniaui.net/docs/authoring-controls/defining-properties
     private static string GenerateAvaloniaRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
+    {
+        var writer = new SourceWriter();
+        try
+        {
+            GenerateAvaloniaRegisterMethodArguments(ref writer, @class, property);
+            return writer.ToString();
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
+    private static void GenerateAvaloniaRegisterMethodArguments(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         var defaultBindingMode = property.DefaultBindingMode is null or "Default"
             ? "OneWay"
             : property.DefaultBindingMode;
 
-        return property switch
+        switch (property)
         {
-            { IsDirect: true, IsAddOwner: true } => $"""
+            case { IsDirect: true, IsAddOwner: true }:
+                writer.Append($"""
 
                                                                      getter: static sender => sender.{property.Name},
                                                                      setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
                                                                      unsetValue: {GenerateDefaultValue(property)},
                                                                      defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
                                                                      enableDataValidation: {(property.EnableDataValidation ? "true" : "false")}
-                                                     """,
-            _ => property.IsDirect switch
-            {
-                true => $"""
-
-                                         name: "{property.Name}",
-                                         getter: static sender => sender.{property.Name},
-                                         setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
-                                         unsetValue: {GenerateDefaultValue(property)},
-                                         defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
-                                         enableDataValidation: {(property.EnableDataValidation ? "true" : "false")}
-                         """,
-                _ => property.IsAttached switch
+                                                     """);
+                return;
+            default:
+                if (property.IsDirect)
                 {
-                    true => $"""
+                    writer.Append($"""
+
+                                                                         name: "{property.Name}",
+                                                                         getter: static sender => sender.{property.Name},
+                                                                         setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
+                                                                         unsetValue: {GenerateDefaultValue(property)},
+                                                                         defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
+                                                                         enableDataValidation: {(property.EnableDataValidation ? "true" : "false")}
+                                                         """);
+                }
+                else if (property.IsAttached)
+                {
+                    writer.Append($"""
 
                                              name: "{property.Name}",
                                              defaultValue: {GenerateDefaultValue(property)},
@@ -165,8 +171,11 @@ internal static partial class SourceGenerationHelper
                                              defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
                                              validate: {GenerateValidateValueCallback(@class, property)},
                                              coerce: {GenerateCoerceValueCallback(@class, property)}
-                             """,
-                    _ => $"""
+                             """);
+                }
+                else
+                {
+                    writer.Append($"""
 
                                           name: "{property.Name}",
                                           defaultValue: {GenerateDefaultValue(property)},
@@ -174,18 +183,32 @@ internal static partial class SourceGenerationHelper
                                           defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
                                           validate: {GenerateValidateValueCallback(@class, property)},
                                           coerce: {GenerateCoerceValueCallback(@class, property)}
-                          """
+                          """);
                 }
-            }
-        };
+                return;
+        }
     }
 
     private static string GeneratePropertyMetadata(ClassData @class, DependencyPropertyData property)
     {
-        switch (property)
+        var writer = new SourceWriter();
+        try
         {
-            case { IsAddOwner: true, DefaultValue: null }:
-                return "null";
+            GeneratePropertyMetadata(ref writer, @class, property);
+            return writer.ToString();
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
+    private static void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        if (property is { IsAddOwner: true, DefaultValue: null })
+        {
+            writer.Append("null");
+            return;
         }
 
         var parameterName = (@class.Framework, property.IsAttached) switch
@@ -195,76 +218,107 @@ internal static partial class SourceGenerationHelper
             (Framework.Uno, true) or (Framework.UnoWinUi, true) => string.Empty,
             _ => "typeMetadata: ",
         };
+
         switch (@class.Framework)
         {
             case Framework.Wpf:
-                return property.DefaultUpdateSourceTrigger switch
-                {
-                    null => $"""
-                             {parameterName}new global::System.Windows.FrameworkPropertyMetadata(
-                                                 defaultValue: {GenerateDefaultValue(property)},
-                                                 flags: {GenerateOptions(property)},
-                                                 propertyChangedCallback: {GeneratePropertyChangedCallback(@class, property)},
-                                                 coerceValueCallback: {GenerateCoerceValueCallback(@class, property)},
-                                                 isAnimationProhibited: {property.IsAnimationProhibited.ToString().ToLower(CultureInfo.InvariantCulture)})
-                             """,
-                    _ => $"""
-                          {parameterName}new global::System.Windows.FrameworkPropertyMetadata(
-                                              defaultValue: {GenerateDefaultValue(property)},
-                                              flags: {GenerateOptions(property)},
-                                              propertyChangedCallback: {GeneratePropertyChangedCallback(@class, property)},
-                                              coerceValueCallback: {GenerateCoerceValueCallback(@class, property)},
-                                              isAnimationProhibited: {property.IsAnimationProhibited.ToString().ToLower(CultureInfo.InvariantCulture)},
-                                              defaultUpdateSourceTrigger: global::System.Windows.Data.UpdateSourceTrigger.{property.DefaultUpdateSourceTrigger})
-                          """
-                };
-
+                GenerateWpfPropertyMetadata(ref writer, @class, property, parameterName);
+                break;
             case Framework.Uwp:
             case Framework.WinUi:
             case Framework.Uno:
             case Framework.UnoWinUi:
-            {
-                var type = GenerateTypeByPlatform(@class.Framework, "PropertyMetadata");
-                switch (property.CreateDefaultValueCallback)
-                {
-                    case true:
-                        return $"""
-                                {parameterName}{type}.Create(
-                                                    createDefaultValueCallback: {GenerateCreateDefaultValueCallbackValueCallback(property)},
-                                                    propertyChangedCallback: {GeneratePropertyChangedCallback(@class, property)})
-                                """;
-                    default:
-                    {
-                        // fix for NotImplementedException: The member PropertyMetadata PropertyMetadata.Create(object defaultValue, PropertyChangedCallback propertyChangedCallback) is not implemented in Uno.
-                        var create = property.Framework switch
-                        {
-                            Framework.Uno or Framework.UnoWinUi => $"new {type}",
-                            _ => $"{type}.Create",
-                        };
-                        return $"""
-                                {parameterName}{create}(
-                                                    defaultValue: {GenerateDefaultValue(property)},
-                                                    propertyChangedCallback: {GeneratePropertyChangedCallback(@class, property)})
-                                """;
-                    }
-                }
-            }
-
+                GenerateUwpPropertyMetadata(ref writer, @class, property, parameterName);
+                break;
             case Framework.Avalonia:
-            {
-                var metadataType = GenerateTypeByPlatform(@class.Framework, $"StyledPropertyMetadata<{property.Type}>");
-
-                return $"""
-                        {parameterName}new {metadataType}(
-                                            defaultValue: {GenerateDefaultValue(property)},
-                                            defaultBindingMode: global::Avalonia.Data.BindingMode.Default,
-                                            coerce: {GenerateCoerceValueCallback(@class, property)},
-                                            enableDataValidation: {property.EnableDataValidation.ToBooleanKeyword()})
-                        """;
-            }
+                GenerateAvaloniaPropertyMetadata(ref writer, @class, property, parameterName);
+                break;
+            case Framework.None:
+            case Framework.Maui:
+                throw new InvalidOperationException("Platform is not supported.");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(@class));
         }
+    }
 
-        throw new InvalidOperationException("Platform is not supported.");
+    private static void GenerateWpfPropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
+    {
+        var defaultValue = GenerateDefaultValue(property);
+        var flags = GenerateOptions(property);
+        var propertyChanged = GeneratePropertyChangedCallback(@class, property);
+        var coerceValue = GenerateCoerceValueCallback(@class, property);
+        var isAnimationProhibited = property.IsAnimationProhibited.ToString().ToLower(CultureInfo.InvariantCulture);
+
+        if (property.DefaultUpdateSourceTrigger is null)
+        {
+            writer.Append($"""
+                {parameterName}new global::System.Windows.FrameworkPropertyMetadata(
+                                    defaultValue: {defaultValue},
+                                    flags: {flags},
+                                    propertyChangedCallback: {propertyChanged},
+                                    coerceValueCallback: {coerceValue},
+                                    isAnimationProhibited: {isAnimationProhibited})
+                """);
+        }
+        else
+        {
+            writer.Append($"""
+                {parameterName}new global::System.Windows.FrameworkPropertyMetadata(
+                                    defaultValue: {defaultValue},
+                                    flags: {flags},
+                                    propertyChangedCallback: {propertyChanged},
+                                    coerceValueCallback: {coerceValue},
+                                    isAnimationProhibited: {isAnimationProhibited},
+                                    defaultUpdateSourceTrigger: global::System.Windows.Data.UpdateSourceTrigger.{property.DefaultUpdateSourceTrigger})
+                """);
+        }
+    }
+
+    private static void GenerateUwpPropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
+    {
+        var type = GenerateTypeByPlatform(@class.Framework, "PropertyMetadata");
+        var propertyChanged = GeneratePropertyChangedCallback(@class, property);
+
+        if (property.CreateDefaultValueCallback)
+        {
+            var createDefaultValue = GenerateCreateDefaultValueCallbackValueCallback(property);
+            writer.Append($"""
+                {parameterName}{type}.Create(
+                                    createDefaultValueCallback: {createDefaultValue},
+                                    propertyChangedCallback: {propertyChanged})
+                """);
+        }
+        else
+        {
+            // fix for NotImplementedException: The member PropertyMetadata PropertyMetadata.Create(object defaultValue, PropertyChangedCallback propertyChangedCallback) is not implemented in Uno.
+            var create = @class.Framework switch
+            {
+                Framework.Uno or Framework.UnoWinUi => $"new {type}",
+                _ => $"{type}.Create",
+            };
+            var defaultValue = GenerateDefaultValue(property);
+            writer.Append($"""
+                {parameterName}{create}(
+                                    defaultValue: {defaultValue},
+                                    propertyChangedCallback: {propertyChanged})
+                """);
+        }
+    }
+
+    private static void GenerateAvaloniaPropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
+    {
+        var metadataType = GenerateTypeByPlatform(@class.Framework, $"StyledPropertyMetadata<{property.Type}>");
+        var defaultValue = GenerateDefaultValue(property);
+        var coerce = GenerateCoerceValueCallback(@class, property);
+        var enableValidation = property.EnableDataValidation.ToBooleanKeyword();
+
+        writer.Append($"""
+            {parameterName}new {metadataType}(
+                                defaultValue: {defaultValue},
+                                defaultBindingMode: global::Avalonia.Data.BindingMode.Default,
+                                coerce: {coerce},
+                                enableDataValidation: {enableValidation})
+            """);
     }
 
     private static string GenerateManagerType(ClassData @class)
@@ -337,69 +391,76 @@ internal static partial class SourceGenerationHelper
                     ?
                     $"RegisterAttached<{@class.Type}, {GenerateBrowsableForType(property)}, {GenerateType(property)}>"
                     : $"Register<{@class.Type}, {GenerateType(property)}>",
-            _ => property switch
-            {
-                { IsReadOnly: true, Framework: Framework.Wpf } => property.IsAttached
+            _ => property is { IsReadOnly: true, Framework: Framework.Wpf }
+                ? property.IsAttached
                     ? "RegisterAttachedReadOnly"
-                    : "RegisterReadOnly",
-                _ => property.IsAttached ? "RegisterAttached" : "Register"
-            }
+                    : "RegisterReadOnly"
+                : property.IsAttached ? "RegisterAttached" : "Register"
         };
     }
-
-    private static string GenerateCoercePartialMethod(DependencyPropertyData property)
+    private static void GenerateCoercePartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
-        return property.Coerce switch
+        if (!property.Coerce)
         {
-            false => " ",
-            _ => property.IsAttached
-                ? $"        private static partial {GenerateType(property)} Coerce{property.Name}({GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, {GenerateType(property, canBeNull: true)} value);"
-                : $"        private partial {GenerateType(property)} Coerce{property.Name}({GenerateType(property, canBeNull: true)} value);"
-        };
+            writer.Append(" ");
+            return;
+        }
+
+        if (property.IsAttached)
+        {
+            writer.Append($"        private static partial {GenerateType(property)} Coerce{property.Name}({GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, {GenerateType(property, canBeNull: true)} value);");
+        }
+        else
+        {
+            writer.Append($"        private partial {GenerateType(property)} Coerce{property.Name}({GenerateType(property, canBeNull: true)} value);");
+        }
     }
 
-    private static string GenerateAdditionalFieldForDirectProperties(DependencyPropertyData property)
+    private static void GenerateAdditionalFieldForDirectProperties(ref SourceWriter writer, DependencyPropertyData property)
     {
-        return property.IsDirect switch
+        if (!property.IsDirect)
         {
-            false => " ",
-            _ => property.Framework switch
-            {
-                Framework.Avalonia => $"""
-                                        
-                                               private {GenerateType(property)} _{property.Name.ToParameterName()} = {GenerateDefaultValue(property)};
+            writer.Append(" ");
+            return;
+        }
 
-                                       """,
-                _ => " ",
-            }
-        };
+        if (property.Framework == Framework.Avalonia)
+        {
+            writer.Append($"        private {GenerateType(property)} _{property.Name.ToParameterName()} = {GenerateDefaultValue(property)};");
+            writer.AppendLine();
+        }
+        else
+        {
+            writer.Append(" ");
+        }
     }
 
-    private static string GenerateAdditionalPropertyForReadOnlyProperties(DependencyPropertyData property)
+
+
+    private static void GenerateAdditionalPropertyForReadOnlyProperties(ref SourceWriter writer, DependencyPropertyData property)
     {
-        return property.IsReadOnly switch
+        if (!property.IsReadOnly)
         {
-            false => " ",
-            _ => property.Framework switch
-            {
-                Framework.Maui => $"""
-                                    
-                                   {GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false)}
-                                           public static readonly {GenerateTypeByPlatform(property.Framework, "BindableProperty")} {property.Name}Property
-                                               = {GenerateDependencyPropertyName(property)}.BindableProperty;
+            writer.Append(" ");
+            return;
+        }
 
-                                   """,
-                // https://docs.microsoft.com/en-us/dotnet/api/system.windows.dependencypropertykey?view=windowsdesktop-6.0#examples
-                Framework.Wpf => $"""
-                                   
-                                  {GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false)}
-                                          public static readonly {GenerateTypeByPlatform(property.Framework, "DependencyProperty")} {property.Name}Property
-                                              = {GenerateDependencyPropertyName(property)}.DependencyProperty;
-
-                                  """,
-                _ => " ",
-            }
-        };
+        if (property.Framework == Framework.Maui)
+        {
+            GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+            writer.AppendLine($"        public static readonly {GenerateTypeByPlatform(property.Framework, "BindableProperty")} {property.Name}Property");
+            writer.AppendLine($"            = {GenerateDependencyPropertyName(property)}.BindableProperty;");
+        }
+        else if (property.Framework == Framework.Wpf)
+        {
+            GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+            writer.AppendLine($"        public static readonly {GenerateTypeByPlatform(property.Framework, "DependencyProperty")} {property.Name}Property");
+            writer.AppendLine($"            = {GenerateDependencyPropertyName(property)}.DependencyProperty;");
+        }
+        else
+        {
+            writer.Append(" ");
+        }
     }
 }
 

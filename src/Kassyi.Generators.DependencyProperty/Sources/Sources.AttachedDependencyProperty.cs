@@ -1,15 +1,23 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static string GenerateAttachedDependencyProperty(ClassData @class, DependencyPropertyData property)
+    public static void GenerateAttachedDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        var modifiers = GenerateModifiers(@class);
-        var xmlDocumentation = GenerateXmlDocumentationFrom(property.XmlDocumentation, property, isProperty: false);
-        var generatedCodeAttribute = GenerateGeneratedCodeAttribute(@class.Version);
+        writer.AppendLine();
+        writer.AppendLine("#nullable enable");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {@class.Namespace}");
+        writer.AppendLine("{");
+        writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
+        writer.AppendLine("    {");
+
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+
         var propertyModifier = GeneratePropertyModifier(property);
         var propertyType = GeneratePropertyType(@class, property);
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
@@ -17,93 +25,64 @@ internal static partial class SourceGenerationHelper
         var registerMethod = GenerateRegisterMethod(@class, property);
         var registerAttachedMethodArguments = GenerateRegisterAttachedMethodArguments(@class, property);
 
-        var additionalPropertyForReadOnlyProperties = GenerateAdditionalPropertyForReadOnlyProperties(property);
-        var setterXmlDocumentation = GenerateXmlDocumentationFrom(property.SetterXmlDocumentation, property, isProperty: true);
-        var categoryAttribute = GenerateCategoryAttribute(property.Category);
-        var descriptionAttribute = GenerateDescriptionAttribute(property.Description);
-        var typeConverterAttribute = GenerateTypeConverterAttribute(property.TypeConverter);
-        var bindableAttribute = GenerateBindableAttribute(property.Bindable);
-        var browsableAttribute = GenerateBrowsableAttribute(property.Browsable);
-        var designerSerializationVisibilityAttribute = GenerateDesignerSerializationVisibilityAttribute(property.DesignerSerializationVisibility);
-        var clsCompliantAttribute = GenerateClsCompliantAttribute(property.ClsCompliant);
-        var localizabilityAttribute = GenerateLocalizabilityAttribute(property.Localizability, @class.Framework);
-        var excludeFromCodeCoverageAttribute = GenerateExcludeFromCodeCoverageAttribute();
+        writer.Append($"        {propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
+        writer.AppendLine($"            {managerType}.{registerMethod}(");
+        writer.AppendLine($"                {registerAttachedMethodArguments});");
+
+        GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
+        GenerateXmlDocumentationFrom(ref writer, property.SetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.Category);
+        GenerateDescriptionAttribute(ref writer, property.Description);
+        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
+        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+        GenerateExcludeFromCodeCoverageAttribute(ref writer);
+
         var setterVisibility = property.IsReadOnly ? "internal" : "public";
         var browsableForType = GenerateBrowsableForType(property);
         var type = GenerateType(property);
 
-        var getterXmlDocumentation = GenerateXmlDocumentationFrom(property.GetterXmlDocumentation, property, isProperty: true);
-        var browsableForTypeAttribute = GenerateBrowsableForTypeAttribute(property);
+        writer.AppendLine($"        {setterVisibility} static void Set{property.Name}({browsableForType} element, {type} value)");
+        writer.AppendLine("        {");
+        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+        writer.AppendLine();
+        writer.AppendLine($"            element.SetValue({dependencyPropertyName}, value);");
+        writer.AppendLine("        }");
 
-        var onChangedMethods = GenerateOnChangedMethods(@class, property);
-        var onChangingMethods = GenerateOnChangingMethods(property);
-        var coercePartialMethod = GenerateCoercePartialMethod(property);
-        var validatePartialMethod = GenerateValidatePartialMethod(@class, property);
-        var createDefaultValueCallbackPartialMethod = GenerateCreateDefaultValueCallbackPartialMethod(property);
-        var bindEventMethod = GenerateBindEventMethod(property);
+        GenerateXmlDocumentationFrom(ref writer, property.GetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.Category);
+        GenerateDescriptionAttribute(ref writer, property.Description);
+        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
+        GenerateBrowsableForTypeAttribute(ref writer, property);
+        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+        GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        return $$"""
+        writer.AppendLine($"        public static {type} Get{property.Name}({browsableForType} element)");
+        writer.AppendLine("        {");
+        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+        writer.AppendLine();
+        writer.AppendLine($"            return ({type})element.GetValue({property.Name}Property);");
+        writer.AppendLine("        }");
 
-            #nullable enable
+        GenerateOnChangedMethods(ref writer, @class, property);
+        GenerateOnChangingMethods(ref writer, property);
+        GenerateCoercePartialMethod(ref writer, property);
+        GenerateValidatePartialMethod(ref writer, @class, property);
+        GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
+        GenerateBindEventMethod(ref writer, property);
 
-            namespace {{@class.Namespace}}
-            {
-                {{modifiers}}partial class {{@class.Name}}
-                {
-            {{xmlDocumentation}}
-            {{generatedCodeAttribute}}
-                    {{propertyModifier}} static readonly {{propertyType}} {{dependencyPropertyName}} =
-                        {{managerType}}.{{registerMethod}}(
-                            {{registerAttachedMethodArguments}});
-
-            {{additionalPropertyForReadOnlyProperties}}
-            {{setterXmlDocumentation}}
-            {{categoryAttribute}}
-            {{descriptionAttribute}}
-            {{typeConverterAttribute}}
-            {{bindableAttribute}}
-            {{browsableAttribute}}
-            {{designerSerializationVisibilityAttribute}}
-            {{clsCompliantAttribute}}
-            {{localizabilityAttribute}}
-            {{generatedCodeAttribute}}
-            {{excludeFromCodeCoverageAttribute}}
-                    {{setterVisibility}} static void Set{{property.Name}}({{browsableForType}} element, {{type}} value)
-                    {
-                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-                        element.SetValue({{dependencyPropertyName}}, value);
-                    }
-
-            {{getterXmlDocumentation}}
-            {{categoryAttribute}}
-            {{descriptionAttribute}}
-            {{typeConverterAttribute}}
-            {{bindableAttribute}}
-            {{browsableAttribute}}
-            {{designerSerializationVisibilityAttribute}}
-            {{browsableForTypeAttribute}}
-            {{clsCompliantAttribute}}
-            {{localizabilityAttribute}}
-            {{generatedCodeAttribute}}
-            {{excludeFromCodeCoverageAttribute}}
-                    public static {{type}} Get{{property.Name}}({{browsableForType}} element)
-                    {
-                        element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-                        return ({{type}})element.GetValue({{property.Name}}Property);
-                    }
-
-            {{onChangedMethods}}
-            {{onChangingMethods}}
-            {{coercePartialMethod}}
-            {{validatePartialMethod}}
-            {{createDefaultValueCallbackPartialMethod}}
-            {{bindEventMethod}}
-                }
-            }
-            """.RemoveBlankLinesWhereOnlyWhitespaces();
+        writer.AppendLine("    }");
+        writer.AppendLine("}");
     }
     
     private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)

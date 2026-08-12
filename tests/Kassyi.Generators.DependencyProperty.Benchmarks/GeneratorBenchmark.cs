@@ -76,13 +76,35 @@ public class GeneratorBenchmark
     private static Dictionary<string, string> GetGlobalOptions(Framework framework)
     {
         var globalOptions = new Dictionary<string, string>();
-        if (framework == Framework.Wpf) globalOptions.Add("build_property.UseWPF", "true");
-        else if (framework == Framework.WinUi) globalOptions.Add("build_property.UseWinUI", "true");
-        else if (framework == Framework.Maui) globalOptions.Add("build_property.UseMaui", "true");
-        else if (framework == Framework.Uwp) globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
-        else if (framework == Framework.Uno) globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
-        else if (framework == Framework.UnoWinUi) globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
-        else if (framework == Framework.Avalonia) globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
+        if (framework == Framework.Wpf)
+        {
+            globalOptions.Add("build_property.UseWPF", "true");
+        }
+        else if (framework == Framework.WinUi)
+        {
+            globalOptions.Add("build_property.UseWinUI", "true");
+        }
+        else if (framework == Framework.Maui)
+        {
+            globalOptions.Add("build_property.UseMaui", "true");
+        }
+        else if (framework == Framework.Uwp)
+        {
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
+        }
+        else if (framework == Framework.Uno)
+        {
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
+        }
+        else if (framework == Framework.UnoWinUi)
+        {
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
+        }
+        else if (framework == Framework.Avalonia)
+        {
+            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
+        }
+
         globalOptions.Add("build_property.RecognizeFramework_Version", "0.0.0.0");
         return globalOptions;
     }

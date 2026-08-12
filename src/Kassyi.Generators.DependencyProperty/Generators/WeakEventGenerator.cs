@@ -1,4 +1,4 @@
-﻿using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
@@ -70,9 +70,18 @@ public class WeakEventGenerator : IIncrementalGenerator
 
     private static FileWithName GetSourceCode((ClassData Class, EventData Event) data)
     {
-        return new FileWithName(
-            Name: $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs",
-            Text: SourceGenerationHelper.GenerateWeakEvent(data.Class, data.Event));
+        var writer = new SourceWriter();
+        try
+        {
+            SourceGenerationHelper.GenerateWeakEvent(ref writer, data.Class, data.Event);
+            return new FileWithName(
+                Name: $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs",
+                Text: writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     #endregion
