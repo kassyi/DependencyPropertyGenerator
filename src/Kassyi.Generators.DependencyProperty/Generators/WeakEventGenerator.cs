@@ -3,53 +3,28 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 [Generator]
-public class WeakEventGenerator : IIncrementalGenerator
+public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {
-    #region Constants
+    protected override string Id => "WEG";
 
-    private const string Id = "WEG";
-
-    #endregion
-
-    #region Methods
-
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
     {
-        context.RegisterPostInitializationOutput(static context =>
-        {
-            context.AddSource(
-                hintName: "WeakEventAttribute.g.cs",
-                source: Resources.WeakEventAttribute_cs.AsString());
-        });
+        KnownAttributes.WeakEvent,
+        $"{KnownAttributes.WeakEvent}`1"
+    };
 
-        var framework = context.DetectFramework();
-        var version = context.DetectVersion();
-
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string attributeName = $"{ns}WeakEventAttribute";
-        var attributes = new[]
-        {
-            attributeName,
-            $"{attributeName}`1"
-        };
-
-        context.RegisterAttributeGenerator(
-            framework,
-            version,
-            attributes,
-            PrepareData,
-            GetSourceCode,
-            Id);
+    protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddSource(
+            hintName: "WeakEventAttribute.g.cs",
+            source: Resources.WeakEventAttribute_cs.AsString());
     }
 
-    private static (ClassData Class, EventData Event)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+    protected override (ClassData Class, EventData Event)? PrepareData(
+        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
         var (((_, attributes, _, classSymbol), framework), version) = tuple;
         if (framework is not (Framework.Maui or Framework.Wpf) ||
@@ -64,23 +39,13 @@ public class WeakEventGenerator : IIncrementalGenerator
         return (classData, eventData);
     }
 
-    private static FileWithName GetSourceCode((ClassData Class, EventData Event) data)
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data)
     {
-        var writer = new SourceWriter();
-        try
-        {
-            SourceGenerationHelper.GenerateWeakEvent(ref writer, data.Class, data.Event);
-            return new FileWithName(
-                Name: $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs",
-                Text: writer.ToString());
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        SourceGenerationHelper.GenerateWeakEvent(ref writer, data.Class, data.Event);
     }
 
-    #endregion
+    protected override string GetHintName((ClassData Class, EventData Event) data)
+    {
+        return $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs";
+    }
 }
-
-

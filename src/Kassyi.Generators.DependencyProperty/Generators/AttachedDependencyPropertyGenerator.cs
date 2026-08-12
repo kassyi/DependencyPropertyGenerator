@@ -3,54 +3,29 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 [Generator]
-public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
+public class AttachedDependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Class, DependencyPropertyData DependencyProperty)>
 {
-    #region Constants
+    protected override string Id => "ADPG";
 
-    private const string Id = "ADPG";
-
-    #endregion
-
-    #region Methods
-
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
     {
-        context.RegisterPostInitializationOutput(static context =>
-        {
-            context.AddSource(
-                hintName: "AttachedDependencyPropertyAttribute.g.cs",
-                source: Resources.AttachedDependencyPropertyAttribute_cs.AsString());
-        });
+        KnownAttributes.AttachedDependencyProperty,
+        $"{KnownAttributes.AttachedDependencyProperty}`1",
+        $"{KnownAttributes.AttachedDependencyProperty}`2"
+    };
 
-        var framework = context.DetectFramework();
-        var version = context.DetectVersion();
-
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string attributeName = $"{ns}AttachedDependencyPropertyAttribute";
-        var attributes = new[]
-        {
-            attributeName,
-            $"{attributeName}`1",
-            $"{attributeName}`2"
-        };
-
-        context.RegisterAttributeGenerator(
-            framework,
-            version,
-            attributes,
-            PrepareData,
-            GetSourceCode,
-            Id);
+    protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddSource(
+            hintName: "AttachedDependencyPropertyAttribute.g.cs",
+            source: Resources.AttachedDependencyPropertyAttribute_cs.AsString());
     }
 
-    private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+    protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
+        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
         var (((_, attributes, classSyntax, classSymbol), framework), version) = tuple;
         if (attributes.FirstOrDefault() is not { } attribute)
@@ -65,23 +40,13 @@ public class AttachedDependencyPropertyGenerator : IIncrementalGenerator
         return (classData, dependencyPropertyData);
     }
 
-    private static FileWithName GetSourceCode((ClassData Class, DependencyPropertyData DependencyProperty) data)
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data)
     {
-        var writer = new SourceWriter();
-        try
-        {
-            SourceGenerationHelper.GenerateAttachedDependencyProperty(ref writer, data.Class, data.DependencyProperty);
-            return new FileWithName(
-                Name: $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs",
-                Text: writer.ToString());
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        SourceGenerationHelper.GenerateAttachedDependencyProperty(ref writer, data.Class, data.DependencyProperty);
     }
 
-    #endregion
+    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data)
+    {
+        return $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs";
+    }
 }
-
-

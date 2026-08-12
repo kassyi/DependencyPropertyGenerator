@@ -3,53 +3,28 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 [Generator]
-public class AddOwnerGenerator : IIncrementalGenerator
+public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, DependencyPropertyData DependencyProperty)>
 {
-    #region Constants
+    protected override string Id => "AOG";
 
-    private const string Id = "AOG";
-
-    #endregion
-
-    #region Methods
-
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
     {
-        context.RegisterPostInitializationOutput(static context =>
-        {
-            context.AddSource(
-                hintName: "AddOwnerAttribute.g.cs",
-                source: Resources.AddOwnerAttribute_cs.AsString());
-        });
+        KnownAttributes.AddOwner,
+        $"{KnownAttributes.AddOwner}`2"
+    };
 
-        var framework = context.DetectFramework();
-        var version = context.DetectVersion();
-
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string attributeName = $"{ns}AddOwnerAttribute";
-        var attributes = new[]
-        {
-            attributeName,
-            $"{attributeName}`2"
-        };
-
-        context.RegisterAttributeGenerator(
-            framework,
-            version,
-            attributes,
-            PrepareData,
-            GetSourceCode,
-            Id);
+    protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddSource(
+            hintName: "AddOwnerAttribute.g.cs",
+            source: Resources.AddOwnerAttribute_cs.AsString());
     }
 
-    private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+    protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
+        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
         var (((_, attributes, _, classSymbol), framework), version) = tuple;
         if (framework is not (Framework.Avalonia or Framework.Wpf) ||
@@ -65,23 +40,13 @@ public class AddOwnerGenerator : IIncrementalGenerator
         return (classData, dependencyPropertyData);
     }
 
-    private static FileWithName GetSourceCode((ClassData Class, DependencyPropertyData DependencyProperty) data)
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data)
     {
-        var writer = new SourceWriter();
-        try
-        {
-            SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
-            return new FileWithName(
-                Name: $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs",
-                Text: writer.ToString());
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
     }
 
-    #endregion
+    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data)
+    {
+        return $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs";
+    }
 }
-
-

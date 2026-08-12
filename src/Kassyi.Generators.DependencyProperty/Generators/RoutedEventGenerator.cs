@@ -3,57 +3,31 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
-
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 [Generator]
-public class RoutedEventGenerator : IIncrementalGenerator
+public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {
-    #region Constants
+    protected override string Id => "REG";
 
-    private const string Id = "REG";
-
-    #endregion
-
-    #region Methods
-
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
     {
-        context.RegisterPostInitializationOutput(static context =>
-        {
-            context.AddSource(
-                hintName: "RoutedEventAttribute.g.cs",
-                source: Resources.RoutedEventAttribute_cs.AsString());
-            context.AddSource(
-                hintName: "RoutedEventStrategy.g.cs",
-                source: Resources.RoutedEventStrategy_cs.AsString());
-        });
+        KnownAttributes.RoutedEvent,
+        $"{KnownAttributes.RoutedEvent}`1"
+    };
 
-        var framework = context.DetectFramework();
-        var version = context.DetectVersion();
-
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string attributeName = $"{ns}RoutedEventAttribute";
-        var attributes = new[]
-        {
-            attributeName,
-            $"{attributeName}`1"
-        };
-
-        context.RegisterAttributeGenerator(
-            framework,
-            version,
-            attributes,
-            PrepareData,
-            GetSourceCode,
-            Id);
+    protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddSource(
+            hintName: "RoutedEventAttribute.g.cs",
+            source: Resources.RoutedEventAttribute_cs.AsString());
+        context.AddSource(
+            hintName: "RoutedEventStrategy.g.cs",
+            source: Resources.RoutedEventStrategy_cs.AsString());
     }
 
-    private static (ClassData Class, EventData Event)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+    protected override (ClassData Class, EventData Event)? PrepareData(
+        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
         var (((_, attributes, _, classSymbol), framework), version) = tuple;
         if (attributes.FirstOrDefault() is not { } attribute)
@@ -73,27 +47,16 @@ public class RoutedEventGenerator : IIncrementalGenerator
         return (classData, eventData);
     }
 
-    private static FileWithName GetSourceCode((ClassData Class, EventData Event) data)
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data)
+    {
+        SourceGenerationHelper.GenerateRoutedEvent(ref writer, data.Class, data.Event);
+    }
+
+    protected override string GetHintName((ClassData Class, EventData Event) data)
     {
         var category = data.Event.IsAttached
             ? "AttachedEvents"
             : "Events";
-
-        var writer = new SourceWriter();
-        try
-        {
-            SourceGenerationHelper.GenerateRoutedEvent(ref writer, data.Class, data.Event);
-            return new FileWithName(
-                Name: $"{data.Class.FullName}.{category}.{data.Event.Name}.g.cs",
-                Text: writer.ToString());
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        return $"{data.Class.FullName}.{category}.{data.Event.Name}.g.cs";
     }
-
-    #endregion
 }
-
-
