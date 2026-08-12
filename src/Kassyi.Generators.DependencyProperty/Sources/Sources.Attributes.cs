@@ -25,7 +25,7 @@ internal static partial class SourceGenerationHelper
         GenerateAttribute(ref writer, $"System.ComponentModel.{name}", value);
     }
 
-    private static void GenerateCategoryAttribute(ref SourceWriter writer, string? value)
+    internal static void GenerateCategoryAttribute(ref SourceWriter writer, string? value)
     {
         if (value != null)
         {
@@ -33,7 +33,7 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static void GenerateDescriptionAttribute(ref SourceWriter writer, string? value)
+    internal static void GenerateDescriptionAttribute(ref SourceWriter writer, string? value)
     {
         if (value == null) return;
         
@@ -49,7 +49,7 @@ internal static partial class SourceGenerationHelper
                 : $"\"{SecurityElement.Escape(value)}\"");
     }
 
-    private static void GenerateTypeConverterAttribute(ref SourceWriter writer, string? value)
+    internal static void GenerateTypeConverterAttribute(ref SourceWriter writer, string? value)
     {
         if (value != null)
         {
@@ -65,7 +65,7 @@ internal static partial class SourceGenerationHelper
             : "false";
     }
 
-    private static void GenerateBindableAttribute(ref SourceWriter writer, bool? value)
+    internal static void GenerateBindableAttribute(ref SourceWriter writer, bool? value)
     {
         GenerateComponentModelAttribute(
             ref writer,
@@ -95,13 +95,13 @@ internal static partial class SourceGenerationHelper
         GenerateAttribute(ref writer, "System.CLSCompliant", value?.ToBooleanKeyword());
     }
 
-    private static void GenerateGeneratedCodeAttribute(ref SourceWriter writer, string version)
+    internal static void GenerateGeneratedCodeAttribute(ref SourceWriter writer, string version)
     {
         GenerateAttribute(ref writer, "System.CodeDom.Compiler.GeneratedCode",
             $"\"DependencyPropertyGenerator\", \"{version}\"");
     }
 
-    private static void GenerateExcludeFromCodeCoverageAttribute(ref SourceWriter writer)
+    internal static void GenerateExcludeFromCodeCoverageAttribute(ref SourceWriter writer)
     {
         GenerateAttribute(ref writer, "System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage");
     }

@@ -19,7 +19,7 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static void GenerateXmlDocumentationFrom(
+    internal static void GenerateXmlDocumentationFrom(
         ref SourceWriter writer,
         string? value,
         DependencyPropertyData property,
@@ -45,7 +45,7 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine("        /// </summary>");
     }
 
-    private static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string? value, EventData @event)
+    internal static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string? value, EventData @event)
     {
         if (value != null)
         {

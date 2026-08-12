@@ -279,7 +279,7 @@ public static class PrepareData
         framework == Framework.Maui ? "Microsoft.Maui.Controls.BindableObject" :
         framework == Framework.Avalonia ? "Avalonia.AvaloniaObject" :
         framework == Framework.Wpf ? "System.Windows.DependencyObject" :
-        framework == Framework.Uwp || framework == Framework.Uno ? "Windows.UI.Xaml.DependencyObject" :
+        framework is Framework.Uwp or Framework.Uno ? "Windows.UI.Xaml.DependencyObject" :
         "Microsoft.UI.Xaml.DependencyObject";
 
     public static EventData GetEventData(this AttributeData attribute, bool isStaticClass)
@@ -354,8 +354,10 @@ public static class PrepareData
         {
             null => null,
             _ => symbol is IArrayTypeSymbol || symbol.SpecialType != SpecialType.None ||
-                 (symbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T && symbol.BaseType != null &&
-                  symbol.BaseType.SpecialType != SpecialType.None)
+                 (symbol.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T && symbol.BaseType is
+                 {
+                     SpecialType: not SpecialType.None
+                 })
         };
     }
 

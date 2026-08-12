@@ -5,7 +5,7 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    private static string GenerateType(DependencyPropertyData property, bool canBeNull = false)
+    internal static string GenerateType(DependencyPropertyData property, bool canBeNull = false)
     {
         var value = property.Type;
         if ((canBeNull ||
@@ -18,7 +18,7 @@ internal static partial class SourceGenerationHelper
         return value;
     }
 
-    private static string GenerateType(EventData @event, bool nullable = true)
+    internal static string GenerateType(EventData @event, bool nullable = true)
     {
         var value = @event.Type;
         if (nullable && !@event.IsValueType)
@@ -29,7 +29,7 @@ internal static partial class SourceGenerationHelper
         return value;
     }
 
-    private static string GenerateDependencyPropertyName(DependencyPropertyData property)
+    internal static string GenerateDependencyPropertyName(DependencyPropertyData property)
     {
         if (property is { IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui })
         {
@@ -39,7 +39,7 @@ internal static partial class SourceGenerationHelper
         return $"{property.Name}Property";
     }
 
-    private static string GenerateTypeByPlatform(Framework framework, string name)
+    internal static string GenerateTypeByPlatform(Framework framework, string name)
     {
         return (framework switch
         {
@@ -52,7 +52,7 @@ internal static partial class SourceGenerationHelper
         }).WithGlobalPrefix();
     }
 
-    private static string GenerateDependencyObjectType(Framework framework)
+    internal static string GenerateDependencyObjectType(Framework framework)
     {
         if (framework == Framework.Maui)
         {
@@ -67,7 +67,7 @@ internal static partial class SourceGenerationHelper
         return GenerateTypeByPlatform(framework, "DependencyObject");
     }
 
-    private static string GenerateDefaultValue(DependencyPropertyData property)
+    internal static string GenerateDefaultValue(DependencyPropertyData property)
     {
         var type = property.Type;
         if (property is { IsSpecialType: true, DefaultValueDocumentation: { } })
@@ -80,7 +80,7 @@ internal static partial class SourceGenerationHelper
             : $"default({type})";
     }
 
-    private static string GenerateBrowsableForType(DependencyPropertyData property)
+    internal static string GenerateBrowsableForType(DependencyPropertyData property)
     {
         return property.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
     }
@@ -104,7 +104,7 @@ internal static partial class SourceGenerationHelper
     }
 
     private const string OptionsPrefix = "global::System.Windows.FrameworkPropertyMetadataOptions.";
-    private static string GenerateOptions(DependencyPropertyData property)
+    internal static string GenerateOptions(DependencyPropertyData property)
     {
         var writer = new SourceWriter();
         try
@@ -284,34 +284,11 @@ internal static partial class SourceGenerationHelper
 
     private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
     {
-        if (property.Framework == Framework.Maui)
-        {
-            return GenerateTypeByPlatform(
-                property.Framework,
-                property.IsReadOnly
-                    ? "BindablePropertyKey"
-                    : "BindableProperty");
-        }
-
-        if (property.Framework == Framework.Avalonia)
-        {
-            return property.IsDirect
-                ? GenerateTypeByPlatform(
-                    property.Framework,
-                    $"DirectProperty<{@class.Type}, {GenerateType(property)}>")
-                : property.IsAttached
-                    ? GenerateTypeByPlatform(
-                        property.Framework,
-                        $"AttachedProperty<{GenerateType(property)}>")
-                    : GenerateTypeByPlatform(
-                        property.Framework,
-                        $"StyledProperty<{GenerateType(property)}>");
-        }
-
-        return GenerateTypeByPlatform(property.Framework, property is { IsReadOnly: true, Framework: Framework.Wpf } ? "DependencyPropertyKey" : "DependencyProperty");
+        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        return generator.GeneratePropertyType(@class, property);
     }
     
-    private static string GenerateEventArgsType(EventData @event)
+    internal static string GenerateEventArgsType(EventData @event)
     {
         return string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
     }

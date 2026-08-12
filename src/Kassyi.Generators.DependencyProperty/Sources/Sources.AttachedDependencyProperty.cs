@@ -75,7 +75,7 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine("        }");
 
         GenerateOnChangedMethods(ref writer, @class, property);
-        GenerateOnChangingMethods(ref writer, property);
+        GenerateOnChangingMethods(ref writer, @class, property);
         GenerateCoercePartialMethod(ref writer, property);
         GenerateValidatePartialMethod(ref writer, @class, property);
         GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
@@ -87,29 +87,11 @@ internal static partial class SourceGenerationHelper
     
     private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)
     {
-        return @class.Framework switch
-        {
-            Framework.Maui => GenerateMauiRegisterMethodArguments(@class, property),
-            Framework.Avalonia => GenerateAvaloniaRegisterMethodArguments(@class, property),
-            Framework.Wpf => $"""
-
-                                              name: "{property.Name}",
-                                              propertyType: typeof({property.Type}),
-                                              ownerType: typeof({@class.Type}),
-                                              {GeneratePropertyMetadata(@class, property)},
-                                              validateValueCallback: {GenerateValidateValueCallback(@class, property)}
-                              """,
-            _ => $"""
-
-                                  name: "{property.Name}",
-                                  propertyType: typeof({property.Type}),
-                                  ownerType: typeof({@class.Type}),
-                                  {GeneratePropertyMetadata(@class, property)}
-                  """
-        };
+        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        return generator.GenerateRegisterMethodArguments(@class, property);
     }
 
-    private static string GenerateModifiers(ClassData @class)
+    internal static string GenerateModifiers(ClassData @class)
     {
         return @class.Framework switch
         {
