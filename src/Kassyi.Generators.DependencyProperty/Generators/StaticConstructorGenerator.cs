@@ -4,8 +4,6 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
-
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 [Generator]
@@ -37,28 +35,21 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
 
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string adp1 = $"{ns}AttachedDependencyPropertyAttribute";
-        const string dp1 = $"{ns}DependencyPropertyAttribute";
+
 
         var attributes = new (string Name, bool IsAttached)[]
         {
-            (dp1, false),
-            ($"{dp1}`1", false),
-            (adp1, true),
-            ($"{adp1}`1", true),
-            ($"{adp1}`2", true)
+            (KnownAttributes.DependencyProperty, false),
+            ($"{KnownAttributes.DependencyProperty}`1", false),
+            (KnownAttributes.AttachedDependencyProperty, true),
+            ($"{KnownAttributes.AttachedDependencyProperty}`1", true),
+            ($"{KnownAttributes.AttachedDependencyProperty}`2", true)
         };
 
-        var combined = GetClassData(context, attributes[0].Name, framework, version, attributes[0].IsAttached);
-        for (var i = 1; i < attributes.Length; i++)
-        {
-            combined = combined
-                .Combine(GetClassData(context, attributes[i].Name, framework, version, attributes[i].IsAttached))
-                .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray());
-        }
+        var providers = attributes
+            .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
 
-        combined
+        providers.CombineAll()
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
     }

@@ -9,11 +9,12 @@ internal static class GeneratorHelper
         this IncrementalGeneratorInitializationContext context,
         IncrementalValueProvider<Framework> framework,
         IncrementalValueProvider<string> version,
-        string[] attributeNames,
+        IReadOnlyList<string> attributeNames,
         Func<((ClassWithAttributesContext context, Framework framework) left, string version), TData?> prepareData,
         Func<TData, FileWithName> getSourceCode,
         string id,
         bool selectMany = true)
+        where TData : struct
     {
         foreach (var attributeName in attributeNames)
         {
@@ -32,5 +33,26 @@ internal static class GeneratorHelper
                 .SelectAndReportExceptions(getSourceCode, context, id)
                 .AddSource(context);
         }
+    }
+
+    public static IncrementalValueProvider<EquatableArray<T>> CombineAll<T>(
+        this IEnumerable<IncrementalValueProvider<EquatableArray<T>>> providers)
+        where T : IEquatable<T>
+    {
+        var list = providers.ToList();
+        if (list.Count == 0)
+        {
+            throw new ArgumentException("Providers list cannot be empty.", nameof(providers));
+        }
+
+        var combined = list[0];
+        for (var i = 1; i < list.Count; i++)
+        {
+            combined = combined
+                .Combine(list[i])
+                .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray());
+        }
+
+        return combined;
     }
 }
