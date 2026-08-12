@@ -1,9 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Runtime.CompilerServices;
+using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Tests.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
-using System.Runtime.CompilerServices;
-using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 public partial class Tests : VerifyBase
 {
@@ -85,10 +85,7 @@ public partial class Tests : VerifyBase
                 .Replace("PointerExited", "MouseLeave")
                 .Replace("PointerRoutedEventArgs", "MouseEventArgs");
         }
-        if (framework == Framework.Uno ||
-            framework == Framework.UnoWinUi ||
-            framework == Framework.WinUi ||
-            framework == Framework.Uwp)
+        if (framework is Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp)
         {
             source = source
                 .Replace("KeyEventArgs", "KeyRoutedEventArgs");

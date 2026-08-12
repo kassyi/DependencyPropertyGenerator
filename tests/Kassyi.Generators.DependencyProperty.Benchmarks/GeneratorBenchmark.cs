@@ -1,10 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
-using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.Benchmarks;
 [MemoryDiagnoser]
 public class GeneratorBenchmark

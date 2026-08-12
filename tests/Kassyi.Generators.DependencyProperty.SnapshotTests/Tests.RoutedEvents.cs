@@ -85,9 +85,9 @@ public partial class Tests
     [TestMethod]
     public async Task Cs0436Suppressor_SuppressesOnlyGeneratedAttributeConflicts()
     {
-        var parseOptions = global::Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default
-            .WithLanguageVersion(global::Microsoft.CodeAnalysis.CSharp.LanguageVersion.Preview);
-        var references = (await global::Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.NetFramework.Net48.Wpf.ResolveAsync(null, CancellationToken.None))
+        var parseOptions = Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default
+            .WithLanguageVersion(Microsoft.CodeAnalysis.CSharp.LanguageVersion.Preview);
+        var references = (await Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.NetFramework.Net48.Wpf.ResolveAsync(null, CancellationToken.None))
             .ToArray();
         var projectA = CreateCompilation(
             assemblyName: "ProjectA",
@@ -134,7 +134,7 @@ public partial class Tests
                         }
                     }
                     """,
-            references.Concat(new[] { global::Microsoft.CodeAnalysis.MetadataReference.CreateFromStream(projectAAssembly) }).ToArray(),
+            references.Concat([Microsoft.CodeAnalysis.MetadataReference.CreateFromStream(projectAAssembly)]).ToArray(),
             parseOptions);
         projectB = RunRoutedEventGenerator(projectB, parseOptions);
         var rawCs0436Diagnostics = projectB.GetDiagnostics()
@@ -144,42 +144,43 @@ public partial class Tests
             diagnostic.GetMessage().Contains("RoutedEventAttribute", StringComparison.Ordinal));
         rawCs0436Diagnostics.Should().Contain(static diagnostic =>
             diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal));
-        var diagnostics = await global::Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzerExtensions
+        var diagnostics = await Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzerExtensions
             .WithAnalyzers(
                 projectB,
-                global::System.Collections.Immutable.ImmutableArray.Create<global::Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzer>(
-                    new global::Kassyi.Generators.DependencyProperty.Suppressors.Cs0436Suppressor()),
-                new global::Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions(
-                    global::System.Collections.Immutable.ImmutableArray<global::Microsoft.CodeAnalysis.AdditionalText>.Empty))
+                [
+                    new Suppressors.Cs0436Suppressor()
+                ],
+                new Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions(
+                    System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.AdditionalText>.Empty))
             .GetAllDiagnosticsAsync();
         diagnostics.Where(static diagnostic => diagnostic.Id == "CS0436")
             .Should()
             .ContainSingle(static diagnostic => diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal));
-        diagnostics.Where(static diagnostic => diagnostic.Severity == global::Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
+        diagnostics.Where(static diagnostic => diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
             .Should()
             .BeEmpty();
     }
-    private static global::Microsoft.CodeAnalysis.Compilation CreateCompilation(
+    private static Microsoft.CodeAnalysis.Compilation CreateCompilation(
         string assemblyName,
         string source,
-        global::Microsoft.CodeAnalysis.MetadataReference[] references,
-        global::Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
+        Microsoft.CodeAnalysis.MetadataReference[] references,
+        Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
     {
-        return global::Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create(
+        return Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create(
             assemblyName: assemblyName,
-            syntaxTrees: new[]
-            {
-                global::Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(source, options: parseOptions),
-            },
+            syntaxTrees:
+            [
+                Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(source, options: parseOptions)
+            ],
             references: references,
-            options: new global::Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(global::Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary));
+            options: new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary));
     }
-    private static global::Microsoft.CodeAnalysis.Compilation RunRoutedEventGenerator(
-        global::Microsoft.CodeAnalysis.Compilation compilation,
-        global::Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
+    private static Microsoft.CodeAnalysis.Compilation RunRoutedEventGenerator(
+        Microsoft.CodeAnalysis.Compilation compilation,
+        Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
     {
-        global::Microsoft.CodeAnalysis.GeneratorDriver driver = global::Microsoft.CodeAnalysis.CSharp.CSharpGeneratorDriver.Create(
-            generators: new[] { global::Microsoft.CodeAnalysis.GeneratorExtensions.AsSourceGenerator(new RoutedEventGenerator()) },
+        Microsoft.CodeAnalysis.GeneratorDriver driver = Microsoft.CodeAnalysis.CSharp.CSharpGeneratorDriver.Create(
+            generators: [Microsoft.CodeAnalysis.GeneratorExtensions.AsSourceGenerator(new RoutedEventGenerator())],
             parseOptions: parseOptions);
         driver = driver
             .WithUpdatedAnalyzerConfigOptions(new global::Kassyi.Generators.Tests.Extensions.DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(Framework.Wpf)))
