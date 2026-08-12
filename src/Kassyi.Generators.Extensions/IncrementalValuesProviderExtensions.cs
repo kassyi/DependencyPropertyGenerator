@@ -1,11 +1,15 @@
-﻿using Microsoft.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
 
 /// <summary>
-/// 
+/// IncrementalValuesProvider および IncrementalValueProvider の汎用拡張メソッド群を提供するクラスです。
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("ReSharper", "UnusedMethod.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Library extension methods for Source Generators")]
 public static class IncrementalValuesProviderExtensions
 {
     /// <summary>
@@ -19,16 +23,11 @@ public static class IncrementalValuesProviderExtensions
     {
         context.RegisterSourceOutput(source, static (context, file) =>
         {
-            switch (file.IsEmpty)
-            {
-                case true:
-                    return;
-                default:
-                    context.AddSource(
-                        hintName: file.Name,
-                        source: file.Text);
-                    break;
-            }
+            if (file.IsEmpty)
+                return;
+            context.AddSource(
+                hintName: file.Name,
+                source: file.Text);
         });
     }
 
@@ -43,16 +42,11 @@ public static class IncrementalValuesProviderExtensions
     {
         context.RegisterSourceOutput(source, static (context, file) =>
         {
-            switch (file.IsEmpty)
-            {
-                case true:
-                    return;
-                default:
-                    context.AddSource(
-                        hintName: file.Name,
-                        source: file.Text);
-                    break;
-            }
+            if (file.IsEmpty)
+                return;
+            context.AddSource(
+                hintName: file.Name,
+                source: file.Text);
         });
     }
 
@@ -131,14 +125,9 @@ public static class IncrementalValuesProviderExtensions
         initializationContext.RegisterSourceOutput(outputWithErrors,
             (context, tuple) =>
             {
-                switch (tuple.Exception)
-                {
-                    case null:
-                        return;
-                    default:
-                        context.ReportException(id: id, exception: tuple.Exception);
-                        break;
-                }
+                if (tuple.Exception == null)
+                    return;
+                context.ReportException(id: id, exception: tuple.Exception);
             });
 
         return outputWithErrors
@@ -216,11 +205,8 @@ public static class IncrementalValuesProviderExtensions
             });
 
         initializationContext.RegisterSourceOutput(outputWithErrors
-            .Where(static x => x.Exception is not null),
-            (context, tuple) =>
-            {
-                context.ReportException(id: id, exception: tuple.Exception!);
-            });
+                .Where(static x => x.Exception is not null),
+            (context, tuple) => { context.ReportException(id: id, exception: tuple.Exception!); });
 
         return outputWithErrors
             .Where(static x => x.Exception is null)
@@ -278,10 +264,10 @@ public static class IncrementalValuesProviderExtensions
     /// <typeparam name="TLeft"></typeparam>
     /// <returns></returns>
     public static IncrementalValuesProvider<TResult> SelectAndReportExceptions<TResult, TLeft>(
-            this IncrementalValuesProvider<(TLeft Left, Framework Right)> source,
-            Func<Framework, TLeft, TResult> selector,
-            IncrementalGeneratorInitializationContext context,
-            string id = "SRE001")
+        this IncrementalValuesProvider<(TLeft Left, Framework Right)> source,
+        Func<Framework, TLeft, TResult> selector,
+        IncrementalGeneratorInitializationContext context,
+        string id = "SRE001")
     {
         return source
             .SelectAndReportExceptions(x => selector(x.Right, x.Left), context, id);
@@ -307,7 +293,8 @@ public static class IncrementalValuesProviderExtensions
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public static IncrementalValueProvider<Framework> DetectFramework(this IncrementalGeneratorInitializationContext context)
+    public static IncrementalValueProvider<Framework> DetectFramework(
+        this IncrementalGeneratorInitializationContext context)
     {
         var frameworkWithDiagnostic = context.AnalyzerConfigOptionsProvider
             .Select<AnalyzerConfigOptionsProvider, (Framework Framework, Diagnostic? Diagnostic)>((options, _) =>
@@ -333,14 +320,9 @@ public static class IncrementalValuesProviderExtensions
             frameworkWithDiagnostic,
             static (sourceProductionContext, tuple) =>
             {
-                switch (tuple.Diagnostic)
-                {
-                    case null:
-                        return;
-                    default:
-                        sourceProductionContext.ReportDiagnostic(tuple.Diagnostic);
-                        break;
-                }
+                if (tuple.Diagnostic == null)
+                    return;
+                sourceProductionContext.ReportDiagnostic(tuple.Diagnostic);
             });
 
         return frameworkWithDiagnostic
