@@ -1,6 +1,5 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -13,7 +12,7 @@ namespace Kassyi.Generators.Extensions;
 public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 {
     [ThreadStatic]
-    private static StringBuilder[]? _threadStaticBuilders;
+    private static StringBuilder?[]? _threadStaticBuilders;
 
     [ThreadStatic]
     private static int _depth;
@@ -59,6 +58,7 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
         Builder.Append(value);
     }
 
+#pragma warning disable CA1822 // Mark members as static
     public void Append([InterpolatedStringHandlerArgument("")] ref SourceWriterInterpolatedStringHandler handler)
     {
         // The handler appends directly to the builder.
@@ -134,62 +134,7 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 
     internal StringBuilder GetBuilder() => Builder;
 
-    /// <summary>
-    /// The handler that enables zero-allocation string interpolation using <see cref="SourceWriter"/>.
-    /// </summary>
-    [InterpolatedStringHandler]
-    public ref struct SourceWriterInterpolatedStringHandler
-    {
-        private readonly StringBuilder? _builder;
-
-        public SourceWriterInterpolatedStringHandler(int literalLength, int formattedCount, SourceWriter writer)
-        {
-            _builder = writer.GetBuilder();
-        }
-
-        public SourceWriterInterpolatedStringHandler(int literalLength, int formattedCount, SourceWriter writer, bool condition, out bool isHandlerEnabled)
-        {
-            if (condition)
-            {
-                _builder = writer.GetBuilder();
-                isHandlerEnabled = true;
-            }
-            else
-            {
-                _builder = null;
-                isHandlerEnabled = false;
-            }
-        }
-
-        public void AppendLiteral(string s)
-        {
-            _builder?.Append(s);
-        }
-
-        public void AppendFormatted(string? s)
-        {
-            if (s is not null)
-            {
-                _builder?.Append(s);
-            }
-        }
-
-        public void AppendFormatted<T>(T t)
-        {
-            if (t is not null)
-            {
-                _builder?.Append(t?.ToString());
-            }
-        }
-
-        public void AppendFormatted<T>(T t, string format) where T : IFormattable
-        {
-            if (t is not null)
-            {
-                _builder?.Append(t.ToString(format, null));
-            }
-        }
-    }
+#pragma warning restore CA1822
 
     public bool Equals(SourceWriter other)
     {
@@ -203,7 +148,7 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 
     public override int GetHashCode()
     {
-        throw new NotImplementedException();
+        return _myDepth;
     }
 
     public static bool operator ==(SourceWriter left, SourceWriter right)
@@ -216,4 +161,55 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
         return !(left == right);
     }
 
+}
+
+/// <summary>
+/// The handler that enables zero-allocation string interpolation using <see cref="SourceWriter"/>.
+/// </summary>
+[InterpolatedStringHandler]
+public readonly ref struct SourceWriterInterpolatedStringHandler
+{
+    private readonly StringBuilder? _builder;
+
+    public SourceWriterInterpolatedStringHandler(int literalLength, int formattedCount, SourceWriter writer)
+    {
+        _builder = writer.GetBuilder();
+    }
+
+    public SourceWriterInterpolatedStringHandler(int literalLength, int formattedCount, SourceWriter writer, bool condition, out bool isHandlerEnabled)
+    {
+        if (condition)
+        {
+            _builder = writer.GetBuilder();
+            isHandlerEnabled = true;
+        }
+        else
+        {
+            _builder = null;
+            isHandlerEnabled = false;
+        }
+    }
+
+    public void AppendLiteral(string s)
+    {
+        _builder?.Append(s);
+    }
+
+    public void AppendFormatted(string? s)
+    {
+        if (s is not null)
+        {
+            _builder?.Append(s);
+        }
+    }
+
+    public void AppendFormatted<T>(T t)
+    {
+        _builder?.Append(t?.ToString());
+    }
+
+    public void AppendFormatted<T>(T? t, string format) where T : IFormattable
+    {
+        _builder?.Append(t?.ToString(format, null));
+    }
 }
