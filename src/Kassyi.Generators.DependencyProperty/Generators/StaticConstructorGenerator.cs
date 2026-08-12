@@ -37,60 +37,28 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
 
-        var dp1 = context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: false), context, Id)
-            .WhereNotNull()
-            .CollectAsEquatableArray();
+        const string ns = "Kassyi.Generators.DependencyProperty.";
+        const string adp1 = $"{ns}AttachedDependencyPropertyAttribute";
+        const string dp1 = $"{ns}DependencyPropertyAttribute";
 
-        var dp2 = context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute`1")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: false), context, Id)
-            .WhereNotNull()
-            .CollectAsEquatableArray();
+        var attributes = new (string Name, bool IsAttached)[]
+        {
+            (dp1, false),
+            ($"{dp1}`1", false),
+            (adp1, true),
+            ($"{adp1}`1", true),
+            ($"{adp1}`2", true)
+        };
 
-        var adp1 = context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: true), context, Id)
-            .WhereNotNull()
-            .CollectAsEquatableArray();
+        var combined = GetClassData(context, attributes[0].Name, framework, version, attributes[0].IsAttached);
+        for (var i = 1; i < attributes.Length; i++)
+        {
+            combined = combined
+                .Combine(GetClassData(context, attributes[i].Name, framework, version, attributes[i].IsAttached))
+                .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray());
+        }
 
-        var adp2 = context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`1")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: true), context, Id)
-            .WhereNotNull()
-            .CollectAsEquatableArray();
-
-        var adp3 = context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords("Kassyi.Generators.DependencyProperty.AttachedDependencyPropertyAttribute`2")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(static (x, _) => PrepareData(x, isAttached: true), context, Id)
-            .WhereNotNull()
-            .CollectAsEquatableArray();
-
-        dp1
-            .Combine(dp2)
-            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
-            .Combine(adp1)
-            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
-            .Combine(adp2)
-            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
-            .Combine(adp3)
-            .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray())
+        combined
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
     }
@@ -150,7 +118,21 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .AsEquatableArray();
     }
 
+    private static IncrementalValueProvider<EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)>> GetClassData(
+        IncrementalGeneratorInitializationContext context,
+        string attributeName,
+        IncrementalValueProvider<Framework> framework,
+        IncrementalValueProvider<string> version,
+        bool isAttached)
+    {
+        return context.SyntaxProvider
+            .ForAttributeWithMetadataNameOfClassesAndRecords(attributeName)
+            .SelectManyAllAttributesOfCurrentClassSyntax()
+            .Combine(framework)
+            .Combine(version)
+            .SelectAndReportExceptions((x, _) => PrepareData(x, isAttached: isAttached), context, Id)
+            .WhereNotNull()
+            .CollectAsEquatableArray();
+    }
     #endregion
 }
-
-

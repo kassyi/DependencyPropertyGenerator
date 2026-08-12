@@ -29,26 +29,21 @@ public class DependencyPropertyGenerator : IIncrementalGenerator
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
 
-        context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords(
-                "Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(PrepareData, context, Id)
-            .WhereNotNull()
-            .SelectAndReportExceptions(GetSourceCode, context, Id)
-            .AddSource(context);
-        context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords(
-                "Kassyi.Generators.DependencyProperty.DependencyPropertyAttribute`1")
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndReportExceptions(PrepareData, context, Id)
-            .WhereNotNull()
-            .SelectAndReportExceptions(GetSourceCode, context, Id)
-            .AddSource(context);
+        const string ns = "Kassyi.Generators.DependencyProperty.";
+        const string attributeName = $"{ns}DependencyPropertyAttribute";
+        var attributes = new[]
+        {
+            attributeName,
+            $"{attributeName}`1"
+        };
+
+        context.RegisterAttributeGenerator(
+            framework,
+            version,
+            attributes,
+            PrepareData,
+            GetSourceCode,
+            Id);
     }
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
