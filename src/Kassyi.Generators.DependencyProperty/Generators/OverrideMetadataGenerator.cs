@@ -1,9 +1,7 @@
 using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
-using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -30,8 +28,7 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
 
-        const string ns = "Kassyi.Generators.DependencyProperty.";
-        const string attributeName = $"{ns}OverrideMetadataAttribute";
+        const string attributeName = KnownAttributes.OverrideMetadata;
         var attributes = new[]
         {
             attributeName,
@@ -71,24 +68,16 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
     private static FileWithName GetSourceCode(
         (ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada) data)
     {
-        var name = data.Class.Framework is Framework.Wpf
-            ? $"{data.Class.FullName}.StaticConstructor.g.cs"
-            : $"{data.Class.FullName}.Methods.RegisterPropertyChangedCallbacks.g.cs";
+        IGenerationStrategy strategy = data.Class.Framework is Framework.Wpf
+            ? new WpfGenerationStrategy()
+            : new NonWpfGenerationStrategy();
 
         var writer = new SourceWriter();
         try
         {
-            if (data.Class.Framework is Framework.Wpf)
-            {
-                SourceGenerationHelper.GenerateStaticConstructor(ref writer, data.Class, data.OverrideMetada.AsImmutableArray());
-            }
-            else
-            {
-                SourceGenerationHelper.GenerateRegisterPropertyChangedCallbacksMethod(ref writer, data.Class, data.OverrideMetada.AsImmutableArray());
-            }
-
+            strategy.Generate(ref writer, data.Class, data.OverrideMetada);
             return new FileWithName(
-                Name: name,
+                Name: strategy.GetFileName(data.Class),
                 Text: writer.ToString());
         }
         finally
@@ -99,5 +88,3 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
 
     #endregion
 }
-
-
