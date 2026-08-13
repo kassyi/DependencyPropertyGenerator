@@ -148,20 +148,32 @@ internal sealed class DependencyPropertyDataBuilder
 
         var bindEventsArray = GetBindEventsArray(bindEvent, bindEvents);
 
-        matchChanged.Has2 |= !isCustomOnChanged && !_isAttached && !bindEventsArray.IsEmpty;
-        matchChanged.Has3 |= !isCustomOnChanged && _isAttached && !bindEventsArray.IsEmpty;
-
         _validationAndCallbacks = _validationAndCallbacks with
         {
             BindEvents = bindEventsArray,
             OnChanged = onChanged,
             Callbacks = new EventCallbackData(
-                IsChanged0: matchChanged.Has0, IsChanged1: matchChanged.Has1, IsChanged2: matchChanged.Has2, IsChanged3: matchChanged.Has3,
-                IsChangedArgs1: matchChanged.HasArgs1, IsChangedArgs2: matchChanged.HasArgs2,
-                IsChanging0: matchChanging.Has0, IsChanging1: matchChanging.Has1, IsChanging2: matchChanging.Has2, IsChanging3: matchChanging.Has3
+                ChangedSignatures: GetChangedSignatureFlags(matchChanged.Signatures, isCustomOnChanged, _isAttached, !bindEventsArray.IsEmpty),
+                ChangingSignatures: matchChanging.Signatures
             )
         };
         return this;
+    }
+
+    private static CallbackSignature GetChangedSignatureFlags(
+        CallbackSignature currentSignatures,
+        bool isCustomOnChanged,
+        bool isAttached,
+        bool hasBindEvents)
+    {
+        var signatures = currentSignatures;
+        if (!isCustomOnChanged && hasBindEvents)
+        {
+            signatures |= isAttached
+                ? CallbackSignature.SenderAndOldAndNewValue
+                : CallbackSignature.OldAndNewValue;
+        }
+        return signatures;
     }
 
     private string GetTargetSenderType(INamedTypeSymbol? classSymbol)

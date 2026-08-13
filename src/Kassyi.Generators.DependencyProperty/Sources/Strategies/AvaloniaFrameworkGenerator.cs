@@ -209,7 +209,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         var (name, callbacks) 
             = SourceGenerationHelper.CheckOnChangedMethods(@class, property);
         
-        if (callbacks is { IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false, IsChangedArgs1: false, IsChangedArgs2: false })
+        if (callbacks.ChangedSignatures == CallbackSignature.None)
         {
             return;
         }
@@ -221,36 +221,43 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
             
-        var instanceCast = property.IsAttached ? "" : $"(({@class.Type})x.Sender).";
         var senderCast = $"({senderType})x.Sender";
+        var instanceCast = $"(({@class.Type})x.Sender)";
         var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
         
-        writer.LineIf(callbacks.IsChanged0, $"                {instanceCast}{name}();");
-        writer.LineIf(callbacks.IsChanged1, $"""
-                            {instanceCast}{name}(
-                                {(property.IsAttached ? senderCast : $"{typeCast}x.NewValue.GetValueOrDefault()")});
-            """);
-        writer.LineIf(callbacks.IsChanged2, $"""
-                            {instanceCast}{name}(
-                                {(property.IsAttached ? senderCast : $"{typeCast}x.OldValue.GetValueOrDefault()")},
-                                {typeCast}x.NewValue.GetValueOrDefault());
-            """);
-        writer.LineIf(callbacks.IsChanged3, $"""
-                            {instanceCast}{name}(
-                                {senderCast},
-                                {typeCast}x.OldValue.GetValueOrDefault(),
-                                {typeCast}x.NewValue.GetValueOrDefault());
-            """);
-        writer.LineIf(callbacks.IsChangedArgs1, $"""
-                            {instanceCast}{name}(
-                                x);
-            """);
-        writer.LineIf(callbacks.IsChangedArgs2, $"""
-                            {instanceCast}{name}(
-                                {senderCast},
-                                x);
-            """);
+        var signatures = callbacks.ChangedSignatures;
+        var oldVal = $"{typeCast}x.OldValue.GetValueOrDefault()";
+        var newVal = $"{typeCast}x.NewValue.GetValueOrDefault()";
+
+        if (signatures.HasFlag(CallbackSignature.NoParameters))
+        {
+            writer.AppendLine(append(property.IsAttached));
+        }
+        if (signatures.HasFlag(CallbackSignature.NewValue))
+        {
+            writer.AppendLine(append(property.IsAttached, property.IsAttached ? [senderCast] : [newVal]));
+        }
+        if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
+        {
+            writer.AppendLine(append(property.IsAttached, property.IsAttached ? [senderCast, newVal] : [oldVal, newVal]));
+        }
+        if (signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue))
+        {
+            writer.AppendLine(append(property.IsAttached, senderCast, oldVal, newVal));
+        }
+        if (signatures.HasFlag(CallbackSignature.EventArgs))
+        {
+            writer.AppendLine(append(property.IsAttached, "x"));
+        }
+        if (signatures.HasFlag(CallbackSignature.SenderAndEventArgs))
+        {
+            writer.AppendLine(append(isStatic: true, property.IsAttached ? senderCast : instanceCast, "x"));
+        }
 
         writer.AppendLine("            }));");
+        return;
+
+        string append(bool isStatic, params string[] args) =>
+            $"{GenerateCall(name, isStatic, instanceCast, args)}";
     }
 }

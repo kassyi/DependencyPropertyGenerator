@@ -14,12 +14,12 @@ internal sealed class SingleParameterRule : IMethodSignatureRule
             
             if (type0 == targetType || type0 == senderType)
             {
-                match.Has1 = true;
+                match.Signatures |= CallbackSignature.NewValue;
             }
             
             if (SignatureRuleHelper.IsEventArgsType(p.Type.Name))
             {
-                match.HasArgs1 = true;
+                match.Signatures |= CallbackSignature.EventArgs;
             }
         }
     }

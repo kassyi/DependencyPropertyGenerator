@@ -28,32 +28,12 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
                 """;
     }
 
-    public static string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
+    public string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
     {
-        if (property.ValidationAndCallbacks.Callbacks is { IsChanging0: false, IsChanging1: false, IsChanging2: false, IsChanging3: false })
-        {
-            return "null";
-        }
-
-        var senderType = property.IsAttached
-            ? SourceGenerationHelper.GenerateBrowsableForType(property)
-            : @class.Type;
-
-        var name = property.Name;
-        var senderCast = $"({senderType})sender";
-        var instanceCast = $"(({senderType})sender)";
-        var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
-        var isAttached = property.IsAttached;
-        
-        return $$"""
-            static (sender, oldValue, newValue) =>
-                            {
-                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging0 ? GenerateCall($"On{name}Changing", isAttached, instanceCast) : "")}}
-                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging1 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast] : [$"{typeCast}newValue"]) : "")}}
-                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging2 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast, $"{typeCast}newValue"] : [$"{typeCast}oldValue", $"{typeCast}newValue"]) : "")}}
-                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging3 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, senderCast, $"{typeCast}oldValue", $"{typeCast}newValue") : "")}}
-                            }
-            """;
+        var signatures = property.ValidationAndCallbacks.Callbacks.ChangingSignatures;
+        return signatures == CallbackSignature.None
+            ? "null"
+            : GenerateCallbackInternal(@class, property, $"On{property.Name}Changing", signatures, PropertyChangedCallbackSignature);
     }
 
     public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)

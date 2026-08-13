@@ -5,6 +5,24 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
+    private static IEnumerable<string[]> GetCallbackArgumentSets(CallbackSignature signatures, string getValue)
+    {
+        if (signatures.HasFlag(CallbackSignature.NoParameters))
+        {
+            yield return [];
+        }
+
+        if (signatures.HasFlag(CallbackSignature.NewValue))
+        {
+            yield return [getValue];
+        }
+
+        if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
+        {
+            yield return [getValue, getValue];
+        }
+    }
+
     public static void GenerateRegisterPropertyChangedCallbacksMethod(
         ref SourceWriter writer,
         ClassData @class,
@@ -29,7 +47,8 @@ internal static partial class SourceGenerationHelper
                 : @class.Type;
 
             var (name, callbacks) = CheckOnChangedMethods(@class, property);
-            if (callbacks is { IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false })
+            var signatures = callbacks.ChangedSignatures;
+            if (signatures == CallbackSignature.None)
             {
                 continue;
             }
@@ -42,16 +61,21 @@ internal static partial class SourceGenerationHelper
                 callback: static (sender, dependencyProperty) =>
                 {
 """);
-            writer.LineIf(callbacks.IsChanged0, $"                    (({senderType})sender).{name}();");
-            writer.LineIf(callbacks.IsChanged1, $$"""
-                                (({{senderType}})sender).{{name}}(
-                                                        ({{type}})sender.GetValue(dependencyProperty));
-                """);
-            writer.LineIf(callbacks.IsChanged2, $$"""
-                                (({{senderType}})sender).{{name}}(
-                                                        ({{type}})sender.GetValue(dependencyProperty),
-                                                        ({{type}})sender.GetValue(dependencyProperty));
-                """);
+            var senderCast = $"(({senderType})sender)";
+            var getValue = $"({type})sender.GetValue(dependencyProperty)";
+
+            foreach (var args in GetCallbackArgumentSets(signatures, getValue))
+            {
+                if (args.Length == 0)
+                {
+                    writer.AppendLine($"                    {senderCast}.{name}();");
+                }
+                else
+                {
+                    var argsString = string.Join(",\n                                                        ", args);
+                    writer.AppendLine($"                    {senderCast}.{name}(\n                                                        {argsString});");
+                }
+            }
             writer.AppendLine("""
                 });
 

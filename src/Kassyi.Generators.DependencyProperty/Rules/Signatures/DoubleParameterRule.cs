@@ -17,12 +17,12 @@ internal sealed class DoubleParameterRule : IMethodSignatureRule
             
             if ((type0 == targetType || type0 == senderType) && type1 == targetType)
             {
-                match.Has2 = true;
+                match.Signatures |= CallbackSignature.OldAndNewValue;
             }
             
             if (SignatureRuleHelper.IsEventArgsType(p1.Type.Name))
             {
-                match.HasArgs2 = true;
+                match.Signatures |= CallbackSignature.SenderAndEventArgs;
             }
         }
     }

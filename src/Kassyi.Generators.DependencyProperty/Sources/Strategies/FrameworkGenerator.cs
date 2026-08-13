@@ -51,12 +51,7 @@ internal abstract class FrameworkGenerator :
     {
         var (name, callbacks) = SourceGenerationHelper.CheckOnChangedMethods(@class, property);
         
-        if (callbacks is { IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false, IsChangedArgs1: false, IsChangedArgs2: false })
-        {
-            return "null";
-        }
-        
-        return GeneratePropertyChangedCallbackInternal(@class, property, name, callbacks);
+        return callbacks.ChangedSignatures == CallbackSignature.None ? "null" : GeneratePropertyChangedCallbackInternal(@class, property, name, callbacks);
     }
 
     protected virtual string PropertyChangedCallbackSignature => "static (sender, args) =>";
@@ -66,72 +61,69 @@ internal abstract class FrameworkGenerator :
 
     protected virtual string GeneratePropertyChangedCallbackInternal(
         ClassData @class, DependencyPropertyData property, string name, 
-        EventCallbackData callbacks)
+        EventCallbackData callbacks) =>
+        GenerateCallbackInternal(@class, property, name, callbacks.ChangedSignatures, PropertyChangedCallbackSignature);
+
+    protected string GenerateCallbackInternal(
+        ClassData @class,
+        DependencyPropertyData property,
+        string name,
+        CallbackSignature signatures,
+        string callbackSignature)
     {
         var senderType = property.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
-            
-        var argsExpr = GenerateArgsExpression(property);
 
         var senderCast = $"({senderType})sender";
         var instanceCast = $"(({senderType})sender)";
         var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
         var isAttached = property.IsAttached;
 
+        var oldVal = $"{typeCast}{OldValueExpression}";
+        var newVal = $"{typeCast}{NewValueExpression}";
+        var argsExpr = GenerateArgsExpression(property);
+
         using var writer = new SourceWriter();
-        writer.AppendLine(PropertyChangedCallbackSignature);
-        writer.AppendLine("                    {");
+        writer.AppendLine(callbackSignature);
+        writer.AppendLine("{");
 
-        if (callbacks.IsChanged0)
+        if (signatures.HasFlag(CallbackSignature.NoParameters))
         {
-            writer.AppendLine($"                        {GenerateCall(name, isAttached, instanceCast)}");
+            append(isAttached);
         }
-        if (callbacks.IsChanged1)
+        if (signatures.HasFlag(CallbackSignature.NewValue))
         {
-            var args = isAttached ? new[] { senderCast } : new[] { $"{typeCast}{NewValueExpression}" };
-            writer.AppendLine($"                        {GenerateCall(name, isAttached, instanceCast, args)}");
+            append(isAttached, isAttached ? [senderCast] : [newVal]);
         }
-        if (callbacks.IsChanged2)
+        if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
         {
-            var args = isAttached ? new[] { senderCast, $"{typeCast}{NewValueExpression}" } : new[] { $"{typeCast}{OldValueExpression}", $"{typeCast}{NewValueExpression}" };
-            writer.AppendLine($"                        {GenerateCall(name, isAttached, instanceCast, args)}");
+            append(isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]);
         }
-        if (callbacks.IsChanged3)
+        if (signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue))
         {
-            writer.AppendLine($"                        {GenerateCall(name, isAttached, instanceCast, senderCast, $"{typeCast}{OldValueExpression}", $"{typeCast}{NewValueExpression}")}");
+            append(isAttached, senderCast, oldVal, newVal);
         }
-        if (callbacks.IsChangedArgs1)
+        if (signatures.HasFlag(CallbackSignature.EventArgs))
         {
-            writer.AppendLine($"                        {GenerateCall(name, isAttached, instanceCast, argsExpr)}");
+            append(isAttached, argsExpr);
         }
-        if (callbacks.IsChangedArgs2)
+        if (signatures.HasFlag(CallbackSignature.SenderAndEventArgs))
         {
-            var senderArg = isAttached ? senderCast : instanceCast;
-            writer.AppendLine($"                        {GenerateCall(name, true, instanceCast, senderArg, argsExpr)}");
+            append(isStatic: true, isAttached ? senderCast : instanceCast, argsExpr);
         }
 
-        writer.Append("                    }");
+        writer.Append("}");
         return writer.ToString();
+
+        void append(bool isStatic, params string[] args) =>
+            writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
     }
 
     protected static string GenerateCall(string methodName, bool isStatic, string senderExpression, params string[] args)
     {
-        var argIndent = "                            ";
-        if (isStatic)
-        {
-            return args.Length == 0 ? $"{methodName}();" : $"""
-                                                            {methodName}(
-                                                            {argIndent}{string.Join($",\n{argIndent}", args)});
-                                                            """;
-        }
-        else
-        {
-            return args.Length == 0 ? $"{senderExpression}.{methodName}();" : $"""
-                 {senderExpression}.{methodName}(
-                 {argIndent}{string.Join($",\n{argIndent}", args)});
-                 """;
-        }
+        var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
+        return $"{target}({string.Join(", ", args)});";
     }
     
 
@@ -402,51 +394,58 @@ internal abstract class FrameworkGenerator :
         var routedEventHandlerType = GenerateRoutedEventHandlerType(@class);
         var uiElementType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "UIElement");
         var contentElementType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "ContentElement");
+        var modifiers = SourceGenerationHelper.GenerateModifiers(@class);
 
-        writer.AppendLine($$"""
-
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
-            {
-        """);
+        writeClassHeader(ref writer);
+        writeEventField(ref writer);
         
-        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.XmlDocumentation, @event);
-        writer.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
-        writer.AppendLine($"            {eventManagerType}.{registerMethod}(");
-        writer.AppendLine($"                {registerArgs});");
-        writer.AppendLine();
-        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
-        SourceGenerationHelper.GenerateCategoryAttribute(ref writer, @event.Category);
-        SourceGenerationHelper.GenerateDescriptionAttribute(ref writer, @event.Description);
-        writer.AppendLine($$"""
-        public static void Add{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-""");
-        
+        writeMethodSignature(ref writer, "Add");
         GenerateAddHandler(ref writer, @class, @event, uiElementType, contentElementType);
-        
         writer.AppendLine("        }");
         writer.AppendLine();
-        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
-        SourceGenerationHelper.GenerateCategoryAttribute(ref writer, @event.Category);
-        SourceGenerationHelper.GenerateDescriptionAttribute(ref writer, @event.Description);
-        writer.AppendLine($$"""
-        public static void Remove{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-""");
         
+        writeMethodSignature(ref writer, "Remove");
         GenerateRemoveHandler(ref writer, @class, @event, uiElementType, contentElementType);
-        
         writer.AppendLine("        }");
+        
         writer.AppendLine("    }");
         writer.AppendLine("}");
+        return;
+
+        void writeClassHeader(ref SourceWriter w)
+        {
+            w.AppendLine($$"""
+
+                #nullable enable
+
+                namespace {{@class.Namespace}}
+                {
+                    {{modifiers}}partial class {{@class.Name}}
+                    {
+                """);
+        }
+
+        void writeEventField(ref SourceWriter w)
+        {
+            SourceGenerationHelper.GenerateXmlDocumentationFrom(ref w, @event.XmlDocumentation, @event);
+            w.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
+            w.AppendLine($"            {eventManagerType}.{registerMethod}(");
+            w.AppendLine($"                {registerArgs});");
+            w.AppendLine();
+        }
+
+        void writeMethodSignature(ref SourceWriter w, string prefix)
+        {
+            SourceGenerationHelper.GenerateXmlDocumentationFrom(ref w, @event.EventXmlDocumentation, @event);
+            SourceGenerationHelper.GenerateCategoryAttribute(ref w, @event.Category);
+            SourceGenerationHelper.GenerateDescriptionAttribute(ref w, @event.Description);
+            w.AppendLine($$"""
+                        public static void {{prefix}}{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
+                        {
+                            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+
+                """);
+        }
     }
 
     protected virtual void GenerateHandlerAction(ref SourceWriter writer, EventData @event, string uiElementType, string contentElementType, string action)

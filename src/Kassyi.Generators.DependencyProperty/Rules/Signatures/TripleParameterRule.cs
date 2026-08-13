@@ -19,7 +19,7 @@ internal sealed class TripleParameterRule : IMethodSignatureRule
             
             if (type0 == senderType && type1 == targetType && type2 == targetType)
             {
-                match.Has3 = true;
+                match.Signatures |= CallbackSignature.SenderAndOldAndNewValue;
             }
         }
     }

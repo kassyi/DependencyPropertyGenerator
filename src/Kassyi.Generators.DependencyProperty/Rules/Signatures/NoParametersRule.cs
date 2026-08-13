@@ -9,7 +9,7 @@ internal sealed class NoParametersRule : IMethodSignatureRule
     {
         if (method.Parameters.Length == 0)
         {
-            match.Has0 = true;
+            match.Signatures |= CallbackSignature.NoParameters;
         }
     }
 }
