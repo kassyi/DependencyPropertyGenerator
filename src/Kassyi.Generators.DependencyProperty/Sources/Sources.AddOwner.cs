@@ -9,7 +9,7 @@ internal static partial class SourceGenerationHelper
     private static void GenerateAddOwnerCreateCall(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         writer.AppendLine();
-        writer.Append(FrameworkGeneratorFactory.Create(@class.Framework).GenerateAddOwnerCreateCall(@class, property));
+        writer.Append(FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(@class.Framework).GenerateAddOwnerCreateCall(@class, property));
     }
 }
 

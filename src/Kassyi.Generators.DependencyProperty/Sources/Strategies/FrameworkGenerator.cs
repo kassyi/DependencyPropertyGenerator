@@ -3,7 +3,10 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
-internal abstract class FrameworkGenerator
+internal abstract class FrameworkGenerator : 
+    IDependencyPropertyGeneratorStrategy,
+    IRoutedEventGeneratorStrategy,
+    IWeakEventGeneratorStrategy
 {
     public abstract string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property);
     public abstract string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property);

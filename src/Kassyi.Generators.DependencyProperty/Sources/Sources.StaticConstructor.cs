@@ -11,7 +11,7 @@ internal static partial class SourceGenerationHelper
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> properties)
     {
-        var generator = FrameworkGeneratorFactory.Create(@class.Framework);
+        var generator = FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(@class.Framework);
         generator.GenerateStaticConstructor(ref writer, @class, properties);
     }
 }

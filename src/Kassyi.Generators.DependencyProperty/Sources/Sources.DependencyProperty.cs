@@ -1,10 +1,26 @@
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
+    public static CompilationUnitSyntax GenerateDependencyPropertySyntax(ClassData @class, DependencyPropertyData property)
+    {
+        var writer = new SourceWriter();
+        try
+        {
+            GenerateDependencyProperty(ref writer, @class, property);
+            return SyntaxFactory.ParseCompilationUnit(writer.ToString());
+        }
+        finally
+        {
+            writer.Dispose();
+        }
+    }
+
     public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         writer.AppendLine($$"""
@@ -122,19 +138,19 @@ internal static partial class SourceGenerationHelper
 
     private static string GenerateManagerType(ClassData @class)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(@class.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(@class.Framework);
         return generator.GenerateManagerType(@class);
     }
     
     private static string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
         return generator.GenerateRegisterMethodArguments(@class, property);
     }
 
     private static string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
         return generator.GenerateRegisterMethod(@class, property);
     }
     private static void GenerateCoercePartialMethod(ref SourceWriter writer, DependencyPropertyData property)
@@ -157,7 +173,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateAdditionalFieldForDirectProperties(ref SourceWriter writer, DependencyPropertyData property)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
         generator.GenerateAdditionalFieldForDirectProperties(ref writer, property);
     }
 
@@ -165,7 +181,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateAdditionalPropertyForReadOnlyProperties(ref SourceWriter writer, DependencyPropertyData property)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
         generator.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
     }
 }

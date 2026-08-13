@@ -18,4 +18,8 @@ internal static class FrameworkGeneratorFactory
             _ => throw new ArgumentOutOfRangeException(nameof(framework))
         };
     }
+
+    public static IDependencyPropertyGeneratorStrategy CreateDependencyPropertyStrategy(Framework framework) => Create(framework);
+    public static IRoutedEventGeneratorStrategy CreateRoutedEventStrategy(Framework framework) => Create(framework);
+    public static IWeakEventGeneratorStrategy CreateWeakEventStrategy(Framework framework) => Create(framework);
 }

@@ -313,7 +313,7 @@ internal static partial class SourceGenerationHelper
 
     private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
     {
-        var generator = Strategies.FrameworkGeneratorFactory.Create(property.Framework);
+        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
         return generator.GeneratePropertyType(@class, property);
     }
     
