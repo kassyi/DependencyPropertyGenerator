@@ -176,11 +176,9 @@ public partial class Tests : VerifyBase
         await Task.WhenAll(
             Verify(diagnostics.ToSnapshotModels())
                 .UseDirectory($"Snapshots/{callerName}/{framework:G}")
-                //.AutoVerify()
                 .UseTextForParameters("Diagnostics"),
             Verify(driver)
                 .UseDirectory($"Snapshots/{callerName}/{framework:G}")
-                //.AutoVerify()
                 .UseFileName("_"));
     }
     private static async Task<string> GenerateSourceAsync<T>(
@@ -192,8 +190,7 @@ public partial class Tests : VerifyBase
         source = ApplyFrameworkReplacements(source, framework);
         var referenceAssemblies = framework switch
         {
-            Framework.None => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
+            Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
             Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
             Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
             Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
