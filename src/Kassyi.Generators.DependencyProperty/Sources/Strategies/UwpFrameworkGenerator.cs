@@ -5,16 +5,12 @@ namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
 internal sealed class UwpFrameworkGenerator : FrameworkGenerator
 {
-    public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
-    {
-        return $"""
-
-                                          name: "{property.Name}",
-                                          propertyType: typeof({property.Type}),
-                                          ownerType: typeof({@class.Type}),
-                                          {FrameworkGeneratorFactory.Create(@class.Framework).GeneratePropertyMetadata(@class, property)}
-                          """;
-    }
+    public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property) => $"""
+        name: "{property.Name}",
+        propertyType: typeof({property.Type}),
+        ownerType: typeof({@class.Type}),
+        {FrameworkGeneratorFactory.Create(@class.Framework).GeneratePropertyMetadata(@class, property)}
+        """;
 
     public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property) =>
         property.IsAttached ? "RegisterAttached" : "Register";
@@ -29,8 +25,8 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
         {
             writer.Append($"""
                 {parameterName}new {type}(
-                                    defaultValue: {defaultValue},
-                                    propertyChangedCallback: {propertyChanged})
+                    defaultValue: {defaultValue},
+                    propertyChangedCallback: {propertyChanged})
                 """);
         }
         else
@@ -40,8 +36,8 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
                 var createDefaultValue = GenerateCreateDefaultValueCallback(property);
                 writer.Append($"""
                     {parameterName}{type}.Create(
-                                        createDefaultValueCallback: {createDefaultValue},
-                                        propertyChangedCallback: {propertyChanged})
+                        createDefaultValueCallback: {createDefaultValue},
+                        propertyChangedCallback: {propertyChanged})
                     """);
             }
             else
@@ -54,8 +50,8 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
                 };
                 writer.Append($"""
                     {parameterName}{create}(
-                                        defaultValue: {defaultValue},
-                                        propertyChangedCallback: {propertyChanged})
+                        defaultValue: {defaultValue},
+                        propertyChangedCallback: {propertyChanged})
                     """);
             }
         }

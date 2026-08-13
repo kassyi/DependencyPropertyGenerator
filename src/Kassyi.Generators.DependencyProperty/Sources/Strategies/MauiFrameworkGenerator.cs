@@ -14,18 +14,17 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
             : property.FrameworkMetadata.DefaultBindingMode;
 
         return $"""
-
-                                propertyName: "{property.Name}",
-                                returnType: typeof({property.Type}),
-                                declaringType: typeof({@class.Type}),
-                                defaultValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
-                                defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.{defaultBindingMode},
-                                validateValue: {GenerateValidateValueCallback(@class, property)},
-                                propertyChanged: {GeneratePropertyChangedCallback(@class, property)},
-                                propertyChanging: {GeneratePropertyChangingCallback(@class, property)},
-                                coerceValue: {GenerateCoerceValueCallback(@class, property)},
-                                defaultValueCreator: {GenerateCreateDefaultValueCallbackValueCallback(property)}
-                """;
+            propertyName: "{property.Name}",
+            returnType: typeof({property.Type}),
+            declaringType: typeof({@class.Type}),
+            defaultValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
+            defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.{defaultBindingMode},
+            validateValue: {GenerateValidateValueCallback(@class, property)},
+            propertyChanged: {GeneratePropertyChangedCallback(@class, property)},
+            propertyChanging: {GeneratePropertyChangingCallback(@class, property)},
+            coerceValue: {GenerateCoerceValueCallback(@class, property)},
+            defaultValueCreator: {GenerateCreateDefaultValueCallbackValueCallback(property)}
+            """;
     }
 
     public string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
@@ -60,12 +59,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
 
-        return $"""
-               static (sender, value) =>
-                                       Is{property.Name}Valid(
-                                           ({senderType})sender,
-                                           ({SourceGenerationHelper.GenerateType(property, canBeNull: true)})value)
-               """;
+        return $"static (sender, value) => Is{property.Name}Valid(({senderType})sender, ({SourceGenerationHelper.GenerateType(property, canBeNull: true)})value)";
     }
 
     public override string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
@@ -88,8 +82,8 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
         }
 
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
-        writer.AppendLine($"        public static readonly {SourceGenerationHelper.GenerateTypeByPlatform(property.Framework, "BindableProperty")} {property.Name}Property");
-        writer.AppendLine($"            = {SourceGenerationHelper.GenerateDependencyPropertyName(property)}.BindableProperty;");
+        writer.AppendLine($"public static readonly {SourceGenerationHelper.GenerateTypeByPlatform(property.Framework, "BindableProperty")} {property.Name}Property");
+        writer.AppendLine($"= {SourceGenerationHelper.GenerateDependencyPropertyName(property)}.BindableProperty;");
     }
 
     public override void GenerateWeakEvent(ref SourceWriter writer, ClassData @class, EventData @event)
@@ -107,37 +101,23 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
         var nullable = !@event.Type.Contains("EventArgs");
         var eventHandlerType = GenerateEventHandlerType(@event, nullable: nullable, nullableType: nullable);
 
-        writer.AppendLine($$"""
-
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
-            {
-        """);
-        writer.AppendLine($$"""
-        private{{modifiers}} global::Microsoft.Maui.WeakEventManager {{@event.Name}}WeakEventManager { get; } = new global::Microsoft.Maui.WeakEventManager();
-
-""");
+        using var _ = writer.ClassScope(@class);
+        writer.AppendLine($"private{modifiers} global::Microsoft.Maui.WeakEventManager {@event.Name}WeakEventManager {{ get; }} = new global::Microsoft.Maui.WeakEventManager();");
+        writer.AppendLine();
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
-        writer.AppendLine($$"""
-        public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
+        using (writer.Scope($"public{modifiers} event {eventHandlerType} {@event.Name}"))
         {
-            add => {{@event.Name}}WeakEventManager.AddEventHandler(value);
-            remove => {{@event.Name}}WeakEventManager.RemoveEventHandler(value);
+            writer.AppendLine($"add => {@event.Name}WeakEventManager.AddEventHandler(value);");
+            writer.AppendLine($"remove => {@event.Name}WeakEventManager.RemoveEventHandler(value);");
         }
-
-        /// <summary>
-        /// A helper method to raise the {{@event.Name}} event.
-        /// </summary>
-        internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
+        writer.AppendLine();
+        writer.AppendLine("/// <summary>");
+        writer.AppendLine($"/// A helper method to raise the {@event.Name} event.");
+        writer.AppendLine("/// </summary>");
+        using (writer.Scope($"internal{modifiers} void Raise{@event.Name}Event(object? sender{additionalParameters})"))
         {
-            {{@event.Name}}WeakEventManager.HandleEvent(sender!, {{args}}!, eventName: nameof({{@event.Name}}));
+            writer.AppendLine($"{@event.Name}WeakEventManager.HandleEvent(sender!, {args}!, eventName: nameof({@event.Name}));");
         }
-    }
-}
-""");
     }
 
     public override string GenerateManagerType(ClassData @class) =>

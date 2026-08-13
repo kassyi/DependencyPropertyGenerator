@@ -38,14 +38,8 @@ internal abstract class FrameworkGenerator :
         }
     }
 
-    public virtual string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property)
-    {
-        return $"""
-                        {property.ComponentModel.FromType}.{property.Name}Property.AddOwner(
-                            ownerType: typeof({@class.Type}),
-                            {GeneratePropertyMetadata(@class, property)});
-            """;
-    }
+    public virtual string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property) =>
+        $"{property.ComponentModel.FromType}.{property.Name}Property.AddOwner(ownerType: typeof({@class.Type}), {GeneratePropertyMetadata(@class, property)});";
 
     public string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
     {
@@ -136,7 +130,7 @@ internal abstract class FrameworkGenerator :
         
         return GenerateCoerceValueCallbackInternal(@class, property);
     }
-    
+
     protected virtual string CoerceAttachedCallbackSignature => "static (sender, args) =>";
     protected virtual string CoerceAttachedValueExpression => "args.Value";
 
@@ -145,21 +139,13 @@ internal abstract class FrameworkGenerator :
         var senderType = property.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
+        var propertyType = SourceGenerationHelper.GenerateType(property, canBeNull: true);
 
         return property.IsAttached
-            ? $"""
-               {CoerceAttachedCallbackSignature}
-                                       Coerce{property.Name}(
-                                           ({senderType})sender,
-                                           ({SourceGenerationHelper.GenerateType(property, canBeNull: true)}){CoerceAttachedValueExpression})
-               """
-            : $"""
-               static (sender, value) =>
-                                       (({senderType})sender).Coerce{property.Name}(
-                                           ({SourceGenerationHelper.GenerateType(property, canBeNull: true)})value)
-               """;
+            ? $"{CoerceAttachedCallbackSignature} Coerce{property.Name}(({senderType})sender, ({propertyType}){CoerceAttachedValueExpression})"
+            : $"static (sender, value) => (({senderType})sender).Coerce{property.Name}(({propertyType})value)";
     }
-
+    
     public string GenerateValidateValueCallback(ClassData @class, DependencyPropertyData property)
     {
         if (!property.ValidationAndCallbacks.Validate)
@@ -175,19 +161,11 @@ internal abstract class FrameworkGenerator :
         var senderType = property.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
+        var propertyType = SourceGenerationHelper.GenerateType(property, canBeNull: true);
 
         return property.IsAttached
-            ? $"""
-               static (sender, args) =>
-                                       Is{property.Name}Valid(
-                                           ({senderType})sender,
-                                           ({SourceGenerationHelper.GenerateType(property, canBeNull: true)})args.Value)
-               """
-            : $"""
-               static value =>
-                                       Is{property.Name}Valid(
-                                           ({SourceGenerationHelper.GenerateType(property, canBeNull: true)})value)
-               """;
+            ? $"static (sender, args) => Is{property.Name}Valid(({senderType})sender, ({propertyType})args.Value)"
+            : $"static value => Is{property.Name}Valid(({propertyType})value)";
     }
     
     public virtual string GenerateCreateDefaultValueCallback(DependencyPropertyData property) =>
@@ -238,54 +216,40 @@ internal abstract class FrameworkGenerator :
             routerEventType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "RoutedEventHandler");
         }
 
-        writer.AppendLine($$"""
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
-            {
-        """);
+        using var _ = writer.ClassScope(@class);
         
         if (!@event.WinRtEvents)
         {
-            writer.AppendLine($$"""
-        /// <summary>
-        /// A helper method to raise the {{@event.Name}} event. <br/>
-        /// WinRT events are disabled by default due to a series of issues with them in Windows 10:
-        /// https://github.com/HavenDV/H.NotifyIcon/issues/36
-        /// https://github.com/HavenDV/H.NotifyIcon/issues/31
-        /// Use the WinRTEvents = true option to enable them.
-        /// </summary>
-        protected {{routedEventArgsType}}? On{{@event.Name}}()
-        {
-            return null;
-        }
-""");
+            writer.AppendLine("/// <summary>");
+            writer.AppendLine($"/// A helper method to raise the {@event.Name} event. <br/>");
+            writer.AppendLine("/// WinRT events are disabled by default due to a series of issues with them in Windows 10:");
+            writer.AppendLine("/// https://github.com/HavenDV/H.NotifyIcon/issues/36");
+            writer.AppendLine("/// https://github.com/HavenDV/H.NotifyIcon/issues/31");
+            writer.AppendLine("/// Use the WinRTEvents = true option to enable them.");
+            writer.AppendLine("/// </summary>");
+            using (writer.Scope($"protected {routedEventArgsType}? On{@event.Name}()"))
+            {
+                writer.AppendLine("return null;");
+            }
         }
         else
         {
             SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
             SourceGenerationHelper.GenerateCategoryAttribute(ref writer, @event.Category);
             SourceGenerationHelper.GenerateDescriptionAttribute(ref writer, @event.Description);
-            writer.AppendLine($"        public event {routerEventType}? {@event.Name};");
+            writer.AppendLine($"public event {routerEventType}? {@event.Name};");
             writer.AppendLine();
-            writer.AppendLine($$"""
-        /// <summary>
-        /// A helper method to raise the {{@event.Name}} event.
-        /// </summary>
-        protected {{routedEventArgsType}} On{{@event.Name}}()
-        {
-            var args = new {{routedEventArgsType}}();
-            {{@event.Name}}?.Invoke(this, args);
-
-            return args;
+            writer.AppendLine("/// <summary>");
+            writer.AppendLine($"/// A helper method to raise the {@event.Name} event.");
+            writer.AppendLine("/// </summary>");
+            using (writer.Scope($"protected {routedEventArgsType} On{@event.Name}()"))
+            {
+                writer.AppendLine($"var args = new {routedEventArgsType}();");
+                writer.AppendLine($"{@event.Name}?.Invoke(this, args);");
+                writer.AppendLine();
+                writer.AppendLine("return args;");
+            }
         }
-""");
-        }
-        
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
     }
 
     public virtual void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
@@ -319,13 +283,8 @@ internal abstract class FrameworkGenerator :
     protected virtual string GenerateRouterEventType(ClassData @class, EventData @event) =>
         string.IsNullOrWhiteSpace(@event.Type) ? GenerateRoutedEventHandlerType(@class) : @event.Type;
 
-    protected virtual string GenerateRegisterRoutedEventMethodArguments(ClassData @class, EventData @event) => $"""
-
-                                  name: "{@event.Name}",
-                                  routingStrategy: {GenerateRoutingStrategyType(@class)}.{@event.Strategy},
-                                  handlerType: typeof({GenerateRouterEventType(@class, @event)}),
-                                  ownerType: typeof({@class.Type})
-                  """;
+    protected virtual string GenerateRegisterRoutedEventMethodArguments(ClassData @class, EventData @event) =>
+        $"name: \"{@event.Name}\", routingStrategy: {GenerateRoutingStrategyType(@class)}.{@event.Strategy}, handlerType: typeof({GenerateRouterEventType(@class, @event)}), ownerType: typeof({@class.Type})";
 
     protected void GenerateRoutedEventInternal(ref SourceWriter writer, ClassData @class, EventData @event)
     {
@@ -336,51 +295,34 @@ internal abstract class FrameworkGenerator :
         var routedEventArgsType = GenerateRoutedEventArgsType(@class);
         var routerEventType = GenerateRouterEventType(@class, @event);
 
-        writer.AppendLine($$"""
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
-            {
-        """);
+        using var _ = writer.ClassScope(@class);
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.XmlDocumentation, @event);
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
-        writer.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
-        writer.AppendLine($"            {eventManagerType}.{registerMethod}(");
-        writer.AppendLine($"                {registerArgs});");
+        writer.AppendLine($"public static readonly {routedEventType} {@event.Name}Event = {eventManagerType}.{registerMethod}({registerArgs});");
         writer.AppendLine();
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
         SourceGenerationHelper.GenerateCategoryAttribute(ref writer, @event.Category);
         SourceGenerationHelper.GenerateDescriptionAttribute(ref writer, @event.Description);
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         SourceGenerationHelper.GenerateExcludeFromCodeCoverageAttribute(ref writer);
-        writer.AppendLine($$"""
-        public event {{routerEventType}} {{@event.Name}}
+        using (writer.Scope($"public event {routerEventType} {@event.Name}"))
         {
-            add => AddHandler({{@event.Name}}Event, value);
-            remove => RemoveHandler({{@event.Name}}Event, value);
+            writer.AppendLine($"add => AddHandler({@event.Name}Event, value);");
+            writer.AppendLine($"remove => RemoveHandler({@event.Name}Event, value);");
         }
-""");
         writer.AppendLine();
-        writer.AppendLine($$"""
-        /// <summary>
-        /// A helper method to raise the {{@event.Name}} event.
-        /// </summary>
-""");
+        writer.AppendLine("/// <summary>");
+        writer.AppendLine($"/// A helper method to raise the {@event.Name} event.");
+        writer.AppendLine("/// </summary>");
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         SourceGenerationHelper.GenerateExcludeFromCodeCoverageAttribute(ref writer);
-        writer.AppendLine($$"""
-        protected {{routedEventArgsType}} On{{@event.Name}}()
+        using (writer.Scope($"protected {routedEventArgsType} On{@event.Name}()"))
         {
-            var args = new {{routedEventArgsType}}({{@event.Name}}Event);
-            this.RaiseEvent(args);
-
-            return args;
+            writer.AppendLine($"var args = new {routedEventArgsType}({@event.Name}Event);");
+            writer.AppendLine("this.RaiseEvent(args);");
+            writer.AppendLine();
+            writer.AppendLine("return args;");
         }
-""");
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
     }
 
     protected void GenerateAttachedRoutedEventInternal(ref SourceWriter writer, ClassData @class, EventData @event)
@@ -394,72 +336,49 @@ internal abstract class FrameworkGenerator :
         var routedEventHandlerType = GenerateRoutedEventHandlerType(@class);
         var uiElementType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "UIElement");
         var contentElementType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "ContentElement");
-        var modifiers = SourceGenerationHelper.GenerateModifiers(@class);
 
-        writeClassHeader(ref writer);
-        writeEventField(ref writer);
-        
-        writeMethodSignature(ref writer, "Add");
-        GenerateAddHandler(ref writer, @class, @event, uiElementType, contentElementType);
-        writer.AppendLine("        }");
+        using var _ = writer.ClassScope(@class);
+        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.XmlDocumentation, @event);
+        writer.AppendLine($"public static readonly {routedEventType} {@event.Name}Event = {eventManagerType}.{registerMethod}({registerArgs});");
         writer.AppendLine();
-        
+
+        writeMethodSignature(ref writer, "Add");
+        using (writer.Scope())
+        {
+            writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+            GenerateAddHandler(ref writer, @class, @event, uiElementType, contentElementType);
+        }
+        writer.AppendLine();
+
         writeMethodSignature(ref writer, "Remove");
-        GenerateRemoveHandler(ref writer, @class, @event, uiElementType, contentElementType);
-        writer.AppendLine("        }");
-        
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
+        using (writer.Scope())
+        {
+            writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+            GenerateRemoveHandler(ref writer, @class, @event, uiElementType, contentElementType);
+        }
         return;
-
-        void writeClassHeader(ref SourceWriter w)
-        {
-            w.AppendLine($$"""
-
-                #nullable enable
-
-                namespace {{@class.Namespace}}
-                {
-                    {{modifiers}}partial class {{@class.Name}}
-                    {
-                """);
-        }
-
-        void writeEventField(ref SourceWriter w)
-        {
-            SourceGenerationHelper.GenerateXmlDocumentationFrom(ref w, @event.XmlDocumentation, @event);
-            w.AppendLine($"        public static readonly {routedEventType} {@event.Name}Event =");
-            w.AppendLine($"            {eventManagerType}.{registerMethod}(");
-            w.AppendLine($"                {registerArgs});");
-            w.AppendLine();
-        }
 
         void writeMethodSignature(ref SourceWriter w, string prefix)
         {
             SourceGenerationHelper.GenerateXmlDocumentationFrom(ref w, @event.EventXmlDocumentation, @event);
             SourceGenerationHelper.GenerateCategoryAttribute(ref w, @event.Category);
             SourceGenerationHelper.GenerateDescriptionAttribute(ref w, @event.Description);
-            w.AppendLine($$"""
-                        public static void {{prefix}}{{@event.Name}}Handler({{dependencyObjectType}} element, {{routedEventHandlerType}} handler)
-                        {
-                            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-                """);
+            w.AppendLine($"public static void {prefix}{@event.Name}Handler({dependencyObjectType} element, {routedEventHandlerType} handler)");
         }
     }
 
     protected virtual void GenerateHandlerAction(ref SourceWriter writer, EventData @event, string uiElementType, string contentElementType, string action)
     {
-        writer.AppendLine($$"""
-            if (element is {{uiElementType}} uiElement)
-            {
-                uiElement.{{action}}({{@event.Name}}Event, handler);
-            }
-            else if (element is {{contentElementType}} contentElement)
-            {
-                contentElement.{{action}}({{@event.Name}}Event, handler);
-            }
-""");
+        writer.AppendLine($"if (element is {uiElementType} uiElement)");
+        using (writer.Scope())
+        {
+            writer.AppendLine($"uiElement.{action}({@event.Name}Event, handler);");
+        }
+        writer.AppendLine($"else if (element is {contentElementType} contentElement)");
+        using (writer.Scope())
+        {
+            writer.AppendLine($"contentElement.{action}({@event.Name}Event, handler);");
+        }
     }
 
     protected virtual void GenerateAddHandler(ref SourceWriter writer, ClassData @class, EventData @event, string uiElementType, string contentElementType) =>
