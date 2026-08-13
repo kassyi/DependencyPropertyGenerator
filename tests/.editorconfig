@@ -1,0 +1,27 @@
+root = true
+
+[*]
+generated_code = true
+resharper_inspection_severity = none
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.severity = none
+
+[*.cs]
+generated_code = true
+resharper_inspection_severity = none
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.severity = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_unused_member_global_highlighting = none
+resharper_unused_parameter_in_partial_method_highlighting = none
+resharper_redundant_extends_list_entry_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_identifier_typo_highlighting = none
+resharper_empty_type_declaration_highlighting = none
+resharper_class_never_instantiated_global_highlighting = none
+resharper_event_never_subscribed_to_global_highlighting = none
+resharper_partial_type_with_single_part_highlighting = none
+resharper_method_has_async_overload_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_parameter_global_highlighting = none
+resharper_redundant_type_declaration_body_highlighting = none

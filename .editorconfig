@@ -204,8 +204,20 @@ dotnet_diagnostic.CA1308.severity = none
 dotnet_diagnostic.CS0809.severity = none
 dotnet_diagnostic.CA1000.severity = none
 
-[src/tests/**/*.cs]
-# Test helper / dummy test code settings
+# ==============================================================================
+# テストコード・スナップショットテストの解析除外 (ReSharper / Rider / Roslyn)
+# ==============================================================================
+[tests/**]
+generated_code = true
+resharper_inspection_severity = none
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.severity = none
+
+[tests/**/*.cs]
+generated_code = true
+resharper_inspection_severity = none
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.severity = none
 resharper_member_can_be_private_global_highlighting = none
 resharper_unused_member_global_highlighting = none
 resharper_unused_parameter_in_partial_method_highlighting = none
@@ -217,6 +229,10 @@ resharper_class_never_instantiated_global_highlighting = none
 resharper_event_never_subscribed_to_global_highlighting = none
 resharper_partial_type_with_single_part_highlighting = none
 resharper_method_has_async_overload_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_parameter_global_highlighting = none
+resharper_redundant_type_declaration_body_highlighting = none
+
 
 # ==============================================================================
 # 会計 API 連携関連のモデルおよびインターフェースの警告抑制 (ReSharper / Rider)

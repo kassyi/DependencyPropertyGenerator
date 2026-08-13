@@ -5,4 +5,8 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=WINUI/@EntryIndexedValue">True</s:Boolean>
 	<s:Int64 x:Key="/Default/CodeFormatting/CSharpFormatting/RIGHT_MARGIN/@EntryValue">120</s:Int64>
 	<s:Boolean x:Key="/Default/CodeFormatting/CSharpFormatting/WRAP_LONG_LINES/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=tests_002F_002A_002A/@EntryIndexedValue">tests/**</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=tests_005C_002A_002A/@EntryIndexedValue">tests\**</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002ATests_002A_002A/@EntryIndexedValue">*Tests*</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002ASnapshots_002A_002A/@EntryIndexedValue">*Snapshots*</s:String>
 </wpf:ResourceDictionary>
