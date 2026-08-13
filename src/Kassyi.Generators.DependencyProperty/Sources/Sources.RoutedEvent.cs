@@ -22,16 +22,14 @@ internal static partial class SourceGenerationHelper
     public static void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
     {
         var generator = Strategies.FrameworkGeneratorFactory.CreateRoutedEventStrategy(@class.Framework);
-        
-        switch (@event.IsAttached)
+
+        if (@event.IsAttached)
         {
-            case true:
-                generator.GenerateAttachedRoutedEvent(ref writer, @class, @event);
-                return;
-            default:
-                generator.GenerateRoutedEvent(ref writer, @class, @event);
-                return;
+            generator.GenerateAttachedRoutedEvent(ref writer, @class, @event);
+            return;
         }
+
+        generator.GenerateRoutedEvent(ref writer, @class, @event);
     }
 }
 
