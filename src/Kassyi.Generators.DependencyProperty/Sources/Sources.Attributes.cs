@@ -8,13 +8,13 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 internal static partial class SourceGenerationHelper
 {
     private static void GenerateAttribute(ref SourceWriter writer, string name) =>
-        writer.AppendLine($"        [global::{name}]");
+        writer.AppendLine($"[global::{name}]");
 
     private static void GenerateAttribute(ref SourceWriter writer, string name, string? value)
     {
         if (value != null)
         {
-            writer.AppendLine($"        [global::{name}({value})]");
+            writer.AppendLine($"[global::{name}({value})]");
         }
     }
 

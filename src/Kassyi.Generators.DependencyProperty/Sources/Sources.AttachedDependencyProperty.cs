@@ -21,16 +21,7 @@ internal static partial class SourceGenerationHelper
 
     public static void GenerateAttachedDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        writer.AppendLine($$"""
-
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{GenerateModifiers(@class)}}partial class {{@class.Name}}
-            {
-        """);
-
+        using var _ = writer.ClassScope(@class);
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
@@ -41,9 +32,8 @@ internal static partial class SourceGenerationHelper
         var registerMethod = GenerateRegisterMethod(@class, property);
         var registerAttachedMethodArguments = GenerateRegisterAttachedMethodArguments(@class, property);
 
-        writer.Append($"        {propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
-        writer.AppendLine($"            {managerType}.{registerMethod}(");
-        writer.AppendLine($"                {registerAttachedMethodArguments});");
+        writer.Append($"{propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
+        writer.AppendLine($"{managerType}.{registerMethod}({registerAttachedMethodArguments});");
 
         GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
@@ -63,14 +53,11 @@ internal static partial class SourceGenerationHelper
         var browsableForType = GenerateBrowsableForType(property);
         var type = GenerateType(property);
 
-        writer.AppendLine($$"""
-        {{setterVisibility}} static void Set{{property.Name}}({{browsableForType}} element, {{type}} value)
+        using (writer.Scope($"{setterVisibility} static void Set{property.Name}({browsableForType} element, {type} value)"))
         {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-            element.SetValue({{dependencyPropertyName}}, value);
+            writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+            writer.AppendLine($"element.SetValue({dependencyPropertyName}, value);");
         }
-""");
 
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
         GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
@@ -85,14 +72,11 @@ internal static partial class SourceGenerationHelper
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        writer.AppendLine($$"""
-        public static {{type}} Get{{property.Name}}({{browsableForType}} element)
+        using (writer.Scope($"public static {type} Get{property.Name}({browsableForType} element)"))
         {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-            return ({{type}})element.GetValue({{property.Name}}Property);
+            writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
+            writer.AppendLine($"return ({type})element.GetValue({property.Name}Property);");
         }
-""");
 
         GenerateOnChangedMethods(ref writer, @class, property);
         GenerateOnChangingMethods(ref writer, @class, property);
@@ -100,9 +84,6 @@ internal static partial class SourceGenerationHelper
         GenerateValidatePartialMethod(ref writer, @class, property);
         GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
         GenerateBindEventMethod(ref writer, property);
-
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
     }
     
     private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)

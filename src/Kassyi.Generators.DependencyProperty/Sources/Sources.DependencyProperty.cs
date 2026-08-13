@@ -21,16 +21,7 @@ internal static partial class SourceGenerationHelper
 
     public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        writer.AppendLine($$"""
-
-        #nullable enable
-
-        namespace {{@class.Namespace}}
-        {
-            {{@class.Modifiers}}partial class {{@class.Name}}
-            {
-        """);
-
+        using var _ = writer.ClassScope(@class);
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
@@ -38,7 +29,7 @@ internal static partial class SourceGenerationHelper
         var propertyType = GeneratePropertyType(@class, property);
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
 
-        writer.Append($"        {propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
+        writer.Append($"{propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
         GenerateDependencyPropertyCreateCall(ref writer, @class, property);
         writer.AppendLine();
 
@@ -56,18 +47,16 @@ internal static partial class SourceGenerationHelper
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        writer.AppendLine($"        public {GenerateType(property)} {property.Name}");
-        writer.AppendLine("        {");
-        writer.Append("            ");
-        GenerateGetter(ref writer, property);
-        writer.AppendLine();
-        if (!property.IsReadOnly)
+        using (writer.Scope($"public {GenerateType(property)} {property.Name}"))
         {
-            writer.Append("            ");
-            GenerateSetter(ref writer, property);
+            GenerateGetter(ref writer, property);
             writer.AppendLine();
+            if (!property.IsReadOnly)
+            {
+                GenerateSetter(ref writer, property);
+                writer.AppendLine();
+            }
         }
-        writer.AppendLine("        }");
 
         GenerateOnChangedMethods(ref writer, @class, property);
         GenerateOnChangingMethods(ref writer, @class, property);
@@ -75,11 +64,6 @@ internal static partial class SourceGenerationHelper
         GenerateValidatePartialMethod(ref writer, @class, property);
         GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
         GenerateBindEventMethod(ref writer, property);
-
-        writer.AppendLine("""
-            }
-        }
-        """);
     }
     private static void GenerateGetter(ref SourceWriter writer, DependencyPropertyData property)
     {
@@ -97,23 +81,19 @@ internal static partial class SourceGenerationHelper
     {
         if (property is { IsDirect: true, Framework: Framework.Avalonia })
         {
-            writer.Append($$"""
-            private set
-                        {
-                            var oldValue = _{{property.Name.ToParameterName()}};
-                            SetAndRaise({{property.Name}}Property, ref _{{property.Name.ToParameterName()}}, value);
-                            On{{property.Name}}Changed();
-                            On{{property.Name}}Changed(
-                                ({{GenerateType(property)}})value);
-                            On{{property.Name}}Changed(
-                                ({{GenerateType(property)}})oldValue,
-                                ({{GenerateType(property)}})value);
-                        }
-            """);
+            using (writer.Scope("private set"))
+            {
+                var type = GenerateType(property);
+                writer.AppendLine($"var oldValue = _{property.Name.ToParameterName()};");
+                writer.AppendLine($"SetAndRaise({property.Name}Property, ref _{property.Name.ToParameterName()}, value);");
+                writer.AppendLine($"On{property.Name}Changed();");
+                writer.AppendLine($"On{property.Name}Changed(({type})value);");
+                writer.AppendLine($"On{property.Name}Changed(({type})oldValue, ({type})value);");
+            }
         }
         else
         {
-            writer.Append($"{GenerateAdditionalSetterModifier(property)}set => SetValue({GenerateDependencyPropertyName(property)}, value);");
+            writer.AppendLine($"{GenerateAdditionalSetterModifier(property)}set => SetValue({GenerateDependencyPropertyName(property)}, value);");
         }
     }
 
@@ -126,10 +106,7 @@ internal static partial class SourceGenerationHelper
         else
         {
             writer.AppendLine();
-            writer.Append($"""
-                              {GenerateManagerType(@class)}.{GenerateRegisterMethod(@class, property)}(
-                                  {GenerateRegisterMethodArguments(@class, property)});
-                  """);
+            writer.AppendLine($"{GenerateManagerType(@class)}.{GenerateRegisterMethod(@class, property)}({GenerateRegisterMethodArguments(@class, property)});");
         }
     }
 
@@ -161,11 +138,11 @@ internal static partial class SourceGenerationHelper
 
         if (property.IsAttached)
         {
-            writer.Append($"        private static partial {GenerateType(property)} Coerce{property.Name}({GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, {GenerateType(property, canBeNull: true)} value);");
+            writer.AppendLine($"private static partial {GenerateType(property)} Coerce{property.Name}({GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, {GenerateType(property, canBeNull: true)} value);");
         }
         else
         {
-            writer.Append($"        private partial {GenerateType(property)} Coerce{property.Name}({GenerateType(property, canBeNull: true)} value);");
+            writer.AppendLine($"private partial {GenerateType(property)} Coerce{property.Name}({GenerateType(property, canBeNull: true)} value);");
         }
     }
 

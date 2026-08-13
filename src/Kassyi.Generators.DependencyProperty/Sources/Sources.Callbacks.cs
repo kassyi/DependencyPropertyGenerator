@@ -42,22 +42,22 @@ internal static partial class SourceGenerationHelper
         if (property.IsAttached)
         {
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        static partial void On{name}{suffix}();");
+            writer.AppendLine($"static partial void On{name}{suffix}();");
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        static partial void On{name}{suffix}({browsable} {browsableName});");
+            writer.AppendLine($"static partial void On{name}{suffix}({browsable} {browsableName});");
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        static partial void On{name}{suffix}({browsable} {browsableName}, {type} newValue);");
+            writer.AppendLine($"static partial void On{name}{suffix}({browsable} {browsableName}, {type} newValue);");
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        static partial void On{name}{suffix}({browsable} {browsableName}, {type} oldValue, {type} newValue);");
+            writer.AppendLine($"static partial void On{name}{suffix}({browsable} {browsableName}, {type} oldValue, {type} newValue);");
         }
         else
         {
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        partial void On{name}{suffix}();");
+            writer.AppendLine($"partial void On{name}{suffix}();");
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        partial void On{name}{suffix}({type} newValue);");
+            writer.AppendLine($"partial void On{name}{suffix}({type} newValue);");
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
-            writer.AppendLine($"        partial void On{name}{suffix}({type} oldValue, {type} newValue);");
+            writer.AppendLine($"partial void On{name}{suffix}({type} oldValue, {type} newValue);");
         }
     }
     

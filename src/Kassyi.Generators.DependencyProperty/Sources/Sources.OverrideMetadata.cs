@@ -28,71 +28,42 @@ internal static partial class SourceGenerationHelper
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> overrideMetadata)
     {
-        writer.AppendLine($$"""
-
-        #nullable enable
-
-        namespace {{@class.Namespace}}
+        using var _ = writer.ClassScope(@class);
+        using (writer.Scope("private void RegisterPropertyChangedCallbacks()"))
         {
-            {{GenerateModifiers(@class)}}partial class {{@class.Name}}
+            foreach (var property in overrideMetadata)
             {
-                private void RegisterPropertyChangedCallbacks()
+                var senderType = property.IsAttached
+                    ? GenerateBrowsableForType(property)
+                    : @class.Type;
+
+                var (name, callbacks) = CheckOnChangedMethods(@class, property);
+                var signatures = callbacks.ChangedSignatures;
+                if (signatures == CallbackSignature.None)
                 {
-        """);
-
-        foreach (var property in overrideMetadata)
-        {
-            var senderType = property.IsAttached
-                ? GenerateBrowsableForType(property)
-                : @class.Type;
-
-            var (name, callbacks) = CheckOnChangedMethods(@class, property);
-            var signatures = callbacks.ChangedSignatures;
-            if (signatures == CallbackSignature.None)
-            {
-                continue;
-            }
-
-            var type = GenerateType(property);
-            
-            writer.AppendLine($$"""
-            _ = this.RegisterPropertyChangedCallback(
-                dp: {{property.Name}}Property,
-                callback: static (sender, dependencyProperty) =>
-                {
-""");
-            var senderCast = $"(({senderType})sender)";
-            var getValue = $"({type})sender.GetValue(dependencyProperty)";
-
-            foreach (var args in GetCallbackArgumentSets(signatures, getValue))
-            {
-                if (args.Length == 0)
-                {
-                    writer.AppendLine($"                    {senderCast}.{name}();");
+                    continue;
                 }
-                else
+
+                var type = GenerateType(property);
+                
+                using (writer.Scope($"_ = this.RegisterPropertyChangedCallback(dp: {property.Name}Property, callback: static (sender, dependencyProperty) =>", ");"))
                 {
-                    var argsString = string.Join(",\n                                                        ", args);
-                    writer.AppendLine($"                    {senderCast}.{name}(\n                                                        {argsString});");
+                    var senderCast = $"(({senderType})sender)";
+                    var getValue = $"({type})sender.GetValue(dependencyProperty)";
+
+                    foreach (var args in GetCallbackArgumentSets(signatures, getValue))
+                    {
+                        var argsString = string.Join(", ", args);
+                        writer.AppendLine($"{senderCast}.{name}({argsString});");
+                    }
                 }
             }
-            writer.AppendLine("""
-                });
-
-""");
         }
-
-        writer.AppendLine("        }");
 
         foreach (var property in overrideMetadata)
         {
             GenerateOnChangedMethods(ref writer, @class, property);
         }
-
-        writer.AppendLine("""
-            }
-        }
-        """);
     }
 }
 

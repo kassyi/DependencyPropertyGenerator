@@ -15,7 +15,7 @@ internal static partial class SourceGenerationHelper
 
         foreach (var line in lines)
         {
-            writer.AppendLine($"        /// {line}");
+            writer.AppendLine($"/// {line}");
         }
     }
 
@@ -38,11 +38,11 @@ internal static partial class SourceGenerationHelper
             return;
         }
 
-        writer.AppendLine("        /// <summary>");
-        writer.LineIf(body.Length > 0, $"        /// {body}");
+        writer.AppendLine("/// <summary>");
+        writer.LineIf(body.Length > 0, $"/// {body}");
         var defaultDoc = property.DefaultValueDocumentation?.ExtractSimpleName() ?? $"default({WebUtility.HtmlEncode(property.ShortType)})";
-        writer.AppendLine($"        /// Default value: {defaultDoc}");
-        writer.AppendLine("        /// </summary>");
+        writer.AppendLine($"/// Default value: {defaultDoc}");
+        writer.AppendLine("/// </summary>");
     }
 
     internal static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string? value, EventData @event)
@@ -53,9 +53,9 @@ internal static partial class SourceGenerationHelper
             return;
         }
 
-        writer.AppendLine("        /// <summary>");
-        writer.LineIf(!string.IsNullOrWhiteSpace(@event.Description), $"        /// {@event.Description}");
-        writer.AppendLine("        /// </summary>");
+        writer.AppendLine("/// <summary>");
+        writer.LineIf(!string.IsNullOrWhiteSpace(@event.Description), $"/// {@event.Description}");
+        writer.AppendLine("/// </summary>");
     }
 }
 
