@@ -356,3 +356,7 @@ MigrationBackup/
 **/*.received.*
 **/*.g.verified.cs
 **/*.verified.txt
+
+tmp/
+.agents/workflows/
+.agents/skills/

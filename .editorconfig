@@ -1,14 +1,195 @@
 root = true
 
+# ==============================================================================
+# グローバル設定 (すべてのファイル)
+# ==============================================================================
 [*]
-end_of_line = linefeed
-insert_final_newline = true
 charset = utf-8
+end_of_line = lf
 indent_style = space
 indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
 
+# ==============================================================================
+# C# ファイル固有の設定
+# ==============================================================================
 [*.cs]
-# Common C# settings
+# インデントサイズ・右マージン（折り返し）設定
+indent_size = 4
+max_line_length = 120
+resharper_csharp_max_line_length = 120
+resharper_csharp_wrap_lines = true
+resharper_csharp_wrap_long_lines = true
+
+# ------------------------------------------------------------------------------
+# コードスタイル・最新構文ルール (MS標準 & C# 14対応)
+# ------------------------------------------------------------------------------
+# if/for/foreach等の制御文で波括弧を必須とし、改行を強制する
+csharp_prefer_braces = true:warning
+resharper_csharp_braces_for_ifeach = required
+resharper_csharp_simple_embedded_statement_style = line_break
+csharp_preserve_single_line_blocks = false
+resharper_csharp_place_simple_blocks_on_single_line = false
+resharper_csharp_place_simple_property_indexer_event_declaration_on_single_line = true
+resharper_csharp_place_abstract_accessorholder_on_single_line = true
+resharper_csharp_place_attribute_on_same_line = never
+
+# 生文字列リテラルのインデント設定 (右に深くアライメントせず、改行時は通常インデント)
+csharp_indent_raw_literal_string = indent
+resharper_csharp_indent_raw_literal_string = indent
+resharper_xmldoc_indent_child_elements = zero_indent
+resharper_xmldoc_indent_text = zero_indent
+
+csharp_style_namespace_declarations = file_scoped:warning
+dotnet_style_prefer_collection_expression = true:warning
+dotnet_style_object_initializer = true:warning
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+
+# 式形式 (Expression-bodied) のメンバー推奨度 (サンプルコードの get => field などのスタイル)
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# ------------------------------------------------------------------------------
+# 新しい構文のスペース・改行制御 (ReSharper / Roslyn フォーマッタ用)
+# ------------------------------------------------------------------------------
+# 波括弧（ブレース）は常に新しい行から開始 (Allman Style)
+csharp_new_line_before_open_brace = all
+
+# コレクション式 [...] の内部スペース制御（括弧の直後はスペースなし、要素間は1スペース）
+csharp_space_between_parentheses = none
+csharp_space_after_comma = true
+csharp_space_before_comma = false
+
+# ------------------------------------------------------------------------------
+# 1. 命名スタイル (Styles) の定義
+# ------------------------------------------------------------------------------
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.prefix_underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.prefix_underscore_camel_case.required_prefix = _
+dotnet_naming_style.prefix_s_camel_case.capitalization = camel_case
+dotnet_naming_style.prefix_s_camel_case.required_prefix = s_
+dotnet_naming_style.interface_style.capitalization = pascal_case
+dotnet_naming_style.interface_style.required_prefix = I
+
+# ------------------------------------------------------------------------------
+# 2. 対象シンボル (Symbols) のグループ定義
+# ------------------------------------------------------------------------------
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+
+# プライベートインスタンスフィールド (_camelCase)
+dotnet_naming_symbols.private_instance_fields.applicable_kinds = field
+dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = private, protected, internal, private_protected, protected_internal
+dotnet_naming_symbols.private_instance_fields.required_modifiers = instance
+
+# プライベート静的フィールド (s_camelCase)
+# ※不具合修正: constを除くすべてのstaticフィールドをここに集約
+dotnet_naming_symbols.non_public_static_fields.applicable_kinds = field
+dotnet_naming_symbols.non_public_static_fields.applicable_accessibilities = private, protected, internal, private_protected, protected_internal
+dotnet_naming_symbols.non_public_static_fields.required_modifiers = static
+
+# 定数 (PascalCase)
+dotnet_naming_symbols.constants_and_statics.applicable_kinds = local, field
+dotnet_naming_symbols.constants_and_statics.required_modifiers = const
+
+# ローカル変数・メソッド引数・例外変数 (camelCase)
+dotnet_naming_symbols.local_variables_and_parameters.applicable_kinds = local, parameter, local_function
+
+# PascalCase を適用するメンバー限定グループ
+dotnet_naming_symbols.pascal_case_members.applicable_kinds = class, struct, enum, method, property, event, delegate, namespace
+
+# ------------------------------------------------------------------------------
+# 3. 命名規則ルール (Rules) のマッピング
+# ------------------------------------------------------------------------------
+# インターフェース
+dotnet_naming_rule.interfaces_must_have_i.symbols = interface_symbols
+dotnet_naming_rule.interfaces_must_have_i.style = interface_style
+dotnet_naming_rule.interfaces_must_have_i.severity = warning
+dotnet_naming_rule.interfaces_must_have_i.import_to_resharper = as_predefined
+
+# プライベート/プロテクト インスタンスフィールドは `_camelCase`
+dotnet_naming_rule.private_instance_fields_must_have_underscore.symbols = private_instance_fields
+dotnet_naming_rule.private_instance_fields_must_have_underscore.style = prefix_underscore_camel_case
+dotnet_naming_rule.private_instance_fields_must_have_underscore.severity = warning
+dotnet_naming_rule.private_instance_fields_must_have_underscore.import_to_resharper = as_predefined
+
+# 静的プライベートフィールドは `s_camelCase`
+dotnet_naming_rule.private_static_fields_must_have_s.symbols = non_public_static_fields
+dotnet_naming_rule.private_static_fields_must_have_s.style = prefix_s_camel_case
+dotnet_naming_rule.private_static_fields_must_have_s.severity = warning
+dotnet_naming_rule.private_static_fields_must_have_s.import_to_resharper = as_predefined
+
+# 定数 (const) は PascalCase
+dotnet_naming_rule.constants_must_be_pascal_case.symbols = constants_and_statics
+dotnet_naming_rule.constants_must_be_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_must_be_pascal_case.severity = warning
+dotnet_naming_rule.constants_must_be_pascal_case.import_to_resharper = as_predefined
+
+# ローカル変数や引数は camelCase
+dotnet_naming_rule.locals_must_be_camel_case.symbols = local_variables_and_parameters
+dotnet_naming_rule.locals_must_be_camel_case.style = camel_case
+dotnet_naming_rule.locals_must_be_camel_case.severity = warning
+dotnet_naming_rule.locals_must_be_camel_case.import_to_resharper = as_predefined
+
+# 型、メソッド、プロパティ、パブリックメンバーなどのみを PascalCase にする
+dotnet_naming_rule.general_members_must_be_pascal_case.symbols = pascal_case_members
+dotnet_naming_rule.general_members_must_be_pascal_case.style = pascal_case
+dotnet_naming_rule.general_members_must_be_pascal_case.severity = warning
+dotnet_naming_rule.general_members_must_be_pascal_case.import_to_resharper = as_predefined
+
+# ------------------------------------------------------------------------------
+# 4. ReSharper 固有の古い設定の上書き
+# ------------------------------------------------------------------------------
+resharper_csharp_naming_rule.private_instance_fields = _+aaBb
+resharper_csharp_naming_rule.private_static_fields = s_+aaBb
+resharper_csharp_naming_rule.constants = AaBb
+resharper_csharp_naming_rule.local_constants = AaBb
+
+# ==============================================================================
+# JSON, XML, YAML, HTML 等の設定
+# ==============================================================================
+[*.{json,xml,yaml,yml,html,js,ts}]
+indent_size = 2
+
+# ==============================================================================
+# Markdown の設定
+# ==============================================================================
+[*.md]
+trim_trailing_whitespace = false
+
+# ==============================================================================
+# 自動生成コードの警告抑制・整形除外 (ReSharper / Roslyn Analyzers)
+# ==============================================================================
+[**/*.{g,i,designer,generated}.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[**/obj/**/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[**/GeneratedFiles/**/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[**/TemporaryGeneratedFile_*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[**/Migrations/**]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+resharper_inspection_severity = none
+dotnet_diagnostic.severity = none
+
+# ==============================================================================
+# プロジェクト固有の設定 (DependencyPropertyGenerator)
+# ==============================================================================
 
 [src/libs/Kassyi.Generators.DependencyProperty.Attributes/**/*.cs]
 # Attributes are public APIs for source generator consumers
@@ -35,3 +216,16 @@ resharper_empty_type_declaration_highlighting = none
 resharper_class_never_instantiated_global_highlighting = none
 resharper_event_never_subscribed_to_global_highlighting = none
 resharper_partial_type_with_single_part_highlighting = none
+resharper_method_has_async_overload_highlighting = none
+
+# ==============================================================================
+# 会計 API 連携関連のモデルおよびインターフェースの警告抑制 (ReSharper / Rider)
+# ==============================================================================
+[**/Accounting/**/*.cs]
+resharper_unused_member_global_highlighting = none
+resharper_unused_member_local_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+resharper_unused_auto_property_accessor_local_highlighting = none
+resharper_unused_member_in_super_global_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_class_never_instantiated_local_highlighting = none
