@@ -192,9 +192,7 @@ public static class PrepareData
 
     internal static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
     {
-        if (typeSymbol == null ||
-            defaultValue is not { Length: > 0 } ||
-            !defaultValue.Trim().StartsWith("new", StringComparison.Ordinal))
+        if (typeSymbol == null || string.IsNullOrWhiteSpace(defaultValue))
         {
             return defaultValue;
         }
@@ -203,14 +201,23 @@ public static class PrepareData
             ? nullableType.TypeArguments[0]
             : typeSymbol;
 
-        return SyntaxFactory.ParseExpression(defaultValue) switch
+        try
         {
-            ImplicitObjectCreationExpressionSyntax implicitNew => SyntaxFactory.ObjectCreationExpression(
-                SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
-                SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
-                implicitNew.ArgumentList,
-                implicitNew.Initializer).ToFullString(),
-            _ => defaultValue,
-        };
+            var expression = SyntaxFactory.ParseExpression(defaultValue!);
+            if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
+            {
+                return SyntaxFactory.ObjectCreationExpression(
+                    SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
+                    SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
+                    implicitNew.ArgumentList,
+                    implicitNew.Initializer).ToFullString();
+            }
+        }
+        catch
+        {
+            // Fallback to the original string if parsing fails
+        }
+
+        return defaultValue;
     }
 }
