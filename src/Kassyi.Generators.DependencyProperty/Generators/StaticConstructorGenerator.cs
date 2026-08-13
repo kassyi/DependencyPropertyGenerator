@@ -37,14 +37,14 @@ public class StaticConstructorGenerator : IIncrementalGenerator
 
 
 
-        var attributes = new (string Name, bool IsAttached)[]
-        {
+        (string Name, bool IsAttached)[] attributes =
+        [
             (KnownAttributes.DependencyProperty, false),
             ($"{KnownAttributes.DependencyProperty}`1", false),
             (KnownAttributes.AttachedDependencyProperty, true),
             ($"{KnownAttributes.AttachedDependencyProperty}`1", true),
             ($"{KnownAttributes.AttachedDependencyProperty}`2", true)
-        };
+        ];
 
         var providers = attributes
             .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
@@ -91,7 +91,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
                     SourceGenerationHelper.GenerateStaticConstructor(
                         ref writer,
                         g.Key,
-                        g.Where(static property => !property.IsDirect).ToArray());
+                        [.. g.Where(static property => !property.IsDirect)]);
                     var text = writer.ToString();
                     return string.IsNullOrWhiteSpace(text) switch
                     {

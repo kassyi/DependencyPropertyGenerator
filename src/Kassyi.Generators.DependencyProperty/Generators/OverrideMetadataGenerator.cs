@@ -28,11 +28,11 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
 
-        const string attributeName = KnownAttributes.OverrideMetadata;
+        const string AttributeName = KnownAttributes.OverrideMetadata;
         var attributes = new[]
         {
-            attributeName,
-            $"{attributeName}`1"
+            AttributeName,
+            $"{AttributeName}`1"
         };
 
         context.RegisterAttributeGenerator(

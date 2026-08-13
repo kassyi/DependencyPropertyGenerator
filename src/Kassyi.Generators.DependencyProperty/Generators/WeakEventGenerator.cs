@@ -10,11 +10,11 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
 {
     protected override string Id => "WEG";
 
-    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
-    {
+    protected override IReadOnlyList<string> AttributeNames { get; } =
+    [
         KnownAttributes.WeakEvent,
         $"{KnownAttributes.WeakEvent}`1"
-    };
+    ];
 
     protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
     {
@@ -39,13 +39,9 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
         return (classData, eventData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data)
-    {
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data) =>
         SourceGenerationHelper.GenerateWeakEvent(ref writer, data.Class, data.Event);
-    }
 
-    protected override string GetHintName((ClassData Class, EventData Event) data)
-    {
-        return $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs";
-    }
+    protected override string GetHintName((ClassData Class, EventData Event) data) =>
+        $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs";
 }

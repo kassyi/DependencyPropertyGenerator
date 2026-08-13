@@ -10,12 +10,12 @@ public class AttachedDependencyPropertyGenerator : AttributeGeneratorBase<(Class
 {
     protected override string Id => "ADPG";
 
-    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
-    {
+    protected override IReadOnlyList<string> AttributeNames { get; } =
+    [
         KnownAttributes.AttachedDependencyProperty,
         $"{KnownAttributes.AttachedDependencyProperty}`1",
         $"{KnownAttributes.AttachedDependencyProperty}`2"
-    };
+    ];
 
     protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
     {
@@ -40,13 +40,9 @@ public class AttachedDependencyPropertyGenerator : AttributeGeneratorBase<(Class
         return (classData, dependencyPropertyData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateAttachedDependencyProperty(ref writer, data.Class, data.DependencyProperty);
-    }
 
-    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
-        return $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs";
-    }
+    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
+        $"{data.Class.FullName}.AttachedProperties.{data.DependencyProperty.Name}.g.cs";
 }

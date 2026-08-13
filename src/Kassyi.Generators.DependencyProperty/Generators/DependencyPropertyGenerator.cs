@@ -10,11 +10,11 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
 {
     protected override string Id => "DPG";
 
-    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
-    {
+    protected override IReadOnlyList<string> AttributeNames { get; } =
+    [
         KnownAttributes.DependencyProperty,
         $"{KnownAttributes.DependencyProperty}`1"
-    };
+    ];
 
     protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
     {
@@ -40,13 +40,9 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
         return (classData, dependencyPropertyData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
-    }
 
-    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
-        return $"{data.Class.FullName}.Properties.{data.DependencyProperty.Name}.g.cs";
-    }
+    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
+        $"{data.Class.FullName}.Properties.{data.DependencyProperty.Name}.g.cs";
 }

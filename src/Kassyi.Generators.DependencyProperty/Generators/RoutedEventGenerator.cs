@@ -10,11 +10,11 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
 {
     protected override string Id => "REG";
 
-    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
-    {
+    protected override IReadOnlyList<string> AttributeNames { get; } =
+    [
         KnownAttributes.RoutedEvent,
         $"{KnownAttributes.RoutedEvent}`1"
-    };
+    ];
 
     protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
     {
@@ -47,10 +47,8 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
         return (classData, eventData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data)
-    {
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data) =>
         SourceGenerationHelper.GenerateRoutedEvent(ref writer, data.Class, data.Event);
-    }
 
     protected override string GetHintName((ClassData Class, EventData Event) data)
     {

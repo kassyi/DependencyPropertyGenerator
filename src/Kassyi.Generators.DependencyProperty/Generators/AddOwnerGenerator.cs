@@ -10,11 +10,11 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
 {
     protected override string Id => "AOG";
 
-    protected override IReadOnlyList<string> AttributeNames { get; } = new[]
-    {
+    protected override IReadOnlyList<string> AttributeNames { get; } =
+    [
         KnownAttributes.AddOwner,
         $"{KnownAttributes.AddOwner}`2"
-    };
+    ];
 
     protected override void PostInitialize(IncrementalGeneratorPostInitializationContext context)
     {
@@ -40,13 +40,9 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
         return (classData, dependencyPropertyData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
+    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
-    }
 
-    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data)
-    {
-        return $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs";
-    }
+    protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
+        $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs";
 }
