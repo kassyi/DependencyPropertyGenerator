@@ -1,7 +1,8 @@
-﻿using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Represents metadata about the target class declaring generated members.</summary>
 public readonly record struct ClassData(
     string Namespace,
     string Name,

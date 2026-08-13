@@ -1,5 +1,6 @@
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Represents component model attribute metadata for generated properties.</summary>
 public readonly record struct ComponentModelData(
     string? Description,
     string? Category,

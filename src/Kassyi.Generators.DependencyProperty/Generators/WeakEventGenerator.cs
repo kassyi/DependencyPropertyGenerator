@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Incremental generator for weak event pattern subscriptions.</summary>
 [Generator]
 public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {

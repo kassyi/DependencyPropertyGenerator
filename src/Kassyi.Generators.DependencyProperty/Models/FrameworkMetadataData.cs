@@ -1,5 +1,6 @@
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Represents WPF framework property metadata flags and options.</summary>
 public readonly record struct FrameworkMetadataData(
     bool AffectsMeasure,
     bool AffectsArrange,

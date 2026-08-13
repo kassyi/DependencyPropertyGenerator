@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Incremental generator for adding dependency property owners.</summary>
 [Generator]
 public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, DependencyPropertyData DependencyProperty)>
 {

@@ -2,10 +2,12 @@ using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Incremental generator for platform static constructor registrations.</summary>
 [Generator]
 public class StaticConstructorGenerator : IIncrementalGenerator
 {
@@ -17,6 +19,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
 
     #region Methods
 
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(static context =>

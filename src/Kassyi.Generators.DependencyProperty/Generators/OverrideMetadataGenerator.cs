@@ -1,10 +1,12 @@
 using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Incremental generator for overriding dependency property metadata.</summary>
 [Generator]
 public class OverrideMetadataGenerator : IIncrementalGenerator
 {
@@ -16,6 +18,7 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
 
     #region Methods
 
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(static context =>

@@ -1,5 +1,6 @@
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Specifies the parameter combinations supported by property change callbacks.</summary>
 [Flags]
 public enum CallbackSignature
 {

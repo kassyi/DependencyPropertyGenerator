@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Incremental generator for WPF and WinUI routed events.</summary>
 [Generator]
 public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {

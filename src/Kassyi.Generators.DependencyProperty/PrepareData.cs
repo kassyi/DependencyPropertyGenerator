@@ -9,8 +9,10 @@ using System.Collections.Immutable;
 
 namespace Kassyi.Generators.DependencyProperty;
 
+/// <summary>Provides data extraction and transformation helpers for Roslyn generator pipeline stages.</summary>
 public static class PrepareData
 {
+    /// <summary>Extracts dependency property model data from attribute and syntax definitions.</summary>
     public static DependencyPropertyData GetDependencyPropertyData(
         this AttributeData attribute,
         Framework framework,
@@ -65,6 +67,7 @@ public static class PrepareData
         framework is Framework.Uwp or Framework.Uno ? "Windows.UI.Xaml.DependencyObject" :
         "Microsoft.UI.Xaml.DependencyObject";
 
+    /// <summary>Extracts routed or weak event model data from attribute definitions.</summary>
     public static EventData GetEventData(this AttributeData attribute, bool isStaticClass)
     {
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
@@ -108,6 +111,7 @@ public static class PrepareData
             WinRtEvents: winRtEvents);
     }
 
+    /// <summary>Extracts target class metadata from a named type symbol.</summary>
     public static ClassData GetClassData(
         this INamedTypeSymbol classSymbol,
         Framework framework,
@@ -182,6 +186,7 @@ public static class PrepareData
                 x => x.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"').RemoveNameof() == name);
     }
 
+    /// <summary>Resolves a type symbol from either a generic attribute argument or a named attribute argument.</summary>
     public static ITypeSymbol? GetGenericTypeArgumentOrNamed(this AttributeData attribute, int position, string name)
     {
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
@@ -215,7 +220,7 @@ public static class PrepareData
         }
         catch
         {
-            // Fallback to the original string if parsing fails
+            // [WHY] Fallback to raw string if Roslyn syntax parsing fails.
         }
 
         return defaultValue;

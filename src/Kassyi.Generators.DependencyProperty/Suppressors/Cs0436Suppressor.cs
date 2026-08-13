@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.DependencyProperty.Suppressors;
 
+/// <summary>Suppresses CS0436 warnings caused by duplicate internal attribute helper types across friend assemblies.</summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class Cs0436Suppressor : DiagnosticSuppressor
 {
