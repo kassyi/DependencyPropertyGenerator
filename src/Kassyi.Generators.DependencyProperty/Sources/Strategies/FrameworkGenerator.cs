@@ -82,36 +82,26 @@ internal abstract class FrameworkGenerator :
         writer.AppendLine(callbackSignature);
         writer.AppendLine("{");
 
-        if (signatures.HasFlag(CallbackSignature.NoParameters))
+        (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
+        [
+            (CallbackSignature.NoParameters, isAttached, []),
+            (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
+            (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
+            (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
+            (CallbackSignature.EventArgs, isAttached, [argsExpr]),
+            (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, argsExpr]),
+        ];
+
+        foreach (var (flag, isStatic, args) in mappings)
         {
-            append(isAttached);
-        }
-        if (signatures.HasFlag(CallbackSignature.NewValue))
-        {
-            append(isAttached, isAttached ? [senderCast] : [newVal]);
-        }
-        if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
-        {
-            append(isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]);
-        }
-        if (signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue))
-        {
-            append(isAttached, senderCast, oldVal, newVal);
-        }
-        if (signatures.HasFlag(CallbackSignature.EventArgs))
-        {
-            append(isAttached, argsExpr);
-        }
-        if (signatures.HasFlag(CallbackSignature.SenderAndEventArgs))
-        {
-            append(isStatic: true, isAttached ? senderCast : instanceCast, argsExpr);
+            if (signatures.HasFlag(flag))
+            {
+                writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
+            }
         }
 
         writer.Append("}");
         return writer.ToString();
-
-        void append(bool isStatic, params string[] args) =>
-            writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
     }
 
     protected static string GenerateCall(string methodName, bool isStatic, string senderExpression, params string[] args)

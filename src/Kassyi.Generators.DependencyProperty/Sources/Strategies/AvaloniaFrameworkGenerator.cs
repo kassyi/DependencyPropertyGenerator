@@ -186,7 +186,8 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         }
 
         var propertyType = SourceGenerationHelper.GenerateType(property);
-        using (writer.Scope($"{property.Name}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{propertyType}>>(static x =>", "}));"))
+        var observerType = $"global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{propertyType}>>";
+        using (writer.Scope($"{property.Name}Property.Changed.Subscribe(new {observerType}(static x =>", "}));"))
         {
             var senderType = property.IsAttached
                 ? SourceGenerationHelper.GenerateBrowsableForType(property)
@@ -200,33 +201,23 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             var oldVal = $"{typeCast}x.OldValue.GetValueOrDefault()";
             var newVal = $"{typeCast}x.NewValue.GetValueOrDefault()";
 
-            if (signatures.HasFlag(CallbackSignature.NoParameters))
-            {
-                writer.AppendLine(append(isAttached));
-            }
-            if (signatures.HasFlag(CallbackSignature.NewValue))
-            {
-                writer.AppendLine(append(isAttached, isAttached ? [senderCast] : [newVal]));
-            }
-            if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
-            {
-                writer.AppendLine(append(isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]));
-            }
-            if (signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue))
-            {
-                writer.AppendLine(append(isAttached, senderCast, oldVal, newVal));
-            }
-            if (signatures.HasFlag(CallbackSignature.EventArgs))
-            {
-                writer.AppendLine(append(isAttached, "x"));
-            }
-            if (signatures.HasFlag(CallbackSignature.SenderAndEventArgs))
-            {
-                writer.AppendLine(append(isStatic: true, isAttached ? senderCast : instanceCast, "x"));
-            }
+            (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
+            [
+                (CallbackSignature.NoParameters, isAttached, []),
+                (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
+                (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
+                (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
+                (CallbackSignature.EventArgs, isAttached, ["x"]),
+                (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, "x"]),
+            ];
 
-            string append(bool isStatic, params string[] args) =>
-                GenerateCall(name, isStatic, instanceCast, args);
+            foreach (var (flag, isStatic, args) in mappings)
+            {
+                if (signatures.HasFlag(flag))
+                {
+                    writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
+                }
+            }
         }
     }
 }
