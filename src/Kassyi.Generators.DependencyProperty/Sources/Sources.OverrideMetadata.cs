@@ -10,15 +10,17 @@ internal static partial class SourceGenerationHelper
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> overrideMetadata)
     {
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("    {");
-        writer.AppendLine("        private void RegisterPropertyChangedCallbacks()");
-        writer.AppendLine("        {");
+        writer.AppendLine($$"""
+
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{GenerateModifiers(@class)}}partial class {{@class.Name}}
+            {
+                private void RegisterPropertyChangedCallbacks()
+                {
+        """);
 
         foreach (var property in overrideMetadata)
         {
@@ -26,32 +28,34 @@ internal static partial class SourceGenerationHelper
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
-            var (name, isChanged0, isChanged1, isChanged2, isChanged3, _, _) = CheckOnChangedMethods(@class, property);
-            if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3)
+            var (name, callbacks) = CheckOnChangedMethods(@class, property);
+            if (callbacks is { IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false })
             {
                 continue;
             }
 
             var type = GenerateType(property);
             
-            writer.AppendLine("            _ = this.RegisterPropertyChangedCallback(");
-            writer.AppendLine($"                dp: {property.Name}Property,");
-            writer.AppendLine("                callback: static (sender, dependencyProperty) =>");
-            writer.AppendLine("                {");
-            if (isChanged0) writer.AppendLine($"                    (({senderType})sender).{name}();");
-            if (isChanged1)
-            {
-                writer.AppendLine($"                    (({senderType})sender).{name}(");
-                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty));");
-            }
-            if (isChanged2)
-            {
-                writer.AppendLine($"                    (({senderType})sender).{name}(");
-                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty),");
-                writer.AppendLine($"                                            ({type})sender.GetValue(dependencyProperty));");
-            }
-            writer.AppendLine("                });");
-            writer.AppendLine();
+            writer.AppendLine($$"""
+            _ = this.RegisterPropertyChangedCallback(
+                dp: {{property.Name}}Property,
+                callback: static (sender, dependencyProperty) =>
+                {
+""");
+            writer.LineIf(callbacks.IsChanged0, $"                    (({senderType})sender).{name}();");
+            writer.LineIf(callbacks.IsChanged1, $$"""
+                                (({{senderType}})sender).{{name}}(
+                                                        ({{type}})sender.GetValue(dependencyProperty));
+                """);
+            writer.LineIf(callbacks.IsChanged2, $$"""
+                                (({{senderType}})sender).{{name}}(
+                                                        ({{type}})sender.GetValue(dependencyProperty),
+                                                        ({{type}})sender.GetValue(dependencyProperty));
+                """);
+            writer.AppendLine("""
+                });
+
+""");
         }
 
         writer.AppendLine("        }");
@@ -61,8 +65,10 @@ internal static partial class SourceGenerationHelper
             GenerateOnChangedMethods(ref writer, @class, property);
         }
 
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
+        writer.AppendLine("""
+            }
+        }
+        """);
     }
 }
 

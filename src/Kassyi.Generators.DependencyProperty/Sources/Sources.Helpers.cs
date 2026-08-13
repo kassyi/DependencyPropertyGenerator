@@ -80,27 +80,52 @@ internal static partial class SourceGenerationHelper
             : $"default({type})";
     }
 
-    internal static string GenerateBrowsableForType(DependencyPropertyData property)
-    {
-        return property.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
-    }
+    private static readonly string[] s_cSharpKeywords =
+    [
+        "class", "struct", "record", "enum", "interface", "object", "string", "int", "long", "bool", "double", "float",
+        "decimal", "byte", "sbyte", "short", "ushort", "uint", "ulong", "char", "void", "dynamic"
+    ];
+
+    internal static string GenerateBrowsableForType(DependencyPropertyData property) =>
+        property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
 
     private static string GenerateBrowsableForTypeParameterName(DependencyPropertyData property)
     {
-        var typeName = property.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
-        int lastDot = typeName.LastIndexOf('.');
-        int startIndex = lastDot >= 0 ? lastDot + 1 : 0;
-        int length = typeName.Length - startIndex;
+        var typeName = property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
+        
+        if (string.IsNullOrWhiteSpace(typeName))
+        {
+            return "sender";
+        }
+        
+        var genericIndex = typeName.IndexOf('<');
+        var nameToProcess = genericIndex >= 0 ? typeName.Substring(0, genericIndex) : typeName;
+        
+        var lastDot = nameToProcess.LastIndexOf('.');
+        var startIndex = lastDot >= 0 ? lastDot + 1 : 0;
+        var length = nameToProcess.Length - startIndex;
         
         if (length <= 0)
         {
-            return string.Empty;
+            return "sender";
         }
 
         Span<char> span = stackalloc char[length];
-        typeName.AsSpan(startIndex).CopyTo(span);
-        span[0] = char.ToLowerInvariant(span[0]);
-        return span.ToString();
+        nameToProcess.AsSpan(startIndex).CopyTo(span);
+        
+        if (char.IsLetter(span[0]))
+        {
+            span[0] = char.ToLowerInvariant(span[0]);
+        }
+        
+        var name = span.ToString();
+        
+        if (Array.IndexOf(s_cSharpKeywords, name) >= 0)
+        {
+            return "@" + name;
+        }
+
+        return name;
     }
 
     private const string OptionsPrefix = "global::System.Windows.FrameworkPropertyMetadataOptions.";
@@ -120,32 +145,36 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateOptions(ref SourceWriter writer, DependencyPropertyData property)
     {
-        bool hasOption = false;
-        static void AppendOption(ref SourceWriter w, ref bool ho, bool condition, string name)
+        var hasOption = false;
+        var options = new (bool Condition, string Name)[]
         {
-            if (condition)
-            {
-                if (ho)
-                {
-                    w.Append(" | ");
-                }
-                w.Append(OptionsPrefix);
-                w.Append(name);
-                ho = true;
-            }
-        }
+            (property.FrameworkMetadata.AffectsMeasure, nameof(FrameworkMetadataData.AffectsMeasure)),
+            (property.FrameworkMetadata.AffectsArrange, nameof(FrameworkMetadataData.AffectsArrange)),
+            (property.FrameworkMetadata.AffectsParentMeasure, nameof(FrameworkMetadataData.AffectsParentMeasure)),
+            (property.FrameworkMetadata.AffectsParentArrange, nameof(FrameworkMetadataData.AffectsParentArrange)),
+            (property.FrameworkMetadata.AffectsRender, nameof(FrameworkMetadataData.AffectsRender)),
+            (property.FrameworkMetadata.Inherits, nameof(FrameworkMetadataData.Inherits)),
+            (property.FrameworkMetadata.OverridesInheritanceBehavior, nameof(FrameworkMetadataData.OverridesInheritanceBehavior)),
+            (property.FrameworkMetadata.NotDataBindable, nameof(FrameworkMetadataData.NotDataBindable)),
+            (property.FrameworkMetadata.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault"),
+            (property.FrameworkMetadata.Journal, nameof(FrameworkMetadataData.Journal)),
+            (property.FrameworkMetadata.SubPropertiesDoNotAffectRender, nameof(FrameworkMetadataData.SubPropertiesDoNotAffectRender))
+        };
 
-        AppendOption(ref writer, ref hasOption, property.AffectsMeasure, nameof(DependencyPropertyData.AffectsMeasure));
-        AppendOption(ref writer, ref hasOption, property.AffectsArrange, nameof(DependencyPropertyData.AffectsArrange));
-        AppendOption(ref writer, ref hasOption, property.AffectsParentMeasure, nameof(DependencyPropertyData.AffectsParentMeasure));
-        AppendOption(ref writer, ref hasOption, property.AffectsParentArrange, nameof(DependencyPropertyData.AffectsParentArrange));
-        AppendOption(ref writer, ref hasOption, property.AffectsRender, nameof(DependencyPropertyData.AffectsRender));
-        AppendOption(ref writer, ref hasOption, property.Inherits, nameof(DependencyPropertyData.Inherits));
-        AppendOption(ref writer, ref hasOption, property.OverridesInheritanceBehavior, nameof(DependencyPropertyData.OverridesInheritanceBehavior));
-        AppendOption(ref writer, ref hasOption, property.NotDataBindable, nameof(DependencyPropertyData.NotDataBindable));
-        AppendOption(ref writer, ref hasOption, property.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault");
-        AppendOption(ref writer, ref hasOption, property.Journal, nameof(DependencyPropertyData.Journal));
-        AppendOption(ref writer, ref hasOption, property.SubPropertiesDoNotAffectRender, nameof(DependencyPropertyData.SubPropertiesDoNotAffectRender));
+        foreach (var (condition, name) in options)
+        {
+            if (!condition)
+            {
+                continue;
+            }
+            if (hasOption)
+            {
+                writer.Append(" | ");
+            }
+            writer.Append(OptionsPrefix);
+            writer.Append(name);
+            hasOption = true;
+        }
 
         if (!hasOption)
         {
@@ -174,7 +203,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateValidatePartialMethod(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        if (!property.Validate)
+        if (!property.ValidationAndCallbacks.Validate)
         {
             writer.Append(" ");
             return;
@@ -201,7 +230,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateCreateDefaultValueCallbackPartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
-        if (!property.CreateDefaultValueCallback)
+        if (!property.ValidationAndCallbacks.CreateDefaultValueCallback)
         {
             writer.Append(" ");
             return;
@@ -241,7 +270,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateBindEventMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
-        if (property.BindEvents.IsEmpty)
+        if (property.ValidationAndCallbacks.BindEvents.IsEmpty)
         {
             writer.Append(" ");
             return;
@@ -264,14 +293,14 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine();
         writer.AppendLine($"            if (oldValue is not default({type}))");
         writer.AppendLine("            {");
-        foreach (var @event in property.BindEvents)
+        foreach (var @event in property.ValidationAndCallbacks.BindEvents)
         {
             writer.AppendLine($"                {sender}.{@event} -= On{property.Name}Changed_{@event};");
         }
         writer.AppendLine("            }");
         writer.AppendLine($"            if (newValue is not default({type}))");
         writer.AppendLine("            {");
-        foreach (var @event in property.BindEvents)
+        foreach (var @event in property.ValidationAndCallbacks.BindEvents)
         {
             writer.AppendLine($"                {sender}.{@event} += On{property.Name}Changed_{@event};");
         }
@@ -288,9 +317,12 @@ internal static partial class SourceGenerationHelper
         return generator.GeneratePropertyType(@class, property);
     }
     
-    internal static string GenerateEventArgsType(EventData @event)
-    {
-        return string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
-    }
+    internal static string GenerateEventArgsType(EventData @event) =>
+        string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
 }
 
+internal static class StringExtensions
+{
+    public static string If(this string text, bool condition) =>
+        condition ? text : string.Empty;
+}

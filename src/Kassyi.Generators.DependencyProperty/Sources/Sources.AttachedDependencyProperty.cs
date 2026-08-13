@@ -7,15 +7,17 @@ internal static partial class SourceGenerationHelper
 {
     public static void GenerateAttachedDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("    {");
+        writer.AppendLine($$"""
 
-        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{GenerateModifiers(@class)}}partial class {{@class.Name}}
+            {
+        """);
+
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
         var propertyModifier = GeneratePropertyModifier(property);
@@ -31,15 +33,15 @@ internal static partial class SourceGenerationHelper
 
         GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
-        GenerateXmlDocumentationFrom(ref writer, property.SetterXmlDocumentation, property, isProperty: true);
-        GenerateCategoryAttribute(ref writer, property.Category);
-        GenerateDescriptionAttribute(ref writer, property.Description);
-        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
-        GenerateBindableAttribute(ref writer, property.Bindable);
-        GenerateBrowsableAttribute(ref writer, property.Browsable);
-        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
-        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.SetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
+        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
+        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
+        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
@@ -47,32 +49,36 @@ internal static partial class SourceGenerationHelper
         var browsableForType = GenerateBrowsableForType(property);
         var type = GenerateType(property);
 
-        writer.AppendLine($"        {setterVisibility} static void Set{property.Name}({browsableForType} element, {type} value)");
-        writer.AppendLine("        {");
-        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
-        writer.AppendLine();
-        writer.AppendLine($"            element.SetValue({dependencyPropertyName}, value);");
-        writer.AppendLine("        }");
+        writer.AppendLine($$"""
+        {{setterVisibility}} static void Set{{property.Name}}({{browsableForType}} element, {{type}} value)
+        {
+            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
 
-        GenerateXmlDocumentationFrom(ref writer, property.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCategoryAttribute(ref writer, property.Category);
-        GenerateDescriptionAttribute(ref writer, property.Description);
-        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
-        GenerateBindableAttribute(ref writer, property.Bindable);
-        GenerateBrowsableAttribute(ref writer, property.Browsable);
-        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
+            element.SetValue({{dependencyPropertyName}}, value);
+        }
+""");
+
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
+        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
+        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
         GenerateBrowsableForTypeAttribute(ref writer, property);
-        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        writer.AppendLine($"        public static {type} Get{property.Name}({browsableForType} element)");
-        writer.AppendLine("        {");
-        writer.AppendLine("            element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
-        writer.AppendLine();
-        writer.AppendLine($"            return ({type})element.GetValue({property.Name}Property);");
-        writer.AppendLine("        }");
+        writer.AppendLine($$"""
+        public static {{type}} Get{{property.Name}}({{browsableForType}} element)
+        {
+            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+
+            return ({{type}})element.GetValue({{property.Name}}Property);
+        }
+""");
 
         GenerateOnChangedMethods(ref writer, @class, property);
         GenerateOnChangingMethods(ref writer, @class, property);

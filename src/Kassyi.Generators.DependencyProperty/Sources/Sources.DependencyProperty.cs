@@ -7,15 +7,17 @@ internal static partial class SourceGenerationHelper
 {
     public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {@class.Modifiers}partial class {@class.Name}");
-        writer.AppendLine("    {");
+        writer.AppendLine($$"""
 
-        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{@class.Modifiers}}partial class {{@class.Name}}
+            {
+        """);
+
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
         var propertyModifier = GeneratePropertyModifier(property);
@@ -28,15 +30,15 @@ internal static partial class SourceGenerationHelper
 
         GenerateAdditionalFieldForDirectProperties(ref writer, property);
         GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
-        GenerateXmlDocumentationFrom(ref writer, property.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCategoryAttribute(ref writer, property.Category);
-        GenerateDescriptionAttribute(ref writer, property.Description);
-        GenerateTypeConverterAttribute(ref writer, property.TypeConverter);
-        GenerateBindableAttribute(ref writer, property.Bindable);
-        GenerateBrowsableAttribute(ref writer, property.Browsable);
-        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.DesignerSerializationVisibility);
-        GenerateClsCompliantAttribute(ref writer, property.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.Localizability, @class.Framework);
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
+        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
+        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
+        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
+        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
@@ -60,8 +62,10 @@ internal static partial class SourceGenerationHelper
         GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
         GenerateBindEventMethod(ref writer, property);
 
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
+        writer.AppendLine("""
+            }
+        }
+        """);
     }
     private static void GenerateGetter(ref SourceWriter writer, DependencyPropertyData property)
     {
@@ -135,7 +139,7 @@ internal static partial class SourceGenerationHelper
     }
     private static void GenerateCoercePartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
-        if (!property.Coerce)
+        if (!property.ValidationAndCallbacks.Coerce)
         {
             writer.Append(" ");
             return;

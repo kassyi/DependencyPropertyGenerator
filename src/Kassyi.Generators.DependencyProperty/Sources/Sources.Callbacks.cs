@@ -6,29 +6,30 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 internal static partial class SourceGenerationHelper
 {
 
-    internal static void GenerateOnChangedMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
-    {
+    internal static void GenerateOnChangedMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property) =>
         GenerateOnMethods(ref writer, @class, property, "Changed", true);
-    }
 
-    internal static void GenerateOnChangingMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
-    {
+    internal static void GenerateOnChangingMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property) =>
         GenerateOnMethods(ref writer, @class, property, "Changing", false);
-    }
 
     private static void GenerateOnMethods(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string suffix, bool checkExists)
     {
         if (checkExists)
         {
-            switch (string.IsNullOrWhiteSpace(property.OnChanged))
+            if (!string.IsNullOrWhiteSpace(property.ValidationAndCallbacks.OnChanged))
             {
-                case false:
-                    var (_, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) = CheckOnChangedMethods(@class, property);
-                    if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2)
+                var (_, callbacks) = CheckOnChangedMethods(@class, property);
+                if (callbacks is
                     {
-                        writer.AppendLine($"#error DPG0001: The specified OnChanged method '{property.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.");
-                    }
-                    return;
+                        IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false,
+                        IsChangedArgs1: false, IsChangedArgs2: false
+                    })
+                {
+                    writer.AppendLine(
+                        $"#error DPG0001: The specified OnChanged method '{property.ValidationAndCallbacks.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.");
+                }
+
+                return;
             }
         }
         else if (property.Framework != Framework.Maui)
@@ -64,14 +65,14 @@ internal static partial class SourceGenerationHelper
         }
     }
     
-    internal static (string Name, bool IsChanged0, bool IsChanged1, bool IsChanged2, bool IsChanged3, bool IsChangedArgs1, bool IsChangedArgs2) CheckOnChangedMethods(ClassData @class, DependencyPropertyData property)
+    internal static (string Name, EventCallbackData Callbacks) CheckOnChangedMethods(ClassData @class, DependencyPropertyData property)
     {
-        var isCustom = !string.IsNullOrWhiteSpace(property.OnChanged);
+        var isCustom = !string.IsNullOrWhiteSpace(property.ValidationAndCallbacks.OnChanged);
         var name = isCustom
-            ? property.OnChanged
+            ? property.ValidationAndCallbacks.OnChanged
             : $"On{property.Name}Changed";
 
-        return (name, property.IsChanged0, property.IsChanged1, property.IsChanged2, property.IsChanged3, property.IsChangedArgs1, property.IsChangedArgs2);
+        return (name, property.ValidationAndCallbacks.Callbacks);
     }
 
 }

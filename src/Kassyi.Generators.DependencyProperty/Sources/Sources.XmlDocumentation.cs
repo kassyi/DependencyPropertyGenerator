@@ -7,11 +7,11 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    private static readonly char[] Separator = ['\r', '\n'];
+    private static readonly char[] s_separator = ['\r', '\n'];
 
     private static void GenerateXmlDocumentationFrom(ref SourceWriter writer, string value)
     {
-        var lines = value.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+        var lines = value.Split(s_separator, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
         {
@@ -29,7 +29,7 @@ internal static partial class SourceGenerationHelper
             ? property.Name
             : $"<see cref=\"{property.Name}\"/>";
         var body = isProperty
-            ? property.Description != null ? $"{SecurityElement.Escape(property.Description)}<br/>" : ""
+            ? property.ComponentModel.Description != null ? $"{SecurityElement.Escape(property.ComponentModel.Description)}<br/>" : ""
             : $"Identifies the {name} dependency property.<br/>";
             
         if (value != null)
