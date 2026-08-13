@@ -50,6 +50,13 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
 
         providers.CombineAll()
+            .SelectMany(static (array, _) =>
+                array.Where(static x => x.Class.Framework is Framework.Avalonia)
+                     .GroupBy(static x => x.Class, static x => x.DependencyProperty)
+                     .Select(static g => new StaticConstructorData(
+                         Class: g.Key,
+                         Properties: g.ToImmutableArray().AsEquatableArray())))
+            .WithComparer(EqualityComparer<StaticConstructorData>.Default)
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
     }
@@ -72,41 +79,30 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         return (classData, dependencyPropertyData);
     }
 
-    private static EquatableArray<FileWithName> GetSourceCode(
-        EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)> values)
+    private static FileWithName GetSourceCode(StaticConstructorData data)
     {
-        if (values.AsImmutableArray().IsDefaultOrEmpty)
+        var writer = new SourceWriter();
+        try
         {
-            return ImmutableArray<FileWithName>.Empty.AsEquatableArray();
-        }
-
-        return values
-            .Where(static x => x.Class.Framework is Framework.Avalonia)
-            .GroupBy(static x => x.Class, static x => x.DependencyProperty)
-            .Select(static g =>
+            SourceGenerationHelper.GenerateStaticConstructor(
+                ref writer,
+                data.Class,
+                [.. data.Properties.Where(static property => !property.IsDirect)]);
+            var text = writer.ToString();
+            if (string.IsNullOrWhiteSpace(text))
             {
-                var writer = new SourceWriter();
-                try
-                {
-                    SourceGenerationHelper.GenerateStaticConstructor(
-                        ref writer,
-                        g.Key,
-                        [.. g.Where(static property => !property.IsDirect)]);
-                    var text = writer.ToString();
-                    return string.IsNullOrWhiteSpace(text) switch
-                    {
-                        false => new FileWithName(Name: $"{g.Key.FullName}.StaticConstructor.g.cs", Text: text),
-                        _ => FileWithName.Empty
-                    };
-                }
-                finally
-                {
-                    writer.Dispose();
-                }
-            })
-            .Where(static f => !string.IsNullOrWhiteSpace(f.Text))
-            .ToImmutableArray()
-            .AsEquatableArray();
+                return FileWithName.Empty;
+            }
+
+            var compilationUnit = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseCompilationUnit(text);
+            var formattedText = compilationUnit.NormalizeWhitespace(indentation: "    ", eol: "\n").ToFullString();
+
+            return new FileWithName(Name: $"{data.Class.FullName}.StaticConstructor.g.cs", Text: formattedText);
+        }
+        finally
+        {
+            writer.Dispose();
+        }
     }
 
     private static IncrementalValueProvider<EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)>> GetClassData(
