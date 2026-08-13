@@ -2,6 +2,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -47,8 +48,8 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
         return (classData, eventData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, EventData Event) data) =>
-        SourceGenerationHelper.GenerateRoutedEvent(ref writer, data.Class, data.Event);
+    protected override CompilationUnitSyntax GenerateSyntax((ClassData Class, EventData Event) data) =>
+        SourceGenerationHelper.GenerateRoutedEventSyntax(data.Class, data.Event);
 
     protected override string GetHintName((ClassData Class, EventData Event) data)
     {

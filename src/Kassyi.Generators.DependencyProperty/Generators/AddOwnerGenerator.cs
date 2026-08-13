@@ -2,6 +2,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -40,8 +41,8 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
         return (classData, dependencyPropertyData);
     }
 
-    protected override void GenerateCode(ref SourceWriter writer, (ClassData Class, DependencyPropertyData DependencyProperty) data) =>
-        SourceGenerationHelper.GenerateDependencyProperty(ref writer, data.Class, data.DependencyProperty);
+    protected override CompilationUnitSyntax GenerateSyntax((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
+        SourceGenerationHelper.GenerateDependencyPropertySyntax(data.Class, data.DependencyProperty);
 
     protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         $"{data.Class.FullName}.AddOwner.{data.DependencyProperty.Name}.g.cs";

@@ -1,5 +1,6 @@
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -11,7 +12,10 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
 
     protected abstract void PostInitialize(IncrementalGeneratorPostInitializationContext context);
     protected abstract TData? PrepareData(((ClassWithAttributesContext context, Framework framework) left, string version) tuple);
-    protected abstract void GenerateCode(ref SourceWriter writer, TData data);
+    
+    // 新しいASTベース生成 (全廃された GenerateCode の代わり)
+    protected abstract CompilationUnitSyntax GenerateSyntax(TData data);
+
     protected abstract string GetHintName(TData data);
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -32,17 +36,10 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
 
     private FileWithName GetSourceCode(TData data)
     {
-        var writer = new SourceWriter();
-        try
-        {
-            GenerateCode(ref writer, data);
-            return new FileWithName(
-                Name: GetHintName(data),
-                Text: writer.ToString());
-        }
-        finally
-        {
-            writer.Dispose();
-        }
+        var compilationUnit = GenerateSyntax(data);
+        var formattedCode = compilationUnit.NormalizeWhitespace(indentation: "    ", eol: "\n").ToFullString();
+        return new FileWithName(
+            Name: GetHintName(data),
+            Text: formattedCode);
     }
 }
