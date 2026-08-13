@@ -31,15 +31,18 @@ public static class PrepareData
             .Build();
     }
 
-    internal static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat
-        .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
+    private static readonly ImmutableArray<Rules.IMethodSignatureRule> s_signatureRules =
+    [
+        new Rules.Signatures.NoParametersRule(),
+        new Rules.Signatures.SingleParameterRule(),
+        new Rules.Signatures.DoubleParameterRule(),
+        new Rules.Signatures.TripleParameterRule()
+    ];
 
-    internal static (bool Has0, bool Has1, bool Has2, bool Has3, bool HasArgs1, bool HasArgs2) CheckMethodsDirectly(
+    internal static MethodSignatureMatch CheckMethodsDirectly(
         INamedTypeSymbol classSymbol, string methodName, string targetType, string senderType)
     {
-        bool has0 = false, has1 = false, has2 = false, has3 = false;
-        bool hasArgs1 = false, hasArgs2 = false;
-
+        var match = new MethodSignatureMatch();
         foreach (var member in classSymbol.GetMembers(methodName))
         {
             if (member is not IMethodSymbol method)
@@ -47,61 +50,13 @@ public static class PrepareData
                 continue;
             }
 
-            var p = method.Parameters;
-            switch (p.Length)
+            foreach (var rule in s_signatureRules)
             {
-                case 0:
-                    has0 = true;
-                    break;
-                case 1:
-                    has1 |= CheckHas1(p, targetType, senderType);
-                    hasArgs1 |= IsEventArgsType(p[0].Type.Name);
-                    break;
-                case 2:
-                    has2 |= CheckHas2(p, targetType, senderType);
-                    hasArgs2 |= IsEventArgsType(p[1].Type.Name);
-                    break;
-                case 3:
-                    has3 |= CheckHas3(p, targetType, senderType);
-                    break;
+                rule.Evaluate(method, targetType, senderType, match);
             }
         }
-
-        return (has0, has1, has2, has3, hasArgs1, hasArgs2);
+        return match;
     }
-
-    private static bool CheckHas1(ImmutableArray<IParameterSymbol> parameters, string targetType, string senderType)
-    {
-        var type0 = GetNormalizedTypeName(parameters[0].Type);
-        return type0 == targetType || type0 == senderType;
-    }
-
-    private static bool CheckHas2(ImmutableArray<IParameterSymbol> parameters, string targetType, string senderType)
-    {
-        var type0 = GetNormalizedTypeName(parameters[0].Type);
-        var type1 = GetNormalizedTypeName(parameters[1].Type);
-        return (type0 == targetType || type0 == senderType) && type1 == targetType;
-    }
-
-    private static bool CheckHas3(ImmutableArray<IParameterSymbol> parameters, string targetType, string senderType)
-    {
-        var type0 = GetNormalizedTypeName(parameters[0].Type);
-        var type1 = GetNormalizedTypeName(parameters[1].Type);
-        var type2 = GetNormalizedTypeName(parameters[2].Type);
-        return type0 == senderType && type1 == targetType && type2 == targetType;
-    }
-
-    private static string GetNormalizedTypeName(ITypeSymbol typeSymbol)
-    {
-        var str = typeSymbol.ToDisplayString(TypeFormat);
-        return str.EndsWith("?", StringComparison.Ordinal) ? str.Substring(0, str.Length - 1) : str;
-    }
-
-    private static bool IsEventArgsType(string typeName) =>
-        typeName.EndsWith("EventArgs", StringComparison.Ordinal) ||
-        typeName.EndsWith("EventArgs>", StringComparison.Ordinal) ||
-        typeName.EndsWith("DependencyPropertyChangedEventArgs", StringComparison.Ordinal) ||
-        typeName.EndsWith("ValueChangedEventArgs", StringComparison.Ordinal);
 
     internal static string GenerateDependencyObjectType(Framework framework) =>
         framework == Framework.Maui ? "Microsoft.Maui.Controls.BindableObject" :

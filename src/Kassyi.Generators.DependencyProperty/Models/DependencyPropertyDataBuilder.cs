@@ -138,29 +138,29 @@ internal sealed class DependencyPropertyDataBuilder
         var targetType = _type.Replace("global::", string.Empty).Replace("?", string.Empty);
         var targetSenderType = GetTargetSenderType(classSymbol);
 
-        var (c0, c1, c2, c3, ca1, ca2) = classSymbol != null
+        var matchChanged = classSymbol != null
             ? PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
-            : (false, false, false, false, false, false);
+            : new MethodSignatureMatch();
 
-        var (ch0, ch1, ch2, ch3, _, _) = classSymbol != null
+        var matchChanging = classSymbol != null
             ? PrepareData.CheckMethodsDirectly(classSymbol, onChangingName, targetType, targetSenderType)
-            : (false, false, false, false, false, false);
+            : new MethodSignatureMatch();
 
         var bindEventsArray = GetBindEventsArray(bindEvent, bindEvents);
 
-        c2 |= !isCustomOnChanged && !_isAttached && !bindEventsArray.IsEmpty;
-        c3 |= !isCustomOnChanged && _isAttached && !bindEventsArray.IsEmpty;
+        matchChanged.Has2 |= !isCustomOnChanged && !_isAttached && !bindEventsArray.IsEmpty;
+        matchChanged.Has3 |= !isCustomOnChanged && _isAttached && !bindEventsArray.IsEmpty;
 
         _validationAndCallbacks = _validationAndCallbacks with
         {
             BindEvents = bindEventsArray,
             OnChanged = onChanged,
             Callbacks = new EventCallbackData(
-                IsChanged0: c0, IsChanged1: c1, IsChanged2: c2, IsChanged3: c3,
-                IsChangedArgs1: ca1, IsChangedArgs2: ca2,
-                IsChanging0: ch0, IsChanging1: ch1, IsChanging2: ch2, IsChanging3: ch3)
+                IsChanged0: matchChanged.Has0, IsChanged1: matchChanged.Has1, IsChanged2: matchChanged.Has2, IsChanged3: matchChanged.Has3,
+                IsChangedArgs1: matchChanged.HasArgs1, IsChangedArgs2: matchChanged.HasArgs2,
+                IsChanging0: matchChanging.Has0, IsChanging1: matchChanging.Has1, IsChanging2: matchChanging.Has2, IsChanging3: matchChanging.Has3
+            )
         };
-
         return this;
     }
 

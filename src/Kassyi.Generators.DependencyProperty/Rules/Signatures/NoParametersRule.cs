@@ -1,0 +1,15 @@
+using Microsoft.CodeAnalysis;
+using Kassyi.Generators.DependencyProperty.Models;
+
+namespace Kassyi.Generators.DependencyProperty.Rules.Signatures;
+
+internal sealed class NoParametersRule : IMethodSignatureRule
+{
+    public void Evaluate(IMethodSymbol method, string targetType, string senderType, MethodSignatureMatch match)
+    {
+        if (method.Parameters.Length == 0)
+        {
+            match.Has0 = true;
+        }
+    }
+}
