@@ -8,81 +8,50 @@ using System.Runtime.CompilerServices;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// Extensions for <see cref="EquatableArray{T}"/>.
-/// </summary>
+/// <summary>Extensions for <see cref="EquatableArray{T}"/>.</summary>
 public static class EquatableArray
 {
-    /// <summary>
-    /// Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the input array.</typeparam>
-    /// <param name="array">The input <see cref="ImmutableArray{T}"/> instance.</param>
-    /// <returns>An <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</returns>
+    /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
     public static EquatableArray<T> AsEquatableArray<T>(this ImmutableArray<T> array)
-        where T : IEquatable<T>
-    {
-        return new(array);
-    }
+        where T : IEquatable<T> => [with(array)];
 }
 
-/// <summary>
-/// An imutable, equatable array. This is equivalent to <see cref="ImmutableArray{T}"/> but with value equality support.
-/// </summary>
-/// <typeparam name="T">The type of values in the array.</typeparam>
+/// <summary>An immutable, equatable array wrapper providing value equality support for incremental generators.</summary>
 public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnumerable<T>
     where T : IEquatable<T>
 {
-    /// <summary>
-    /// The underlying <typeparamref name="T"/> array.
-    /// </summary>
-    private readonly T[]? array;
+    private readonly T[]? _array;
 
-    /// <summary>
-    /// Creates a new <see cref="EquatableArray{T}"/> instance.
-    /// </summary>
-    /// <param name="array">The input <see cref="ImmutableArray{T}"/> to wrap.</param>
+    /// <summary>Creates a new <see cref="EquatableArray{T}"/> instance.</summary>
     public EquatableArray(ImmutableArray<T> array)
     {
-        this.array = Unsafe.As<ImmutableArray<T>, T[]?>(ref array);
+        this._array = Unsafe.As<ImmutableArray<T>, T[]?>(ref array);
     }
 
-    /// <summary>
-    /// Gets a reference to an item at a specified position within the array.
-    /// </summary>
-    /// <param name="index">The index of the item to retrieve a reference to.</param>
-    /// <returns>A reference to an item at a specified position within the array.</returns>
+    /// <summary>Gets a reference to an item at a specified position within the array.</summary>
     public ref readonly T this[int index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => ref AsImmutableArray().ItemRef(index);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the current array is empty.
-    /// </summary>
+    /// <summary>Gets a value indicating whether the current array is empty.</summary>
     public bool IsEmpty
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => AsImmutableArray().IsEmpty;
     }
 
-    /// <sinheritdoc/>
-    public bool Equals(EquatableArray<T> other)
-    {
-        return AsSpan().SequenceEqual(other.AsSpan());
-    }
+    /// <inheritdoc/>
+    public bool Equals(EquatableArray<T> other) => AsSpan().SequenceEqual(other.AsSpan());
 
-    /// <sinheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        return obj is EquatableArray<T> other && Equals(this, other);
-    }
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => obj is EquatableArray<T> other && Equals(this, other);
 
-    /// <sinheritdoc/>
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
-        if (array is not { } other)
+        if (_array is not { } other)
         {
             return 0;
         }
@@ -97,112 +66,42 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
         return hashCode.ToHashCode();
     }
 
-    /// <summary>
-    /// Gets an <see cref="ImmutableArray{T}"/> instance from the current <see cref="EquatableArray{T}"/>.
-    /// </summary>
-    /// <returns>The <see cref="ImmutableArray{T}"/> from the current <see cref="EquatableArray{T}"/>.</returns>
+    /// <summary>Gets the underlying <see cref="ImmutableArray{T}"/> instance.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ImmutableArray<T> AsImmutableArray()
-    {
-        return Unsafe.As<T[]?, ImmutableArray<T>>(ref Unsafe.AsRef(in array));
-    }
+    public ImmutableArray<T> AsImmutableArray() => Unsafe.As<T[]?, ImmutableArray<T>>(ref Unsafe.AsRef(in _array));
 
-    /// <summary>
-    /// Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.
-    /// </summary>
-    /// <param name="array">The input <see cref="ImmutableArray{T}"/> instance.</param>
-    /// <returns>An <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</returns>
+    /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1000:Do not declare static members on generic types",
         Justification = "Factory method pattern for EquatableArray<T> struct.")]
     public static EquatableArray<T> FromImmutableArray(ImmutableArray<T> array) => [with(array)];
 
-    /// <summary>
-    /// Returns a <see cref="ReadOnlySpan{T}"/> wrapping the current items.
-    /// </summary>
-    /// <returns>A <see cref="ReadOnlySpan{T}"/> wrapping the current items.</returns>
-    public ReadOnlySpan<T> AsSpan()
-    {
-        return AsImmutableArray().AsSpan();
-    }
+    /// <summary>Returns a <see cref="ReadOnlySpan{T}"/> wrapping the current items.</summary>
+    public ReadOnlySpan<T> AsSpan() => AsImmutableArray().AsSpan();
 
-    /// <summary>
-    /// Copies the contents of this <see cref="EquatableArray{T}"/> instance. to a mutable array.
-    /// </summary>
-    /// <returns>The newly instantiated array.</returns>
-    public T[] ToArray()
-    {
-        return AsImmutableArray().ToArray();
-    }
+    /// <summary>Copies the contents of this instance to a new mutable array.</summary>
+    public T[] ToArray() => [.. AsSpan()];
 
-    /// <summary>
-    /// Gets an <see cref="ImmutableArray{T}.Enumerator"/> value to traverse items in the current array.
-    /// </summary>
-    /// <returns>An <see cref="ImmutableArray{T}.Enumerator"/> value to traverse items in the current array.</returns>
-    public ImmutableArray<T>.Enumerator GetEnumerator()
-    {
-        return AsImmutableArray().GetEnumerator();
-    }
+    /// <summary>Gets an enumerator to traverse items in the current array.</summary>
+    public ImmutableArray<T>.Enumerator GetEnumerator() => AsImmutableArray().GetEnumerator();
 
-    /// <sinheritdoc/>
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
-    {
-        return ((IEnumerable<T>)AsImmutableArray()).GetEnumerator();
-    }
+    /// <inheritdoc/>
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)AsImmutableArray()).GetEnumerator();
 
-    /// <sinheritdoc/>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)AsImmutableArray()).GetEnumerator();
-    }
+    /// <inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)AsImmutableArray()).GetEnumerator();
 
-    /// <summary>
-    /// Implicitly converts an <see cref="ImmutableArray{T}"/> to <see cref="EquatableArray{T}"/>.
-    /// </summary>
-    /// <returns>An <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</returns>
-    public static implicit operator EquatableArray<T>(ImmutableArray<T> array)
-    {
-        return FromImmutableArray(array);
-    }
+    /// <summary>Implicitly converts an <see cref="ImmutableArray{T}"/> to <see cref="EquatableArray{T}"/>.</summary>
+    public static implicit operator EquatableArray<T>(ImmutableArray<T> array) => FromImmutableArray(array);
 
-    /// <summary>
-    /// Implicitly converts an <see cref="EquatableArray{T}"/> to <see cref="ImmutableArray{T}"/>.
-    /// </summary>
-    /// <returns>An <see cref="ImmutableArray{T}"/> instance from a given <see cref="EquatableArray{T}"/>.</returns>
-    public static implicit operator ImmutableArray<T>(EquatableArray<T> array)
-    {
-        return array.AsImmutableArray();
-    }
+    /// <summary>Implicitly converts an <see cref="EquatableArray{T}"/> to <see cref="ImmutableArray{T}"/>.</summary>
+    public static implicit operator ImmutableArray<T>(EquatableArray<T> array) => array.AsImmutableArray();
 
-    /// <summary>
-    /// Checks whether two <see cref="EquatableArray{T}"/> values are the same.
-    /// </summary>
-    /// <param name="left">The first <see cref="EquatableArray{T}"/> value.</param>
-    /// <param name="right">The second <see cref="EquatableArray{T}"/> value.</param>
-    /// <returns>Whether <paramref name="left"/> and <paramref name="right"/> are equal.</returns>
-    public static bool operator ==(EquatableArray<T> left, EquatableArray<T> right)
-    {
-        return left.Equals(right);
-    }
+    /// <summary>Checks whether two <see cref="EquatableArray{T}"/> values are equal.</summary>
+    public static bool operator ==(EquatableArray<T> left, EquatableArray<T> right) => left.Equals(right);
 
-    /// <summary>
-    /// Checks whether two <see cref="EquatableArray{T}"/> values are not the same.
-    /// </summary>
-    /// <param name="left">The first <see cref="EquatableArray{T}"/> value.</param>
-    /// <param name="right">The second <see cref="EquatableArray{T}"/> value.</param>
-    /// <returns>Whether <paramref name="left"/> and <paramref name="right"/> are not equal.</returns>
-    public static bool operator !=(EquatableArray<T> left, EquatableArray<T> right)
-    {
-        return !left.Equals(right);
-    }
+    /// <summary>Checks whether two <see cref="EquatableArray{T}"/> values are not equal.</summary>
+    public static bool operator !=(EquatableArray<T> left, EquatableArray<T> right) => !left.Equals(right);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public ImmutableArray<T> ToImmutableArray()
-    {
-        throw new NotImplementedException();
-    }
+    /// <summary>Converts the current instance to an <see cref="ImmutableArray{T}"/>.</summary>
+    public ImmutableArray<T> ToImmutableArray() => throw new NotImplementedException();
 }
-

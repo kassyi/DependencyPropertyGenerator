@@ -1,11 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides extension methods for <see cref="AnalyzerConfigOptionsProvider"/> to resolve MSBuild build properties and options.</summary>
 public static class AnalyzerConfigOptionsProviderExtensions
 {
     private static string GetFullName(string name, string? prefix = null)
@@ -15,13 +13,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
             : $"{prefix}_{name}";
     }
 
-    /// <summary>
-    /// Returns the value of the global option, or null if the option is missing or an empty string.
-    /// </summary>
-    /// <param name="options"></param>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Returns the value of the option, or <see langword="null"/> if missing or whitespace.</summary>
     public static string? GetOption(
         this AnalyzerConfigOptions options,
         string key)
@@ -36,14 +28,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
                 : null;
     }
 
-    /// <summary>
-    /// Returns the value of the global option, or null if the option is missing or an empty string.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="name"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Returns the value of the global MSBuild property, or <see langword="null"/> if missing or whitespace.</summary>
     public static string? GetGlobalOption(
         this AnalyzerConfigOptionsProvider provider,
         string name,
@@ -55,16 +40,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
         return provider.GlobalOptions.GetOption($"build_property.{GetFullName(name, prefix)}");
     }
 
-    /// <summary>
-    /// Returns the value of the <see cref="AdditionalText"/> option, or null if the option is missing or an empty string.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="text"></param>
-    /// <param name="name"></param>
-    /// <param name="group">Default: AdditionalFiles</param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Returns the value of the <see cref="AdditionalText"/> metadata option, or <see langword="null"/> if missing or whitespace.</summary>
     public static string? GetOption(
         this AnalyzerConfigOptionsProvider provider,
         AdditionalText text,
@@ -79,14 +55,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
         return provider.GetOptions(text).GetOption($"build_metadata.{group}.{GetFullName(name, prefix)}");
     }
 
-    /// <summary>
-    /// Returns the value of the global option, or throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="name"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <summary>Returns the value of the required global MSBuild property, throwing <see cref="InvalidOperationException"/> if missing.</summary>
     public static string GetRequiredGlobalOption(
         this AnalyzerConfigOptionsProvider provider,
         string name,
@@ -97,15 +66,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
             throw new InvalidOperationException($"{GetFullName(name, prefix)} MSBuild property is required.");
     }
 
-    /// <summary>
-    /// Returns the value of the <see cref="AdditionalText"/> option, or throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="text"></param>
-    /// <param name="name"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <summary>Returns the value of the required <see cref="AdditionalText"/> option, throwing <see cref="InvalidOperationException"/> if missing.</summary>
     public static string GetRequiredOption(
         this AnalyzerConfigOptionsProvider provider,
         AdditionalText text,
@@ -117,12 +78,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
             throw new InvalidOperationException($"{GetFullName(name, prefix)} metadata for AdditionalText is required.");
     }
 
-    /// <summary>
-    /// Returns true if generator running in design-time.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <summary>Determines whether the generator is executing within a design-time build context.</summary>
     public static bool IsDesignTime(this AnalyzerConfigOptionsProvider provider)
     {
         var isBuildingProjectValue = provider.GetGlobalOption("BuildingProject"); // legacy projects
@@ -132,11 +88,7 @@ public static class AnalyzerConfigOptionsProviderExtensions
             || string.Equals(isDesignTimeBuildValue, "true", StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>
-    /// Try recognize the framework using MSBuild properties and constants.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <returns></returns>
+    /// <summary>Attempts to recognize the target UI framework from MSBuild properties and compilation constants.</summary>
     public static Framework TryRecognizeFramework(this AnalyzerConfigOptionsProvider provider)
     {
         provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -163,19 +115,12 @@ public static class AnalyzerConfigOptionsProviderExtensions
         };
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <summary>Error message template displayed when the UI framework cannot be recognized.</summary>
     public const string FrameworkIsNotRecognized = @"Framework is not recognized.
 You can explicitly specify the framework by setting one of the following constants in your project:
 HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI";
 
-    /// <summary>
-    /// Recognizes the framework using MSBuild properties and constants or throws an exception.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <summary>Recognizes the target UI framework or throws <see cref="InvalidOperationException"/> if unrecognized.</summary>
     public static Framework RecognizeFramework(this AnalyzerConfigOptionsProvider provider)
     {
         var framework = provider.TryRecognizeFramework();

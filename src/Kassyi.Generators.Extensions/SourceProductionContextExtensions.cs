@@ -1,20 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides diagnostic reporting extension methods for <see cref="SourceProductionContext"/>.</summary>
 public static class SourceProductionContextExtensions
 {
-    /// <summary>
-    /// Generates a diagnostic for the selected exception.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="id"></param>
-    /// <param name="exception"></param>
-    /// <param name="prefix"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Reports an unhandled exception as a compilation error diagnostic.</summary>
     public static void ReportException(
         this SourceProductionContext context,
         string id,
@@ -27,13 +18,7 @@ public static class SourceProductionContextExtensions
         context.ReportDiagnostic(exception.ToDiagnostic(id, prefix));
     }
 
-    /// <summary>
-    /// Creates a diagnostic for the selected exception.
-    /// </summary>
-    /// <param name="exception"></param>
-    /// <param name="id"></param>
-    /// <param name="prefix"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Creates a compiler error diagnostic representing an unhandled exception.</summary>
     public static Diagnostic ToDiagnostic(
         this Exception exception,
         string id,

@@ -1,19 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides extension methods for querying <see cref="AttributeData"/> arguments.</summary>
 public static class AttributeDataExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="attributeData"></param>
-    /// <param name="position"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Returns the generic type argument at the specified index, or <see langword="null"/> if not found.</summary>
     public static ITypeSymbol? GetGenericTypeArgument(this AttributeData attributeData, int position)
     {
         attributeData = attributeData ?? throw new ArgumentNullException(nameof(attributeData));
@@ -21,13 +13,7 @@ public static class AttributeDataExtensions
         return attributeData.AttributeClass?.TypeArguments.ElementAtOrDefault(position);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="attributeData"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Returns the named attribute argument matching the specified parameter name.</summary>
     public static TypedConstant GetNamedArgument(this AttributeData attributeData, string name)
     {
         attributeData = attributeData ?? throw new ArgumentNullException(nameof(attributeData));

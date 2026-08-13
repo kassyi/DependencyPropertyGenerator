@@ -1,47 +1,29 @@
-﻿namespace Kassyi.Generators.Extensions;
+namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// Framework enumeration for generators that are platform specific.
-/// </summary>
+/// <summary>Specifies the target UI framework for platform-specific source generation.</summary>
 public enum Framework
 {
-    /// <summary>
-    /// Not recognized.
-    /// </summary>
+    /// <summary>Not recognized framework.</summary>
     None,
 
-    /// <summary>
-    /// Windows Presentation Foundation.
-    /// </summary>
+    /// <summary>Windows Presentation Foundation (WPF).</summary>
     Wpf,
 
-    /// <summary>
-    /// Universal Windows Platform.
-    /// </summary>
+    /// <summary>Universal Windows Platform (UWP).</summary>
     Uwp,
 
-    /// <summary>
-    /// WinUI 3/WindowsAppSDK.
-    /// </summary>
+    /// <summary>WinUI 3 / Windows App SDK.</summary>
     WinUi,
 
-    /// <summary>
-    /// Uno.
-    /// </summary>
+    /// <summary>Uno Platform (UWP).</summary>
     Uno,
 
-    /// <summary>
-    /// Uno WinUI.
-    /// </summary>
+    /// <summary>Uno Platform (WinUI).</summary>
     UnoWinUi,
 
-    /// <summary>
-    /// AvaloniaUI.
-    /// </summary>
+    /// <summary>Avalonia UI.</summary>
     Avalonia,
 
-    /// <summary>
-    /// MAUI.
-    /// </summary>
+    /// <summary>.NET MAUI.</summary>
     Maui,
 }

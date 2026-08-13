@@ -1,22 +1,17 @@
 using System.Diagnostics.CodeAnalysis;
+using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// IncrementalValuesProvider および IncrementalValueProvider の汎用拡張メソッド群を提供するクラスです。
-/// </summary>
+/// <summary>Provides extension methods for incremental source generator value providers.</summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Library extension methods for Source Generators")]
 [SuppressMessage("ReSharper", "UnusedMethod.Global", Justification = "Library extension methods for Source Generators")]
 [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Library extension methods for Source Generators")]
 public static class IncrementalValuesProviderExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="source"></param>
+    /// <summary>Registers source file outputs with the generator initialization context.</summary>
     public static void AddSource(
         this IncrementalValuesProvider<FileWithName> source,
         IncrementalGeneratorInitializationContext context)
@@ -24,18 +19,17 @@ public static class IncrementalValuesProviderExtensions
         context.RegisterSourceOutput(source, static (context, file) =>
         {
             if (file.IsEmpty)
+            {
                 return;
+            }
+
             context.AddSource(
                 hintName: file.Name,
                 source: file.Text);
         });
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="source"></param>
+    /// <summary>Registers source file outputs with the generator initialization context.</summary>
     public static void AddSource(
         this IncrementalValueProvider<FileWithName> source,
         IncrementalGeneratorInitializationContext context)
@@ -43,18 +37,17 @@ public static class IncrementalValuesProviderExtensions
         context.RegisterSourceOutput(source, static (context, file) =>
         {
             if (file.IsEmpty)
+            {
                 return;
+            }
+
             context.AddSource(
                 hintName: file.Name,
                 source: file.Text);
         });
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="source"></param>
+    /// <summary>Registers multiple source file outputs with the generator initialization context.</summary>
     public static void AddSource(
         this IncrementalValueProvider<EquatableArray<FileWithName>> source,
         IncrementalGeneratorInitializationContext context)
@@ -64,11 +57,7 @@ public static class IncrementalValuesProviderExtensions
             .AddSource(context);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="source"></param>
+    /// <summary>Registers multiple source file outputs with the generator initialization context.</summary>
     public static void AddSource(
         this IncrementalValuesProvider<EquatableArray<FileWithName>> source,
         IncrementalGeneratorInitializationContext context)
@@ -78,10 +67,7 @@ public static class IncrementalValuesProviderExtensions
             .AddSource(context);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
+    /// <summary>Collects all provider values into an equatable array to ensure incremental caching stability.</summary>
     public static IncrementalValueProvider<EquatableArray<TSource>> CollectAsEquatableArray<TSource>(
         this IncrementalValuesProvider<TSource> source)
         where TSource : IEquatable<TSource>
@@ -91,16 +77,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.AsEquatableArray());
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="selector"></param>
-    /// <param name="initializationContext"></param>
-    /// <param name="id"></param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TResult"></typeparam>
-    /// <returns></returns>
+    /// <summary>Transforms values while capturing and reporting unhandled exceptions as compiler diagnostics.</summary>
     public static IncrementalValueProvider<TResult> SelectAndReportExceptions<TSource, TResult>(
         this IncrementalValueProvider<TSource> source,
         Func<TSource, CancellationToken, TResult> selector,
@@ -126,7 +103,10 @@ public static class IncrementalValuesProviderExtensions
             (context, tuple) =>
             {
                 if (tuple.Exception == null)
+                {
                     return;
+                }
+
                 context.ReportException(id: id, exception: tuple.Exception);
             });
 
@@ -134,13 +114,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.Value!);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="initializationContext"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <summary>Emits contained diagnostics and returns valid non-null values.</summary>
     public static IncrementalValuesProvider<T> SelectAndReportDiagnostics<T>(
         this IncrementalValuesProvider<ResultWithDiagnostics<T?>> source,
         IncrementalGeneratorInitializationContext initializationContext)
@@ -154,13 +128,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.Result!);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="initializationContext"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <summary>Emits contained diagnostics and returns the result value.</summary>
     public static IncrementalValueProvider<T?> SelectAndReportDiagnostics<T>(
         this IncrementalValueProvider<ResultWithDiagnostics<T?>> source,
         IncrementalGeneratorInitializationContext initializationContext)
@@ -173,16 +141,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.Result);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="selector"></param>
-    /// <param name="initializationContext"></param>
-    /// <param name="id"></param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TResult"></typeparam>
-    /// <returns></returns>
+    /// <summary>Transforms values while capturing and reporting unhandled exceptions as compiler diagnostics.</summary>
     public static IncrementalValuesProvider<TResult> SelectAndReportExceptions<TSource, TResult>(
         this IncrementalValuesProvider<TSource> source,
         Func<TSource, CancellationToken, TResult> selector,
@@ -213,16 +172,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.Value!);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="selector"></param>
-    /// <param name="initializationContext"></param>
-    /// <param name="id"></param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TResult"></typeparam>
-    /// <returns></returns>
+    /// <summary>Transforms values while capturing and reporting unhandled exceptions as compiler diagnostics.</summary>
     public static IncrementalValuesProvider<TResult> SelectAndReportExceptions<TSource, TResult>(
         this IncrementalValuesProvider<TSource> source,
         Func<TSource, TResult> selector,
@@ -233,16 +183,7 @@ public static class IncrementalValuesProviderExtensions
             .SelectAndReportExceptions((x, _) => selector(x), initializationContext, id);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="selector"></param>
-    /// <param name="initializationContext"></param>
-    /// <param name="id"></param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TResult"></typeparam>
-    /// <returns></returns>
+    /// <summary>Transforms values while capturing and reporting unhandled exceptions as compiler diagnostics.</summary>
     public static IncrementalValueProvider<TResult> SelectAndReportExceptions<TSource, TResult>(
         this IncrementalValueProvider<TSource> source,
         Func<TSource, TResult> selector,
@@ -253,16 +194,7 @@ public static class IncrementalValuesProviderExtensions
             .SelectAndReportExceptions((x, _) => selector(x), initializationContext, id);
     }
 
-    /// <summary>
-    /// Specific case after Combine with detect framework.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="selector"></param>
-    /// <param name="context"></param>
-    /// <param name="id"></param>
-    /// <typeparam name="TResult"></typeparam>
-    /// <typeparam name="TLeft"></typeparam>
-    /// <returns></returns>
+    /// <summary>Transforms paired framework and left values while capturing and reporting unhandled exceptions.</summary>
     public static IncrementalValuesProvider<TResult> SelectAndReportExceptions<TResult, TLeft>(
         this IncrementalValuesProvider<(TLeft Left, Framework Right)> source,
         Func<Framework, TLeft, TResult> selector,
@@ -273,12 +205,7 @@ public static class IncrementalValuesProviderExtensions
             .SelectAndReportExceptions(x => selector(x.Right, x.Left), context, id);
     }
 
-    /// <summary>
-    /// Filters nullable values and select non-nullable values.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <returns></returns>
+    /// <summary>Filters out null values from the provider pipeline.</summary>
     public static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(
         this IncrementalValuesProvider<TSource?> source)
         where TSource : struct
@@ -288,11 +215,7 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x!.Value);
     }
 
-    /// <summary>
-    /// Returns <see cref="Framework.None"/> if the framework is not recognized and report diagnostic.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
+    /// <summary>Detects the target UI framework from compilation configuration and reports an error diagnostic if unrecognized.</summary>
     public static IncrementalValueProvider<Framework> DetectFramework(
         this IncrementalGeneratorInitializationContext context)
     {
@@ -321,7 +244,10 @@ public static class IncrementalValuesProviderExtensions
             static (sourceProductionContext, tuple) =>
             {
                 if (tuple.Diagnostic == null)
+                {
                     return;
+                }
+
                 sourceProductionContext.ReportDiagnostic(tuple.Diagnostic);
             });
 

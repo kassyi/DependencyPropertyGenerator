@@ -2,18 +2,10 @@ using System.Globalization;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides string manipulation and normalization utilities for source generation.</summary>
 public static class StringExtensions
 {
-    /// <summary>
-    /// Makes the first letter of the name uppercase.
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
+    /// <summary>Converts the input string to PascalCase suitable for a C# property name.</summary>
     public static string ToPropertyName(this string input)
     {
         return input switch
@@ -28,18 +20,12 @@ public static class StringExtensions
         };
     }
 
-    /// <summary>
-    /// Makes the first letter of the name lowercase.
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
+    /// <summary>Converts the input string to camelCase and escapes C# language keywords.</summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "C# identifier and camelCase parameter normalization requires lowercase string comparison.")]
     public static string ToParameterName(this string input)
     {
         input = input ?? throw new ArgumentNullException(nameof(input));
-#pragma warning disable CA1308 // [WHY] C#識別子・キーワード退避のため小文字化処理（ToLowerInvariant）が不可欠です
+#pragma warning disable CA1308 // [WHY] Lowercase conversion (ToLowerInvariant) is essential for escaping C# reserved keywords.
         return input.ToLowerInvariant() switch
 #pragma warning restore CA1308
         {
@@ -133,16 +119,9 @@ public static class StringExtensions
         };
     }
 
-    private static readonly char[] Separator = { '\n' };
+    private static readonly char[] s_separator = ['\n'];
 
-    /// <summary>
-    /// Removes blank lines where there are only spaces.
-    /// Used to preserve formatting in code where lines of code may be missing based on conditions.
-    /// Just return a string with spaces to remove it.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Removes whitespace-only lines to maintain clean generated source layout.</summary>
     public static string RemoveBlankLinesWhereOnlyWhitespaces(this string text)
     {
         text = text ?? throw new ArgumentNullException(nameof(text));
@@ -151,17 +130,11 @@ public static class StringExtensions
             separator: "\n",
             values: text
                 .NormalizeLineEndings()
-                .Split(Separator, StringSplitOptions.None)
+                .Split(s_separator, StringSplitOptions.None)
                 .Where(static line => line.Length == 0 || !line.All(char.IsWhiteSpace)));
     }
 
-    /// <summary>
-    /// Normalizes line endings to '\n' or your endings.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="newLine">'\n' by default</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Normalizes line endings to the specified newline sequence (defaulting to '\n').</summary>
     public static string NormalizeLineEndings(
         this string text,
         string? newLine = null)
@@ -179,12 +152,7 @@ public static class StringExtensions
         return newText;
     }
 
-    /// <summary>
-    /// Returns the namespace for the selected type's fully qualified name.
-    /// </summary>
-    /// <param name="fullTypeName"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Extracts the namespace portion from a fully qualified type name.</summary>
     public static string ExtractNamespace(this string fullTypeName)
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
@@ -192,12 +160,7 @@ public static class StringExtensions
         return fullTypeName.Substring(0, fullTypeName.LastIndexOf('.'));
     }
 
-    /// <summary>
-    /// Returns the simple name(without namespace) for the selected type's fully qualified name.
-    /// </summary>
-    /// <param name="fullTypeName"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Extracts the unqualified type name from a fully qualified type name.</summary>
     public static string ExtractSimpleName(this string fullTypeName)
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
@@ -205,12 +168,7 @@ public static class StringExtensions
         return fullTypeName.Substring(fullTypeName.LastIndexOf('.') + 1);
     }
 
-    /// <summary>
-    /// Returns selected type's fully qualified name with 'global::' prefix.
-    /// </summary>
-    /// <param name="fullTypeName"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <summary>Prepends the <c>global::</c> namespace alias to a fully qualified type name.</summary>
     public static string WithGlobalPrefix(this string fullTypeName)
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));

@@ -1,53 +1,26 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Result"></param>
-/// <param name="Diagnostics"></param>
-/// <typeparam name="T"></typeparam>
+/// <summary>Represents a generation result bundled with associated compilation diagnostics.</summary>
 public readonly record struct ResultWithDiagnostics<T>(
     T Result,
     EquatableArray<Diagnostic> Diagnostics
 )
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="result"></param>
+    /// <summary>Creates a new instance with an empty diagnostic list.</summary>
     public ResultWithDiagnostics(T result) : this(result, ImmutableArray<Diagnostic>.Empty.AsEquatableArray())
     {
     }
 }
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides extension methods to wrap results with diagnostics.</summary>
 public static class ResultWithDiagnosticsExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="result"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static ResultWithDiagnostics<T> ToResultWithDiagnostics<T>(this T result)
-    {
-        return new ResultWithDiagnostics<T>(result);
-    }
+    /// <summary>Wraps a value with an empty diagnostic set.</summary>
+    public static ResultWithDiagnostics<T> ToResultWithDiagnostics<T>(this T result) => new(result);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="result"></param>
-    /// <param name="diagnostics"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static ResultWithDiagnostics<T> ToResultWithDiagnostics<T>(this T result, ImmutableArray<Diagnostic> diagnostics)
-    {
-        return new ResultWithDiagnostics<T>(result, diagnostics.AsEquatableArray());
-    }
+    /// <summary>Wraps a value with the specified diagnostics.</summary>
+    public static ResultWithDiagnostics<T> ToResultWithDiagnostics<T>(this T result, ImmutableArray<Diagnostic> diagnostics) => new(result, diagnostics.AsEquatableArray());
 }

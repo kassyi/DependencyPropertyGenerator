@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,17 +6,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// 
-/// </summary>
+/// <summary>Provides Roslyn syntax provider extension methods for finding annotated types.</summary>
 public static class SyntaxValueProviderExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="fullyQualifiedMetadataName"></param>
-    /// <returns></returns>
+    /// <summary>Creates a provider for classes and records decorated with the specified attribute metadata name.</summary>
     public static IncrementalValuesProvider<GeneratorAttributeSyntaxContext>
         ForAttributeWithMetadataNameOfClassesAndRecords(
             this SyntaxValueProvider source,
@@ -36,11 +29,7 @@ public static class SyntaxValueProviderExtensions
                 transform: static (context, _) => context);
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
+    /// <summary>Transforms syntax contexts into <see cref="ClassWithAttributesContext"/> instances.</summary>
     public static IncrementalValuesProvider<ClassWithAttributesContext>
         SelectAllAttributes(
             this IncrementalValuesProvider<GeneratorAttributeSyntaxContext> source)
@@ -58,8 +47,7 @@ public static class SyntaxValueProviderExtensions
         value = value ?? throw new ArgumentNullException(nameof(value));
 
         return value.Contains("nameof(")
-            ? value
-                .Substring(value.LastIndexOf('.') + 1)
+            ? value[(value.LastIndexOf('.') + 1)..]
                 .TrimEnd(')', ' ')
             : value;
     }
@@ -76,11 +64,7 @@ public static class SyntaxValueProviderExtensions
                 x => x.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"').RemoveNameof() == name);
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
+    /// <summary>Transforms syntax contexts into individual <see cref="ClassWithAttributesContext"/> entries per matched attribute.</summary>
     public static IncrementalValuesProvider<ClassWithAttributesContext>
         SelectManyAllAttributesOfCurrentClassSyntax(
             this IncrementalValuesProvider<GeneratorAttributeSyntaxContext> source)
@@ -101,12 +85,7 @@ public static class SyntaxValueProviderExtensions
                     ClassSymbol: (INamedTypeSymbol)context.TargetSymbol)));
     }
     
-    /// <summary>
-    /// Returns version from RecognizeFramework_Version MSBuild property.
-    /// Usually used to set fixed version in SnapshotTests.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
+    /// <summary>Resolves the assembly or generator version from MSBuild properties.</summary>
     public static IncrementalValueProvider<string> DetectVersion(
         this IncrementalGeneratorInitializationContext context)
     {

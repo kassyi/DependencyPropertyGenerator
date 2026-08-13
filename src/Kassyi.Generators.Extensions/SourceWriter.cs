@@ -7,10 +7,7 @@ using System.Text;
 
 namespace Kassyi.Generators.Extensions;
 
-/// <summary>
-/// A zero-allocation (or minimal-allocation) writer for source generators.
-/// Internally uses a thread-static StringBuilder to avoid allocations during source string building.
-/// </summary>
+/// <summary>A zero-allocation writer that builds source text using a pooled thread-static <see cref="StringBuilder"/>.</summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Library methods for Source Generators")]
 [SuppressMessage("ReSharper", "UnusedMethod.Global", Justification = "Library methods for Source Generators")]
 [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Library methods for Source Generators")]
@@ -28,6 +25,7 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 
     public SourceWriter()
     {
+        // [WHY] Reuses a thread-static StringBuilder pool to eliminate heap allocations during source generation.
         s_threadStaticBuilders ??= new StringBuilder[8];
         _myDepth = s_depth++;
 
@@ -215,7 +213,7 @@ public readonly ref struct SourceWriterInterpolatedStringHandler
         }
     }
 
-    public void AppendFormatted<T>(T t) => _builder?.Append(t?.ToString());
+    public void AppendFormatted<T>(T t) => _builder?.Append(t);
 
     public void AppendFormatted<T>(T? t, string format) where T : IFormattable => _builder?.Append(t?.ToString(format, null));
 }
