@@ -16,12 +16,9 @@ public sealed class Cs0436Suppressor : DiagnosticSuppressor
 
     public override void ReportSuppressions(SuppressionAnalysisContext context)
     {
-        foreach (var diagnostic in context.ReportedDiagnostics)
+        foreach (var diagnostic in context.ReportedDiagnostics.Where(ShouldSuppress))
         {
-            if (ShouldSuppress(diagnostic))
-            {
-                context.ReportSuppression(Suppression.Create(s_descriptor, diagnostic));
-            }
+            context.ReportSuppression(Suppression.Create(s_descriptor, diagnostic));
         }
     }
 
