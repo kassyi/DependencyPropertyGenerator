@@ -1,0 +1,13 @@
+{
+  "name": "dependency-property-generator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "update:agents": "node ./scripts/update-agents.js",
+    "prepack": "clean-package",
+    "postpack": "clean-package restore"
+  },
+  "devDependencies": {
+    "clean-package": "^2.2.0"
+  }
+}
