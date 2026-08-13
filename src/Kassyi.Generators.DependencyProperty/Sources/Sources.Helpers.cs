@@ -215,17 +215,11 @@ internal static partial class SourceGenerationHelper
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
-            writer.Append($"""
-                private static partial bool Is{property.Name}Valid(
-                    {senderType} sender,
-                    {GenerateType(property, canBeNull: true)} value);
-        """);
+            writer.AppendLine($"private static partial bool Is{property.Name}Valid({senderType} sender, {GenerateType(property, canBeNull: true)} value);");
             return;
         }
 
-        writer.Append($"""
-                private static partial bool Is{property.Name}Valid({GenerateType(property, canBeNull: true)} value);
-        """);
+        writer.AppendLine($"private static partial bool Is{property.Name}Valid({GenerateType(property, canBeNull: true)} value);");
     }
 
     private static void GenerateCreateDefaultValueCallbackPartialMethod(ref SourceWriter writer, DependencyPropertyData property)
@@ -236,36 +230,27 @@ internal static partial class SourceGenerationHelper
             return;
         }
 
-        writer.Append($"""
-                private static partial {GenerateType(property)} Get{property.Name}DefaultValue();
-        """);
+        writer.AppendLine($"private static partial {GenerateType(property)} Get{property.Name}DefaultValue();");
     }
 
     private static void GenerateOnChangedMethodDeclaration(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
         var modifiers = property.IsAttached ? "static " : string.Empty;
         var targetParameter = property.IsAttached
-            ? $"\n            {GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)},"
+            ? $"{GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, "
             : string.Empty;
+        var propertyType = GenerateType(property);
 
-        writer.Append($"""
-                {modifiers}partial void {name}({targetParameter}
-                    {GenerateType(property)} oldValue,
-                    {GenerateType(property)} newValue)
-        """);
+        writer.Append($"{modifiers}partial void {name}({targetParameter}{propertyType} oldValue, {propertyType} newValue)");
     }
 
     private static void GenerateOnChangedMethodCall(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
         var targetArgument = property.IsAttached
-            ? $"\n                {GenerateBrowsableForTypeParameterName(property)},"
+            ? $"{GenerateBrowsableForTypeParameterName(property)}, "
             : string.Empty;
 
-        writer.Append($"""
-                    {name}({targetArgument}
-                        oldValue,
-                        newValue);
-        """);
+        writer.Append($"{name}({targetArgument}oldValue, newValue);");
     }
 
     private static void GenerateBindEventMethod(ref SourceWriter writer, DependencyPropertyData property)
@@ -287,28 +272,29 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine();
         GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed", property);
         writer.AppendLine();
-        writer.AppendLine("        {");
-        GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_BeforeBind", property);
-        writer.AppendLine();
-        writer.AppendLine();
-        writer.AppendLine($"            if (oldValue is not default({type}))");
-        writer.AppendLine("            {");
-        foreach (var @event in property.ValidationAndCallbacks.BindEvents)
+        using (writer.Scope())
         {
-            writer.AppendLine($"                {sender}.{@event} -= On{property.Name}Changed_{@event};");
+            GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_BeforeBind", property);
+            writer.AppendLine();
+            writer.AppendLine();
+            using (writer.Scope($"if (oldValue is not default({type}))"))
+            {
+                foreach (var @event in property.ValidationAndCallbacks.BindEvents)
+                {
+                    writer.AppendLine($"{sender}.{@event} -= On{property.Name}Changed_{@event};");
+                }
+            }
+            using (writer.Scope($"if (newValue is not default({type}))"))
+            {
+                foreach (var @event in property.ValidationAndCallbacks.BindEvents)
+                {
+                    writer.AppendLine($"{sender}.{@event} += On{property.Name}Changed_{@event};");
+                }
+            }
+            writer.AppendLine();
+            GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_AfterBind", property);
+            writer.AppendLine();
         }
-        writer.AppendLine("            }");
-        writer.AppendLine($"            if (newValue is not default({type}))");
-        writer.AppendLine("            {");
-        foreach (var @event in property.ValidationAndCallbacks.BindEvents)
-        {
-            writer.AppendLine($"                {sender}.{@event} += On{property.Name}Changed_{@event};");
-        }
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_AfterBind", property);
-        writer.AppendLine();
-        writer.Append("        }");
     }
 
     private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
@@ -317,8 +303,29 @@ internal static partial class SourceGenerationHelper
         return generator.GeneratePropertyType(@class, property);
     }
     
+    internal static SourceWriterClassScope ClassScope(ref this SourceWriter writer, ClassData @class)
+    {
+        writer.AppendLine();
+        writer.AppendLine("#nullable enable");
+        writer.AppendLine();
+        writer.AppendLine($"namespace {@class.Namespace}");
+        writer.AppendLine("{");
+        writer.AppendLine($"{GenerateModifiers(@class)}partial class {@class.Name}");
+        writer.AppendLine("{");
+        return new SourceWriterClassScope(writer);
+    }
+
     internal static string GenerateEventArgsType(EventData @event) =>
         string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
+}
+
+internal readonly ref struct SourceWriterClassScope(SourceWriter writer) : IDisposable
+{
+    public void Dispose()
+    {
+        writer.AppendLine("}");
+        writer.AppendLine("}");
+    }
 }
 
 internal static class StringExtensions
