@@ -1,19 +1,17 @@
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static CompilationUnitSyntax GenerateDependencyPropertySyntax(ClassData @class, DependencyPropertyData property)
+    public static string GenerateDependencyPropertySource(ClassData @class, DependencyPropertyData property)
     {
         var writer = new SourceWriter();
         try
         {
             GenerateDependencyProperty(ref writer, @class, property);
-            return SyntaxFactory.ParseCompilationUnit(writer.ToString());
+            return writer.ToString();
         }
         finally
         {

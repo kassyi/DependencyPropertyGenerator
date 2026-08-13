@@ -1,19 +1,17 @@
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    public static CompilationUnitSyntax GenerateRoutedEventSyntax(ClassData @class, EventData @event)
+    public static string GenerateRoutedEventSource(ClassData @class, EventData @event)
     {
         var writer = new SourceWriter();
         try
         {
             GenerateRoutedEvent(ref writer, @class, @event);
-            return SyntaxFactory.ParseCompilationUnit(writer.ToString());
+            return writer.ToString();
         }
         finally
         {

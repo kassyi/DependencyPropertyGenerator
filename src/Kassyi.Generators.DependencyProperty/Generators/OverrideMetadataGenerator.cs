@@ -78,12 +78,10 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
             strategy.Generate(ref writer, data.Class, data.OverrideMetada);
             
             var text = writer.ToString();
-            var compilationUnit = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseCompilationUnit(text);
-            var formattedText = compilationUnit.NormalizeWhitespace(indentation: "    ", eol: "\n").ToFullString();
 
             return new FileWithName(
                 Name: strategy.GetFileName(data.Class),
-                Text: formattedText);
+                Text: text);
         }
         finally
         {

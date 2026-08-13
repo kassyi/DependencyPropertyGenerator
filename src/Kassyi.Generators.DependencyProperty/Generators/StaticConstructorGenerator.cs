@@ -50,15 +50,21 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
 
         providers.CombineAll()
-            .SelectMany(static (array, _) =>
-                array.Where(static x => x.Class.Framework is Framework.Avalonia)
-                     .GroupBy(static x => x.Class, static x => x.DependencyProperty)
-                     .Select(static g => new StaticConstructorData(
-                         Class: g.Key,
-                         Properties: g.ToImmutableArray().AsEquatableArray())))
+            .SelectMany(TransformToStaticConstructorData)
             .WithComparer(EqualityComparer<StaticConstructorData>.Default)
             .SelectAndReportExceptions(GetSourceCode, context, Id)
             .AddSource(context);
+    }
+
+    internal static IEnumerable<StaticConstructorData> TransformToStaticConstructorData(
+        EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)> array,
+        CancellationToken _)
+    {
+        return array.Where(static x => x.Class.Framework is Framework.Avalonia)
+                    .GroupBy(static x => x.Class, static x => x.DependencyProperty)
+                    .Select(static g => new StaticConstructorData(
+                        Class: g.Key,
+                        Properties: g.ToImmutableArray().AsEquatableArray()));
     }
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
@@ -94,10 +100,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
                 return FileWithName.Empty;
             }
 
-            var compilationUnit = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseCompilationUnit(text);
-            var formattedText = compilationUnit.NormalizeWhitespace(indentation: "    ", eol: "\n").ToFullString();
-
-            return new FileWithName(Name: $"{data.Class.FullName}.StaticConstructor.g.cs", Text: formattedText);
+            return new FileWithName(Name: $"{data.Class.FullName}.StaticConstructor.g.cs", Text: text);
         }
         finally
         {

@@ -2,7 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -40,8 +39,8 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
         return (classData, eventData);
     }
 
-    protected override CompilationUnitSyntax GenerateSyntax((ClassData Class, EventData Event) data) =>
-        SourceGenerationHelper.GenerateWeakEventSyntax(data.Class, data.Event);
+    protected override string GenerateSource((ClassData Class, EventData Event) data) =>
+        SourceGenerationHelper.GenerateWeakEventSource(data.Class, data.Event);
 
     protected override string GetHintName((ClassData Class, EventData Event) data) =>
         $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs";

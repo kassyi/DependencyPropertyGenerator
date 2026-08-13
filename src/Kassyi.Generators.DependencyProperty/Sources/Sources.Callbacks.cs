@@ -19,11 +19,7 @@ internal static partial class SourceGenerationHelper
             if (!string.IsNullOrWhiteSpace(property.ValidationAndCallbacks.OnChanged))
             {
                 var (_, callbacks) = CheckOnChangedMethods(@class, property);
-                if (callbacks is
-                    {
-                        IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false,
-                        IsChangedArgs1: false, IsChangedArgs2: false
-                    })
+                if (callbacks.ChangedSignatures == CallbackSignature.None)
                 {
                     writer.AppendLine(
                         $"#error DPG0001: The specified OnChanged method '{property.ValidationAndCallbacks.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.");
