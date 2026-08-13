@@ -3,7 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
-internal class UwpFrameworkGenerator : FrameworkGenerator
+internal sealed class UwpFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
@@ -16,10 +16,8 @@ internal class UwpFrameworkGenerator : FrameworkGenerator
                           """;
     }
 
-    public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)
-    {
-        return property.IsAttached ? "RegisterAttached" : "Register";
-    }
+    public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property) =>
+        property.IsAttached ? "RegisterAttached" : "Register";
 
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
@@ -37,7 +35,7 @@ internal class UwpFrameworkGenerator : FrameworkGenerator
         }
         else
         {
-            if (property.CreateDefaultValueCallback)
+            if (property.ValidationAndCallbacks.CreateDefaultValueCallback)
             {
                 var createDefaultValue = GenerateCreateDefaultValueCallback(property);
                 writer.Append($"""
@@ -70,8 +68,6 @@ internal class UwpFrameworkGenerator : FrameworkGenerator
             "DependencyProperty");
     }
 
-    public override string GenerateManagerType(ClassData @class)
-    {
-        return SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "DependencyProperty");
-    }
+    public override string GenerateManagerType(ClassData @class) =>
+        SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "DependencyProperty");
 }

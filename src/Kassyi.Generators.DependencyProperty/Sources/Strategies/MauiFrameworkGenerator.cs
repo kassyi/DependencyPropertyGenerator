@@ -3,15 +3,15 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
-internal class MauiFrameworkGenerator : FrameworkGenerator
+internal sealed class MauiFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
-        var defaultBindingMode = property.DefaultBindingMode is null or "Default"
+        var defaultBindingMode = property.FrameworkMetadata.DefaultBindingMode is null or "Default"
             ? property.IsReadOnly
                 ? "OneWayToSource"
                 : "OneWay"
-            : property.DefaultBindingMode;
+            : property.FrameworkMetadata.DefaultBindingMode;
 
         return $"""
 
@@ -28,9 +28,9 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
                 """;
     }
 
-    public override string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
+    public static string GeneratePropertyChangingCallback(ClassData @class, DependencyPropertyData property)
     {
-        if (property is { IsChanging0: false, IsChanging1: false, IsChanging2: false, IsChanging3: false })
+        if (property.ValidationAndCallbacks.Callbacks is { IsChanging0: false, IsChanging1: false, IsChanging2: false, IsChanging3: false })
         {
             return "null";
         }
@@ -48,10 +48,10 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
         return $$"""
             static (sender, oldValue, newValue) =>
                             {
-                                {{(property.IsChanging0 ? GenerateCall($"On{name}Changing", isAttached, instanceCast) : "")}}
-                                {{(property.IsChanging1 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast] : [$"{typeCast}newValue"]) : "")}}
-                                {{(property.IsChanging2 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast, $"{typeCast}newValue"] : [$"{typeCast}oldValue", $"{typeCast}newValue"]) : "")}}
-                                {{(property.IsChanging3 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, senderCast, $"{typeCast}oldValue", $"{typeCast}newValue") : "")}}
+                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging0 ? GenerateCall($"On{name}Changing", isAttached, instanceCast) : "")}}
+                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging1 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast] : [$"{typeCast}newValue"]) : "")}}
+                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging2 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, isAttached ? [senderCast, $"{typeCast}newValue"] : [$"{typeCast}oldValue", $"{typeCast}newValue"]) : "")}}
+                                {{(property.ValidationAndCallbacks.Callbacks.IsChanging3 ? GenerateCall($"On{name}Changing", isAttached, instanceCast, senderCast, $"{typeCast}oldValue", $"{typeCast}newValue") : "")}}
                             }
             """;
     }
@@ -62,7 +62,7 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
             property.IsReadOnly ? "CreateReadOnly" : "Create";
     }
 
-    public override void GeneratePropertyMetadata(ref Extensions.SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
+    public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
         // MAUI does not use a separate PropertyMetadata object in this way.
     }
@@ -98,7 +98,7 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
     }
 
     public override void GenerateAdditionalPropertyForReadOnlyProperties(
-        ref Extensions.SourceWriter writer,
+        ref SourceWriter writer,
         DependencyPropertyData property)
     {
         if (!property.IsReadOnly)
@@ -107,7 +107,7 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
             return;
         }
 
-        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         writer.AppendLine($"        public static readonly {SourceGenerationHelper.GenerateTypeByPlatform(property.Framework, "BindableProperty")} {property.Name}Property");
         writer.AppendLine($"            = {SourceGenerationHelper.GenerateDependencyPropertyName(property)}.BindableProperty;");
     }
@@ -127,35 +127,39 @@ internal class MauiFrameworkGenerator : FrameworkGenerator
         var nullable = !@event.Type.Contains("EventArgs");
         var eventHandlerType = GenerateEventHandlerType(@event, nullable: nullable, nullableType: nullable);
 
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {SourceGenerationHelper.GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("    {");
-        writer.AppendLine($"        private{modifiers} global::Microsoft.Maui.WeakEventManager {@event.Name}WeakEventManager {{ get; }} = new global::Microsoft.Maui.WeakEventManager();");
-        writer.AppendLine();
+        writer.AppendLine($$"""
+
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
+            {
+        """);
+        writer.AppendLine($$"""
+        private{{modifiers}} global::Microsoft.Maui.WeakEventManager {{@event.Name}}WeakEventManager { get; } = new global::Microsoft.Maui.WeakEventManager();
+
+""");
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
-        writer.AppendLine($"        public{modifiers} event {eventHandlerType} {@event.Name}");
-        writer.AppendLine("        {");
-        writer.AppendLine($"            add => {@event.Name}WeakEventManager.AddEventHandler(value);");
-        writer.AppendLine($"            remove => {@event.Name}WeakEventManager.RemoveEventHandler(value);");
-        writer.AppendLine("        }");
-        writer.AppendLine();
-        writer.AppendLine("        /// <summary>");
-        writer.AppendLine($"        /// A helper method to raise the {@event.Name} event.");
-        writer.AppendLine("        /// </summary>");
-        writer.AppendLine($"        internal{modifiers} void Raise{@event.Name}Event(object? sender{additionalParameters})");
-        writer.AppendLine("        {");
-        writer.AppendLine($"            {@event.Name}WeakEventManager.HandleEvent(sender!, {args}!, eventName: nameof({@event.Name}));");
-        writer.AppendLine("        }");
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
+        writer.AppendLine($$"""
+        public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
+        {
+            add => {{@event.Name}}WeakEventManager.AddEventHandler(value);
+            remove => {{@event.Name}}WeakEventManager.RemoveEventHandler(value);
+        }
+
+        /// <summary>
+        /// A helper method to raise the {{@event.Name}} event.
+        /// </summary>
+        internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
+        {
+            {{@event.Name}}WeakEventManager.HandleEvent(sender!, {{args}}!, eventName: nameof({{@event.Name}}));
+        }
+    }
+}
+""");
     }
 
-    public override string GenerateManagerType(ClassData @class)
-    {
-        return SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "BindableProperty");
-    }
+    public override string GenerateManagerType(ClassData @class) =>
+        SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "BindableProperty");
 }

@@ -3,7 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
-internal class WpfFrameworkGenerator : FrameworkGenerator
+internal sealed class WpfFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
@@ -26,17 +26,17 @@ internal class WpfFrameworkGenerator : FrameworkGenerator
             : property.IsAttached ? "RegisterAttached" : "Register";
     }
 
-    public override void GeneratePropertyMetadata(ref Extensions.SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
+    public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
         var defaultValue = SourceGenerationHelper.GenerateDefaultValue(property);
         var flags = SourceGenerationHelper.GenerateOptions(property);
         var propertyChanged = GeneratePropertyChangedCallback(@class, property);
         var coerceValue = GenerateCoerceValueCallback(@class, property);
-        var isAnimationProhibited = property.IsAnimationProhibited.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture);
+        var isAnimationProhibited = property.FrameworkMetadata.IsAnimationProhibited.ToString().ToLower(System.Globalization.CultureInfo.InvariantCulture);
 
-        var updateSourceTrigger = property.DefaultUpdateSourceTrigger is null
+        var updateSourceTrigger = property.FrameworkMetadata.DefaultUpdateSourceTrigger is null
             ? ""
-            : $",\n                                    defaultUpdateSourceTrigger: global::System.Windows.Data.UpdateSourceTrigger.{property.DefaultUpdateSourceTrigger}";
+            : $",\n                                    defaultUpdateSourceTrigger: global::System.Windows.Data.UpdateSourceTrigger.{property.FrameworkMetadata.DefaultUpdateSourceTrigger}";
 
         writer.Append($"""
             {parameterName}new global::System.Windows.FrameworkPropertyMetadata(
@@ -57,10 +57,8 @@ internal class WpfFrameworkGenerator : FrameworkGenerator
                 : "DependencyProperty");
     }
 
-    public override string GenerateManagerType(ClassData @class)
-    {
-        return SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "DependencyProperty");
-    }
+    public override string GenerateManagerType(ClassData @class) =>
+        SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "DependencyProperty");
 
     public override void GenerateAdditionalPropertyForReadOnlyProperties(
         ref SourceWriter writer,
@@ -72,20 +70,16 @@ internal class WpfFrameworkGenerator : FrameworkGenerator
             return;
         }
 
-        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation, property, isProperty: false);
+        SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         writer.AppendLine($"        public static readonly {SourceGenerationHelper.GenerateTypeByPlatform(property.Framework, "DependencyProperty")} {property.Name}Property");
         writer.AppendLine($"            = {SourceGenerationHelper.GenerateDependencyPropertyName(property)}.DependencyProperty;");
     }
 
-    public override void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
+    public override void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) =>
         GenerateRoutedEventInternal(ref writer, @class, @event);
-    }
 
-    public override void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
+    public override void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) =>
         GenerateAttachedRoutedEventInternal(ref writer, @class, @event);
-    }
 
     public override void GenerateWeakEvent(ref SourceWriter writer, ClassData @class, EventData @event)
     {
@@ -105,93 +99,113 @@ internal class WpfFrameworkGenerator : FrameworkGenerator
         var eventHandlerType = GenerateEventHandlerType(@event);
         var eventArgsType = SourceGenerationHelper.GenerateEventArgsType(@event);
 
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {SourceGenerationHelper.GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("    {");
+        writer.AppendLine($$"""
+
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
+            {
+        """);
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         SourceGenerationHelper.GenerateExcludeFromCodeCoverageAttribute(ref writer);
-        writer.AppendLine($"        private class {@event.Name}WeakEventManager : global::System.Windows.WeakEventManager");
-        writer.AppendLine("        {");
-        writer.AppendLine($"            private {@event.Name}WeakEventManager()");
-        writer.AppendLine("            {");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine($"            public static void AddHandler(object? source, {eventHandlerType} handler)");
-        writer.AppendLine("            {");
-        writer.AppendLine("                if (source == null)");
-        writer.AppendLine("                    throw new global::System.ArgumentNullException(nameof(source));");
-        writer.AppendLine("                if (handler == null)");
-        writer.AppendLine("                    throw new global::System.ArgumentNullException(nameof(handler));");
-        writer.AppendLine();
-        writer.AppendLine("                CurrentManager.ProtectedAddHandler(source, handler);");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine($"            public static void RemoveHandler(object? source, {eventHandlerType} handler)");
-        writer.AppendLine("            {");
-        writer.AppendLine("                if (source == null)");
-        writer.AppendLine("                    throw new global::System.ArgumentNullException(nameof(source));");
-        writer.AppendLine("                if (handler == null)");
-        writer.AppendLine("                    throw new global::System.ArgumentNullException(nameof(handler));");
-        writer.AppendLine();
-        writer.AppendLine("                CurrentManager.ProtectedRemoveHandler(source, handler);");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine($"            internal static {@event.Name}WeakEventManager CurrentManager");
-        writer.AppendLine("            {");
-        writer.AppendLine("                get");
-        writer.AppendLine("                {");
-        writer.AppendLine($"                    var managerType = typeof({@event.Name}WeakEventManager);");
-        writer.AppendLine($"                    var manager = ({@event.Name}WeakEventManager)GetCurrentManager(managerType);");
-        writer.AppendLine("                    if (manager == null)");
-        writer.AppendLine("                    {");
-        writer.AppendLine($"                        manager = new {@event.Name}WeakEventManager();");
-        writer.AppendLine("                        SetCurrentManager(managerType, manager);");
-        writer.AppendLine("                    }");
-        writer.AppendLine();
-        writer.AppendLine("                    return manager;");
-        writer.AppendLine("                }");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine("            protected override void StartListening(object? source)");
-        writer.AppendLine("            {");
-        writer.AppendLine($"                {source}.{@event.Name} += On{@event.Name};");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine("            protected override void StopListening(object? source)");
-        writer.AppendLine("            {");
-        writer.AppendLine($"                {source}.{@event.Name} -= On{@event.Name};");
-        writer.AppendLine("            }");
-        writer.AppendLine();
-        writer.AppendLine($"            internal void On{@event.Name}(object? sender, {eventArgsType} args)");
-        writer.AppendLine("            {");
-        writer.AppendLine("                DeliverEvent(sender, args);");
-        writer.AppendLine("            }");
-        writer.AppendLine("        }");
-        writer.AppendLine();
+        
+        GenerateWeakEventManagerClass(ref writer, @event.Name, eventHandlerType, eventArgsType, source);
+
         SourceGenerationHelper.GenerateXmlDocumentationFrom(ref writer, @event.EventXmlDocumentation, @event);
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         SourceGenerationHelper.GenerateExcludeFromCodeCoverageAttribute(ref writer);
-        writer.AppendLine($"        public{modifiers} event {eventHandlerType} {@event.Name}");
-        writer.AppendLine("        {");
-        writer.AppendLine($"            add => {@event.Name}WeakEventManager.AddHandler(null, value);");
-        writer.AppendLine($"            remove => {@event.Name}WeakEventManager.RemoveHandler(null, value);");
-        writer.AppendLine("        }");
-        writer.AppendLine();
-        writer.AppendLine("        /// <summary>");
-        writer.AppendLine($"        /// A helper method to raise the {@event.Name} event.");
-        writer.AppendLine("        /// </summary>");
+        writer.AppendLine($$"""
+        public{{modifiers}} event {{eventHandlerType}} {{@event.Name}}
+        {
+            add => {{@event.Name}}WeakEventManager.AddHandler(null, value);
+            remove => {{@event.Name}}WeakEventManager.RemoveHandler(null, value);
+        }
+
+        /// <summary>
+        /// A helper method to raise the {{@event.Name}} event.
+        /// </summary>
+""");
         SourceGenerationHelper.GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         SourceGenerationHelper.GenerateExcludeFromCodeCoverageAttribute(ref writer);
-        writer.AppendLine($"        internal{modifiers} void Raise{@event.Name}Event(object? sender{additionalParameters})");
-        writer.AppendLine("        {");
-        writer.AppendLine($"            {@event.Name}WeakEventManager.CurrentManager.On{@event.Name}(sender, {args});");
-        writer.AppendLine("        }");
-        writer.AppendLine("    }");
-        writer.AppendLine("}");
+        writer.AppendLine($$"""
+        internal{{modifiers}} void Raise{{@event.Name}}Event(object? sender{{additionalParameters}})
+        {
+            {{@event.Name}}WeakEventManager.CurrentManager.On{{@event.Name}}(sender, {{args}});
+        }
+    }
+}
+""");
+    }
+
+    private static void GenerateWeakEventManagerClass(
+        ref SourceWriter writer, 
+        string eventName, 
+        string eventHandlerType, 
+        string eventArgsType, 
+        string source)
+    {
+        writer.AppendLine($$"""
+        private class {{eventName}}WeakEventManager : global::System.Windows.WeakEventManager
+        {
+            private {{eventName}}WeakEventManager()
+            {
+            }
+
+            public static void AddHandler(object? source, {{eventHandlerType}} handler)
+            {
+                if (source == null)
+                    throw new global::System.ArgumentNullException(nameof(source));
+                if (handler == null)
+                    throw new global::System.ArgumentNullException(nameof(handler));
+
+                CurrentManager.ProtectedAddHandler(source, handler);
+            }
+
+            public static void RemoveHandler(object? source, {{eventHandlerType}} handler)
+            {
+                if (source == null)
+                    throw new global::System.ArgumentNullException(nameof(source));
+                if (handler == null)
+                    throw new global::System.ArgumentNullException(nameof(handler));
+
+                CurrentManager.ProtectedRemoveHandler(source, handler);
+            }
+
+            internal static {{eventName}}WeakEventManager CurrentManager
+            {
+                get
+                {
+                    var managerType = typeof({{eventName}}WeakEventManager);
+                    var manager = ({{eventName}}WeakEventManager)GetCurrentManager(managerType);
+                    if (manager == null)
+                    {
+                        manager = new {{eventName}}WeakEventManager();
+                        SetCurrentManager(managerType, manager);
+                    }
+
+                    return manager;
+                }
+            }
+
+            protected override void StartListening(object? source)
+            {
+                {{source}}.{{eventName}} += On{{eventName}};
+            }
+
+            protected override void StopListening(object? source)
+            {
+                {{source}}.{{eventName}} -= On{{eventName}};
+            }
+
+            internal void On{{eventName}}(object? sender, {{eventArgsType}} args)
+            {
+                DeliverEvent(sender, args);
+            }
+        }
+
+""");
     }
 
     public override void GenerateStaticConstructor(
@@ -199,13 +213,15 @@ internal class WpfFrameworkGenerator : FrameworkGenerator
         ClassData @class,
         IReadOnlyCollection<DependencyPropertyData> properties)
     {
-        writer.AppendLine();
-        writer.AppendLine("#nullable enable");
-        writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
-        writer.AppendLine($"    {SourceGenerationHelper.GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("    {");
+        writer.AppendLine($$"""
+
+        #nullable enable
+
+        namespace {{@class.Namespace}}
+        {
+            {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
+            {
+        """);
         writer.AppendLine($"        static {@class.Name}()");
         writer.AppendLine("        {");
 

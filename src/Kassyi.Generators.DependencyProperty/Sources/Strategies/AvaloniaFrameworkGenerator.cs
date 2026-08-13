@@ -2,35 +2,35 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
-internal class AvaloniaFrameworkGenerator : FrameworkGenerator
+internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
-        var defaultBindingMode = property.DefaultBindingMode is null or "Default"
+        var defaultBindingMode = property.FrameworkMetadata.DefaultBindingMode is null or "Default"
             ? "OneWay"
-            : property.DefaultBindingMode;
+            : property.FrameworkMetadata.DefaultBindingMode;
 
-        if (property.IsDirect)
+        if (!property.IsDirect)
         {
-            var nameArgument = property.IsAddOwner ? "" : $"name: \"{property.Name}\",\n                                                                         ";
             return $"""
-                                                                         {nameArgument}getter: static sender => sender.{property.Name},
-                                                                         setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
-                                                                         unsetValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
-                                                                         defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
-                                                                         enableDataValidation: {(property.EnableDataValidation ? "true" : "false")}
-                                                         """;
+
+                                    name: "{property.Name}",
+                                    defaultValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
+                                    inherits: {(property.FrameworkMetadata.Inherits ? "true" : "false")},
+                                    defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
+                                    validate: {GenerateValidateValueCallback(@class, property)},
+                                    coerce: {GenerateCoerceValueCallback(@class, property)}
+                    """;
         }
-
+        var nameArgument = property.IsAddOwner ? "" : $"name: \"{property.Name}\",\n                                                                         ";
         return $"""
+                                {nameArgument}getter: static sender => sender.{property.Name},
+                                setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
+                                unsetValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
+                                defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
+                                enableDataValidation: {(property.ValidationAndCallbacks.EnableDataValidation ? "true" : "false")}
+                """;
 
-                                             name: "{property.Name}",
-                                             defaultValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
-                                             inherits: {(property.Inherits ? "true" : "false")},
-                                             defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
-                                             validate: {GenerateValidateValueCallback(@class, property)},
-                                             coerce: {GenerateCoerceValueCallback(@class, property)}
-                             """;
     }
 
     public override string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property)
@@ -40,7 +40,7 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
             : GeneratePropertyMetadata(@class, property);
 
         return $"""
-                        {property.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
+                        {property.ComponentModel.FromType}.{property.Name}Property.AddOwner<{@class.Type}>(
                             {arguments});
             """;
     }
@@ -58,9 +58,9 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
         var defaultValue = SourceGenerationHelper.GenerateDefaultValue(property);
-        var defaultBindingMode = property.DefaultBindingMode is null or "Default"
+        var defaultBindingMode = property.FrameworkMetadata.DefaultBindingMode is null or "Default"
             ? "OneWay"
-            : property.DefaultBindingMode;
+            : property.FrameworkMetadata.DefaultBindingMode;
 
         if (property.IsDirect)
         {
@@ -68,7 +68,7 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
                 {parameterName}new global::Avalonia.Data.Core.TargetNullValuePropertyMetadata<{SourceGenerationHelper.GenerateType(property)}>(
                                     unsetValue: {defaultValue},
                                     defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
-                                    enableDataValidation: {(property.EnableDataValidation ? "true" : "false")})
+                                    enableDataValidation: {(property.ValidationAndCallbacks.EnableDataValidation ? "true" : "false")})
                 """);
         }
         else
@@ -97,10 +97,8 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
                     $"StyledProperty<{SourceGenerationHelper.GenerateType(property)}>");
     }
 
-    public override string GenerateManagerType(ClassData @class)
-    {
-        return SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "AvaloniaProperty");
-    }
+    public override string GenerateManagerType(ClassData @class) =>
+        SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "AvaloniaProperty");
 
     public override void GenerateAdditionalFieldForDirectProperties(
         ref SourceWriter writer,
@@ -116,22 +114,20 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
         writer.AppendLine();
     }
 
-    public override void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
+    public override void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) =>
         GenerateRoutedEventInternal(ref writer, @class, @event);
-    }
 
-    public override void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
+    public override void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) =>
         GenerateAttachedRoutedEventInternal(ref writer, @class, @event);
-    }
 
     protected override void GenerateHandlerAction(ref SourceWriter writer, EventData @event, string uiElementType, string contentElementType, string action)
     {
-        writer.AppendLine($"            if (element is {uiElementType} uiElement)");
-        writer.AppendLine("            {");
-        writer.AppendLine($"                uiElement.{action}({@event.Name}Event, handler);");
-        writer.AppendLine("            }");
+        writer.AppendLine($$"""
+            if (element is {{uiElementType}} uiElement)
+            {
+                uiElement.{{action}}({{@event.Name}}Event, handler);
+            }
+""");
     }
 
     protected override string GenerateRoutedEventType(ClassData @class) => $"{SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "Interactivity.RoutedEvent")}<{GenerateRoutedEventArgsType(@class)}>";
@@ -169,21 +165,25 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
                 return;
             }
 
-            writer.AppendLine();
-            writer.AppendLine("#nullable enable");
-            writer.AppendLine();
-            writer.AppendLine($"namespace {@class.Namespace}");
-            writer.AppendLine("{");
-            writer.AppendLine($"    {SourceGenerationHelper.GenerateModifiers(@class)}partial class {@class.Name}");
-            writer.AppendLine("    {");
-            writer.AppendLine($"        static {@class.Name}()");
-            writer.AppendLine("        {");
+            writer.AppendLine($$"""
+
+            #nullable enable
+
+            namespace {{@class.Namespace}}
+            {
+                {{SourceGenerationHelper.GenerateModifiers(@class)}}partial class {{@class.Name}}
+                {
+                    static {{@class.Name}}()
+                    {
+            """);
             
             writer.Append(tempWriter.ToString());
 
-            writer.AppendLine("        }");
-            writer.AppendLine("    }");
-            writer.AppendLine("}");
+            writer.AppendLine("""
+                    }
+                }
+            }
+            """);
         }
         finally
         {
@@ -196,9 +196,9 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
         ClassData @class,
         DependencyPropertyData property)
     {
-        writer.LineIf(property.AffectsRender, $"            AffectsRender<{@class.Type}>({property.Name}Property);");
-        writer.LineIf(property.AffectsMeasure, $"            AffectsMeasure<{@class.Type}>({property.Name}Property);");
-        writer.LineIf(property.AffectsArrange, $"            AffectsArrange<{@class.Type}>({property.Name}Property);");
+        writer.LineIf(property.FrameworkMetadata.AffectsRender, $"            AffectsRender<{@class.Type}>({property.Name}Property);");
+        writer.LineIf(property.FrameworkMetadata.AffectsMeasure, $"            AffectsMeasure<{@class.Type}>({property.Name}Property);");
+        writer.LineIf(property.FrameworkMetadata.AffectsArrange, $"            AffectsArrange<{@class.Type}>({property.Name}Property);");
     }
 
     private static void GenerateAvaloniaStaticConstructorPropertyChanged(
@@ -206,67 +206,50 @@ internal class AvaloniaFrameworkGenerator : FrameworkGenerator
         ClassData @class,
         DependencyPropertyData property)
     {
-        var (name, isChanged0, isChanged1, isChanged2, isChanged3, isChangedArgs1, isChangedArgs2) 
+        var (name, callbacks) 
             = SourceGenerationHelper.CheckOnChangedMethods(@class, property);
         
-        if (!isChanged0 && !isChanged1 && !isChanged2 && !isChanged3 && !isChangedArgs1 && !isChangedArgs2)
+        if (callbacks is { IsChanged0: false, IsChanged1: false, IsChanged2: false, IsChanged3: false, IsChangedArgs1: false, IsChangedArgs2: false })
         {
             return;
         }
         
         writer.AppendLine($"            {property.Name}Property.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{SourceGenerationHelper.GenerateType(property)}>>(static x =>");
         writer.AppendLine("            {");
+
+        var senderType = property.IsAttached
+            ? SourceGenerationHelper.GenerateBrowsableForType(property)
+            : @class.Type;
+            
+        var instanceCast = property.IsAttached ? "" : $"(({@class.Type})x.Sender).";
+        var senderCast = $"({senderType})x.Sender";
+        var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
         
-        if (property.IsAttached)
-        {
-            writer.LineIf(isChanged0, $"                {name}();");
-            writer.LineIf(isChanged1, $"""
-                                {name}(
-                                    ({SourceGenerationHelper.GenerateBrowsableForType(property)})x.Sender);
-                """);
-            writer.LineIf(isChanged2, $"""
-                                {name}(
-                                    ({SourceGenerationHelper.GenerateBrowsableForType(property)})x.Sender,
-                                    ({SourceGenerationHelper.GenerateType(property)})x.NewValue.GetValueOrDefault());
-                """);
-            writer.LineIf(isChanged3, $"""
-                                {name}(
-                                    ({SourceGenerationHelper.GenerateBrowsableForType(property)})x.Sender,
-                                    ({SourceGenerationHelper.GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                                    ({SourceGenerationHelper.GenerateType(property)})x.NewValue.GetValueOrDefault());
-                """);
-            writer.LineIf(isChangedArgs1, $"""
-                                {name}(
-                                    x);
-                """);
-            writer.LineIf(isChangedArgs2, $"""
-                                {name}(
-                                    ({SourceGenerationHelper.GenerateBrowsableForType(property)})x.Sender,
-                                    x);
-                """);
-        }
-        else
-        {
-            writer.LineIf(isChanged0, $"                (({@class.Type})x.Sender).{name}();");
-            writer.LineIf(isChanged1, $"""
-                                (({@class.Type})x.Sender).{name}(
-                                    ({SourceGenerationHelper.GenerateType(property)})x.NewValue.GetValueOrDefault());
-                """);
-            writer.LineIf(isChanged2, $"""
-                                (({@class.Type})x.Sender).{name}(
-                                    ({SourceGenerationHelper.GenerateType(property)})x.OldValue.GetValueOrDefault(),
-                                    ({SourceGenerationHelper.GenerateType(property)})x.NewValue.GetValueOrDefault());
-                """);
-            writer.LineIf(isChangedArgs1, $"""
-                                (({@class.Type})x.Sender).{name}(
-                                    x);
-                """);
-            writer.LineIf(isChangedArgs2, $"""
-                                {name}(
-                                    (({@class.Type})x.Sender),
-                                    x);
-                """);
-        }
+        writer.LineIf(callbacks.IsChanged0, $"                {instanceCast}{name}();");
+        writer.LineIf(callbacks.IsChanged1, $"""
+                            {instanceCast}{name}(
+                                {(property.IsAttached ? senderCast : $"{typeCast}x.NewValue.GetValueOrDefault()")});
+            """);
+        writer.LineIf(callbacks.IsChanged2, $"""
+                            {instanceCast}{name}(
+                                {(property.IsAttached ? senderCast : $"{typeCast}x.OldValue.GetValueOrDefault()")},
+                                {typeCast}x.NewValue.GetValueOrDefault());
+            """);
+        writer.LineIf(callbacks.IsChanged3, $"""
+                            {instanceCast}{name}(
+                                {senderCast},
+                                {typeCast}x.OldValue.GetValueOrDefault(),
+                                {typeCast}x.NewValue.GetValueOrDefault());
+            """);
+        writer.LineIf(callbacks.IsChangedArgs1, $"""
+                            {instanceCast}{name}(
+                                x);
+            """);
+        writer.LineIf(callbacks.IsChangedArgs2, $"""
+                            {instanceCast}{name}(
+                                {senderCast},
+                                x);
+            """);
 
         writer.AppendLine("            }));");
     }
