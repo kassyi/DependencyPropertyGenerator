@@ -9,32 +9,189 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.Dependenc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.SnapshotTests", "tests\Kassyi.Generators.DependencyProperty.SnapshotTests\Kassyi.Generators.DependencyProperty.SnapshotTests.csproj", "{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D2B8069-3085-4E7D-AC96-F271C5084456}"
-	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		.github\ISSUE_TEMPLATE\bug-report.yaml = .github\ISSUE_TEMPLATE\bug-report.yaml
-		Directory.Build.props = Directory.Build.props
-		src\Directory.Build.props = src\Directory.Build.props
-		tests\Directory.Build.props = tests\Directory.Build.props
-		LICENSE = LICENSE
-		README.md = README.md
-		Directory.Packages.props = Directory.Packages.props
-		.github\workflows\main.yml = .github\workflows\main.yml
-		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
-		.github\dependabot.yml = .github\dependabot.yml
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.Attributes", "src\Kassyi.Generators.DependencyProperty.Attributes\Kassyi.Generators.DependencyProperty.Attributes.csproj", "{90F8AD3B-1C24-447B-99A3-2FBF5066FECA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CEA09484-30F6-4D44-02F6-822E06DBC57C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.DependencyProperty.Benchmarks", "tests\Kassyi.Generators.DependencyProperty.Benchmarks\Kassyi.Generators.DependencyProperty.Benchmarks.csproj", "{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Extensions", "src\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj", "{A78BBFDB-B522-4B30-A48C-266AF60C61A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Tests.Extensions", "tests\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj", "{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CEA09484-30F6-4D44-02F6-822E06DBC57C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D2B8069-3085-4E7D-AC96-F271C5084456}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		AGENTS.md = AGENTS.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		src\Directory.Build.props = src\Directory.Build.props
+		tests\Directory.Build.props = tests\Directory.Build.props
+		global.json = global.json
+		Kassyi.Generators.DependencyProperty.sln.DotSettings = Kassyi.Generators.DependencyProperty.sln.DotSettings
+		LICENSE = LICENSE
+		README.md = README.md
+		assets\nuget_icon.png = assets\nuget_icon.png
+		package.json = package.json
+		scripts\update-agents.js = scripts\update-agents.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\auto-merge.yml = .github\workflows\auto-merge.yml
+		.github\workflows\main.yml = .github\workflows\main.yml
+		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug-report.yaml = .github\ISSUE_TEMPLATE\bug-report.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spec", "spec", "{4E12F6B8-A321-4190-84E3-8CD5D93B7D41}"
+	ProjectSection(SolutionItems) = preProject
+		spec\README.md = spec\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "en", "en", "{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}"
+	ProjectSection(SolutionItems) = preProject
+		spec\en\01_foundation_and_domain.md = spec\en\01_foundation_and_domain.md
+		spec\en\02_pipeline_architecture.md = spec\en\02_pipeline_architecture.md
+		spec\en\03_generation_and_optimization.md = spec\en\03_generation_and_optimization.md
+		spec\en\04_mathematical_model.md = spec\en\04_mathematical_model.md
+		spec\en\intro.md = spec\en\intro.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ja", "ja", "{B2C3D4E5-F6A7-4B8C-9D0E-1F2A3B4C5D6E}"
+	ProjectSection(SolutionItems) = preProject
+		spec\ja\01_foundation_and_domain.md = spec\ja\01_foundation_and_domain.md
+		spec\ja\02_pipeline_architecture.md = spec\ja\02_pipeline_architecture.md
+		spec\ja\03_generation_and_optimization.md = spec\ja\03_generation_and_optimization.md
+		spec\ja\04_mathematical_model.md = spec\ja\04_mathematical_model.md
+		spec\ja\intro.md = spec\ja\intro.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tmp", "tmp", "{F1E2D3C4-B5A6-4789-9012-3456789ABCDE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "code-reviews", "code-reviews", "{C3D4E5F6-A7B8-4C9D-0E1F-2A3B4C5D6E7F}"
+	ProjectSection(SolutionItems) = preProject
+		tmp\code-reviews\001-extracted_issues.md = tmp\code-reviews\001-extracted_issues.md
+		tmp\code-reviews\001-integrated-review-report_20260813.md = tmp\code-reviews\001-integrated-review-report_20260813.md
+		tmp\code-reviews\001-meta-index-active.json = tmp\code-reviews\001-meta-index-active.json
+		tmp\code-reviews\001-phase01-plan_20260813_053343.md = tmp\code-reviews\001-phase01-plan_20260813_053343.md
+		tmp\code-reviews\001-phase01-review_20260813_053343.md = tmp\code-reviews\001-phase01-review_20260813_053343.md
+		tmp\code-reviews\001-phase02-plan_20260813_053343.md = tmp\code-reviews\001-phase02-plan_20260813_053343.md
+		tmp\code-reviews\001-phase02-review_20260813_053343.md = tmp\code-reviews\001-phase02-review_20260813_053343.md
+		tmp\code-reviews\001-refactoring-plan.md = tmp\code-reviews\001-refactoring-plan.md
+		tmp\code-reviews\002-extracted_issues.md = tmp\code-reviews\002-extracted_issues.md
+		tmp\code-reviews\002-meta-index-active.json = tmp\code-reviews\002-meta-index-active.json
+		tmp\code-reviews\002-phase01-plan_20260813_055000.md = tmp\code-reviews\002-phase01-plan_20260813_055000.md
+		tmp\code-reviews\002-phase01-review_20260813_055000.md = tmp\code-reviews\002-phase01-review_20260813_055000.md
+		tmp\code-reviews\002-phase02-plan_20260813_055000.md = tmp\code-reviews\002-phase02-plan_20260813_055000.md
+		tmp\code-reviews\002-phase02-review_20260813_055000.md = tmp\code-reviews\002-phase02-review_20260813_055000.md
+		tmp\code-reviews\002-phase03-plan_20260813_055000.md = tmp\code-reviews\002-phase03-plan_20260813_055000.md
+		tmp\code-reviews\002-phase03-review_20260813_055000.md = tmp\code-reviews\002-phase03-review_20260813_055000.md
+		tmp\code-reviews\002-phase04-plan_20260813_055000.md = tmp\code-reviews\002-phase04-plan_20260813_055000.md
+		tmp\code-reviews\002-phase04-review_20260813_055000.md = tmp\code-reviews\002-phase04-review_20260813_055000.md
+		tmp\code-reviews\002-phase05-plan_20260813_055000.md = tmp\code-reviews\002-phase05-plan_20260813_055000.md
+		tmp\code-reviews\002-phase05-review_20260813_055000.md = tmp\code-reviews\002-phase05-review_20260813_055000.md
+		tmp\code-reviews\002-phase06-plan_20260813_055000.md = tmp\code-reviews\002-phase06-plan_20260813_055000.md
+		tmp\code-reviews\002-phase06-review_20260813_055000.md = tmp\code-reviews\002-phase06-review_20260813_055000.md
+		tmp\code-reviews\002-phase07-plan_20260813_055000.md = tmp\code-reviews\002-phase07-plan_20260813_055000.md
+		tmp\code-reviews\002-phase07-review_20260813_055000.md = tmp\code-reviews\002-phase07-review_20260813_055000.md
+		tmp\code-reviews\002-phase08-plan_20260813_055000.md = tmp\code-reviews\002-phase08-plan_20260813_055000.md
+		tmp\code-reviews\002-phase08-review_20260813_055000.md = tmp\code-reviews\002-phase08-review_20260813_055000.md
+		tmp\code-reviews\002-phase09-plan_20260813_055000.md = tmp\code-reviews\002-phase09-plan_20260813_055000.md
+		tmp\code-reviews\002-phase09-review_20260813_055000.md = tmp\code-reviews\002-phase09-review_20260813_055000.md
+		tmp\code-reviews\002-refactoring-plan.md = tmp\code-reviews\002-refactoring-plan.md
+		tmp\code-reviews\003-extracted_issues.md = tmp\code-reviews\003-extracted_issues.md
+		tmp\code-reviews\003-integrated-review-report_20260814.md = tmp\code-reviews\003-integrated-review-report_20260814.md
+		tmp\code-reviews\003-meta-index-active.json = tmp\code-reviews\003-meta-index-active.json
+		tmp\code-reviews\003-phase01-plan_20260814.md = tmp\code-reviews\003-phase01-plan_20260814.md
+		tmp\code-reviews\003-phase01-review_20260814.md = tmp\code-reviews\003-phase01-review_20260814.md
+		tmp\code-reviews\003-phase02-plan_20260814.md = tmp\code-reviews\003-phase02-plan_20260814.md
+		tmp\code-reviews\003-phase02-review_20260814.md = tmp\code-reviews\003-phase02-review_20260814.md
+		tmp\code-reviews\003-phase03-plan_20260814.md = tmp\code-reviews\003-phase03-plan_20260814.md
+		tmp\code-reviews\003-phase03-review_20260814.md = tmp\code-reviews\003-phase03-review_20260814.md
+		tmp\code-reviews\003-phase04-plan_20260814.md = tmp\code-reviews\003-phase04-plan_20260814.md
+		tmp\code-reviews\003-phase04-review_20260814.md = tmp\code-reviews\003-phase04-review_20260814.md
+		tmp\code-reviews\003-refactoring-plan.md = tmp\code-reviews\003-refactoring-plan.md
+		tmp\code-reviews\004-extracted_issues.md = tmp\code-reviews\004-extracted_issues.md
+		tmp\code-reviews\004-integrated-review-report_20260814.md = tmp\code-reviews\004-integrated-review-report_20260814.md
+		tmp\code-reviews\004-meta-index-active.json = tmp\code-reviews\004-meta-index-active.json
+		tmp\code-reviews\004-phase01-plan_20260814.md = tmp\code-reviews\004-phase01-plan_20260814.md
+		tmp\code-reviews\004-phase01-review_20260814.md = tmp\code-reviews\004-phase01-review_20260814.md
+		tmp\code-reviews\004-phase02-plan_20260814.md = tmp\code-reviews\004-phase02-plan_20260814.md
+		tmp\code-reviews\004-phase02-review_20260814.md = tmp\code-reviews\004-phase02-review_20260814.md
+		tmp\code-reviews\004-phase03-plan_20260814.md = tmp\code-reviews\004-phase03-plan_20260814.md
+		tmp\code-reviews\004-phase03-review_20260814.md = tmp\code-reviews\004-phase03-review_20260814.md
+		tmp\code-reviews\004-phase04-plan_20260814.md = tmp\code-reviews\004-phase04-plan_20260814.md
+		tmp\code-reviews\004-phase04-review_20260814.md = tmp\code-reviews\004-phase04-review_20260814.md
+		tmp\code-reviews\004-phase05-plan_20260814.md = tmp\code-reviews\004-phase05-plan_20260814.md
+		tmp\code-reviews\004-phase05-review_20260814.md = tmp\code-reviews\004-phase05-review_20260814.md
+		tmp\code-reviews\004-refactoring-plan.md = tmp\code-reviews\004-refactoring-plan.md
+		tmp\code-reviews\005-extracted_issues.md = tmp\code-reviews\005-extracted_issues.md
+		tmp\code-reviews\005-integrated-review-report_20260814.md = tmp\code-reviews\005-integrated-review-report_20260814.md
+		tmp\code-reviews\005-meta-index-active.json = tmp\code-reviews\005-meta-index-active.json
+		tmp\code-reviews\005-phase01-plan_20260814_061537.md = tmp\code-reviews\005-phase01-plan_20260814_061537.md
+		tmp\code-reviews\005-phase01-review_20260814_061537.md = tmp\code-reviews\005-phase01-review_20260814_061537.md
+		tmp\code-reviews\005-phase02-plan_20260814_061537.md = tmp\code-reviews\005-phase02-plan_20260814_061537.md
+		tmp\code-reviews\005-phase02-review_20260814_061537.md = tmp\code-reviews\005-phase02-review_20260814_061537.md
+		tmp\code-reviews\005-phase03-plan_20260814_061537.md = tmp\code-reviews\005-phase03-plan_20260814_061537.md
+		tmp\code-reviews\005-phase03-review_20260814_061537.md = tmp\code-reviews\005-phase03-review_20260814_061537.md
+		tmp\code-reviews\005-phase04-plan_20260814_061537.md = tmp\code-reviews\005-phase04-plan_20260814_061537.md
+		tmp\code-reviews\005-phase04-review_20260814_061537.md = tmp\code-reviews\005-phase04-review_20260814_061537.md
+		tmp\code-reviews\005-refactoring-plan.md = tmp\code-reviews\005-refactoring-plan.md
+		tmp\code-reviews\006-extracted_issues.md = tmp\code-reviews\006-extracted_issues.md
+		tmp\code-reviews\006-integrated-review-report_20260814.md = tmp\code-reviews\006-integrated-review-report_20260814.md
+		tmp\code-reviews\006-meta-index-active.json = tmp\code-reviews\006-meta-index-active.json
+		tmp\code-reviews\006-phase01-review_20260814.md = tmp\code-reviews\006-phase01-review_20260814.md
+		tmp\code-reviews\006-phase02-review_20260814.md = tmp\code-reviews\006-phase02-review_20260814.md
+		tmp\code-reviews\006-phase03-review_20260814.md = tmp\code-reviews\006-phase03-review_20260814.md
+		tmp\code-reviews\006-refactoring-plan.md = tmp\code-reviews\006-refactoring-plan.md
+		tmp\code-reviews\007-extracted_issues.md = tmp\code-reviews\007-extracted_issues.md
+		tmp\code-reviews\007-integrated-review-report_20260814.md = tmp\code-reviews\007-integrated-review-report_20260814.md
+		tmp\code-reviews\007-meta-index-active.json = tmp\code-reviews\007-meta-index-active.json
+		tmp\code-reviews\007-phase01-plan_20260814.md = tmp\code-reviews\007-phase01-plan_20260814.md
+		tmp\code-reviews\007-phase01-review_20260814.md = tmp\code-reviews\007-phase01-review_20260814.md
+		tmp\code-reviews\007-phase02-plan_20260814.md = tmp\code-reviews\007-phase02-plan_20260814.md
+		tmp\code-reviews\007-phase02-review_20260814.md = tmp\code-reviews\007-phase02-review_20260814.md
+		tmp\code-reviews\007-phase03-plan_20260814.md = tmp\code-reviews\007-phase03-plan_20260814.md
+		tmp\code-reviews\007-phase03-review_20260814.md = tmp\code-reviews\007-phase03-review_20260814.md
+		tmp\code-reviews\007-phase04-plan_20260814.md = tmp\code-reviews\007-phase04-plan_20260814.md
+		tmp\code-reviews\007-phase04-review_20260814.md = tmp\code-reviews\007-phase04-review_20260814.md
+		tmp\code-reviews\007-refactoring-plan.md = tmp\code-reviews\007-refactoring-plan.md
+		tmp\code-reviews\008-extracted_issues.md = tmp\code-reviews\008-extracted_issues.md
+		tmp\code-reviews\008-integrated-review-report_20260814.md = tmp\code-reviews\008-integrated-review-report_20260814.md
+		tmp\code-reviews\008-meta-index-active.json = tmp\code-reviews\008-meta-index-active.json
+		tmp\code-reviews\008-phase01-plan_20260814.md = tmp\code-reviews\008-phase01-plan_20260814.md
+		tmp\code-reviews\008-phase01-review_20260814.md = tmp\code-reviews\008-phase01-review_20260814.md
+		tmp\code-reviews\008-phase02-plan_20260814.md = tmp\code-reviews\008-phase02-plan_20260814.md
+		tmp\code-reviews\008-phase02-review_20260814.md = tmp\code-reviews\008-phase02-review_20260814.md
+		tmp\code-reviews\008-phase03-plan_20260814.md = tmp\code-reviews\008-phase03-plan_20260814.md
+		tmp\code-reviews\008-phase03-review_20260814.md = tmp\code-reviews\008-phase03-review_20260814.md
+		tmp\code-reviews\008-phase04-plan_20260814.md = tmp\code-reviews\008-phase04-plan_20260814.md
+		tmp\code-reviews\008-phase04-review_20260814.md = tmp\code-reviews\008-phase04-review_20260814.md
+		tmp\code-reviews\008-phase05-plan_20260814.md = tmp\code-reviews\008-phase05-plan_20260814.md
+		tmp\code-reviews\008-phase05-review_20260814.md = tmp\code-reviews\008-phase05-review_20260814.md
+		tmp\code-reviews\008-phase06-plan_20260814.md = tmp\code-reviews\008-phase06-plan_20260814.md
+		tmp\code-reviews\008-phase0607-review_20260814.md = tmp\code-reviews\008-phase0607-review_20260814.md
+		tmp\code-reviews\008-phase07-plan_20260814.md = tmp\code-reviews\008-phase07-plan_20260814.md
+		tmp\code-reviews\008-phase08-plan_20260814.md = tmp\code-reviews\008-phase08-plan_20260814.md
+		tmp\code-reviews\008-phase08-review_20260814.md = tmp\code-reviews\008-phase08-review_20260814.md
+		tmp\code-reviews\008-refactoring-plan.md = tmp\code-reviews\008-refactoring-plan.md
+		tmp\code-reviews\implementation_plan.md = tmp\code-reviews\implementation_plan.md
+		tmp\code-reviews\task.md = tmp\code-reviews\task.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -142,6 +299,11 @@ Global
 		{1FE5FA56-ADBE-4FDC-8F04-0461ECB4A695} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
 		{90CD41B6-94F4-48CE-A1A8-ABFAFF1B6079} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
 		{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE} = {CEA09484-30F6-4D44-02F6-822E06DBC57C}
+		{2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E} = {1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}
+		{3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F} = {1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}
+		{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D} = {4E12F6B8-A321-4190-84E3-8CD5D93B7D41}
+		{B2C3D4E5-F6A7-4B8C-9D0E-1F2A3B4C5D6E} = {4E12F6B8-A321-4190-84E3-8CD5D93B7D41}
+		{C3D4E5F6-A7B8-4C9D-0E1F-2A3B4C5D6E7F} = {F1E2D3C4-B5A6-4789-9012-3456789ABCDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A795FDA-EBB6-4A3E-9387-AEB372F1E670}
