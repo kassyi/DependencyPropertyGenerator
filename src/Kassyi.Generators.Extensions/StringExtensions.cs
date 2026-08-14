@@ -1,8 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Kassyi.Generators.Extensions;
 
 /// <summary>Provides string manipulation and normalization utilities for source generation.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("ReSharper", "UnusedMethod.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("Roslynator", "RCS1163:Unused parameter", Justification = "Library extension methods for Source Generators")]
 public static class StringExtensions
 {
     /// <summary>Converts the input string to PascalCase suitable for a C# property name.</summary>
@@ -183,6 +187,48 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         return $"global::{fullTypeName}";
+    }
+
+    /// <summary>Sanitizes a type name or string for use in Roslyn source generator hint names and file paths in a single pass without intermediate string allocations.</summary>
+    public static string SanitizeFileName(this string input)
+    {
+        input = input ?? throw new ArgumentNullException(nameof(input));
+
+        // Fast path: if there are no invalid characters (e.g. non-generic classes), return input with 0 allocations.
+        var hasInvalidChar = false;
+        foreach (var ch in input)
+        {
+            if (ch is '<' or '>' or ',' or ' ')
+            {
+                hasInvalidChar = true;
+                break;
+            }
+        }
+
+        if (!hasInvalidChar)
+        {
+            return input;
+        }
+
+        var sb = new System.Text.StringBuilder(input.Length);
+        foreach (var ch in input)
+        {
+            switch (ch)
+            {
+                case '<':
+                case '>':
+                case ',':
+                    sb.Append('_');
+                    break;
+                case ' ':
+                    break;
+                default:
+                    sb.Append(ch);
+                    break;
+            }
+        }
+
+        return sb.ToString();
     }
 }
 

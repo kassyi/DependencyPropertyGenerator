@@ -123,8 +123,8 @@ public static class PrepareData
     {
         classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
 
-        // [WHY] Use Roslyn symbol properties directly instead of string Substring parsing to prevent allocations and handle global namespace properly.
-        var fullClassName = classSymbol.ToDisplayString();
+        // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.
+        var fullClassName = classSymbol.ToDisplayString().SanitizeFileName();
         var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
@@ -175,15 +175,6 @@ public static class PrepareData
         }
 
         return null;
-    }
-
-    /// <summary>Resolves a type symbol from either a generic attribute argument or a named attribute argument.</summary>
-    public static ITypeSymbol? GetGenericTypeArgumentOrNamed(this AttributeData attribute, int position, string name)
-    {
-        attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
-
-        return attribute.GetGenericTypeArgument(position) ??
-               attribute.GetNamedArgument(name).Value as ITypeSymbol;
     }
 
     internal static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
