@@ -36,13 +36,16 @@ jobs:
       - name: Pack NuGet packages
         run: dotnet pack Kassyi.Generators.DependencyProperty.sln --configuration Release --no-build --output ./artifacts
 
-      - name: Publish NuGet package to NuGet.org (Trusted Publishing / API Key)
+      - name: NuGet Login (Trusted Publishing OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: kassyi
+
+      - name: Publish NuGet package to NuGet.org
         run: |
-          if [ -n "${{ secrets.NUGET_API_KEY }}" ]; then
-            dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          else
-            dotnet nuget push "./artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          fi
+          API_KEY="${{ steps.nuget-login.outputs.NUGET_API_KEY || secrets.NUGET_API_KEY }}"
+          dotnet nuget push "./artifacts/*.nupkg" --api-key "$API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create GitHub Release
         run: |
