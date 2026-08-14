@@ -14,7 +14,8 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 [TestClass]
 public class RealWorldStressTests
 {
-    private const string WpfUiRepoUrl = "https://github.com/lepoco/wpfui/archive/refs/heads/main.zip";
+    private const string WpfUiCommit = "ffebacd61058170cf63864b7d5aa730cffff848a";
+    private const string WpfUiRepoUrl = $"https://github.com/lepoco/wpfui/archive/{WpfUiCommit}.zip";
     
     [TestMethod]
     [TestCategory("Stress")]
@@ -115,15 +116,41 @@ public class RealWorldStressTests
         Assert.AreEqual(0, compilerErrors.Count, $"Unexpected compilation errors: {string.Join("; ", compilerErrors.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
     }
 
+    [TestMethod]
+    public void SanitizeFileName_Injective_NoCollisions()
+    {
+        var typeNames = new[]
+        {
+            "MyNamespace.MyClass",
+            "MyNamespace.MyClass<T>",
+            "MyNamespace.MyClass_lt_T_gt_",
+            "MyNamespace.MyClass<T1, T2>",
+            "MyNamespace.MyClass<T1_T2>",
+            "MyNamespace.MyClass<Dictionary<string, int>>",
+            "MyNamespace.MyClass<Dictionary<string_int>>"
+        };
+
+        var sanitizedSet = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var typeName in typeNames)
+        {
+            var sanitized = typeName.SanitizeFileName();
+            Assert.IsTrue(sanitizedSet.Add(sanitized), $"Collision detected for {typeName} -> {sanitized}");
+        }
+
+        // Fast path: non-generic string returns exact same reference
+        var nonGeneric = "RegularClass";
+        Assert.AreSame(nonGeneric, nonGeneric.SanitizeFileName());
+    }
+
     private static async Task<string> EnsureWpfUiRepositoryAsync()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "DependencyPropertyGenerator_StressTests");
-        var extractDir = Path.Combine(tempDir, "wpfui-main");
+        var extractDir = Path.Combine(tempDir, $"wpfui-{WpfUiCommit}");
         
         if (!Directory.Exists(extractDir))
         {
             Directory.CreateDirectory(tempDir);
-            var zipPath = Path.Combine(tempDir, "wpfui-main.zip");
+            var zipPath = Path.Combine(tempDir, $"wpfui-{WpfUiCommit}.zip");
             
             using var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(WpfUiRepoUrl);
