@@ -1,76 +1,94 @@
-# 04. インクリメンタル・ジェネレーターの数理モデル (Mathematical Model)
+# 04. インクリメンタル・ジェネレーターの計算量モデル (Complexity Model)
 
-Roslyn Incremental Source Generator の振る舞いとパフォーマンス最適化の理論的背景は、**集合論と純粋関数**を用いた数式モデルとしてエレガントに表現できます。
-ジェネレーターのパフォーマンス低下（キャッシュミス）がなぜ起こるのかを論理的に理解するためのモデルです。
+[English](../en/04_mathematical_model.md) | [日本語](./04_mathematical_model.md) | [目次 (Intro)](./intro.md)
 
-## Ⅰ. パイプラインの関数モデル
+Roslyn Incremental Source Generator のパフォーマンスを維持するためには、開発者は「どの操作がどれだけの計算量（アロケーションコストと処理時間）を発生させるか」を理解しておく必要があります。
 
-ジェネレーターの処理全体は、状態を持たない（ステートレスな）純粋関数の合成として定義されます。
+ここでは、本プロジェクトのジェネレーターアーキテクチャに基づく**最悪計算量（Worst-Case Complexity）**と、それを回避するための設計意図を解説します。
 
-### 1. フィルタリング関数 $F$ (SyntaxProvider)
-コンパイル対象のすべての構文ツリーの集合を $S$、特定の属性（例: `[DependencyProperty]`）を $A$ とします。
-フィルタリング関数 $F$ は、条件を満たす構文の集合 $S_{filtered}$ を抽出します。
+## Ⅰ. 計算量の基本モデル
 
-$$ S_{filtered} = \{ s \in S \mid \text{HasAttribute}(s, A) \} $$
+ジェネレーターの処理は、大きく分けて2つのフェーズからなります。
 
-### 2. 抽出関数 $E$ (PrepareData)
-Roslynのセマンティックモデル（コンパイラの状態）を $C$ とします。
-抽出関数 $E$ は、構文 $s$ とコンパイラ状態 $C$ から、**完全に状態から切り離された純粋なデータモデル（DTO）の集合 $D$** を射影（プロジェクション）します。
+1. **`PrepareData` (データ抽出フェーズ)**: 属性やクラス構造からデータを抽出する
+2. **`SourceWriter` (ソース生成フェーズ)**: 抽出したデータからC#コードを文字列として生成する
 
-$$ D = \{ E(s, C) \mid s \in S_{filtered} \} $$
+コンパイル対象のソースファイル数を $S$、各ファイルに含まれる対象プロパティ（属性）の平均数を $P$、属性に指定されている NamedArguments (名前付き引数) の最大数を $N$ とします。
 
-この $D$ こそが `ClassData` や `DependencyPropertyData` (readonly record struct) であり、後続のキャッシュ戦略の要となります。
+### 1. `PrepareData` の計算量
+属性の解析において、指定された `NamedArguments` を一つずつ走査して設定値を読み取ります。
+例えば、[`PrepareData.cs`](../../src/Kassyi.Generators.DependencyProperty/PrepareData.cs) の `GetNamedArgumentExpression` メソッドでは、LINQによるアロケーションを避けるため以下のように意図的な `foreach` ループを使用しています。
 
-### 3. 生成関数 $G$ (GetSourceCode)
-純粋なデータモデル $d \in D$ を受け取り、最終的なC#ソースコード文字列 $Code$ を出力します。
+```csharp
+// [WHY] Avoid LINQ FirstOrDefault(predicate) to eliminate delegate allocations during syntax tree analysis.
+foreach (var argument in attributeSyntax.ArgumentList.Arguments)
+{
+    var nameEquals = argument.NameEquals?.ToFullString().Trim('=', ' ', '\t', '\r', '\n');
+    if (nameEquals == name)
+    {
+        return argument.Expression.ToFullString();
+    }
+}
+```
 
-$$ Code = G(d) $$
+引数の数 $N$ に対して、設定項目（$M$ 個）ごとにこのループ処理が発生するため、時間計算量は $O(M \times N)$、定数項を無視して **$O(N)$** となります。
+本プロジェクトでは、抽出結果を `readonly record struct` と `EquatableArray<T>` という**完全な値型DTO**に詰め込みます。これにより、このフェーズでのメモリ割り当て（アロケーションコスト）を最小限に抑えています。
 
----
-
-## Ⅱ. 等価性（キャッシュ）と計算量のモデル
-
-Incremental Generatorの最大の強みは、時間 $t$ におけるコンパイルと、一つ前の時間 $t-1$ におけるコンパイルの差分のみを評価（$G$ を実行）することです。
-
-### キャッシュ判定式
-時間 $t$ におけるデータモデルの集合を $D_t$ とします。
-Roslyn基盤は、前回の状態 $D_{t-1}$ と比較を行い、**同値関係 $\equiv$ （すなわち `IEquatable<T>.Equals`）** を用いて差分集合 $\Delta D$ を計算します。
-
-$$ \Delta D = D_t \setminus (D_t \cap D_{t-1}) $$
-
-ソースコードの生成処理 $G$ は、この差分集合 $\Delta D$ に対してのみ実行されます。
-
-$$ Output_t = \{ G(d) \mid d \in \Delta D \} \cup CachedOutput_{t-1} $$
-
-**もし $D_t \equiv D_{t-1}$ であれば、$\Delta D = \emptyset$ となり、生成フェーズの計算コストはゼロになります。**
+### 2. `SourceWriter` の計算量
+生成されるソースコードの行数（または文字数）を $K$ とします。
+文字列の連結処理ですが、`SourceWriter` (内部的に `StringBuilder` をラップ) を用いており、メモリの再確保を抑えつつ線形に書き出すため、時間計算量は **$O(K)$** となります。
+また、`using var _ = writer.ClassScope(@class);` などのゼロアロケーションスコープを活用しているため、ガベージコレクション(GC)への負荷も $O(1)$（ほぼゼロ）に抑えられています。
 
 ---
 
-## Ⅲ. パフォーマンス最適化の数学的証明
+## Ⅱ. incremental cache による最適化と「最悪計算量」
 
-ジェネレーターの合計実行時間 $T_{total}$ は、以下のようにモデル化できます。
+Incremental Generator は、過去のコンパイル結果をキャッシュし、変更があった部分のみを再計算します。
+[`GeneratorHelper.cs`](../../src/Kassyi.Generators.DependencyProperty/Generators/GeneratorHelper.cs) の `RegisterAttributeGenerator` において、パイプラインは以下のように構築されています。
 
-$$ T_{total} = T_{filter} + T_{extract} + T_{compare} + (1 - H) \cdot T_{generate} $$
+```csharp
+combinedProvider
+    .Combine(framework)
+    .Combine(version)
+    .SelectAndReportExceptions(prepareData, context, id) // O(N)
+    .WhereNotNull()
+    .SelectAndReportExceptions(getSourceCode, context, id) // O(K)
+    .AddSource(context);
+```
 
-- $T_{filter}$: 構文抽出にかかる時間（Roslyn側で最適化済み）
-- $T_{extract}$: `PrepareData` の実行時間
-- $T_{compare}$: $D_t$ と $D_{t-1}$ の比較（`Equals`）にかかる時間
-- $H$: **キャッシュヒット率** ($0 \le H \le 1$)
-- $T_{generate}$: `GetSourceCode` の実行と文字列結合にかかる時間
+キャッシュヒット率を $H$ ($0 \le H \le 1$) とすると、このパイプラインを流れる実際の全体計算量 $T$ は以下のように近似できます。
 
-### アンチパターン：DTOに `ISymbol` を含めてはいけない理由
-もし $D$ （DTO）の中に `ISymbol` や `SyntaxNode` などのRoslynオブジェクトを含めてしまうと何が起きるでしょうか。
+$$ T \approx (1 - H) \times O(S \times P \times (N + K)) $$
 
-タイピングなどによりコンパイルが発生するたび、Roslynは新しい $C$（コンパイル状態）を生成し、すべての `ISymbol` インスタンスは再生成されます。
-つまり、論理的な意味が同じであっても、メモリ上の参照が変わるため、常に $D_t \not\equiv D_{t-1}$ と判定されます。
+理想的な状態（タイピングによる局所的な変更のみ）では、ほぼすべてのファイルで $H \approx 1$ となり、$T \approx 0$ となります。
 
-数式で表すと、**常に差分集合 $\Delta D = D_t$** となり、**キャッシュヒット率 $H = 0$** となります。
+### 最悪ケース (Worst-Case Scenario)
 
-$$ T_{total} \approx T_{filter} + T_{extract} + T_{compare} + 1.0 \cdot T_{generate} $$
+開発者が直面しうる「最も重い（最悪の）操作」とは何でしょうか？
+それは、**キャッシュヒット率 $H = 0$ になるような広範囲な変更**が行われた場合です。
 
-これにより、キーストロークのたびに全プロパティのコード再生成 $T_{generate}$ が走り、IDEがフリーズする（パフォーマンスが著しく低下する）原因となります。
+**シナリオ:**
+ある共通クラス（Baseクラスなど）で定義されている `[DependencyProperty]` の名前や型、あるいは属性のパラメータ（例: `DefaultValue`）を書き換えたとします。
 
-### 最適解：純粋な値ベースの等価性
-$D$ を `readonly record struct` と `EquatableArray<T>` などの「純粋な値の集合」に射影（プロジェクション）することで、タイピングによる影響を受けていない無関係なプロパティの $D$ においては $D_t \equiv D_{t-1}$ を保証できます。
+このとき何が起きるか：
+1. そのクラスに依存している、あるいはファイル全体に影響が及ぶとRoslynが判断します。
+2. すべての対象ファイル $S$ においてキャッシュが無効化（$H = 0$）されます。
+3. 全てのプロパティ $S \times P$ に対して、再度 $O(N)$ の解析と $O(K)$ のソース生成が走ります。
 
-これにより、関係ない部分のコードにおいては $H \approx 1$ （ほぼ100%キャッシュヒット）となり、$T_{generate}$ の項が消滅し、最速のレスポンスを実現できるのです。
+**最悪計算量:** **$O(S \times P \times (N + K))$**
+
+大規模なソリューション（$S$ が数千）において、この最悪ケースが発生すると、IDEが数秒間フリーズする可能性があります。
+
+---
+
+## Ⅲ. パフォーマンス低下を防ぐためのアーキテクチャ上の工夫
+
+この最悪計算量がタイピング（1文字の変更）のたびに発生するのを防ぐため、本ジェネレーターは以下の厳格なルールで設計されています。
+
+1. **DTOへの `ISymbol` や `SyntaxNode` の混入禁止**
+   - Roslynの参照オブジェクトをデータモデルに含めると、1キーストロークごとにインスタンスが変わり、`Equals` が `false` になります。
+   - つまり、関係のないファイルのキャッシュまで無効化され、常に最悪計算量 $O(S \times P)$ が発生する「IDEフリーズ現象」を引き起こします。
+2. **`IEquatable` の完全な実装 (`EquatableArray<T>`)**
+   - リストデータも値ベースの比較を行うことで、「意味的に同じならキャッシュを使う」ことを保証し、$H \approx 1$ を維持しています。
+3. **`SourceWriter` によるアロケーションフリーなコード生成**
+   - 仮に最悪ケース（全ファイル再生成）が発生した場合でも、`StringBuilder` プーリングと `ref struct` (ClassScope等) を駆使することで、GCスパイクによる二次的なパフォーマンス低下（フリーズの延長）を防ぎます。
