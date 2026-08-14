@@ -1,12 +1,5 @@
 #nullable enable
 
-using System.IO.Compression;
-using Kassyi.Generators.DependencyProperty.Generators;
-using Kassyi.Generators.Tests.Extensions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
@@ -14,106 +7,72 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 [TestClass]
 public class RealWorldStressTests
 {
-    private const string WpfUiCommit = "ffebacd61058170cf63864b7d5aa730cffff848a";
-    private const string WpfUiRepoUrl = $"https://github.com/lepoco/wpfui/archive/{WpfUiCommit}.zip";
-    
-    [TestMethod]
-    [TestCategory("Stress")]
-    public async Task WpfUi_StressTest_NoDiagnostics()
+    public static IEnumerable<object[]> GetStressTestTargets()
     {
-        var srcDir = await EnsureWpfUiRepositoryAsync();
-
-        var csFiles = Directory.GetFiles(srcDir, "*.cs", SearchOption.AllDirectories);
-        Assert.IsTrue(csFiles.Length > 0, "No C# source files found.");
-
-        var syntaxTrees = new List<SyntaxTree>(csFiles.Length + 1);
-        var parseOptions = new CSharpParseOptions(LanguageVersion.Preview);
-        var rewriter = new InjectAttributesRewriter();
-        var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Kassyi.Generators.DependencyProperty"))
-            .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
-
-        foreach (var file in csFiles)
+        var targets = new List<StressTestTarget>
         {
-            var sourceText = await File.ReadAllTextAsync(file);
-            var tree = CSharpSyntaxTree.ParseText(sourceText, parseOptions, path: file);
-            var root = tree.GetRoot();
-
-            var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>().ToList();
-            if (classes.Count > 0)
-            {
-                root = rewriter.Visit(root);
-                var compilationUnit = ((CompilationUnitSyntax)root).AddUsings(usingDirective);
-                tree = tree.WithRootAndOptions(compilationUnit, tree.Options);
-            }
-
-            syntaxTrees.Add(tree);
-        }
-        
-        Assert.IsTrue(rewriter.InjectedClassCount > 0, "Could not inject any test properties. No partial classes found.");
-
-        // Add a clean dummy class to guarantee verification of generator behavior
-        var dummyTestClassSyntax = CSharpSyntaxTree.ParseText("""
-            namespace StressTestDummy
-            {
-                [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty", typeof(int))]
-                [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached", typeof(string), BrowsableForType = typeof(global::System.Windows.DependencyObject))]
-                [global::Kassyi.Generators.DependencyProperty.RoutedEvent("StressTestEvent", global::Kassyi.Generators.DependencyProperty.RoutedEventStrategy.Bubble, Type = typeof(global::System.Windows.RoutedEventHandler))]
-                public partial class DummyControl : global::System.Windows.DependencyObject
-                {
-                }
-            }
-            """, parseOptions, path: "DummyControl.cs");
-        syntaxTrees.Add(dummyTestClassSyntax);
-
-        var references = await ReferenceAssemblies.NetFramework.Net48.Wpf.ResolveAsync(null, CancellationToken.None);
-        var refList = references.ToList();
-        
-        var compilation = CSharpCompilation.Create(
-            assemblyName: "WpfUi_StressTest",
-            syntaxTrees: syntaxTrees,
-            references: refList,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-        var generators = new IIncrementalGenerator[]
-        {
-            new DependencyPropertyGenerator(),
-            new AttachedDependencyPropertyGenerator(),
-            new RoutedEventGenerator(),
-            new StaticConstructorGenerator()
+            // 1. Wpf.Ui
+            new("WpfUi", "https://github.com/lepoco/wpfui/archive/ffebacd61058170cf63864b7d5aa730cffff848a.zip", "wpfui-ffebacd61058170cf63864b7d5aa730cffff848a", "src/Wpf.Ui", PlatformType.Wpf),
+            // 2. MaterialDesignInXamlToolkit
+            new("MaterialDesign", "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/archive/refs/heads/master.zip", "MaterialDesignInXamlToolkit-master", "src/MaterialDesignThemes.Wpf", PlatformType.Wpf),
+            // 3. MahApps.Metro
+            new("MahApps.Metro", "https://github.com/MahApps/MahApps.Metro/archive/refs/heads/main.zip", "MahApps.Metro-main", "src/MahApps.Metro", PlatformType.Wpf),
+            // 4. HandyControl
+            new("HandyControl", "https://github.com/HandyOrg/HandyControl/archive/refs/heads/master.zip", "HandyControl-master", "src/Shared", PlatformType.Wpf),
+            // 5. ControlzEx
+            new("ControlzEx", "https://github.com/ControlzEx/ControlzEx/archive/refs/heads/develop.zip", "ControlzEx-develop", "src/ControlzEx", PlatformType.Wpf),
+            // 6. Fluent.Ribbon
+            new("Fluent.Ribbon", "https://github.com/fluentribbon/Fluent.Ribbon/archive/refs/heads/master.zip", "Fluent.Ribbon-master", "Fluent.Ribbon", PlatformType.Wpf),
+            // 7. ModernWpf
+            new("ModernWpf", "https://github.com/Kinnara/ModernWpf/archive/refs/heads/master.zip", "ModernWpf-master", "ModernWpf/Controls", PlatformType.Wpf),
+            // 8. Dragablz
+            new("Dragablz", "https://github.com/ButchersBoy/Dragablz/archive/refs/heads/master.zip", "Dragablz-master", "Dragablz", PlatformType.Wpf),
+            // 9. GongSolutions.WPF.DragDrop
+            new("GongDragDrop", "https://github.com/punker76/gong-wpf-dragdrop/archive/refs/heads/dev.zip", "gong-wpf-dragdrop-dev", "src/GongSolutions.WPF.DragDrop", PlatformType.Wpf),
+            // 10. Nodify
+            new("Nodify", "https://github.com/miroiu/nodify/archive/refs/heads/master.zip", "nodify-master", "Nodify", PlatformType.Wpf),
+            // 11. Panuon.WPF.UI
+            new("Panuon.WPF.UI", "https://github.com/Panuon/Panuon.WPF.UI/archive/refs/heads/master.zip", "Panuon.WPF.UI-master", "Panuon.WPF.UI", PlatformType.Wpf),
+            // 12. LiveCharts2
+            new("LiveCharts2", "https://github.com/beto-rodriguez/LiveCharts2/archive/refs/heads/master.zip", "LiveCharts2-master", "src", PlatformType.Wpf),
+            // 13. OxyPlot
+            new("OxyPlot", "https://github.com/oxyplot/oxyplot/archive/refs/heads/master.zip", "oxyplot-master", "Source", PlatformType.Wpf),
+            // 14. Avalonia
+            new("Avalonia", "https://github.com/AvaloniaUI/Avalonia/archive/refs/heads/master.zip", "Avalonia-master", "src", PlatformType.Avalonia),
+            // 15. AvaloniaEdit
+            new("AvaloniaEdit", "https://github.com/AvaloniaUI/AvaloniaEdit/archive/refs/heads/master.zip", "AvaloniaEdit-master", "src", PlatformType.Avalonia),
+            // 16. microsoft-ui-xaml (WinUI)
+            new("WinUI", "https://github.com/microsoft/microsoft-ui-xaml/archive/refs/heads/main.zip", "microsoft-ui-xaml-main", "dev", PlatformType.WinUI),
+            // 17. WindowsCommunityToolkit (WinUI/UWP)
+            new("WindowsCommunityToolkit", "https://github.com/CommunityToolkit/WindowsCommunityToolkit/archive/refs/heads/main.zip", "WindowsCommunityToolkit-main", "components", PlatformType.WinUI),
+            // 18. dotnet/maui
+            new("MAUI", "https://github.com/dotnet/maui/archive/refs/heads/main.zip", "maui-main", "src/Controls", PlatformType.Maui),
+            // 19. CommunityToolkit.Maui
+            new("MauiCommunityToolkit", "https://github.com/CommunityToolkit/Maui/archive/refs/heads/main.zip", "Maui-main", "src", PlatformType.Maui),
+            // 20. Uno
+            new("Uno", "https://github.com/unoplatform/uno/archive/refs/heads/master.zip", "uno-master", "src/Uno.UI", PlatformType.Uno)
         };
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: generators.Select(GeneratorExtensions.AsSourceGenerator).ToArray(),
-            parseOptions: new CSharpParseOptions(LanguageVersion.Preview)
-        );
+        bool isCi = Environment.GetEnvironmentVariable("CI") == "true" || Environment.GetEnvironmentVariable("CI") == "1";
         
-        driver = driver.WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(
-            new Dictionary<string, string>
-            {
-                { "build_property.UseWPF", "true" },
-                { "build_property.RecognizeFramework_Version", "0.0.0.0" }
-            }));
+        // CI環境では実行時間とレートリミットを考慮して上位3つ(WpfUi, MaterialDesign, MahApps)のみに絞る
+        if (isCi)
+        {
+            targets = targets.Take(3).ToList();
+        }
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+        foreach (var target in targets)
+        {
+            yield return new object[] { target };
+        }
+    }
 
-        var runResult = driver.GetRunResult();
-        var generatorDiagnostics = diagnostics.Where(static d => d.Id.StartsWith("DPG", StringComparison.Ordinal) || d.Id.StartsWith("AD", StringComparison.Ordinal)).ToList();
-        var compilerErrors = diagnostics.Where(static d => d.Severity == DiagnosticSeverity.Error).ToList();
-        var driverDiagnostics = runResult.Diagnostics.ToList();
-
-        // 1. Verify that attributes were successfully injected into hundreds of classes
-        Assert.AreEqual(177, rewriter.InjectedClassCount, $"Expected exactly 177 injected classes, but got {rewriter.InjectedClassCount}.");
-
-        // 2. Verify that generators produced hundreds of source files across all targets
-        Assert.AreEqual(541, runResult.GeneratedTrees.Length, $"Expected exactly 541 generated source files, but got {runResult.GeneratedTrees.Length}.");
-
-        // 3. Verify that all generated source files contain non-empty code
-        Assert.IsTrue(runResult.GeneratedTrees.All(static tree => !string.IsNullOrWhiteSpace(tree.ToString())), "One or more generated source files were unexpectedly empty.");
-
-        // 4. Assert that no internal generator crashes, compiler errors, or driver diagnostics occurred
-        Assert.AreEqual(0, driverDiagnostics.Count, $"Generator driver emitted unexpected diagnostics: {string.Join("; ", driverDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
-        Assert.AreEqual(0, generatorDiagnostics.Count, $"Generator emitted unexpected diagnostics: {string.Join("; ", generatorDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
-        Assert.AreEqual(0, compilerErrors.Count, $"Unexpected compilation errors: {string.Join("; ", compilerErrors.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
+    [DataTestMethod]
+    [DynamicData(nameof(GetStressTestTargets), DynamicDataSourceType.Method)]
+    [TestCategory("Stress")]
+    public async Task RunStressTest(StressTestTarget target)
+    {
+        await StressTestRunner.RunAsync(target);
     }
 
     [TestMethod]
@@ -140,105 +99,5 @@ public class RealWorldStressTests
         // Fast path: non-generic string returns exact same reference
         var nonGeneric = "RegularClass";
         Assert.AreSame(nonGeneric, nonGeneric.SanitizeFileName());
-    }
-
-    private static async Task<string> EnsureWpfUiRepositoryAsync()
-    {
-        var tempDir = Path.Combine(Path.GetTempPath(), "DependencyPropertyGenerator_StressTests");
-        var extractDir = Path.Combine(tempDir, $"wpfui-{WpfUiCommit}");
-        
-        if (!Directory.Exists(extractDir))
-        {
-            Directory.CreateDirectory(tempDir);
-            var zipPath = Path.Combine(tempDir, $"wpfui-{WpfUiCommit}.zip");
-            
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(WpfUiRepoUrl);
-            response.EnsureSuccessStatusCode();
-            
-            await using var fs = new FileStream(zipPath, FileMode.Create);
-            await response.Content.CopyToAsync(fs);
-            fs.Close();
-            
-            ZipFile.ExtractToDirectory(zipPath, tempDir, overwriteFiles: true);
-        }
-
-        var srcDir = Path.Combine(extractDir, "src", "Wpf.Ui");
-        Assert.IsTrue(Directory.Exists(srcDir), $"Source directory not found at {srcDir}");
-        return srcDir;
-    }
-
-    private sealed class InjectAttributesRewriter : CSharpSyntaxRewriter
-    {
-        private static readonly AttributeListSyntax[] s_injectedAttributes = SyntaxFactory.ParseCompilationUnit("""
-            [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty", typeof(int))]
-            [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached", typeof(string), BrowsableForType = typeof(global::System.Windows.DependencyObject))]
-            [global::Kassyi.Generators.DependencyProperty.RoutedEvent("StressTestEvent", global::Kassyi.Generators.DependencyProperty.RoutedEventStrategy.Bubble, Type = typeof(global::System.Windows.RoutedEventHandler))]
-            class Dummy {}
-            """)
-            .DescendantNodes().OfType<ClassDeclarationSyntax>().First().AttributeLists.ToArray();
-
-        private readonly HashSet<string> _injectedClasses = new(StringComparer.Ordinal);
-
-        public int InjectedClassCount => _injectedClasses.Count;
-
-        public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            var qualifiedClassName = GetQualifiedClassName(node);
-            if (!_injectedClasses.Add(qualifiedClassName))
-            {
-                // Already injected attributes into a partial declaration of this qualified class.
-                return base.VisitClassDeclaration(node);
-            }
-
-            var newNode = node.AddAttributeLists(s_injectedAttributes);
-            if (!newNode.Modifiers.Any(SyntaxKind.PartialKeyword))
-            {
-                newNode = newNode.AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
-            }
-            
-            return base.VisitClassDeclaration(newNode);
-        }
-
-        private static string GetQualifiedClassName(ClassDeclarationSyntax node)
-        {
-            var sb = new System.Text.StringBuilder();
-
-            var namespaces = node.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Reverse();
-            foreach (var ns in namespaces)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append('.');
-                }
-                sb.Append(ns.Name);
-            }
-
-            var enclosingClasses = node.Ancestors().OfType<ClassDeclarationSyntax>().Reverse();
-            foreach (var parent in enclosingClasses)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append('.');
-                }
-                sb.Append(parent.Identifier.Text);
-                if (parent.TypeParameterList != null)
-                {
-                    sb.Append(parent.TypeParameterList);
-                }
-            }
-
-            if (sb.Length > 0)
-            {
-                sb.Append('.');
-            }
-            sb.Append(node.Identifier.Text);
-            if (node.TypeParameterList != null)
-            {
-                sb.Append(node.TypeParameterList);
-            }
-
-            return sb.ToString();
-        }
     }
 }
