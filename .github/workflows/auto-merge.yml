@@ -21,12 +21,6 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           
-      - name: Show sender
-        run: echo ${{ github.event.pull_request.sender }}
-          
-      - name: Show triggering_actor
-        run: echo ${{ github.triggering_actor }}
-          
       - name: Approve a PR
         run: gh pr review --approve "$PR_URL"
         env:
