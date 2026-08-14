@@ -134,14 +134,14 @@ public partial class Generatable : Control
 {
 }
 
-[DependencyProperty<Uri>("AquariumGraphic", AffectsRender = true,
-    DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/aquarium-graphic.jpg\")")]
+[DependencyProperty<string>("AquariumGraphic", AffectsRender = true,
+    DefaultValue = "http://www.contoso.com/aquarium-graphic.jpg")]
 public partial class Aquarium : Control
 {
 }
 
-[OverrideMetadata<Uri>("AquariumGraphic",
-    DefaultValueExpression = "new System.Uri(\"http://www.contoso.com/tropical-aquarium-graphic.jpg\")")]
+[OverrideMetadata<string>("AquariumGraphic",
+    DefaultValue = "http://www.contoso.com/tropical-aquarium-graphic.jpg")]
 public partial class TropicalAquarium : Aquarium
 {
 }
