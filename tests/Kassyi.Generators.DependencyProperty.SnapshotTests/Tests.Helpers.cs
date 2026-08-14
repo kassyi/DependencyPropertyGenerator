@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Tests.Extensions;
@@ -29,8 +30,8 @@ public abstract class SnapshotTestBase : VerifyBase
             Environment.NewLine,
             values.Select(value => value switch
             {
-                "" or null => $"using {prefix};",
-                _ when value.StartsWith("System", StringComparison.Ordinal) => $"using {value};",
+                { Length: 0 } or null => $"using {prefix};",
+                ['S', 'y', 's', 't', 'e', 'm', ..] => $"using {value};",
                 _ => $"using {prefix}.{value};"
             }));
 
@@ -55,26 +56,15 @@ public abstract class SnapshotTestBase : VerifyBase
             ["build_property.RecognizeFramework_Version"] = "0.0.0.0"
         };
 
-        if (framework switch
+        switch (framework)
         {
-            Framework.Wpf => "build_property.UseWPF",
-            Framework.WinUi => "build_property.UseWinUI",
-            Framework.Maui => "build_property.UseMaui",
-            _ => null
-        } is { } useProp)
-        {
-            options[useProp] = "true";
-        }
-        else if (framework switch
-        {
-            Framework.Uwp => "WINDOWS_UWP",
-            Framework.Uno => "HAS_UNO",
-            Framework.UnoWinUi => "HAS_UNO;HAS_WINUI",
-            Framework.Avalonia => "HAS_AVALONIA",
-            _ => null
-        } is { } defines)
-        {
-            options["build_property.RecognizeFramework_DefineConstants"] = defines;
+            case Framework.Wpf: options["build_property.UseWPF"] = "true"; break;
+            case Framework.WinUi: options["build_property.UseWinUI"] = "true"; break;
+            case Framework.Maui: options["build_property.UseMaui"] = "true"; break;
+            case Framework.Uwp: options["build_property.RecognizeFramework_DefineConstants"] = "WINDOWS_UWP"; break;
+            case Framework.Uno: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_UNO"; break;
+            case Framework.UnoWinUi: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_UNO;HAS_WINUI"; break;
+            case Framework.Avalonia: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_AVALONIA"; break;
         }
 
         return options;
@@ -178,11 +168,19 @@ public abstract class SnapshotTestBase : VerifyBase
         where T : IIncrementalGenerator, new()
     {
         var (compilation, driver) = await CreateCompilationAndDriverAsync<T>(source, framework, cancellationToken, additionalGenerators);
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out _, cancellationToken);
-        var diagnostics = compilation.GetDiagnostics(cancellationToken);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out var generatorDiagnostics, cancellationToken);
+        var diagnostics = compilation.GetDiagnostics(cancellationToken).Concat(generatorDiagnostics);
+        var diagnosticsArray = ImmutableArray.CreateRange(diagnostics);
+
+        var generatedSources = driver.GetRunResult().Results
+            .SelectMany(static result => result.GeneratedSources)
+            .Select(static generatedSource => generatedSource.SourceText.ToString())
+            .ToArray();
+
+        E2EAssertionPipeline.Verify(source, generatedSources, framework, compilation, diagnosticsArray, callerName ?? string.Empty);
 
         await Task.WhenAll(
-            Verify(diagnostics.ToSnapshotModels())
+            Verify(diagnosticsArray.ToSnapshotModels())
                 .UseDirectory($"Snapshots/{callerName}/{framework:G}")
                 .UseTypeName("Tests")
                 .UseTextForParameters("Diagnostics"),
@@ -225,15 +223,15 @@ internal static class DiagnosticExtensions
             .ThenBy(static x => x.Id)];
     }
 
-    private static string? GetLocation(Location location) => location switch
+    private static string? GetLocation(Location location) => location.GetLineSpan() switch
     {
-        { IsInSource: true } when location.GetLineSpan().Path is { Length: > 0 } path => path.Replace('/', '\\'),
+        { Path: { Length: > 0 } path } when location.IsInSource => path.Replace('/', '\\'),
         _ => null
     };
 
-    private static string? GetSpan(Location location) => location switch
+    private static string? GetSpan(Location location) => location.GetLineSpan() switch
     {
-        { IsInSource: true } when location.GetLineSpan() is var span =>
+        var span when location.IsInSource =>
             $"({span.StartLinePosition.Line + 1},{span.StartLinePosition.Character + 1})-({span.EndLinePosition.Line + 1},{span.EndLinePosition.Character + 1})",
         _ => null
     };
