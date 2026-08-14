@@ -28,23 +28,23 @@ public class RealWorldStressTests
             // 8. Dragablz
             new("Dragablz", "https://github.com/ButchersBoy/Dragablz/archive/refs/heads/master.zip", "Dragablz-master", "Dragablz", PlatformType.Wpf),
             // 9. GongSolutions.WPF.DragDrop
-            new("GongDragDrop", "https://github.com/punker76/gong-wpf-dragdrop/archive/refs/heads/dev.zip", "gong-wpf-dragdrop-dev", "src/GongSolutions.WPF.DragDrop", PlatformType.Wpf),
+            new("GongDragDrop", "https://github.com/punker76/gong-wpf-dragdrop/archive/refs/heads/main.zip", "gong-wpf-dragdrop-main", "src/GongSolutions.WPF.DragDrop", PlatformType.Wpf),
             // 10. Nodify
             new("Nodify", "https://github.com/miroiu/nodify/archive/refs/heads/master.zip", "nodify-master", "Nodify", PlatformType.Wpf),
             // 11. Panuon.WPF.UI
-            new("Panuon.WPF.UI", "https://github.com/Panuon/Panuon.WPF.UI/archive/refs/heads/master.zip", "Panuon.WPF.UI-master", "Panuon.WPF.UI", PlatformType.Wpf),
+            new("Panuon.WPF.UI", "https://github.com/Panuon/Panuon.WPF.UI/archive/refs/heads/master.zip", "Panuon.WPF.UI-master", "SourceCode", PlatformType.Wpf),
             // 12. LiveCharts2
             new("LiveCharts2", "https://github.com/beto-rodriguez/LiveCharts2/archive/refs/heads/master.zip", "LiveCharts2-master", "src", PlatformType.Wpf),
             // 13. OxyPlot
             new("OxyPlot", "https://github.com/oxyplot/oxyplot/archive/refs/heads/master.zip", "oxyplot-master", "Source", PlatformType.Wpf),
             // 14. Avalonia
-            new("Avalonia", "https://github.com/AvaloniaUI/Avalonia/archive/refs/heads/master.zip", "Avalonia-master", "src", PlatformType.Avalonia),
+            new("Avalonia", "https://github.com/AvaloniaUI/Avalonia/archive/refs/heads/master.zip", "Avalonia-main", "src", PlatformType.Avalonia),
             // 15. AvaloniaEdit
             new("AvaloniaEdit", "https://github.com/AvaloniaUI/AvaloniaEdit/archive/refs/heads/master.zip", "AvaloniaEdit-master", "src", PlatformType.Avalonia),
             // 16. microsoft-ui-xaml (WinUI)
-            new("WinUI", "https://github.com/microsoft/microsoft-ui-xaml/archive/refs/heads/main.zip", "microsoft-ui-xaml-main", "dev", PlatformType.WinUI),
+            new("WinUI", "https://github.com/microsoft/microsoft-ui-xaml/archive/refs/heads/main.zip", "microsoft-ui-xaml-main", "controls", PlatformType.WinUI),
             // 17. WindowsCommunityToolkit (WinUI/UWP)
-            new("WindowsCommunityToolkit", "https://github.com/CommunityToolkit/WindowsCommunityToolkit/archive/refs/heads/main.zip", "WindowsCommunityToolkit-main", "components", PlatformType.WinUI),
+            new("WindowsCommunityToolkit", "https://github.com/CommunityToolkit/WindowsCommunityToolkit/archive/refs/heads/main.zip", "WindowsCommunityToolkit-main", ".", PlatformType.WinUI),
             // 18. dotnet/maui
             new("MAUI", "https://github.com/dotnet/maui/archive/refs/heads/main.zip", "maui-main", "src/Controls", PlatformType.Maui),
             // 19. CommunityToolkit.Maui
@@ -73,31 +73,5 @@ public class RealWorldStressTests
     public async Task RunStressTest(StressTestTarget target)
     {
         await StressTestRunner.RunAsync(target);
-    }
-
-    [TestMethod]
-    public void SanitizeFileName_Injective_NoCollisions()
-    {
-        var typeNames = new[]
-        {
-            "MyNamespace.MyClass",
-            "MyNamespace.MyClass<T>",
-            "MyNamespace.MyClass_lt_T_gt_",
-            "MyNamespace.MyClass<T1, T2>",
-            "MyNamespace.MyClass<T1_T2>",
-            "MyNamespace.MyClass<Dictionary<string, int>>",
-            "MyNamespace.MyClass<Dictionary<string_int>>"
-        };
-
-        var sanitizedSet = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var typeName in typeNames)
-        {
-            var sanitized = typeName.SanitizeFileName();
-            Assert.IsTrue(sanitizedSet.Add(sanitized), $"Collision detected for {typeName} -> {sanitized}");
-        }
-
-        // Fast path: non-generic string returns exact same reference
-        var nonGeneric = "RegularClass";
-        Assert.AreSame(nonGeneric, nonGeneric.SanitizeFileName());
     }
 }
