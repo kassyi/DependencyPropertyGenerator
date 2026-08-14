@@ -32,7 +32,7 @@ public static class StringExtensions
             null => throw new ArgumentNullException(nameof(input)),
             "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
             
-            // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
+            // [WHY] Reference for C# keywords that require '@' prefix: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
             "abstract" => "@abstract",
             "as" => "@as",
             "base" => "@base",

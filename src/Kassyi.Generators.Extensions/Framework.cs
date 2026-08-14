@@ -3,7 +3,7 @@ namespace Kassyi.Generators.Extensions;
 /// <summary>Specifies the target UI framework for platform-specific source generation.</summary>
 public enum Framework
 {
-    /// <summary>Not recognized framework.</summary>
+    /// <summary>Unrecognized UI framework.</summary>
     None,
 
     /// <summary>Windows Presentation Foundation (WPF).</summary>

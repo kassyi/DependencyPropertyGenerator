@@ -84,10 +84,8 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
     /// <summary>Gets an enumerator to traverse items in the current array.</summary>
     public ImmutableArray<T>.Enumerator GetEnumerator() => AsImmutableArray().GetEnumerator();
 
-    /// <inheritdoc/>
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)AsImmutableArray()).GetEnumerator();
 
-    /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)AsImmutableArray()).GetEnumerator();
 
     /// <summary>Implicitly converts an <see cref="ImmutableArray{T}"/> to <see cref="EquatableArray{T}"/>.</summary>
