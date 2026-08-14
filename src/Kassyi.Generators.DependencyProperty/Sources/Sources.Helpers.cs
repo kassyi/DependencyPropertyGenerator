@@ -298,7 +298,7 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine();
         writer.AppendLine($"namespace {@class.Namespace}");
         writer.AppendLine("{");
-        writer.AppendLine($"{GenerateModifiers(@class)}partial class {@class.Name}");
+        writer.AppendLine($"{GenerateModifiers(@class)}partial {@class.Keyword} {@class.NameWithTypeParameters}");
         writer.AppendLine("{");
         return new SourceWriterClassScope(writer);
     }

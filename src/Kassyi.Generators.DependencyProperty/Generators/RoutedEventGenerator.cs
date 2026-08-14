@@ -56,6 +56,6 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
         var category = data.Event.IsAttached
             ? "AttachedEvents"
             : "Events";
-        return $"{data.Class.FullName}.{category}.{data.Event.Name}.g.cs";
+        return $"{data.Class.FullName}.{category}.{data.Event.Name.SanitizeFileName()}.g.cs";
     }
 }

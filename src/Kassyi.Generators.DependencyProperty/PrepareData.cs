@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-
+using Kassyi.Generators.DependencyProperty.Rules.Signatures;
 
 
 namespace Kassyi.Generators.DependencyProperty;
@@ -35,10 +35,10 @@ public static class PrepareData
 
     private static readonly ImmutableArray<Rules.IMethodSignatureRule> s_signatureRules =
     [
-        new Rules.Signatures.NoParametersRule(),
-        new Rules.Signatures.SingleParameterRule(),
-        new Rules.Signatures.DoubleParameterRule(),
-        new Rules.Signatures.TripleParameterRule()
+        new NoParametersRule(),
+        new SingleParameterRule(),
+        new DoubleParameterRule(),
+        new TripleParameterRule()
     ];
 
     internal static MethodSignatureMatch CheckMethodsDirectly(
@@ -74,7 +74,7 @@ public static class PrepareData
 
         // [WHY] Avoid LINQ ElementAtOrDefault to prevent delegate allocations.
         var name = (attribute.ConstructorArguments is { Length: > 0 } ctorArgs0
-            ? ctorArgs0[0].Value?.ToString()
+            ? ctorArgs0[0].Value?.ToString()?.TrimStart('@')
             : null) ?? string.Empty;
 
         var arg1 = attribute.ConstructorArguments is { Length: > 1 } ctorArgs1
@@ -123,6 +123,16 @@ public static class PrepareData
     {
         classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
 
+        var isFileLocal = classSymbol.DeclaringSyntaxReferences
+            .Select(x => x.GetSyntax())
+            .OfType<TypeDeclarationSyntax>()
+            .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.FileKeyword) || m.Text == "file"));
+
+        if (isFileLocal)
+        {
+            throw new InvalidOperationException($"DPG0002: File scoped types are not supported by Source Generators ('{classSymbol.Name}').");
+        }
+
         // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.
         var fullClassName = classSymbol.ToDisplayString().SanitizeFileName();
         var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -131,11 +141,18 @@ public static class PrepareData
             : classSymbol.ContainingNamespace.ToDisplayString();
         var className = classSymbol.Name;
 
+        var keyword = classSymbol.IsRecord 
+            ? (classSymbol.IsValueType ? "record struct" : "record") 
+            : (classSymbol.IsValueType ? "struct" : "class");
+        var nameWithTypeParameters = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
         return new ClassData(
             Namespace: @namespace,
             Name: className,
             FullName: fullClassName,
             Type: type,
+            Keyword: keyword,
+            NameWithTypeParameters: nameWithTypeParameters,
             Modifiers: classSymbol.IsStatic ? "public static " : string.Empty,
             Version: version,
             IsStatic: classSymbol.IsStatic,

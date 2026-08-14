@@ -44,5 +44,5 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
         SourceGenerationHelper.GenerateWeakEventSource(data.Class, data.Event);
 
     protected override string GetHintName((ClassData Class, EventData Event) data) =>
-        $"{data.Class.FullName}.WeakEvents.{data.Event.Name}.g.cs";
+        $"{data.Class.FullName}.WeakEvents.{data.Event.Name.SanitizeFileName()}.g.cs";
 }

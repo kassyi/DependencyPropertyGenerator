@@ -45,5 +45,5 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
         SourceGenerationHelper.GenerateDependencyPropertySource(data.Class, data.DependencyProperty);
 
     protected override string GetHintName((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
-        $"{data.Class.FullName}.Properties.{data.DependencyProperty.Name}.g.cs";
+        $"{data.Class.FullName}.Properties.{data.DependencyProperty.Name.SanitizeFileName()}.g.cs";
 }

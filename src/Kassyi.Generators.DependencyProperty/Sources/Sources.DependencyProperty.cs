@@ -47,7 +47,8 @@ internal static partial class SourceGenerationHelper
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
-        using (writer.Scope($"public {GenerateType(property)} {property.Name}"))
+        var partialModifier = property.IsPartialProperty ? "partial " : string.Empty;
+        using (writer.Scope($"public {partialModifier}{GenerateType(property)} {property.Name.EscapeKeyword()}"))
         {
             GenerateGetter(ref writer, property);
             writer.AppendLine();
