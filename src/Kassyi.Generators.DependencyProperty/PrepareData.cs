@@ -25,7 +25,7 @@ public static class PrepareData
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
         return new DependencyPropertyDataBuilder()
-            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached)
+            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached, classSymbol)
             .WithMetadata(attribute)
             .WithDefaultValues(attribute, attributeSyntax)
             .WithXmlDocumentation(attribute)
@@ -135,7 +135,6 @@ public static class PrepareData
 
         // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.
         var fullClassName = classSymbol.ToDisplayString().SanitizeFileName();
-        var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
             : classSymbol.ContainingNamespace.ToDisplayString();
@@ -146,17 +145,55 @@ public static class PrepareData
             : (classSymbol.IsValueType ? "struct" : "class");
         var nameWithTypeParameters = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
+        var parentClassesBuilder = ImmutableArray.CreateBuilder<ParentClassData>();
+        var currentParent = classSymbol.ContainingType;
+        while (currentParent != null)
+        {
+            var parentKeyword = currentParent.IsRecord 
+                ? (currentParent.IsValueType ? "record struct" : "record") 
+                : (currentParent.IsValueType ? "struct" : "class");
+            var parentName = currentParent.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
+            var parentModifiers = currentParent.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax parentSyntaxNode 
+                ? string.Join(" ", parentSyntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
+                : (currentParent.IsStatic ? "public static " : "public ");
+            if (string.IsNullOrWhiteSpace(parentModifiers))
+            {
+                parentModifiers = string.Empty;
+            }
+            else if (!parentModifiers.EndsWith(" ", StringComparison.Ordinal))
+            {
+                parentModifiers += " ";
+            }
+
+            parentClassesBuilder.Add(new ParentClassData(parentKeyword, parentName, parentModifiers));
+            currentParent = currentParent.ContainingType;
+        }
+
+        var modifiers = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax syntaxNode 
+            ? string.Join(" ", syntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
+            : (classSymbol.IsStatic ? "public static " : "public ");
+        if (string.IsNullOrWhiteSpace(modifiers))
+        {
+            modifiers = string.Empty;
+        }
+        else if (!modifiers.EndsWith(" ", StringComparison.Ordinal))
+        {
+            modifiers += " ";
+        }
+
         return new ClassData(
             Namespace: @namespace,
             Name: className,
             FullName: fullClassName,
-            Type: type,
+            Type: nameWithTypeParameters,
             Keyword: keyword,
             NameWithTypeParameters: nameWithTypeParameters,
-            Modifiers: classSymbol.IsStatic ? "public static " : string.Empty,
+            Modifiers: modifiers,
             Version: version,
             IsStatic: classSymbol.IsStatic,
-            Framework: framework);
+            Framework: framework,
+            ParentClasses: parentClassesBuilder.ToImmutable().AsEquatableArray());
     }
 
     internal static bool? IsSpecialType(this ITypeSymbol? symbol)

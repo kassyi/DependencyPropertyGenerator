@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -29,10 +30,11 @@ internal sealed class DependencyPropertyDataBuilder
     private XmlDocumentationData _xmlDocumentation;
     private ValidationAndCallbackData _validationAndCallbacks;
     private bool _isPartialProperty;
+    private bool _hidesBaseProperty;
 
     private TypedConstant GetNamedArgument(string name) => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
-    public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached)
+    public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached, INamedTypeSymbol? classSymbol = null)
     {
         // [WHY] Pre-cache named arguments in a dictionary to achieve O(1) lookups instead of repeated linear O(N) searches across multiple With* methods.
         _namedArguments.Clear();
@@ -55,7 +57,16 @@ internal sealed class DependencyPropertyDataBuilder
         
         if (typeSymbol is { IsRefLikeType: true })
         {
-            throw new InvalidOperationException($"DPG0003: The property type '{typeSymbol.ToDisplayString()}' is a ref struct and cannot be used as a DependencyProperty.");
+            var location = attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+            var descriptor = new DiagnosticDescriptor(
+                id: "DPG0003",
+                title: "Invalid Property Type",
+                messageFormat: "The property type '{0}' is a ref struct and cannot be used as a DependencyProperty",
+                category: "Usage",
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+            throw new DiagnosticException(
+                Diagnostic.Create(descriptor, location, typeSymbol.ToDisplayString()));
         }
 
         _type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
@@ -76,6 +87,20 @@ internal sealed class DependencyPropertyDataBuilder
             BrowsableForType = browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             FromType = fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
         };
+
+        if (!_isAttached && classSymbol != null)
+        {
+            var baseType = classSymbol.BaseType;
+            while (baseType != null)
+            {
+                if (baseType.GetMembers(_name).Any(m => m is IPropertySymbol))
+                {
+                    _hidesBaseProperty = true;
+                    break;
+                }
+                baseType = baseType.BaseType;
+            }
+        }
 
         return this;
     }
@@ -135,6 +160,23 @@ internal sealed class DependencyPropertyDataBuilder
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, typeSymbol);
         _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, typeSymbol);
 
+        if (_defaultValue != null && 
+            (_defaultValue.Contains("new ") || _defaultValue.Contains("new(")) && 
+            !_isValueType && 
+            _type != "string" && _type != "global::System.String")
+        {
+            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+            var descriptor = new DiagnosticDescriptor(
+                id: "DPG0004",
+                title: "Reference Type Default Value Sharing",
+                messageFormat: "Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.",
+                category: "Usage",
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+            throw new DiagnosticException(
+                Diagnostic.Create(descriptor, location, _defaultValue));
+        }
+
         return this;
     }
 
@@ -167,7 +209,7 @@ internal sealed class DependencyPropertyDataBuilder
 
         _isPartialProperty = classSymbol != null && classSymbol.DeclaringSyntaxReferences
             .Select(x => x.GetSyntax())
-            .OfType<ClassDeclarationSyntax>()
+            .OfType<TypeDeclarationSyntax>()
             .SelectMany(c => c.Members)
             .OfType<PropertyDeclarationSyntax>()
             .Any(p => p.Identifier.Text == _name && p.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword) || m.Text == "partial"));
@@ -280,7 +322,8 @@ internal sealed class DependencyPropertyDataBuilder
             FrameworkMetadata: _frameworkMetadata,
             XmlDocumentation: _xmlDocumentation,
             ValidationAndCallbacks: _validationAndCallbacks,
-            IsPartialProperty: _isPartialProperty
+            IsPartialProperty: _isPartialProperty,
+            HidesBaseProperty: _hidesBaseProperty
         );
     }
 }

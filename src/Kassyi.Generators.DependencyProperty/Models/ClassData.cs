@@ -13,4 +13,5 @@ public readonly record struct ClassData(
     string Modifiers,
     string Version,
     bool IsStatic,
-    Framework Framework);
+    Framework Framework,
+    EquatableArray<ParentClassData> ParentClasses);

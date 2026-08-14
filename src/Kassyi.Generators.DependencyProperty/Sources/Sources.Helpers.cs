@@ -296,23 +296,50 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine();
         writer.AppendLine("#nullable enable");
         writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
-        writer.AppendLine("{");
+        
+        var hasNamespace = !string.IsNullOrWhiteSpace(@class.Namespace) && @class.Namespace != "<global namespace>";
+        if (hasNamespace)
+        {
+            writer.AppendLine($"namespace {@class.Namespace}");
+            writer.AppendLine("{");
+        }
+
+        var parentCount = 0;
+        var parentArray = @class.ParentClasses.AsImmutableArray();
+        if (!parentArray.IsEmpty)
+        {
+            for (int i = parentArray.Length - 1; i >= 0; i--)
+            {
+                var parent = parentArray[i];
+                var parentModifiers = string.IsNullOrWhiteSpace(parent.Modifiers) ? string.Empty : parent.Modifiers;
+                writer.AppendLine($"{parentModifiers}partial {parent.Keyword} {parent.NameWithTypeParameters}");
+                writer.AppendLine("{");
+                parentCount++;
+            }
+        }
+
         writer.AppendLine($"{GenerateModifiers(@class)}partial {@class.Keyword} {@class.NameWithTypeParameters}");
         writer.AppendLine("{");
-        return new SourceWriterClassScope(writer);
+        return new SourceWriterClassScope(writer, hasNamespace, parentCount);
     }
 
     internal static string GenerateEventArgsType(EventData @event) =>
         string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
 }
 
-internal readonly ref struct SourceWriterClassScope(SourceWriter writer) : IDisposable
+internal readonly ref struct SourceWriterClassScope(SourceWriter writer, bool hasNamespace, int parentCount) : IDisposable
 {
     public void Dispose()
     {
         writer.AppendLine("}");
-        writer.AppendLine("}");
+        for (var i = 0; i < parentCount; i++)
+        {
+            writer.AppendLine("}");
+        }
+        if (hasNamespace)
+        {
+            writer.AppendLine("}");
+        }
     }
 }
 

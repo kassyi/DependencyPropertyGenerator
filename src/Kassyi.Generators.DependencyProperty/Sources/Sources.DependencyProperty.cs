@@ -48,7 +48,8 @@ internal static partial class SourceGenerationHelper
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
         var partialModifier = property.IsPartialProperty ? "partial " : string.Empty;
-        using (writer.Scope($"public {partialModifier}{GenerateType(property)} {property.Name.EscapeKeyword()}"))
+        var newModifier = property.HidesBaseProperty ? "new " : string.Empty;
+        using (writer.Scope($"public {newModifier}{partialModifier}{GenerateType(property)} {property.Name.EscapeKeyword()}"))
         {
             GenerateGetter(ref writer, property);
             writer.AppendLine();

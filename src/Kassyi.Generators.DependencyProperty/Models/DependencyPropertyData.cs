@@ -21,4 +21,5 @@ public readonly record struct DependencyPropertyData(
     FrameworkMetadataData FrameworkMetadata,
     XmlDocumentationData XmlDocumentation,
     ValidationAndCallbackData ValidationAndCallbacks,
-    bool IsPartialProperty);
+    bool IsPartialProperty,
+    bool HidesBaseProperty);
