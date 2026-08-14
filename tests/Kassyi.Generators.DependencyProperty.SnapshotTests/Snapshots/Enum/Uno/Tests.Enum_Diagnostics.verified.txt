@@ -1,0 +1,71 @@
+﻿[
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Span: (12,35)-(12,43),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Span: (15,39)-(15,47),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (20,16)-(20,57),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (27,28)-(27,69),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (37,90)-(37,131),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (46,35)-(46,76),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (48,35)-(48,76),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  },
+  {
+    Id: CS0618,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions.AttachedProperties.Mode.g.cs,
+    Span: (50,35)-(50,76),
+    MessageFormat: '{0}' is obsolete: '{1}'
+  }
+]

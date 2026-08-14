@@ -1,0 +1,17 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (4,1)-(4,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS3021,
+    Severity: Warning,
+    WarningLevel: 2,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid.Properties.AttributedProperty.g.cs,
+    Span: (37,16)-(37,34),
+    MessageFormat: '{0}' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+  }
+]
