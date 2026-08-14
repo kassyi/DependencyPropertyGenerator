@@ -72,12 +72,16 @@ public static class PrepareData
     {
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
-        var name =
-            attribute.ConstructorArguments.ElementAtOrDefault(0).Value?.ToString() ??
-            string.Empty;
-        var strategy = attribute.ConstructorArguments.ElementAtOrDefault(1)
-            .ToEnum(defaultValue: RoutedEventStrategy.Direct)
-            .ToString("G");
+        // [WHY] Avoid LINQ ElementAtOrDefault to prevent delegate allocations.
+        var name = (attribute.ConstructorArguments is { Length: > 0 } ctorArgs0
+            ? ctorArgs0[0].Value?.ToString()
+            : null) ?? string.Empty;
+
+        var arg1 = attribute.ConstructorArguments is { Length: > 1 } ctorArgs1
+            ? ctorArgs1[1]
+            : default;
+
+        var strategy = arg1.ToEnum(defaultValue: RoutedEventStrategy.Direct).ToString("G");
         var isStatic = attribute.GetNamedArgument(nameof(WeakEventAttribute.IsStatic)).ToBoolean();
         var typeSymbol =
             attribute.GetGenericTypeArgument(0) ??
@@ -85,7 +89,7 @@ public static class PrepareData
         var type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
         var isValueType =
             typeSymbol?.IsValueType ??
-            attribute.ConstructorArguments.ElementAtOrDefault(1).Type?.IsValueType ??
+            arg1.Type?.IsValueType ??
             true;
         var isAttached = attribute.GetNamedArgument(nameof(RoutedEventAttribute.IsAttached)).ToBoolean();
         var description = attribute.GetNamedArgument(nameof(RoutedEventAttribute.Description)).Value?.ToString();
@@ -119,10 +123,13 @@ public static class PrepareData
     {
         classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
 
-        var fullClassName = classSymbol.ToString() ?? string.Empty;
+        // [WHY] Use Roslyn symbol properties directly instead of string Substring parsing to prevent allocations and handle global namespace properly.
+        var fullClassName = classSymbol.ToDisplayString();
         var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
-        var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
+        var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace
+            ? string.Empty
+            : classSymbol.ContainingNamespace.ToDisplayString();
+        var className = classSymbol.Name;
 
         return new ClassData(
             Namespace: @namespace,
@@ -152,38 +159,22 @@ public static class PrepareData
     {
         attributeSyntax = attributeSyntax ?? throw new ArgumentNullException(nameof(attributeSyntax));
 
-        return attributeSyntax.ArgumentList?.Arguments
-            .FirstOrDefault(x =>
+        if (attributeSyntax.ArgumentList == null)
+        {
+            return null;
+        }
+
+        // [WHY] Avoid LINQ FirstOrDefault(predicate) to eliminate delegate allocations during syntax tree analysis.
+        foreach (var argument in attributeSyntax.ArgumentList.Arguments)
+        {
+            var nameEquals = argument.NameEquals?.ToFullString().Trim('=', ' ', '\t', '\r', '\n');
+            if (nameEquals == name)
             {
-                var nameEquals = x.NameEquals?.ToFullString()
-                    .Trim('=', ' ', '\t', '\r', '\n');
+                return argument.Expression.ToFullString();
+            }
+        }
 
-                return nameEquals == name;
-            })?
-            .Expression
-            .ToFullString();
-    }
-
-    private static string RemoveNameof(this string value)
-    {
-        value = value ?? throw new ArgumentNullException(nameof(value));
-
-        return value.Contains("nameof(")
-            ? value
-                .Substring(value.LastIndexOf('.') + 1)
-                .TrimEnd(')', ' ')
-            : value;
-    }
-
-    internal static AttributeSyntax? TryFindAttributeSyntax(this ClassDeclarationSyntax classSyntax,
-        AttributeData attribute)
-    {
-        var name = attribute.ConstructorArguments.ElementAtOrDefault(0).Value?.ToString();
-
-        return classSyntax.AttributeLists
-            .SelectMany(static x => x.Attributes)
-            .FirstOrDefault(
-                x => x.ArgumentList?.Arguments.FirstOrDefault()?.ToString().Trim('"').RemoveNameof() == name);
+        return null;
     }
 
     /// <summary>Resolves a type symbol from either a generic attribute argument or a named attribute argument.</summary>

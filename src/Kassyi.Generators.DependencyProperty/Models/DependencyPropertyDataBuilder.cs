@@ -8,6 +8,7 @@ namespace Kassyi.Generators.DependencyProperty.Models;
 
 internal sealed class DependencyPropertyDataBuilder
 {
+    private readonly Dictionary<string, TypedConstant> _namedArguments = new(StringComparer.Ordinal);
     private string _name = string.Empty;
     private string _version = string.Empty;
     private string _type = string.Empty;
@@ -27,28 +28,49 @@ internal sealed class DependencyPropertyDataBuilder
     private XmlDocumentationData _xmlDocumentation;
     private ValidationAndCallbackData _validationAndCallbacks;
 
+    private TypedConstant GetNamedArgument(string name)
+    {
+        return _namedArguments.TryGetValue(name, out var value) ? value : default;
+    }
+
     public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached)
     {
+        // [WHY] Pre-cache named arguments in a dictionary to achieve O(1) lookups instead of repeated linear O(N) searches across multiple With* methods.
+        _namedArguments.Clear();
+        foreach (var pair in attribute.NamedArguments)
+        {
+            _namedArguments[pair.Key] = pair.Value;
+        }
+
         _framework = framework;
         _version = version;
         _isAddOwner = isAddOwner;
         _isAttached = isAttached;
 
-        _name = attribute.ConstructorArguments.ElementAtOrDefault(0).Value?.ToString() ?? string.Empty;
-        var typeSymbol = attribute.GetGenericTypeArgument(0) ?? attribute.ConstructorArguments.ElementAtOrDefault(1).Value as ITypeSymbol;
+        _name = attribute.ConstructorArguments is { Length: > 0 } ctorArgs
+            ? ctorArgs[0].Value?.ToString() ?? string.Empty
+            : string.Empty;
+
+        var typeSymbol = attribute.GetGenericTypeArgument(0) ??
+            (attribute.ConstructorArguments is { Length: > 1 } ctorArgs2 ? ctorArgs2[1].Value as ITypeSymbol : null);
         
         _type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
         _shortType = typeSymbol?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? string.Empty;
         _isValueType = typeSymbol?.IsValueType ?? true;
         _isSpecialType = typeSymbol.IsSpecialType() ?? false;
         
-        _isReadOnly = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.IsReadOnly)).ToBoolean();
-        _isDirect = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.IsDirect)).ToBoolean();
+        _isReadOnly = GetNamedArgument(nameof(DependencyPropertyAttribute.IsReadOnly)).ToBoolean();
+        _isDirect = GetNamedArgument(nameof(DependencyPropertyAttribute.IsDirect)).ToBoolean();
+
+        var browsableForTypeSymbol = attribute.GetGenericTypeArgument(1) ??
+            (GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.BrowsableForType)).Value as ITypeSymbol);
+        var fromTypeSymbol = attribute.GetGenericTypeArgument(1) ??
+            (GetNamedArgument(nameof(AddOwnerAttribute.FromType)).Value as ITypeSymbol);
 
         _componentModel = _componentModel with
         {
-            BrowsableForType = attribute.GetGenericTypeArgumentOrNamed(1, nameof(AttachedDependencyPropertyAttribute.BrowsableForType))?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            FromType = attribute.GetGenericTypeArgumentOrNamed(1, nameof(AddOwnerAttribute.FromType))?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            BrowsableForType = browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            FromType = fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
         };
 
         return this;
@@ -58,38 +80,38 @@ internal sealed class DependencyPropertyDataBuilder
     {
         _componentModel = _componentModel with
         {
-            Description = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Description)).Value?.ToString(),
-            Category = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Category)).Value?.ToString(),
-            TypeConverter = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(),
-            Bindable = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(),
-            Browsable = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(),
-            DesignerSerializationVisibility = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"),
-            ClsCompliant = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(),
-            Localizability = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G")
+            Description = GetNamedArgument(nameof(DependencyPropertyAttribute.Description)).Value?.ToString(),
+            Category = GetNamedArgument(nameof(DependencyPropertyAttribute.Category)).Value?.ToString(),
+            TypeConverter = GetNamedArgument(nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(),
+            Bindable = GetNamedArgument(nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(),
+            Browsable = GetNamedArgument(nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(),
+            DesignerSerializationVisibility = GetNamedArgument(nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"),
+            ClsCompliant = GetNamedArgument(nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(),
+            Localizability = GetNamedArgument(nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G")
         };
 
         _frameworkMetadata = new FrameworkMetadataData(
-            AffectsMeasure: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsMeasure)).ToBoolean(),
-            AffectsArrange: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsArrange)).ToBoolean(),
-            AffectsParentMeasure: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentMeasure)).ToBoolean(),
-            AffectsParentArrange: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentArrange)).ToBoolean(),
-            AffectsRender: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsRender)).ToBoolean(),
-            Inherits: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Inherits)).ToBoolean(),
-            OverridesInheritanceBehavior: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.OverridesInheritanceBehavior)).ToBoolean(),
-            NotDataBindable: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.NotDataBindable)).ToBoolean(),
-            Journal: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Journal)).ToBoolean(),
-            SubPropertiesDoNotAffectRender: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.SubPropertiesDoNotAffectRender)).ToBoolean(),
-            IsAnimationProhibited: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.IsAnimationProhibited)).ToBoolean(),
-            DefaultUpdateSourceTrigger: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultUpdateSourceTrigger)).ToEnum<SourceTrigger>()?.ToString("G"),
-            DefaultBindingMode: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultBindingMode)).ToEnum<DefaultBindingMode>()?.ToString("G")
+            AffectsMeasure: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsMeasure)).ToBoolean(),
+            AffectsArrange: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsArrange)).ToBoolean(),
+            AffectsParentMeasure: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentMeasure)).ToBoolean(),
+            AffectsParentArrange: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentArrange)).ToBoolean(),
+            AffectsRender: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsRender)).ToBoolean(),
+            Inherits: GetNamedArgument(nameof(DependencyPropertyAttribute.Inherits)).ToBoolean(),
+            OverridesInheritanceBehavior: GetNamedArgument(nameof(DependencyPropertyAttribute.OverridesInheritanceBehavior)).ToBoolean(),
+            NotDataBindable: GetNamedArgument(nameof(DependencyPropertyAttribute.NotDataBindable)).ToBoolean(),
+            Journal: GetNamedArgument(nameof(DependencyPropertyAttribute.Journal)).ToBoolean(),
+            SubPropertiesDoNotAffectRender: GetNamedArgument(nameof(DependencyPropertyAttribute.SubPropertiesDoNotAffectRender)).ToBoolean(),
+            IsAnimationProhibited: GetNamedArgument(nameof(DependencyPropertyAttribute.IsAnimationProhibited)).ToBoolean(),
+            DefaultUpdateSourceTrigger: GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultUpdateSourceTrigger)).ToEnum<SourceTrigger>()?.ToString("G"),
+            DefaultBindingMode: GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultBindingMode)).ToEnum<DefaultBindingMode>()?.ToString("G")
         );
 
         _validationAndCallbacks = _validationAndCallbacks with
         {
-            EnableDataValidation = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.EnableDataValidation)).ToBoolean(),
-            Coerce = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Coerce)).ToBoolean(),
-            Validate = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.Validate)).ToBoolean(),
-            CreateDefaultValueCallback = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.CreateDefaultValueCallback)).ToBoolean()
+            EnableDataValidation = GetNamedArgument(nameof(DependencyPropertyAttribute.EnableDataValidation)).ToBoolean(),
+            Coerce = GetNamedArgument(nameof(DependencyPropertyAttribute.Coerce)).ToBoolean(),
+            Validate = GetNamedArgument(nameof(DependencyPropertyAttribute.Validate)).ToBoolean(),
+            CreateDefaultValueCallback = GetNamedArgument(nameof(DependencyPropertyAttribute.CreateDefaultValueCallback)).ToBoolean()
         };
 
         return this;
@@ -97,12 +119,13 @@ internal sealed class DependencyPropertyDataBuilder
 
     public DependencyPropertyDataBuilder WithDefaultValues(AttributeData attribute, AttributeSyntax? attributeSyntax)
     {
-        var typeSymbol = attribute.GetGenericTypeArgument(0) ?? attribute.ConstructorArguments.ElementAtOrDefault(1).Value as ITypeSymbol;
+        var typeSymbol = attribute.GetGenericTypeArgument(0) ??
+            (attribute.ConstructorArguments is { Length: > 1 } ctorArgs ? ctorArgs[1].Value as ITypeSymbol : null);
         
-        var defaultValue = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
-                           attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
+        var defaultValue = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
+                           GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
                            
-        var defaultValueDoc = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
+        var defaultValueDoc = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
                               attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, typeSymbol);
@@ -113,13 +136,13 @@ internal sealed class DependencyPropertyDataBuilder
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
     {
-        var propertyXmlDoc = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value?.ToString();
-        var getterXmlDoc = attribute.GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.GetterXmlDocumentation)).Value?.ToString();
+        var propertyXmlDoc = GetNamedArgument(nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value?.ToString();
+        var getterXmlDoc = GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.GetterXmlDocumentation)).Value?.ToString();
         
         _xmlDocumentation = new XmlDocumentationData(
-            XmlDocumentation: attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.XmlDocumentation)).Value?.ToString(),
+            XmlDocumentation: GetNamedArgument(nameof(DependencyPropertyAttribute.XmlDocumentation)).Value?.ToString(),
             GetterXmlDocumentation: getterXmlDoc ?? propertyXmlDoc,
-            SetterXmlDocumentation: attribute.GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.SetterXmlDocumentation)).Value?.ToString()
+            SetterXmlDocumentation: GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.SetterXmlDocumentation)).Value?.ToString()
         );
         
         return this;
@@ -127,9 +150,9 @@ internal sealed class DependencyPropertyDataBuilder
 
     public DependencyPropertyDataBuilder WithCallbacks(AttributeData attribute, INamedTypeSymbol? classSymbol)
     {
-        var bindEvent = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvent)).Value?.ToString();
-        var bindEvents = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvents));
-        var onChanged = attribute.GetNamedArgument(nameof(DependencyPropertyAttribute.OnChanged)).Value?.ToString() ?? string.Empty;
+        var bindEvent = GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvent)).Value?.ToString();
+        var bindEvents = GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvents));
+        var onChanged = GetNamedArgument(nameof(DependencyPropertyAttribute.OnChanged)).Value?.ToString() ?? string.Empty;
 
         var isCustomOnChanged = !string.IsNullOrWhiteSpace(onChanged);
         var onChangedName = isCustomOnChanged ? onChanged : $"On{_name}Changed";
@@ -197,13 +220,19 @@ internal sealed class DependencyPropertyDataBuilder
             return new[] { bindEvent }.ToImmutableArray().AsEquatableArray();
         }
 
-        if (bindEvents.Kind == TypedConstantKind.Array)
+        // [WHY] Avoid LINQ Select/Where chains to prevent array and enumerator allocations.
+        if (bindEvents.Kind == TypedConstantKind.Array && !bindEvents.Values.IsDefaultOrEmpty)
         {
-            var values = bindEvents.Values
-                .Select(static value => value.Value?.ToString() ?? string.Empty)
-                .Where(value => !string.IsNullOrWhiteSpace(value))
-                .ToArray();
-            return values.ToImmutableArray().AsEquatableArray();
+            var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
+            foreach (var value in bindEvents.Values)
+            {
+                var str = value.Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(str))
+                {
+                    builder.Add(str!);
+                }
+            }
+            return builder.ToImmutable().AsEquatableArray();
         }
 
         return Array.Empty<string>().ToImmutableArray().AsEquatableArray();
