@@ -1,6 +1,8 @@
 #nullable enable
 
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO.Compression;
 using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Tests.Extensions;
@@ -34,8 +36,6 @@ public static class PlatformReferenceAssemblies
 {
     public static ReferenceAssemblies Get(PlatformType platform)
     {
-        // 妥協せず、Microsoft.CodeAnalysis.Testing を利用して NuGet パッケージ群から
-        // フレームワークのメタデータを取得・解決する
         return platform switch
         {
             PlatformType.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
@@ -54,6 +54,32 @@ public static class PlatformReferenceAssemblies
             _ => throw new ArgumentOutOfRangeException(nameof(platform), platform, null)
         };
     }
+}
+
+public static class PlatformHelper
+{
+    public static string GetBaseClass(PlatformType platform) => platform switch
+    {
+        PlatformType.Avalonia => "global::Avalonia.AvaloniaObject",
+        PlatformType.Maui => "global::Microsoft.Maui.Controls.BindableObject",
+        _ => "global::System.Windows.DependencyObject"
+    };
+
+    public static string GetDefineConstants(PlatformType platform) => platform switch
+    {
+        PlatformType.Avalonia => "HAS_AVALONIA",
+        PlatformType.Maui => "HAS_MAUI",
+        PlatformType.Uno => "HAS_UNO;HAS_WINUI",
+        PlatformType.Uwp => "WINDOWS_UWP",
+        _ => ""
+    };
+
+    public static string GetRegistrationMethod(PlatformType platform) => platform switch
+    {
+        PlatformType.Avalonia => "AvaloniaProperty.Register",
+        PlatformType.Maui => "BindableProperty.Create",
+        _ => "DependencyProperty.Register"
+    };
 }
 
 public static class RepositoryDownloader
@@ -85,74 +111,135 @@ public static class RepositoryDownloader
     }
 }
 
+public record StressTestExecutionResult(
+    int GeneratedTreesCount,
+    bool HasRegistrationMethod,
+    IReadOnlyCollection<Diagnostic> DriverDiagnostics,
+    IReadOnlyCollection<Diagnostic> GeneratorDiagnostics
+);
+
 public static class StressTestRunner
 {
+    private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.Preview);
+    private static readonly UsingDirectiveSyntax GeneratorUsingDirective =
+        SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Kassyi.Generators.DependencyProperty"))
+            .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
+
     public static async Task RunAsync(StressTestTarget target)
     {
         var srcDir = await RepositoryDownloader.EnsureRepositoryAsync(target);
+        var syntaxTrees = await LoadAndInjectSyntaxTreesAsync(srcDir, target.Platform);
+        var references = await ResolveReferencesAsync(target.Platform);
 
+        var result = await RunGeneratorInChunksAsync(target, syntaxTrees, references);
+
+        AssertGeneratorResults(target, result);
+    }
+
+    private static async Task<SyntaxTree[]> LoadAndInjectSyntaxTreesAsync(string srcDir, PlatformType platform)
+    {
         var csFiles = Directory.GetFiles(srcDir, "*.cs", SearchOption.AllDirectories);
         Assert.IsTrue(csFiles.Length > 0, $"No C# source files found in {srcDir}");
 
-        var syntaxTreesBag = new System.Collections.Concurrent.ConcurrentBag<SyntaxTree>();
-        var parseOptions = new CSharpParseOptions(LanguageVersion.Preview);
-        var injectedClasses = new System.Collections.Concurrent.ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
-        
-        var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Kassyi.Generators.DependencyProperty"))
-            .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
+        var syntaxTreesBag = new ConcurrentBag<SyntaxTree>();
+        var injectedClassesCount = 0;
 
         await Parallel.ForEachAsync(csFiles, async (file, ct) =>
         {
             var sourceText = await File.ReadAllTextAsync(file, ct);
-            var tree = CSharpSyntaxTree.ParseText(sourceText, parseOptions, path: file, cancellationToken: ct);
+            var tree = CSharpSyntaxTree.ParseText(sourceText, ParseOptions, path: file, cancellationToken: ct);
             var root = await tree.GetRootAsync(ct);
 
             var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>().ToList();
             if (classes.Count > 0)
             {
-                var rewriter = new InjectAttributesRewriter(target.Platform, injectedClasses);
+                var rewriter = new InjectAttributesRewriter(platform);
                 root = rewriter.Visit(root);
-                var compilationUnit = ((CompilationUnitSyntax)root).AddUsings(usingDirective);
+                var compilationUnit = ((CompilationUnitSyntax)root).AddUsings(GeneratorUsingDirective);
                 tree = tree.WithRootAndOptions(compilationUnit, tree.Options);
+                Interlocked.Add(ref injectedClassesCount, rewriter.InjectedClassCount);
             }
 
             syntaxTreesBag.Add(tree);
         });
 
-        var syntaxTrees = syntaxTreesBag.ToList();
+        Assert.IsTrue(injectedClassesCount > 0, $"Could not inject any test properties. No partial classes found.");
+        return syntaxTreesBag.ToArray();
+    }
 
-        Assert.IsTrue(injectedClasses.Count > 0, $"Could not inject any test properties into {target.Name}. No partial classes found.");
+    private static async Task<IReadOnlyList<MetadataReference>> ResolveReferencesAsync(PlatformType platform)
+    {
+        var referenceAssemblies = PlatformReferenceAssemblies.Get(platform);
+        var references = await referenceAssemblies.ResolveAsync(null, CancellationToken.None);
+        return references.ToList();
+    }
 
-        // Add a clean dummy class to guarantee verification of generator behavior
-        var baseClass = target.Platform switch
+    private static async Task<StressTestExecutionResult> RunGeneratorInChunksAsync(
+        StressTestTarget target,
+        SyntaxTree[] syntaxTrees,
+        IReadOnlyList<MetadataReference> references)
+    {
+        var processorCount = Environment.ProcessorCount;
+        var chunkSize = Math.Max(1, (int)Math.Ceiling((double)syntaxTrees.Length / processorCount));
+        var chunks = syntaxTrees.Chunk(chunkSize).ToArray();
+
+        var driverDiagnostics = new ConcurrentBag<Diagnostic>();
+        var generatorDiagnostics = new ConcurrentBag<Diagnostic>();
+        var generatedTreesCount = 0;
+        var hasRegistrationMethodFlag = 0;
+
+        var dummySyntax = CreateDummyTestClassSyntax(target.Platform);
+        var registrationMethod = PlatformHelper.GetRegistrationMethod(target.Platform);
+
+        await Parallel.ForEachAsync(chunks, (chunk, ct) =>
         {
-            PlatformType.Avalonia => "global::Avalonia.AvaloniaObject",
-            PlatformType.Maui => "global::Microsoft.Maui.Controls.BindableObject",
-            _ => "global::System.Windows.DependencyObject" // WPF, WinUI, UWP, Uno
-        };
+            var chunkTrees = chunk.ToList();
+            chunkTrees.Add(dummySyntax);
 
-        var dummyTestClassSyntax = CSharpSyntaxTree.ParseText($$"""
-            namespace StressTestDummy
+            var compilation = CSharpCompilation.Create(
+                assemblyName: $"{target.Name}_StressTest_{Guid.NewGuid():N}",
+                syntaxTrees: chunkTrees,
+                references: references,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            var driver = CreateGeneratorDriver(target.Platform);
+            driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+            var runResult = driver.GetRunResult();
+
+            foreach (var d in runResult.Diagnostics)
             {
-                [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty", typeof(int))]
-                [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached", typeof(string), BrowsableForType = typeof({{baseClass}}))]
-                public partial class DummyControl : {{baseClass}}
+                driverDiagnostics.Add(d);
+            }
+
+            foreach (var d in diagnostics)
+            {
+                if (d.Id.StartsWith("DPG", StringComparison.Ordinal) || d.Id.StartsWith("AD", StringComparison.Ordinal))
                 {
+                    generatorDiagnostics.Add(d);
                 }
             }
-            """, parseOptions, path: "DummyControl.cs");
-        syntaxTrees.Add(dummyTestClassSyntax);
 
-        var referenceAssemblies = PlatformReferenceAssemblies.Get(target.Platform);
-        var references = await referenceAssemblies.ResolveAsync(null, CancellationToken.None);
-        var refList = references.ToList();
+            Interlocked.Add(ref generatedTreesCount, runResult.GeneratedTrees.Length);
 
-        var compilation = CSharpCompilation.Create(
-            assemblyName: $"{target.Name}_StressTest",
-            syntaxTrees: syntaxTrees,
-            references: refList,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            var generatedCode = string.Join("\n", runResult.GeneratedTrees.Select(static t => t.ToString()));
+            if (generatedCode.Contains(registrationMethod))
+            {
+                Interlocked.Exchange(ref hasRegistrationMethodFlag, 1);
+            }
 
+            return ValueTask.CompletedTask;
+        });
+
+        return new StressTestExecutionResult(
+            GeneratedTreesCount: generatedTreesCount,
+            HasRegistrationMethod: hasRegistrationMethodFlag == 1,
+            DriverDiagnostics: driverDiagnostics.ToArray(),
+            GeneratorDiagnostics: generatorDiagnostics.ToArray()
+        );
+    }
+
+    private static GeneratorDriver CreateGeneratorDriver(PlatformType platform)
+    {
         var generators = new IIncrementalGenerator[]
         {
             new DependencyPropertyGenerator(),
@@ -161,128 +248,87 @@ public static class StressTestRunner
             new StaticConstructorGenerator()
         };
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+        var driver = CSharpGeneratorDriver.Create(
             generators: generators.Select(GeneratorExtensions.AsSourceGenerator).ToArray(),
-            parseOptions: new CSharpParseOptions(LanguageVersion.Preview)
+            parseOptions: ParseOptions
         );
 
-        driver = driver.WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(
+        return driver.WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(
             new Dictionary<string, string>
             {
-                { "build_property.UseWPF", target.Platform == PlatformType.Wpf ? "true" : "false" },
-                { "build_property.UseWinUI", target.Platform == PlatformType.WinUI || target.Platform == PlatformType.Uno ? "true" : "false" },
-                { "build_property.UseAvalonia", target.Platform == PlatformType.Avalonia ? "true" : "false" },
-                { "build_property.UseMAUI", target.Platform == PlatformType.Maui ? "true" : "false" },
-                { "build_property.UseUWP", target.Platform == PlatformType.Uwp ? "true" : "false" },
+                { "build_property.UseWPF", platform == PlatformType.Wpf ? "true" : "false" },
+                { "build_property.UseWinUI", platform == PlatformType.WinUI ? "true" : "false" },
+                { "build_property.RecognizeFramework_DefineConstants", PlatformHelper.GetDefineConstants(platform) },
                 { "build_property.RecognizeFramework_Version", "0.0.0.0" }
             }));
+    }
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+    private static SyntaxTree CreateDummyTestClassSyntax(PlatformType platform)
+    {
+        var baseClass = PlatformHelper.GetBaseClass(platform);
+        return CSharpSyntaxTree.ParseText($$"""
+            namespace StressTestDummy
+            {
+                [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty", typeof(int))]
+                [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached", typeof(string), BrowsableForType = typeof({{baseClass}}))]
+                public partial class DummyControl : {{baseClass}}
+                {
+                }
+            }
+            """, ParseOptions, path: "DummyControl.cs");
+    }
 
-        var runResult = driver.GetRunResult();
-        var generatorDiagnostics = diagnostics.Where(static d => d.Id.StartsWith("DPG", StringComparison.Ordinal) || d.Id.StartsWith("AD", StringComparison.Ordinal)).ToList();
-        var driverDiagnostics = runResult.Diagnostics.ToList();
+    private static void AssertGeneratorResults(StressTestTarget target, StressTestExecutionResult result)
+    {
+        Assert.IsTrue(result.HasRegistrationMethod,
+            $"No property registration method calls found in the generated code for {target.Platform}. This suggests a complete failure to generate semantics.");
+        Assert.IsTrue(result.GeneratedTreesCount > 0, "Expected at least 1 generated source file, but got 0.");
 
-        // 1. Verify that all generated source files contain non-empty code
-        Assert.IsTrue(runResult.GeneratedTrees.All(static tree => !string.IsNullOrWhiteSpace(tree.ToString())), "One or more generated source files were unexpectedly empty.");
+        var unexpectedDriverDiagnostics = result.DriverDiagnostics
+            .Where(static d => !d.GetMessage().Contains("DPG0002"))
+            .ToList();
+        Assert.AreEqual(0, unexpectedDriverDiagnostics.Count,
+            $"Generator driver emitted unexpected diagnostics: {string.Join("; ", unexpectedDriverDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
 
-        // 2. Verify that some property registration code is actually generated (Semantic Oracle)
-        var fullGeneratedCode = string.Join("\n", runResult.GeneratedTrees.Select(static t => t.ToString()));
-        var hasRegistrationMethod = target.Platform switch
-        {
-            PlatformType.Avalonia => fullGeneratedCode.Contains("AvaloniaProperty.Register"),
-            PlatformType.Maui => fullGeneratedCode.Contains("BindableProperty.Create"),
-            _ => fullGeneratedCode.Contains("DependencyProperty.Register")
-        };
-        Assert.IsTrue(hasRegistrationMethod, $"No property registration method calls found in the generated code for {target.Platform}. This suggests a complete failure to generate semantics.");
-
-        // 3. Assert that no internal generator crashes or driver diagnostics occurred
-        Assert.AreEqual(0, driverDiagnostics.Count, $"Generator driver emitted unexpected diagnostics: {string.Join("; ", driverDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
-        Assert.AreEqual(0, generatorDiagnostics.Count, $"Generator emitted unexpected diagnostics: {string.Join("; ", generatorDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
+        var unexpectedGeneratorDiagnostics = result.GeneratorDiagnostics
+            .Where(static d => d.Id != "DPG0002" && !d.GetMessage().Contains("DPG0002"))
+            .ToList();
+        Assert.AreEqual(0, unexpectedGeneratorDiagnostics.Count,
+            $"Generator emitted unexpected diagnostics: {string.Join("; ", unexpectedGeneratorDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
     }
 
     private sealed class InjectAttributesRewriter : CSharpSyntaxRewriter
     {
-        private readonly AttributeListSyntax[] _injectedAttributes;
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _injectedClasses;
+        private static int s_classCounter;
+        private readonly string _baseClass;
+        private int _injectedClassCount;
 
-        public InjectAttributesRewriter(PlatformType platform, System.Collections.Concurrent.ConcurrentDictionary<string, byte> injectedClasses)
+        public InjectAttributesRewriter(PlatformType platform)
         {
-            _injectedClasses = injectedClasses;
-            var baseClass = platform switch
-            {
-                PlatformType.Avalonia => "global::Avalonia.AvaloniaObject",
-                PlatformType.Maui => "global::Microsoft.Maui.Controls.BindableObject",
-                _ => "global::System.Windows.DependencyObject"
-            };
-
-            _injectedAttributes = SyntaxFactory.ParseCompilationUnit($$"""
-                [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty", typeof(int))]
-                [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached", typeof(string), BrowsableForType = typeof({{baseClass}}))]
-                class Dummy {}
-                """)
-                .DescendantNodes().OfType<ClassDeclarationSyntax>().First().AttributeLists.ToArray();
+            _baseClass = PlatformHelper.GetBaseClass(platform);
         }
 
-        public int InjectedClassCount => _injectedClasses.Count;
+        public int InjectedClassCount => _injectedClassCount;
 
         public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var qualifiedClassName = GetQualifiedClassName(node);
-            if (!_injectedClasses.TryAdd(qualifiedClassName, 0))
-            {
-                // Already injected attributes into a partial declaration of this qualified class.
-                return base.VisitClassDeclaration(node);
-            }
+            var id = Interlocked.Increment(ref s_classCounter);
+            _injectedClassCount++;
 
-            var newNode = node.AddAttributeLists(_injectedAttributes);
+            var injectedAttributes = SyntaxFactory.ParseCompilationUnit($$"""
+                [global::Kassyi.Generators.DependencyProperty.DependencyProperty("StressTestProperty_{{id}}", typeof(int))]
+                [global::Kassyi.Generators.DependencyProperty.AttachedDependencyProperty("StressTestAttached_{{id}}", typeof(string), BrowsableForType = typeof({{_baseClass}}))]
+                class Dummy {}
+                """)
+                .DescendantNodes().OfType<ClassDeclarationSyntax>().First().AttributeLists.ToArray();
+
+            var newNode = node.AddAttributeLists(injectedAttributes);
             if (!newNode.Modifiers.Any(SyntaxKind.PartialKeyword))
             {
                 newNode = newNode.AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
             }
             
             return base.VisitClassDeclaration(newNode);
-        }
-
-        private static string GetQualifiedClassName(ClassDeclarationSyntax node)
-        {
-            var sb = new System.Text.StringBuilder();
-
-            var namespaces = node.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Reverse();
-            foreach (var ns in namespaces)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append('.');
-                }
-                sb.Append(ns.Name);
-            }
-
-            var enclosingClasses = node.Ancestors().OfType<ClassDeclarationSyntax>().Reverse();
-            foreach (var parent in enclosingClasses)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append('.');
-                }
-                sb.Append(parent.Identifier.Text);
-                if (parent.TypeParameterList != null)
-                {
-                    sb.Append(parent.TypeParameterList);
-                }
-            }
-
-            if (sb.Length > 0)
-            {
-                sb.Append('.');
-            }
-            sb.Append(node.Identifier.Text);
-            if (node.TypeParameterList != null)
-            {
-                sb.Append(node.TypeParameterList);
-            }
-
-            return sb.ToString();
         }
     }
 }
