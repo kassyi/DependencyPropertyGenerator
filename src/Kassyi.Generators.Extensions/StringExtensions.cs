@@ -15,7 +15,7 @@ public static class StringExtensions
 #if NET6_0_OR_GREATER
             _ => string.Concat(input[0].ToString().ToUpper(CultureInfo.InvariantCulture), input.AsSpan(1)),
 #else
-            _ => input[0].ToString().ToUpper(CultureInfo.InvariantCulture) + input.Substring(1),
+            _ => input[0].ToString().ToUpper(CultureInfo.InvariantCulture) + input[1..],
 #endif
         };
     }
@@ -113,7 +113,7 @@ public static class StringExtensions
 #if NET6_0_OR_GREATER
             _ => string.Concat(input[0].ToString().ToLower(CultureInfo.InvariantCulture), input.AsSpan(1)),
 #else
-            _ => input[0].ToString().ToLower(CultureInfo.InvariantCulture) + input.Substring(1),
+            _ => input[0].ToString().ToLower(CultureInfo.InvariantCulture) + input[1..],
 #endif
 #pragma warning restore CA1308 // Normalize strings to uppercase
         };
@@ -165,7 +165,7 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         var lastDot = fullTypeName.LastIndexOf('.');
-        return lastDot >= 0 ? fullTypeName.Substring(0, lastDot) : string.Empty;
+        return lastDot >= 0 ? fullTypeName[..lastDot] : string.Empty;
     }
 
     /// <summary>Extracts the unqualified type name from a fully qualified type name.</summary>
@@ -174,7 +174,7 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         var lastDot = fullTypeName.LastIndexOf('.');
-        return lastDot >= 0 ? fullTypeName.Substring(lastDot + 1) : fullTypeName;
+        return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
     }
 
     /// <summary>Prepends the <c>global::</c> namespace alias to a fully qualified type name.</summary>
