@@ -96,7 +96,8 @@ public class RealWorldStressTests
         driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
 
         var runResult = driver.GetRunResult();
-        var generatorDiagnostics = diagnostics.Where(d => d.Id.StartsWith("DPG", StringComparison.Ordinal) || d.Id.StartsWith("AD", StringComparison.Ordinal)).ToList();
+        var generatorDiagnostics = diagnostics.Where(static d => d.Id.StartsWith("DPG", StringComparison.Ordinal) || d.Id.StartsWith("AD", StringComparison.Ordinal)).ToList();
+        var compilerErrors = diagnostics.Where(static d => d.Severity == DiagnosticSeverity.Error).ToList();
         var driverDiagnostics = runResult.Diagnostics.ToList();
 
         // 1. Verify that attributes were successfully injected into hundreds of classes
@@ -108,9 +109,10 @@ public class RealWorldStressTests
         // 3. Verify that all generated source files contain non-empty code
         Assert.IsTrue(runResult.GeneratedTrees.All(static tree => !string.IsNullOrWhiteSpace(tree.ToString())), "One or more generated source files were unexpectedly empty.");
 
-        // 4. Assert that no internal generator crashes or driver diagnostics occurred
+        // 4. Assert that no internal generator crashes, compiler errors, or driver diagnostics occurred
         Assert.AreEqual(0, driverDiagnostics.Count, $"Generator driver emitted unexpected diagnostics: {string.Join("; ", driverDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
         Assert.AreEqual(0, generatorDiagnostics.Count, $"Generator emitted unexpected diagnostics: {string.Join("; ", generatorDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
+        Assert.AreEqual(0, compilerErrors.Count, $"Unexpected compilation errors: {string.Join("; ", compilerErrors.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");
     }
 
     private static async Task<string> EnsureWpfUiRepositoryAsync()
@@ -155,10 +157,10 @@ public class RealWorldStressTests
 
         public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var className = node.Identifier.Text;
-            if (!_injectedClasses.Add(className))
+            var qualifiedClassName = GetQualifiedClassName(node);
+            if (!_injectedClasses.Add(qualifiedClassName))
             {
-                // Already injected attributes into a partial declaration of this class.
+                // Already injected attributes into a partial declaration of this qualified class.
                 return base.VisitClassDeclaration(node);
             }
 
@@ -169,6 +171,47 @@ public class RealWorldStressTests
             }
             
             return base.VisitClassDeclaration(newNode);
+        }
+
+        private static string GetQualifiedClassName(ClassDeclarationSyntax node)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            var namespaces = node.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().Reverse();
+            foreach (var ns in namespaces)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append('.');
+                }
+                sb.Append(ns.Name);
+            }
+
+            var enclosingClasses = node.Ancestors().OfType<ClassDeclarationSyntax>().Reverse();
+            foreach (var parent in enclosingClasses)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append('.');
+                }
+                sb.Append(parent.Identifier.Text);
+                if (parent.TypeParameterList != null)
+                {
+                    sb.Append(parent.TypeParameterList);
+                }
+            }
+
+            if (sb.Length > 0)
+            {
+                sb.Append('.');
+            }
+            sb.Append(node.Identifier.Text);
+            if (node.TypeParameterList != null)
+            {
+                sb.Append(node.TypeParameterList);
+            }
+
+            return sb.ToString();
         }
     }
 }
