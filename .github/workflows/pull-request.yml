@@ -1,14 +1,47 @@
-﻿name: Build and test
+name: CI (Build & Test)
+
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
-  build-test:
-    name: Build, test and publish
-    uses: HavenDV/workflows/.github/workflows/dotnet_build-test-publish.yml@main
-    with:
-      generate-build-number: false
-      conventional-commits-publish-conditions: false
-      additional-test-arguments: '--logger GitHubActions'
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Enable Git LongPaths for Windows
+        if: runner.os == 'Windows'
+        run: git config --system core.longpaths true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Kassyi.Generators.DependencyProperty.sln
+
+      - name: Build solution
+        run: dotnet build Kassyi.Generators.DependencyProperty.sln --configuration Release --no-restore
+
+      - name: Run Tests
+        run: dotnet test Kassyi.Generators.DependencyProperty.sln --configuration Release --no-build --logger GitHubActions --verbosity normal

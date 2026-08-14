@@ -32,7 +32,7 @@ public static class StringExtensions
             null => throw new ArgumentNullException(nameof(input)),
             "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
             
-            // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
+            // [WHY] Reference for C# keywords that require '@' prefix: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
             "abstract" => "@abstract",
             "as" => "@as",
             "base" => "@base",
@@ -141,10 +141,17 @@ public static class StringExtensions
     {
         text = text ?? throw new ArgumentNullException(nameof(text));
 
+        // [WHY] Fast path: return original string immediately if text already uses Unix line endings and no custom newline is requested, avoiding string allocations.
+        var targetNewLine = newLine ?? "\n";
+        if (text.IndexOf('\r') < 0 && targetNewLine == "\n")
+        {
+            return text;
+        }
+
         var newText = text
             .Replace("\r\n", "\n")
             .Replace("\r", "\n");
-        if (newLine != null)
+        if (newLine != null && newLine != "\n")
         {
             newText = newText.Replace("\n", newLine);
         }
@@ -157,7 +164,8 @@ public static class StringExtensions
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
-        return fullTypeName.Substring(0, fullTypeName.LastIndexOf('.'));
+        var lastDot = fullTypeName.LastIndexOf('.');
+        return lastDot >= 0 ? fullTypeName.Substring(0, lastDot) : string.Empty;
     }
 
     /// <summary>Extracts the unqualified type name from a fully qualified type name.</summary>
@@ -165,7 +173,8 @@ public static class StringExtensions
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
-        return fullTypeName.Substring(fullTypeName.LastIndexOf('.') + 1);
+        var lastDot = fullTypeName.LastIndexOf('.');
+        return lastDot >= 0 ? fullTypeName.Substring(lastDot + 1) : fullTypeName;
     }
 
     /// <summary>Prepends the <c>global::</c> namespace alias to a fully qualified type name.</summary>

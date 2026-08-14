@@ -81,8 +81,8 @@ public static class AnalyzerConfigOptionsProviderExtensions
     /// <summary>Determines whether the generator is executing within a design-time build context.</summary>
     public static bool IsDesignTime(this AnalyzerConfigOptionsProvider provider)
     {
-        var isBuildingProjectValue = provider.GetGlobalOption("BuildingProject"); // legacy projects
-        var isDesignTimeBuildValue = provider.GetGlobalOption("DesignTimeBuild"); // sdk-style projects
+        var isBuildingProjectValue = provider.GetGlobalOption("BuildingProject"); // [WHY] Legacy MSBuild projects set BuildingProject=false during design-time builds
+        var isDesignTimeBuildValue = provider.GetGlobalOption("DesignTimeBuild"); // [WHY] SDK-style projects set DesignTimeBuild=true during design-time builds
 
         return string.Equals(isBuildingProjectValue, "false", StringComparison.OrdinalIgnoreCase)
             || string.Equals(isDesignTimeBuildValue, "true", StringComparison.OrdinalIgnoreCase);

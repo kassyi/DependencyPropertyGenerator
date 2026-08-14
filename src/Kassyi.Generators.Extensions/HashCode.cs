@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace System;
 
-// Polyfill type that mirrors HashCode on .NET 6+
+// [WHY] Polyfill type that mirrors HashCode on .NET 6+ to avoid allocations in earlier runtime targets.
 internal struct HashCode : IEquatable<HashCode>
 {
     private const uint Prime1 = 2654435761U;

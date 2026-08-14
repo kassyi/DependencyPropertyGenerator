@@ -61,7 +61,6 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 #pragma warning disable CA1822 // Mark members as static
     public void Append([InterpolatedStringHandlerArgument("")] ref SourceWriterInterpolatedStringHandler handler)
     {
-        // The handler appends directly to the builder.
     }
 
     public void AppendLine() => Builder.AppendLine();
@@ -96,7 +95,6 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 
     public void AppendIf(bool condition, [InterpolatedStringHandlerArgument("", "condition")] ref SourceWriterInterpolatedStringHandler handler)
     {
-        // The handler appends directly to the builder if the condition is true.
     }
 
     public void AppendLineIf(bool condition, string? value)
@@ -141,10 +139,8 @@ public readonly struct SourceWriter : IDisposable, IEquatable<SourceWriter>
 
 }
 
-/// <summary>
-/// A zero-allocation scope that appends an opening string on creation and a closing string on disposal.
-/// </summary>
-public readonly ref struct SourceWriterScope : IDisposable
+/// <summary>A zero-allocation scope that appends an opening string on creation and a closing string on disposal.</summary>
+public readonly ref struct SourceWriterScope
 {
     private readonly SourceWriter _writer;
     private readonly string _closingText;
@@ -176,9 +172,7 @@ public readonly ref struct SourceWriterScope : IDisposable
     }
 }
 
-/// <summary>
-/// The handler that enables zero-allocation string interpolation using <see cref="SourceWriter"/>.
-/// </summary>
+/// <summary>The handler that enables zero-allocation string interpolation using <see cref="SourceWriter"/>.</summary>
 [InterpolatedStringHandler]
 public readonly ref struct SourceWriterInterpolatedStringHandler
 {

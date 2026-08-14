@@ -354,8 +354,6 @@ MigrationBackup/
 
 # Snapshot files
 **/*.received.*
-**/*.g.verified.cs
-**/*.verified.txt
 
 tmp/
 .agents/workflows/

@@ -43,7 +43,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
 
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
-        // MAUI does not use a separate PropertyMetadata object in this way.
+        // [WHY] MAUI does not use a separate PropertyMetadata object in this way.
     }
 
     protected override string PropertyChangedCallbackSignature => "static (sender, oldValue, newValue) =>";

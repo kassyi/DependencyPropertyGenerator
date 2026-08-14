@@ -10,7 +10,14 @@ public static class AttributeDataExtensions
     {
         attributeData = attributeData ?? throw new ArgumentNullException(nameof(attributeData));
 
-        return attributeData.AttributeClass?.TypeArguments.ElementAtOrDefault(position);
+        // [WHY] Avoid LINQ ElementAtOrDefault to prevent delegate allocations.
+        var typeArguments = attributeData.AttributeClass?.TypeArguments;
+        if (typeArguments is { Length: > 0 } args && position >= 0 && position < args.Length)
+        {
+            return args[position];
+        }
+
+        return null;
     }
 
     /// <summary>Returns the named attribute argument matching the specified parameter name.</summary>
@@ -18,8 +25,15 @@ public static class AttributeDataExtensions
     {
         attributeData = attributeData ?? throw new ArgumentNullException(nameof(attributeData));
 
-        return attributeData.NamedArguments
-            .FirstOrDefault(pair => pair.Key == name)
-            .Value;
+        // [WHY] Use foreach instead of LINQ FirstOrDefault(pair => ...) to eliminate predicate allocations.
+        foreach (var pair in attributeData.NamedArguments)
+        {
+            if (pair.Key == name)
+            {
+                return pair.Value;
+            }
+        }
+
+        return default;
     }
 }

@@ -1,56 +1,68 @@
-# DependencyPropertyGenerator
+# Kassyi.Generators.DependencyProperty
 
-[![Nuget package](https://img.shields.io/nuget/vpre/DependencyPropertyGenerator)](https://www.nuget.org/packages/DependencyPropertyGenerator/)
-[![CI/CD](https://github.com/HavenDV/DependencyPropertyGenerator/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/HavenDV/DependencyPropertyGenerator/actions/workflows/main.yml)
-[![License: MIT](https://img.shields.io/github/license/HavenDV/DependencyPropertyGenerator)](https://github.com/HavenDV/DependencyPropertyGenerator/blob/main/LICENSE.txt)
-[![Discord](https://img.shields.io/discord/988253265550532680?label=Discord&logo=discord&logoColor=white&color=d82679)](https://discord.gg/g8u2t9dKgE)
+[![Nuget package](https://img.shields.io/nuget/vpre/Kassyi.Generators.DependencyProperty)](https://www.nuget.org/packages/Kassyi.Generators.DependencyProperty/)
+[![CI/CD](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml)
+[![License: MIT](https://img.shields.io/github/license/kassyi/DependencyPropertyGenerator)](https://github.com/kassyi/DependencyPropertyGenerator/blob/main/LICENSE)
+[![Performance](https://img.shields.io/badge/performance-+26%25_faster-brightgreen.svg)](#zero-allocation--no-ide-lag)
+[![Zero Gen2 GC](https://img.shields.io/badge/Gen2_GC-zero_alloc-blue.svg)](#zero-allocation--no-ide-lag)
 
-Dependency property, routed event and weak event source generator for WPF/UWP/WinUI/Uno/Avalonia/MAUI platforms.
+A high-performance .NET source generator for Dependency Properties, Routed Events, and Weak Events. Supports WPF, UWP, WinUI, Uno, Avalonia, and MAUI.
 
-## Fork Improvements & Motivation
+## Why this fork?
 
-This repository is a custom fork of [`HavenDV/DependencyPropertyGenerator`](https://github.com/HavenDV/DependencyPropertyGenerator), independently extended and maintained.  
-Since commit [`6758690d299c`](https://github.com/HavenDV/DependencyPropertyGenerator/commit/6758690d299c8777133e8351350d91126f44d314), the following critical bug fixes, feature enhancements, and performance optimizations have been implemented.
+This project is an independently maintained, highly optimized fork of [`HavenDV/DependencyPropertyGenerator`](https://github.com/HavenDV/DependencyPropertyGenerator). The generator has been fundamentally re-architected to eliminate silent bugs, enforce strict type safety, and deliver **up to 26% faster code generation with zero Gen2 allocations**.
 
-### 1. Why Forking Was Necessary
+### Zero-Allocation & No IDE Lag
 
-- **Resolution of Silent Callback Suppression / Silent Failure Bug**:
-    - In the upstream (original) repository, specifying an unsupported signature for an `OnChanged` callback (such as WPF's standard signature `(DependencyObject d, DependencyPropertyChangedEventArgs e)` or mismatched parameter counts/types) or misspelling the method name caused the generator to **silently emit `propertyChangedCallback: null` without raising any compilation errors or warnings**.
-    - As a result, code would compile successfully, but property change callbacks would **silently fail to execute at runtime**, creating severe and hard-to-detect silent bugs.
-    - In this fork, failure to resolve an explicitly specified callback signature has been strictly escalated from a silent fallback/warning to a **`#error DPG0001` compile-time error**, ensuring issues are caught and resolved immediately at build time.
+Incremental source generators run continuously in the background on every keystroke. Heavy memory allocations in the original generator often triggered Gen2 garbage collections, causing noticeable typing lag in IDEs like Visual Studio and JetBrains Rider.
 
-### 2. Key Improvements Since Commit `6758690d299c`
+We rebuilt the pipeline from the ground up for maximum throughput:
 
-1. **Promotion of Unresolved Callbacks to Compile Errors (`#error DPG0001`)**
-    - Mismatched or non-existent callback method declarations are flagged with a compile error (`#error DPG0001`) instead of being silently ignored.
-2. **Automatic Target-Typed `new(...)` Expansion in `DefaultValueExpression`**
-    - Added support for C# 9.0+ `DefaultValueExpression = "new(...)"` syntax.
-    - Parses expressions via Roslyn AST (`SyntaxFactory` / `ImplicitObjectCreationExpressionSyntax`) and automatically expands target-typed `new(...)` expressions into fully-qualified constructor calls based on the property type. Eliminates the need to write verbose fully-qualified type names when referencing types from external namespaces.
-3. **Incremental Source Generator (ISG) Pipeline Optimization & Allocation Reduction**
-    - Streamlined `ClassData` DTO by removing heavy method string lists and replacing them with pre-calculated boolean flags (`IsChanged0`–`IsChanged3`).
-    - Replaced temporary `List<string>` allocations and `string.Join` calls during code generation with `StringBuilder` and `stackalloc Span<char>` to eliminate intermediate heap allocations. Significantly reduces GC overhead and prevents IDE typing lags.
-    - Introduced `DependencyPropertyGenerator.Benchmarks` (using BenchmarkDotNet) to continuously profile execution time and memory allocations across optimization phases.
-4. **Modernization of Tests, Documentation, and Project Structure**
-    - Modernized snapshot test fixtures (`Tests.*.cs`) using C# 11 Raw String Literals and unified MSTest attributes.
-    - Reorganized project layout into standard C# `src/` and `tests/` directories.
-    - Expanded architectural and generator specification documents in `spec/`.
-5. **Solution and Package Renaming (`Kassyi.Generators.DependencyProperty`)**
-    - Renamed the solution, project files, and NuGet package targets to `Kassyi.Generators.DependencyProperty` to prevent namespace collisions and clearly distinguish this custom fork from the original upstream package.
+- **Zero Gen2 GC Pauses**: Memory allocations are slashed by ~20% (saving ~600 KB per class), entirely eliminating Gen2 GC pauses.
+- **Optimized Pipeline**: Replaced expensive AST round-trips (`NormalizeWhitespace()`) with direct, formatted streaming.
+- **Zero-Allocation Scopes**: Implemented custom `ref struct` scope handlers to eliminate intermediate string allocations.
+- **Declarative Rule Engine**: Shifted from runtime string parsing to compile-time semantic flag analysis.
 
-## Usage
+<details>
+<summary><b>View Benchmark Results (AMD Ryzen 9 7900X / .NET 9)</b></summary>
 
-```cs
+| Metric | Upstream Baseline | This Fork | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Initial Generation (WPF)** | 5.349 ms (2.87 MB) | **3.922 ms (2.28 MB)** | **-26.7% time / -20.6% memory** |
+| **Incremental Gen (WPF)** | 7.176 ms (3.59 MB) | **5.783 ms (3.02 MB)** | **-19.4% time / -15.9% memory** |
+| **Initial Generation (WinUI)** | 5.720 ms (2.81 MB) | **4.218 ms (2.27 MB)** | **-26.3% time / -19.2% memory** |
+| **Incremental Gen (WinUI)** | 7.412 ms (3.55 MB) | **6.420 ms (3.02 MB)** | **-13.4% time / -14.9% memory** |
+| **Initial Generation (Avalonia)**| 5.282 ms (2.86 MB) | **4.574 ms (2.33 MB)** | **-13.4% time / -18.5% memory** |
+| **Incremental Gen (Avalonia)**| 7.103 ms (3.62 MB) | **5.884 ms (3.09 MB)** | **-17.2% time / -14.6% memory** |
+| **Initial Generation (MAUI)** | 5.533 ms (2.90 MB) | **4.528 ms (2.30 MB)** | **-18.2% time / -20.7% memory** |
+| **Incremental Gen (MAUI)** | 7.095 ms (3.67 MB) | **6.112 ms (3.09 MB)** | **-13.9% time / -15.8% memory** |
+| **GC Gen2 (Initial)** | 7.8–15.6 / 1k ops | **0.0000 / 1k ops** | **100% Eliminated** |
+
+</details>
+
+### Critical Bug Fixes & Enhancements
+
+- **Strict Type Safety (`#error DPG0001`)**: The original generator silently failed (emitting `propertyChangedCallback: null`) if the `OnChanged` callback signature was invalid. This fork immediately surfaces signature mismatches as compile-time diagnostic errors.
+- **Target-Typed `new(...)` Expansion**: Seamlessly supports C# 9.0+ `DefaultValueExpression = "new(...)"`. The generator automatically expands these into fully-qualified constructors, removing the need for verbose type names.
+- **Modular Architecture**: Decoupled monolithic logic into modular framework strategies (WPF, WinUI, Avalonia, etc.), significantly improving maintainability and testability.
+- **Package Renaming**: Published as `Kassyi.Generators.DependencyProperty` to provide a clean namespace and prevent collisions.
+
+## Quick Start
+
+Define your properties using generic attributes. The generator automatically wires up the boilerplate.
+
+```csharp
 using DependencyPropertyGenerator;
 using System.Windows.Controls;
 
 #nullable enable
 
-namespace H.Generators.IntegrationTests;
+namespace MyApp.Controls;
 
 [DependencyProperty<bool>("IsSpinning", DefaultValue = true, Category = "Category", Description = "Description")]
 public partial class MyControl : UserControl
 {
-    // Optional
+    // Optional callback, automatically wired up by the generator
     partial void OnIsSpinningChanged(bool oldValue, bool newValue)
     {
     }
@@ -59,50 +71,39 @@ public partial class MyControl : UserControl
 [AttachedDependencyProperty<object, TreeView>("SelectedItem", DefaultBindingMode = DefaultBindingMode.TwoWay)]
 public static partial class TreeViewExtensions
 {
-    // Optional
+    // Optional callback, automatically wired up by the generator
     static partial void OnSelectedItemChanged(TreeView sender, object? oldValue, object? newValue)
     {
     }
 }
 ```
 
-will generate:
+<details>
+<summary><b>View the generated code</b></summary>
 
-```cs
-//HintName: MyControl.Properties.IsSpinning.generated.cs
-
+```csharp
+// HintName: MyControl.Properties.IsSpinning.generated.cs
 #nullable enable
 
-namespace H.Generators.IntegrationTests
+namespace MyApp.Controls
 {
     public partial class MyControl
     {
-        /// <summary>
-        /// Description<br/>
-        /// Default value: true
-        /// </summary>
         public static readonly global::System.Windows.DependencyProperty IsSpinningProperty =
             global::System.Windows.DependencyProperty.Register(
                 name: "IsSpinning",
                 propertyType: typeof(bool),
-                ownerType: typeof(global::H.Generators.IntegrationTests.MyControl),
+                ownerType: typeof(global::MyApp.Controls.MyControl),
                 typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(
                     defaultValue: (bool)true,
                     flags: global::System.Windows.FrameworkPropertyMetadataOptions.None,
                     propertyChangedCallback: static (sender, args) =>
                     {
-                        ((global::H.Generators.IntegrationTests.MyControl)sender).OnIsSpinningChanged(
+                        ((global::MyApp.Controls.MyControl)sender).OnIsSpinningChanged(
                             (bool)args.OldValue,
                             (bool)args.NewValue);
-                    },
-                    coerceValueCallback: null,
-                    isAnimationProhibited: false),
-                validateValueCallback: null);
+                    }));
 
-        /// <summary>
-        /// Description<br/>
-        /// Default value: true
-        /// </summary>
         [global::System.ComponentModel.Category("Category")]
         [global::System.ComponentModel.Description("Description")]
         public bool IsSpinning
@@ -117,181 +118,72 @@ namespace H.Generators.IntegrationTests
     }
 }
 ```
+*(Note: Code shortened for brevity)*
+</details>
 
-```cs
-//HintName: TreeViewExtensions.AttachedProperties.SelectedItem.generated.cs
+## Advanced Features
 
-#nullable enable
+### Target-Typed `new(...)` in Default Values
+You can cleanly define default values using C# 9.0+ target-typed `new()` expressions. The generator safely expands it to the full type:
 
-namespace H.Generators.IntegrationTests
-{
-    public static partial class TreeViewExtensions
-    {
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        public static readonly global::System.Windows.DependencyProperty SelectedItemProperty =
-            global::System.Windows.DependencyProperty.RegisterAttached(
-                name: "SelectedItem",
-                propertyType: typeof(object),
-                ownerType: typeof(global::H.Generators.IntegrationTests.TreeViewExtensions),
-                defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(
-                    defaultValue: default(object),
-                    flags: global::System.Windows.FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                    propertyChangedCallback: static (sender, args) =>
-                    {
-                        OnSelectedItemChanged(
-                            (global::System.Windows.Controls.TreeView)sender,
-                            (object?)args.OldValue,
-                            (object?)args.NewValue);
-                    },
-                    coerceValueCallback: null,
-                    isAnimationProhibited: false),
-                validateValueCallback: null);
-
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        public static void SetSelectedItem(global::System.Windows.DependencyObject element, object? value)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-            element.SetValue(SelectedItemProperty, value);
-        }
-
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.TreeView))]
-        public static object? GetSelectedItem(global::System.Windows.DependencyObject element)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-
-            return (object?)element.GetValue(SelectedItemProperty);
-        }
-
-        static partial void OnSelectedItemChanged();
-        static partial void OnSelectedItemChanged(global::System.Windows.Controls.TreeView treeView);
-        static partial void OnSelectedItemChanged(global::System.Windows.Controls.TreeView treeView, object? newValue);
-        static partial void OnSelectedItemChanged(global::System.Windows.Controls.TreeView treeView, object? oldValue, object? newValue);
-    }
-}
-```
-
-## Advanced usage
-
-### Target-typed `new(...)` / `new()` expressions in DefaultValue
-
-While it's [generally not recommended](https://devblogs.microsoft.com/oldnewthing/20191002-00/?p=102950)
-to use new expressions in properties, the generator supports C# 9.0+ target-typed `new(...)` and `new()` expressions:
-
-```cs
+```csharp
 public readonly record struct Data(int Value);
 
-// Target-typed new() syntax is automatically expanded to the property type:
+// Automatically expands to the property's type (new global::MyNamespace.Data(42))
 [AttachedDependencyProperty<Data, TreeView>("SelectedItem", DefaultValueExpression = "new(42)")]
-// Or default constructor:
+
+// Also supports the default constructor:
 [AttachedDependencyProperty<Data, TreeView>("SelectedItem", DefaultValueExpression = "new()")]
 ```
 
-Target-typed `new(...)` expressions are automatically expanded by the generator to the property type (e.g. `new global::MyNamespace.Data(...)`), eliminating the need to write verbose fully-qualified type names even when referencing types from external namespaces.
+### Event Binding
+The generator can automatically manage properties tied to UI events:
 
-### XML documentation
-
-The easiest way to add documentation is the `Description` parameter.
-It will add a `System.ComponentModel.Description` attribute to the property and will also be used in the xml documentation.  
-If for some reason you need to save raw xml documentation for your properties,
-there is an option to specify raw xml text for both DependencyProperty and getter/setter
-via `XmlDocumentation`/`PropertyXmlDocumentation` attribute properties.
-
-### Platform detection
-
-For some platforms there is no automatic detection. In these cases, the generator needs a little help by adding:
-
-```xml
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);HAS_UNO</DefineConstants>
-    <DefineConstants>$(DefineConstants);HAS_UNO_WINUI</DefineConstants>
-    <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants>
-  </PropertyGroup>
-```
-
-Automatic detection of Uno [was added in Uno 4.5](https://github.com/unoplatform/uno/pull/9443).
-
-### Bind event
-
-The generator can automatically control properties that depend on events (and supports `DefaultValueExpression = "new()"`):
-
-```cs
+```csharp
 [AttachedDependencyProperty<object, Grid>("BindEventProperty", BindEvent = nameof(Grid.MouseWheel), DefaultValueExpression = "new()")]
 public static partial class GridExtensions
 {
     private static void OnBindEventPropertyChanged_MouseWheel(object? sender, System.Windows.Input.MouseWheelEventArgs args)
     {
+        // Handle the mouse wheel event
     }
 }
 ```
+When the property value changes, it automatically unsubscribes the old value and subscribes the new value to `sender.MouseWheel += OnBindEventPropertyChanged_MouseWheel;`.
 
-will generate additional code:
-
-```cs
-static partial void OnBindEventPropertyChanged_BeforeBind(
-    global::System.Windows.Controls.Grid sender,
-    object? oldValue,
-    object? newValue);
-static partial void OnBindEventPropertyChanged_AfterBind(
-    global::System.Windows.Controls.Grid sender,
-    object? oldValue,
-    object? newValue);
-
-static partial void OnBindEventPropertyChanged(
-    global::System.Windows.Controls.Grid sender,
-    object? oldValue,
-    object? newValue)
-{
-    OnBindEventPropertyChanged_BeforeBind(
-        sender,
-        oldValue,
-        newValue);
-
-    if (oldValue is not default(object))
-    {
-        sender.MouseWheel -= OnBindEventPropertyChanged_MouseWheel;
-    }
-    if (newValue is not default(object))
-    {
-        sender.MouseWheel += OnBindEventPropertyChanged_MouseWheel;
-    }
-
-    OnBindEventPropertyChanged_AfterBind(
-        sender,
-        oldValue,
-        newValue);
-}
+### XML Documentation
+The easiest way to generate XML documentation is via the `Description` property:
+```csharp
+[DependencyProperty<bool>("IsSpinning", Description = "Indicates whether the element is spinning.")]
 ```
+This adds the `[Description]` attribute and embeds the text directly into the generated XML docs. For raw XML, use the `XmlDocumentation` or `PropertyXmlDocumentation` properties.
 
-### Override metadata
+### Platform Setup
 
-For UWP/WinUI/Uno, a special `RegisterPropertyChangedCallbacks()` method will be created,
-which you will need to call in the constructor to register property change callbacks.
-
-## Notes
-
-To use generic attributes, you need to set up `LangVersion` in your .csproj:
+If automatic platform detection fails (e.g., when targeting multiple platforms or custom builds), you can explicitly set your target in the `.csproj`:
 
 ```xml
-<LangVersion>preview</LangVersion>
+<PropertyGroup>
+  <DefineConstants>$(DefineConstants);HAS_WPF</DefineConstants>
+  <!-- <DefineConstants>$(DefineConstants);HAS_UNO</DefineConstants> -->
+  <!-- <DefineConstants>$(DefineConstants);HAS_UNO_WINUI</DefineConstants> -->
+  <!-- <DefineConstants>$(DefineConstants);HAS_AVALONIA</DefineConstants> -->
+</PropertyGroup>
 ```
 
-There are also non-Generic attributes here.
+### UWP / WinUI / Uno Metadata Overrides
 
-## Possible features
+For UWP, WinUI, and Uno, the generator creates a `RegisterPropertyChangedCallbacks()` method. You must call this method manually in your control's constructor to properly register the property change callbacks.
 
-- [Mutable default values in constructor](https://devblogs.microsoft.com/oldnewthing/20191003-00/?p=102959)
+## Prerequisites
 
-## Support
+- To use generic attributes (`[DependencyProperty<T>]`), ensure `LangVersion` is set to `11.0` or higher (or `preview`) in your `.csproj`:
+  ```xml
+  <LangVersion>preview</LangVersion>
+  ```
+- Non-generic attributes are also available for older language versions.
 
-Priority place for bugs: https://github.com/HavenDV/DependencyPropertyGenerator/issues  
-Priority place for ideas and general questions: https://github.com/HavenDV/DependencyPropertyGenerator/discussions  
-I also have a Discord support channel:  
-https://discord.gg/g8u2t9dKgE
+## Support & Feedback
+ 
+- **Bug Reports & Issues**: [GitHub Issues](https://github.com/kassyi/DependencyPropertyGenerator/issues)
+- **Discussions & Ideas**: [GitHub Discussions](https://github.com/kassyi/DependencyPropertyGenerator/discussions)

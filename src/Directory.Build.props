@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
     <Import Project="..\Directory.Build.props" />
 
@@ -16,7 +16,10 @@
     <PropertyGroup Label="Nuget">
         <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Authors>havendv</Authors>
+        <Authors>kassyi;havendv</Authors>
+        <PackageProjectUrl>https://github.com/kassyi/DependencyPropertyGenerator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/kassyi/DependencyPropertyGenerator</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>nuget_icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>

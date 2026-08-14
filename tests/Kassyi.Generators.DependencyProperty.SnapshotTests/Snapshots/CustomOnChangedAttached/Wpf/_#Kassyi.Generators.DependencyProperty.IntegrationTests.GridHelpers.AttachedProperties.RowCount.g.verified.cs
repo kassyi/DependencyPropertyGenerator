@@ -1,0 +1,39 @@
+﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers.AttachedProperties.RowCount.g.cs
+#nullable enable
+namespace Kassyi.Generators.DependencyProperty.IntegrationTests
+{
+    public static partial class GridHelpers
+    {
+        /// <summary>
+        /// Identifies the RowCount dependency property.<br/>
+        /// Default value: -1
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        public static readonly global::System.Windows.DependencyProperty RowCountProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "RowCount", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (int)-1, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            OnRowCountChanged((global::System.Windows.Controls.Grid)sender, (int)args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        /// <summary>
+        /// Default value: -1
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public static void SetRowCount(global::System.Windows.Controls.Grid element, int value)
+        {
+            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+            element.SetValue(RowCountProperty, value);
+        }
+
+        /// <summary>
+        /// Default value: -1
+        /// </summary>
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.Grid))]
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public static int GetRowCount(global::System.Windows.Controls.Grid element)
+        {
+            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+            return (int)element.GetValue(RowCountProperty);
+        }
+    }
+}

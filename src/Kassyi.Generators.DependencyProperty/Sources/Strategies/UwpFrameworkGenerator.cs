@@ -42,7 +42,7 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
             }
             else
             {
-                // fix for NotImplementedException: The member PropertyMetadata PropertyMetadata.Create(object defaultValue, PropertyChangedCallback propertyChangedCallback) is not implemented in Uno.
+                // [WHY] Workaround for NotImplementedException: PropertyMetadata.Create(defaultValue, callback) is not implemented in Uno.
                 var create = @class.Framework switch
                 {
                     Framework.Uno or Framework.UnoWinUi => $"new {type}",
