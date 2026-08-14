@@ -101,7 +101,7 @@ public partial class MyControl : UserControl
 {
     // ⚠️ 未対応のシグネチャ（例: 4引数や (DependencyObject, DependencyPropertyChangedEventArgs)）の場合:
     // 無関係なプライベートメソッドとして無視され、propertyChangedCallback: null が生成される。
-    // 💡 サイレント無視を防ぐため、重要な処理は 方式 A (OnChanged = nameof(...)) ででの明示指定を推奨。
+    // 💡 サイレント無視を防ぐため、重要な処理は 方式 A (OnChanged = nameof(...)) での明示指定を推奨。
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
 }
 ```

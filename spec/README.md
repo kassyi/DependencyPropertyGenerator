@@ -19,4 +19,4 @@ Please select your preferred language:
 | **01** | [Foundation & Domain](./en/01_foundation_and_domain.md) | [基盤とドメイン](./ja/01_foundation_and_domain.md) | Modular structure, ubiquitous language & DTO models |
 | **02** | [Pipeline & Architecture](./en/02_pipeline_architecture.md) | [パイプライン構造](./ja/02_pipeline_architecture.md) | Incremental generator pipeline & caching strategy |
 | **03** | [Generation & Optimization](./en/03_generation_and_optimization.md) | [生成戦略と最適化](./ja/03_generation_and_optimization.md) | `SourceWriter` (`ClassScope`), callbacks & best practices |
-| **04** | [Mathematical Model](./en/04_mathematical_model.md) | [数理モデル](./ja/04_mathematical_model.md) | Set-theoretic & pure functional compiler model |
+| **04** | [Complexity Model](./en/04_mathematical_model.md) | [計算量モデル](./ja/04_mathematical_model.md) | Worst-case complexity analysis & pipeline scaling limits |
