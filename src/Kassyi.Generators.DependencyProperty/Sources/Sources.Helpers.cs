@@ -52,20 +52,8 @@ internal static partial class SourceGenerationHelper
         }).WithGlobalPrefix();
     }
 
-    internal static string GenerateDependencyObjectType(Framework framework)
-    {
-        if (framework == Framework.Maui)
-        {
-            return GenerateTypeByPlatform(framework, "BindableObject");
-        }
-
-        if (framework == Framework.Avalonia)
-        {
-            return GenerateTypeByPlatform(framework, "AvaloniaObject");
-        }
-
-        return GenerateTypeByPlatform(framework, "DependencyObject");
-    }
+    internal static string GenerateDependencyObjectType(Framework framework) => 
+        framework == Framework.Maui ? GenerateTypeByPlatform(framework, "BindableObject") : GenerateTypeByPlatform(framework, framework == Framework.Avalonia ? "AvaloniaObject" : "DependencyObject");
 
     internal static string GenerateDefaultValue(DependencyPropertyData property)
     {
