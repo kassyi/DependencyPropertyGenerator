@@ -7,9 +7,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
-public partial class Tests : VerifyBase
+
+public abstract class SnapshotTestBase : VerifyBase
 {
-    private static string GetHeader(
+    protected static string GetHeader(
         Framework framework,
         bool nullable,
         bool @namespace,
@@ -23,13 +24,16 @@ public partial class Tests : VerifyBase
             Framework.Maui => "Microsoft.Maui",
             _ => "System.Windows",
         };
+
         var usings = string.Join(
             Environment.NewLine,
-            values.Select(value => string.IsNullOrWhiteSpace(value)
-                ? $"using {prefix};"
-                : value.StartsWith("System")
-                    ? $"using {value};"
-                    : $"using {prefix}.{value};"));
+            values.Select(value => value switch
+            {
+                "" or null => $"using {prefix};",
+                _ when value.StartsWith("System", StringComparison.Ordinal) => $"using {value};",
+                _ => $"using {prefix}.{value};"
+            }));
+
         return $"""
                 {usings}
                 using Kassyi.Generators.DependencyProperty;
@@ -38,75 +42,79 @@ public partial class Tests : VerifyBase
                 {(@namespace ? "namespace Kassyi.Generators.DependencyProperty.IntegrationTests;" : string.Empty)}
                 """;
     }
-    private static string GetHeader(
+
+    protected static string GetHeader(
         Framework framework,
-        params string[] values)
+        params string[] values) =>
+        GetHeader(framework, nullable: true, @namespace: true, values);
+
+    protected static Dictionary<string, string> GetGlobalOptions(Framework framework)
     {
-        return GetHeader(framework, nullable: true, @namespace: true, values);
+        var options = new Dictionary<string, string>
+        {
+            ["build_property.RecognizeFramework_Version"] = "0.0.0.0"
+        };
+
+        if (framework switch
+        {
+            Framework.Wpf => "build_property.UseWPF",
+            Framework.WinUi => "build_property.UseWinUI",
+            Framework.Maui => "build_property.UseMaui",
+            _ => null
+        } is { } useProp)
+        {
+            options[useProp] = "true";
+        }
+        else if (framework switch
+        {
+            Framework.Uwp => "WINDOWS_UWP",
+            Framework.Uno => "HAS_UNO",
+            Framework.UnoWinUi => "HAS_UNO;HAS_WINUI",
+            Framework.Avalonia => "HAS_AVALONIA",
+            _ => null
+        } is { } defines)
+        {
+            options["build_property.RecognizeFramework_DefineConstants"] = defines;
+        }
+
+        return options;
     }
-    private static Dictionary<string, string> GetGlobalOptions(Framework framework)
+
+    protected static ReferenceAssemblies GetReferenceAssemblies(Framework framework) => framework switch
     {
-        var globalOptions = new Dictionary<string, string>();
-        switch (framework)
-        {
-            case Framework.Wpf:
-                globalOptions.Add("build_property.UseWPF", "true");
-                break;
-            case Framework.WinUi:
-                globalOptions.Add("build_property.UseWinUI", "true");
-                break;
-            case Framework.Maui:
-                globalOptions.Add("build_property.UseMaui", "true");
-                break;
-            case Framework.Uwp:
-                globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
-                break;
-            case Framework.Uno:
-                globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
-                break;
-            case Framework.UnoWinUi:
-                globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
-                break;
-            case Framework.Avalonia:
-                globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
-                break;
-            case Framework.None:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(framework), framework, null);
-        }
-        globalOptions.Add("build_property.RecognizeFramework_Version", "0.0.0.0");
-        return globalOptions;
-    }
-    private static string ApplyFrameworkReplacements(string source, Framework framework)
+        Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
+        Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
+        Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
+        Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
+        Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
+        Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
+        Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
+        _ => throw new NotImplementedException($"Framework {framework} is not supported.")
+    };
+
+    private static string ApplyFrameworkReplacements(string source, Framework framework) => framework switch
     {
-        if (framework == Framework.Wpf)
-        {
-            source = source
-                .Replace("PointerEntered", "MouseEnter")
-                .Replace("PointerExited", "MouseLeave")
-                .Replace("PointerRoutedEventArgs", "MouseEventArgs");
-        }
-        if (framework is Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp)
-        {
-            source = source
-                .Replace("KeyEventArgs", "KeyRoutedEventArgs");
-        }
-        if (framework == Framework.Avalonia)
-        {
-            source = source
-                .ReplaceType("DispatcherObject", "Avalonia.AvaloniaObject")
-                .ReplaceType("DependencyObject", "Avalonia.AvaloniaObject")
-                .ReplaceType("Visual", "Avalonia.Interactivity.Interactive")
-                .ReplaceType("UIElement", "Avalonia.Input.InputElement")
-                .ReplaceType("FrameworkElement", "Avalonia.Controls.Control")
-                .Replace("static partial class", "partial class")
-                .Replace("Brush", "IBrush")
-                .Replace("PointerRoutedEventArgs", "PointerEventArgs");
-        }
-        if (framework == Framework.Maui)
-        {
-            source = source
+        Framework.Wpf => source
+            .Replace("PointerEntered", "MouseEnter")
+            .Replace("PointerExited", "MouseLeave")
+            .Replace("PointerRoutedEventArgs", "MouseEventArgs"),
+
+        Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp => source
+            .Replace("KeyEventArgs", "KeyRoutedEventArgs"),
+
+        Framework.Avalonia => source
+            .ReplaceType("DispatcherObject", "Avalonia.AvaloniaObject")
+            .ReplaceType("DependencyObject", "Avalonia.AvaloniaObject")
+            .ReplaceType("Visual", "Avalonia.Interactivity.Interactive")
+            .ReplaceType("UIElement", "Avalonia.Input.InputElement")
+            .ReplaceType("FrameworkElement", "Avalonia.Controls.Control")
+            .Replace("static partial class", "partial class")
+            .Replace("Brush", "IBrush")
+            .Replace("PointerRoutedEventArgs", "PointerEventArgs"),
+
+        Framework.Maui => $"""
+            using Microsoft.Maui.Controls;
+            {source
                 .Replace("using Microsoft.Maui.Input;", string.Empty)
                 .Replace("using Microsoft.Maui.Controls;", string.Empty)
                 .Replace("using Microsoft.Maui.Media;", string.Empty)
@@ -120,15 +128,48 @@ public partial class Tests : VerifyBase
                 .Replace("KeyEventArgs", "global::System.EventArgs")
                 .Replace("PointerEntered", "Loaded")
                 .Replace("PointerExited", "Unloaded")
-                .Replace("PointerRoutedEventArgs", "global::System.EventArgs");
-            source = $"""
-                      using Microsoft.Maui.Controls;
-                      {source}
-                      """;
-        }
-        return source;
+                .Replace("PointerRoutedEventArgs", "global::System.EventArgs")}
+            """,
+
+        _ => source
+    };
+
+    private static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
+        string source,
+        Framework framework,
+        CancellationToken cancellationToken,
+        params IIncrementalGenerator[] additionalGenerators)
+        where T : IIncrementalGenerator, new()
+    {
+        var processedSource = ApplyFrameworkReplacements(source, framework);
+        var references = await GetReferenceAssemblies(framework).ResolveAsync(null, cancellationToken);
+
+        var compilation = (Compilation)CSharpCompilation.Create(
+            assemblyName: "Tests",
+            syntaxTrees: [
+                CSharpSyntaxTree.ParseText(processedSource, options: new CSharpParseOptions(LanguageVersion.Preview),
+                    cancellationToken: cancellationToken),
+            ],
+            references: references,
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new T();
+        IIncrementalGenerator[] allGenerators = generator switch
+        {
+            WeakEventGenerator or RoutedEventGenerator or StaticConstructorGenerator => [generator, .. additionalGenerators],
+            _ when !additionalGenerators.Any(static x => x is StaticConstructorGenerator) => [generator, .. additionalGenerators, new StaticConstructorGenerator()],
+            _ => [generator, .. additionalGenerators]
+        };
+
+        var driver = CSharpGeneratorDriver.Create(
+                generators: allGenerators.Select(GeneratorExtensions.AsSourceGenerator).ToArray(),
+                parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview))
+            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)));
+
+        return (compilation, driver);
     }
-    private async Task CheckSourceAsync<T>(
+
+    protected async Task CheckSourceAsync<T>(
         string source,
         Framework framework,
         [CallerMemberName] string? callerName = null,
@@ -136,93 +177,37 @@ public partial class Tests : VerifyBase
         params IIncrementalGenerator[] additionalGenerators)
         where T : IIncrementalGenerator, new()
     {
-        source = ApplyFrameworkReplacements(source, framework);
-        var referenceAssemblies = framework switch
-        {
-            Framework.None => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
-            Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
-            Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
-            Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
-            Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
-            Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
-            _ => throw new NotImplementedException(),
-        };
-        var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
-        var compilation = (Compilation)CSharpCompilation.Create(
-            assemblyName: "Tests",
-            syntaxTrees: [
-                CSharpSyntaxTree.ParseText(source, options: new CSharpParseOptions(LanguageVersion.Preview),
-                    cancellationToken: cancellationToken),
-            ],
-            references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-        var generator = new T();
-        if (generator is not (WeakEventGenerator or RoutedEventGenerator or StaticConstructorGenerator) &&
-            !additionalGenerators.Any(static x => x is StaticConstructorGenerator))
-        {
-            additionalGenerators = [.. additionalGenerators, new StaticConstructorGenerator()];
-        }
-        GeneratorDriver driver = additionalGenerators.Any()
-            ? CSharpGeneratorDriver.Create(
-                generators: [generator.AsSourceGenerator(), .. additionalGenerators.Select(GeneratorExtensions.AsSourceGenerator)],
-                parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview))
-            : CSharpGeneratorDriver.Create(
-                generators: [generator.AsSourceGenerator()],
-                parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
-        driver = driver
-            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)))
-            .RunGeneratorsAndUpdateCompilation(compilation, out compilation, out _, cancellationToken);
+        var (compilation, driver) = await CreateCompilationAndDriverAsync<T>(source, framework, cancellationToken, additionalGenerators);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out _, cancellationToken);
         var diagnostics = compilation.GetDiagnostics(cancellationToken);
+
         await Task.WhenAll(
             Verify(diagnostics.ToSnapshotModels())
                 .UseDirectory($"Snapshots/{callerName}/{framework:G}")
+                .UseTypeName("Tests")
                 .UseTextForParameters("Diagnostics"),
             Verify(driver)
                 .UseDirectory($"Snapshots/{callerName}/{framework:G}")
                 .UseFileName("_"));
     }
-    private static async Task<string> GenerateSourceAsync<T>(
+
+    protected static async Task<string> GenerateSourceAsync<T>(
         string source,
         Framework framework,
         CancellationToken cancellationToken = default)
         where T : IIncrementalGenerator, new()
     {
-        source = ApplyFrameworkReplacements(source, framework);
-        var referenceAssemblies = framework switch
-        {
-            Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
-            Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
-            Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
-            Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
-            Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
-            Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
-            _ => throw new NotImplementedException(),
-        };
-        var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
-        var compilation = (Compilation)CSharpCompilation.Create(
-            assemblyName: "Tests",
-            syntaxTrees: [
-                CSharpSyntaxTree.ParseText(source, options: new CSharpParseOptions(LanguageVersion.Preview),
-                    cancellationToken: cancellationToken),
-            ],
-            references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: [new T().AsSourceGenerator()],
-            parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview));
-        driver = driver
-            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)))
-            .RunGeneratorsAndUpdateCompilation(compilation, out _, out _, cancellationToken);
+        var (compilation, driver) = await CreateCompilationAndDriverAsync<T>(source, framework, cancellationToken);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _, cancellationToken);
+
         return string.Join(
             Environment.NewLine,
             driver.GetRunResult().Results
-                .SelectMany(result => result.GeneratedSources)
-                .Select(generatedSource => generatedSource.SourceText.ToString()));
+                .SelectMany(static result => result.GeneratedSources)
+                .Select(static generatedSource => generatedSource.SourceText.ToString()));
     }
 }
+
 internal static class DiagnosticExtensions
 {
     internal static IReadOnlyList<DiagnosticSnapshot> ToSnapshotModels(this IEnumerable<Diagnostic> diagnostics)
@@ -239,31 +224,21 @@ internal static class DiagnosticExtensions
             .ThenBy(static x => x.Span ?? string.Empty)
             .ThenBy(static x => x.Id)];
     }
-    private static string? GetLocation(Location location)
+
+    private static string? GetLocation(Location location) => location switch
     {
-        if (location is null or { IsInSource: false })
-        {
-            return null;
-        }
-        var path = location.GetLineSpan().Path;
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return null;
-        }
-        return path.Replace('/', '\\');
-    }
-    private static string? GetSpan(Location location)
+        { IsInSource: true } when location.GetLineSpan().Path is { Length: > 0 } path => path.Replace('/', '\\'),
+        _ => null
+    };
+
+    private static string? GetSpan(Location location) => location switch
     {
-        if (location is null or { IsInSource: false })
-        {
-            return null;
-        }
-        var lineSpan = location.GetLineSpan();
-        var start = lineSpan.StartLinePosition;
-        var end = lineSpan.EndLinePosition;
-        return $"({start.Line + 1},{start.Character + 1})-({end.Line + 1},{end.Character + 1})";
-    }
+        { IsInSource: true } when location.GetLineSpan() is var span =>
+            $"({span.StartLinePosition.Line + 1},{span.StartLinePosition.Character + 1})-({span.EndLinePosition.Line + 1},{span.EndLinePosition.Character + 1})",
+        _ => null
+    };
 }
+
 internal sealed record DiagnosticSnapshot(
     string Id,
     string Severity,
@@ -271,6 +246,7 @@ internal sealed record DiagnosticSnapshot(
     string? Location,
     string? Span,
     string MessageFormat);
+
 internal static class StringExtensions
 {
     internal static string ReplaceType(this string source, string from, string to)
@@ -282,8 +258,7 @@ internal static class StringExtensions
             .Replace($"<{from}", $"<global::{to}")
             .Replace($"{from}>", $"global::{to}>")
             .Replace($"({from}", $"(global::{to}")
-            .Replace($"{from})", $"global::{to})")
-            ;
+            .Replace($"{from})", $"global::{to})");
     }
 }
 
