@@ -32,7 +32,7 @@ public static class StringExtensions
         input = input ?? throw new ArgumentNullException(nameof(input));
         if (input.Length == 0) throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
 
-        string camelCased = char.ToLower(input[0], CultureInfo.InvariantCulture) + input[1..];
+        var camelCased = char.ToLower(input[0], CultureInfo.InvariantCulture) + input[1..];
         return EscapeKeyword(camelCased);
     }
 
