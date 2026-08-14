@@ -8,5 +8,5 @@ namespace Kassyi.Generators.Extensions;
 public readonly record struct ClassWithAttributesContext(
     SemanticModel SemanticModel,
     ImmutableArray<AttributeData> Attributes,
-    ClassDeclarationSyntax ClassSyntax,
+    TypeDeclarationSyntax ClassSyntax,
     INamedTypeSymbol ClassSymbol);

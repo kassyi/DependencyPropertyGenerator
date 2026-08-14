@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
 
@@ -27,11 +28,9 @@ internal sealed class DependencyPropertyDataBuilder
     private FrameworkMetadataData _frameworkMetadata;
     private XmlDocumentationData _xmlDocumentation;
     private ValidationAndCallbackData _validationAndCallbacks;
+    private bool _isPartialProperty;
 
-    private TypedConstant GetNamedArgument(string name)
-    {
-        return _namedArguments.TryGetValue(name, out var value) ? value : default;
-    }
+    private TypedConstant GetNamedArgument(string name) => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
     public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached)
     {
@@ -48,12 +47,17 @@ internal sealed class DependencyPropertyDataBuilder
         _isAttached = isAttached;
 
         _name = attribute.ConstructorArguments is { Length: > 0 } ctorArgs
-            ? ctorArgs[0].Value?.ToString() ?? string.Empty
+            ? ctorArgs[0].Value?.ToString()?.TrimStart('@') ?? string.Empty
             : string.Empty;
 
         var typeSymbol = attribute.GetGenericTypeArgument(0) ??
             (attribute.ConstructorArguments is { Length: > 1 } ctorArgs2 ? ctorArgs2[1].Value as ITypeSymbol : null);
         
+        if (typeSymbol is { IsRefLikeType: true })
+        {
+            throw new InvalidOperationException($"DPG0003: The property type '{typeSymbol.ToDisplayString()}' is a ref struct and cannot be used as a DependencyProperty.");
+        }
+
         _type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
         _shortType = typeSymbol?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? string.Empty;
         _isValueType = typeSymbol?.IsValueType ?? true;
@@ -161,13 +165,31 @@ internal sealed class DependencyPropertyDataBuilder
         var targetType = _type.Replace("global::", string.Empty).Replace("?", string.Empty);
         var targetSenderType = GetTargetSenderType(classSymbol);
 
+        _isPartialProperty = classSymbol != null && classSymbol.DeclaringSyntaxReferences
+            .Select(x => x.GetSyntax())
+            .OfType<ClassDeclarationSyntax>()
+            .SelectMany(c => c.Members)
+            .OfType<PropertyDeclarationSyntax>()
+            .Any(p => p.Identifier.Text == _name && p.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword) || m.Text == "partial"));
+
         var matchChanged = classSymbol != null
             ? PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
             : new MethodSignatureMatch();
 
+        if (!isCustomOnChanged)
+        {
+            matchChanged.Signatures = _isAttached
+                ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
+                : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
+        }
+
         var matchChanging = classSymbol != null
             ? PrepareData.CheckMethodsDirectly(classSymbol, onChangingName, targetType, targetSenderType)
             : new MethodSignatureMatch();
+
+        matchChanging.Signatures = _isAttached
+            ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
+            : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
 
         var bindEventsArray = GetBindEventsArray(bindEvent, bindEvents);
 
@@ -221,7 +243,7 @@ internal sealed class DependencyPropertyDataBuilder
         }
 
         // [WHY] Avoid LINQ Select/Where chains to prevent array and enumerator allocations.
-        if (bindEvents.Kind == TypedConstantKind.Array && !bindEvents.Values.IsDefaultOrEmpty)
+        if (bindEvents is { Kind: TypedConstantKind.Array, Values.IsDefaultOrEmpty: false })
         {
             var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
             foreach (var value in bindEvents.Values)
@@ -257,7 +279,8 @@ internal sealed class DependencyPropertyDataBuilder
             ComponentModel: _componentModel,
             FrameworkMetadata: _frameworkMetadata,
             XmlDocumentation: _xmlDocumentation,
-            ValidationAndCallbacks: _validationAndCallbacks
+            ValidationAndCallbacks: _validationAndCallbacks,
+            IsPartialProperty: _isPartialProperty
         );
     }
 }
