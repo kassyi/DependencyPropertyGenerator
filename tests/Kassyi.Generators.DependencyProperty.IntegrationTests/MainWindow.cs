@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+#nullable enable
+
+using System.ComponentModel;
 using Avalonia.Controls;
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
 

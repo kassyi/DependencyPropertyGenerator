@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+#nullable enable
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Tests.Extensions;

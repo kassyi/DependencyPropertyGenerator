@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Runtime.CompilerServices;
 using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Tests.Extensions;

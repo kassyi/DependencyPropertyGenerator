@@ -1,8 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 
 namespace Kassyi.Generators.Extensions;
 
 /// <summary>Provides string manipulation and normalization utilities for source generation.</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("ReSharper", "UnusedMethod.Global", Justification = "Library extension methods for Source Generators")]
+[SuppressMessage("Roslynator", "RCS1163:Unused parameter", Justification = "Library extension methods for Source Generators")]
 public static class StringExtensions
 {
     /// <summary>Converts the input string to PascalCase suitable for a C# property name.</summary>
@@ -15,13 +20,13 @@ public static class StringExtensions
 #if NET6_0_OR_GREATER
             _ => string.Concat(input[0].ToString().ToUpper(CultureInfo.InvariantCulture), input.AsSpan(1)),
 #else
-            _ => input[0].ToString().ToUpper(CultureInfo.InvariantCulture) + input.Substring(1),
+            _ => input[0].ToString().ToUpper(CultureInfo.InvariantCulture) + input[1..],
 #endif
         };
     }
 
     /// <summary>Converts the input string to camelCase and escapes C# language keywords.</summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "C# identifier and camelCase parameter normalization requires lowercase string comparison.")]
+    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "C# identifier and camelCase parameter normalization requires lowercase string comparison.")]
     public static string ToParameterName(this string input)
     {
         input = input ?? throw new ArgumentNullException(nameof(input));
@@ -113,7 +118,7 @@ public static class StringExtensions
 #if NET6_0_OR_GREATER
             _ => string.Concat(input[0].ToString().ToLower(CultureInfo.InvariantCulture), input.AsSpan(1)),
 #else
-            _ => input[0].ToString().ToLower(CultureInfo.InvariantCulture) + input.Substring(1),
+            _ => input[0].ToString().ToLower(CultureInfo.InvariantCulture) + input[1..],
 #endif
 #pragma warning restore CA1308 // Normalize strings to uppercase
         };
@@ -165,7 +170,7 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         var lastDot = fullTypeName.LastIndexOf('.');
-        return lastDot >= 0 ? fullTypeName.Substring(0, lastDot) : string.Empty;
+        return lastDot >= 0 ? fullTypeName[..lastDot] : string.Empty;
     }
 
     /// <summary>Extracts the unqualified type name from a fully qualified type name.</summary>
@@ -174,7 +179,7 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         var lastDot = fullTypeName.LastIndexOf('.');
-        return lastDot >= 0 ? fullTypeName.Substring(lastDot + 1) : fullTypeName;
+        return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
     }
 
     /// <summary>Prepends the <c>global::</c> namespace alias to a fully qualified type name.</summary>
@@ -183,6 +188,36 @@ public static class StringExtensions
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
         return $"global::{fullTypeName}";
+    }
+
+    private static readonly char[] s_specialChars = ['<', '>', ',', ' ', '_'];
+
+    /// <summary>Sanitizes a type name or string injectively for use in Roslyn source generator hint names and file paths in a single pass without intermediate string allocations.</summary>
+    public static string SanitizeFileName(this string input)
+    {
+        input = input ?? throw new ArgumentNullException(nameof(input));
+
+        // Fast path: if there are no characters requiring escaping, return input with 0 allocations.
+        if (input.IndexOfAny(s_specialChars) < 0)
+        {
+            return input;
+        }
+
+        var sb = new StringBuilder(input.Length + 16);
+        foreach (var ch in input)
+        {
+            _ = ch switch
+            {
+                '<' => sb.Append("_lt_"),
+                '>' => sb.Append("_gt_"),
+                ',' => sb.Append("_comma_"),
+                ' ' => sb.Append("_space_"),
+                '_' => sb.Append("__"),
+                _ => sb.Append(ch)
+            };
+        }
+
+        return sb.ToString();
     }
 }
 
