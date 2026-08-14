@@ -5,7 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
-public partial class Tests
+[TestClass]
+public class OrthogonalMatrixTests : SnapshotTestBase
 {
     // 1. 基本ハッピーパス (ブロック名前空間 x public partial class)
     [TestMethod]

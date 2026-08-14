@@ -1,8 +1,8 @@
-﻿using Kassyi.Generators.DependencyProperty.Generators;
+using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
-public partial class Tests
+public class PropertyTests : SnapshotTestBase
 {
     [TestMethod]
     [DataRow(Framework.Wpf)]
