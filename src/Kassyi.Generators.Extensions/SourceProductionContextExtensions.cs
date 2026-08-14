@@ -15,7 +15,9 @@ public static class SourceProductionContextExtensions
         id = id ?? throw new ArgumentNullException(nameof(id));
         exception = exception ?? throw new ArgumentNullException(nameof(exception));
 
-        context.ReportDiagnostic(exception.ToDiagnostic(id, prefix));
+        context.ReportDiagnostic(exception is Models.DiagnosticException { Diagnostic: { } diagnostic }
+            ? diagnostic
+            : exception.ToDiagnostic(id, prefix));
     }
 
     /// <summary>Creates a compiler error diagnostic representing an unhandled exception.</summary>
