@@ -46,7 +46,8 @@ internal static partial class SourceGenerationHelper
 
                 var type = GenerateType(property);
                 
-                using (writer.Scope($"_ = this.RegisterPropertyChangedCallback(dp: {property.Name}Property, callback: static (sender, dependencyProperty) =>", ");"))
+                writer.AppendLine($"_ = this.RegisterPropertyChangedCallback(dp: {property.Name}Property, callback: static (sender, dependencyProperty) =>");
+                using (writer.Scope("{", "});"))
                 {
                     var senderCast = $"(({senderType})sender)";
                     var getValue = $"({type})sender.GetValue(dependencyProperty)";
