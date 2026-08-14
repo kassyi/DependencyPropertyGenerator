@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: -1
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty RowCountProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "RowCount", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers), defaultValue: (int)-1, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty RowCountProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "RowCount", returnType: typeof(int), declaringType: typeof(GridHelpers), defaultValue: (int)-1, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnRowCountChanged((global::Microsoft.Maui.Controls.Grid)sender, (int)newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>

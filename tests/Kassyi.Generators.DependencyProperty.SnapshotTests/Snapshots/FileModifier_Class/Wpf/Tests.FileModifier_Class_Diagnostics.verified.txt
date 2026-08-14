@@ -1,5 +1,25 @@
 ﻿[
   {
+    Id: DPG,
+    Severity: Error,
+    MessageFormat:
+System.InvalidOperationException: DPG0002: File scoped types are not supported by Source Generators ('MyControl').
+   at Kassyi.Generators.DependencyProperty.PrepareData.GetClassData(INamedTypeSymbol classSymbol, Framework framework, String version) in {SolutionDirectory}src\Kassyi.Generators.DependencyProperty\PrepareData.cs:line 133
+   at Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator.PrepareData(ValueTuple`2 tuple) in {SolutionDirectory}src\Kassyi.Generators.DependencyProperty\Generators\DependencyPropertyGenerator.cs:line 36
+   at Kassyi.Generators.Extensions.IncrementalValuesProviderExtensions.<>c__DisplayClass9_0`2.<SelectAndReportExceptions>b__0(TSource x, CancellationToken _) in {SolutionDirectory}src\Kassyi.Generators.Extensions\IncrementalValuesProviderExtensions.cs:line 183
+   at Kassyi.Generators.Extensions.IncrementalValuesProviderExtensions.<>c__DisplayClass8_0`2.<SelectAndReportExceptions>b__0(TSource value, CancellationToken cancellationToken) in {SolutionDirectory}src\Kassyi.Generators.Extensions\IncrementalValuesProviderExtensions.cs:line 158
+  },
+  {
+    Id: SCG,
+    Severity: Error,
+    MessageFormat:
+System.InvalidOperationException: DPG0002: File scoped types are not supported by Source Generators ('MyControl').
+   at Kassyi.Generators.DependencyProperty.PrepareData.GetClassData(INamedTypeSymbol classSymbol, Framework framework, String version) in {SolutionDirectory}src\Kassyi.Generators.DependencyProperty\PrepareData.cs:line 133
+   at Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator.PrepareData(ValueTuple`2 tuple, Boolean isAttached) in {SolutionDirectory}src\Kassyi.Generators.DependencyProperty\Generators\StaticConstructorGenerator.cs:line 85
+   at Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator.<>c__DisplayClass5_0.<GetClassData>b__0(ValueTuple`2 x, CancellationToken _) in {SolutionDirectory}src\Kassyi.Generators.DependencyProperty\Generators\StaticConstructorGenerator.cs:line 126
+   at Kassyi.Generators.Extensions.IncrementalValuesProviderExtensions.<>c__DisplayClass8_0`2.<SelectAndReportExceptions>b__0(TSource value, CancellationToken cancellationToken) in {SolutionDirectory}src\Kassyi.Generators.Extensions\IncrementalValuesProviderExtensions.cs:line 158
+  },
+  {
     Id: CS8019,
     Severity: Hidden,
     WarningLevel: 1,

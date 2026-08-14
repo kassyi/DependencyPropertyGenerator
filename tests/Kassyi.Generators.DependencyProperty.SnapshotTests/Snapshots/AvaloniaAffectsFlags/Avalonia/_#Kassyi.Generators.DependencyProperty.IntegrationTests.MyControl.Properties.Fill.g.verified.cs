@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(IBrush)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<global::Avalonia.Media.IBrush?> FillProperty = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl, global::Avalonia.Media.IBrush?>(name: "Fill", defaultValue: default(global::Avalonia.Media.IBrush), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<global::Avalonia.Media.IBrush?> FillProperty = global::Avalonia.AvaloniaProperty.Register<MyControl, global::Avalonia.Media.IBrush?>(name: "Fill", defaultValue: default(global::Avalonia.Media.IBrush), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(IBrush)
         /// </summary>

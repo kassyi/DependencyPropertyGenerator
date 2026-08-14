@@ -2,23 +2,23 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class AnotherControl
+    public partial class AnotherControl
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty2"/> dependency property.<br/>
         /// Default value: default((int, string))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyProperty2Property = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty2", returnType: typeof((int, string)), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), defaultValue: default((int, string)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyProperty2Property = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty2", returnType: typeof((int, string)), declaringType: typeof(AnotherControl), defaultValue: default((int, string)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed(((int, string))newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed(((int, string))oldValue, ((int, string))newValue);
+            ((AnotherControl)sender).OnMyProperty2Changed();
+            ((AnotherControl)sender).OnMyProperty2Changed(((int, string))newValue);
+            ((AnotherControl)sender).OnMyProperty2Changed(((int, string))oldValue, ((int, string))newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing(((int, string))newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing(((int, string))oldValue, ((int, string))newValue);
+            ((AnotherControl)sender).OnMyProperty2Changing();
+            ((AnotherControl)sender).OnMyProperty2Changing(((int, string))newValue);
+            ((AnotherControl)sender).OnMyProperty2Changing(((int, string))oldValue, ((int, string))newValue);
         }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default((int, string))

@@ -9,7 +9,7 @@ namespace Namespace2
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<int> MyPropertyProperty = global::Avalonia.AvaloniaProperty.Register<global::Namespace2.MyControl, int>(name: "MyProperty", defaultValue: default(int), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<int> MyPropertyProperty = global::Avalonia.AvaloniaProperty.Register<MyControl, int>(name: "MyProperty", defaultValue: default(int), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

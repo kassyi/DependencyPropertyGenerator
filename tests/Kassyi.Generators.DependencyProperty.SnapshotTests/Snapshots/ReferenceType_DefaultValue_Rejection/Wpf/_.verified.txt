@@ -1,0 +1,42 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
+[DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "new List<int>()")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class MyControl : UserControl
+*/
+ : (6,1)-(6,96),
+      Message: Default value 'new List<int>()' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
+[DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "new List<int>()")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class MyControl : UserControl
+*/
+ : (6,1)-(6,96),
+      Message: Default value 'new List<int>()' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

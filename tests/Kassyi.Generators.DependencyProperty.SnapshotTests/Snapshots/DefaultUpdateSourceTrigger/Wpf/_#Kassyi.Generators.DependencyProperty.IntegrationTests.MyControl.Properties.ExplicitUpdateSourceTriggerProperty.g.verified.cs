@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "ExplicitUpdateSourceTriggerProperty"/> dependency property.<br/>
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty ExplicitUpdateSourceTriggerPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "ExplicitUpdateSourceTriggerProperty", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty ExplicitUpdateSourceTriggerPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "ExplicitUpdateSourceTriggerProperty", propertyType: typeof(bool), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)args.OldValue, (bool)args.NewValue);
+            ((MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged();
+            ((MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)args.NewValue);
+            ((MyControl)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)args.OldValue, (bool)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false, defaultUpdateSourceTrigger: global::System.Windows.Data.UpdateSourceTrigger.Explicit), validateValueCallback: null);
         /// <summary>
         /// Default value: default(bool)

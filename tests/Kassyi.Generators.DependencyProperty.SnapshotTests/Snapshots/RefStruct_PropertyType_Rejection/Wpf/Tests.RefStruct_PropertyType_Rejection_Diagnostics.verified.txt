@@ -14,114 +14,15 @@
     MessageFormat: Unnecessary using directive.
   },
   {
-    Id: CS0246,
+    Id: DPG0003,
     Severity: Error,
-    Span: (7,42)-(7,60),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+    Span: (9,2)-(9,55),
+    MessageFormat: The property type '{0}' is a ref struct and cannot be used as a DependencyProperty
   },
   {
-    Id: CS0246,
+    Id: DPG0003,
     Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (15,22)-(15,40),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (18,27)-(18,45),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0030,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (23,103)-(23,137),
-    MessageFormat: Cannot convert type '{0}' to '{1}'
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (23,104)-(23,122),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0030,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (24,103)-(24,137),
-    MessageFormat: Cannot convert type '{0}' to '{1}'
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (24,104)-(24,122),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0030,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (24,139)-(24,173),
-    MessageFormat: Cannot convert type '{0}' to '{1}'
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (24,140)-(24,158),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (35,8)-(35,26),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0030,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (37,8)-(37,57),
-    MessageFormat: Cannot convert type '{0}' to '{1}'
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (37,9)-(37,27),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS1503,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (38,37)-(38,42),
-    MessageFormat: Argument {0}: cannot convert from '{1}' to '{2}'
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (45,34)-(45,52),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (47,34)-(47,52),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
-  },
-  {
-    Id: CS0246,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
-    Span: (47,64)-(47,82),
-    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+    Span: (9,2)-(9,55),
+    MessageFormat: The property type '{0}' is a ref struct and cannot be used as a DependencyProperty
   }
 ]

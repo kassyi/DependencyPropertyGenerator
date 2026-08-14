@@ -2,7 +2,7 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -58,7 +58,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 
             internal void OnUrlChanged(object? sender, string? args)
             {
-                DeliverEvent(sender, args);
+                DeliverEvent(sender, args as object as global::System.EventArgs ?? global::System.EventArgs.Empty);
             }
         }
 

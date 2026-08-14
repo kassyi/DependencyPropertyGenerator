@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "ReadOnlyProperty"/> dependency property.<br/>
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        internal static readonly global::System.Windows.DependencyPropertyKey ReadOnlyPropertyPropertyKey = global::System.Windows.DependencyProperty.RegisterReadOnly(name: "ReadOnlyProperty", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        internal static readonly global::System.Windows.DependencyPropertyKey ReadOnlyPropertyPropertyKey = global::System.Windows.DependencyProperty.RegisterReadOnly(name: "ReadOnlyProperty", propertyType: typeof(bool), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnReadOnlyPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnReadOnlyPropertyChanged((bool)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnReadOnlyPropertyChanged((bool)args.OldValue, (bool)args.NewValue);
+            ((MyControl)sender).OnReadOnlyPropertyChanged();
+            ((MyControl)sender).OnReadOnlyPropertyChanged((bool)args.NewValue);
+            ((MyControl)sender).OnReadOnlyPropertyChanged((bool)args.OldValue, (bool)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Identifies the <see cref = "ReadOnlyProperty"/> dependency property.<br/>

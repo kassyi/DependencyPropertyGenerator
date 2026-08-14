@@ -8,9 +8,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         {
             TextProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<string?>>(static x =>
             {
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)x.Sender).OnTextChanged();
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)x.Sender).OnTextChanged((string? )x.NewValue.GetValueOrDefault());
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)x.Sender).OnTextChanged((string? )x.OldValue.GetValueOrDefault(), (string? )x.NewValue.GetValueOrDefault());
+                ((MyControl)x.Sender).OnTextChanged();
+                ((MyControl)x.Sender).OnTextChanged((string? )x.NewValue.GetValueOrDefault());
+                ((MyControl)x.Sender).OnTextChanged((string? )x.OldValue.GetValueOrDefault(), (string? )x.NewValue.GetValueOrDefault());
             }));
         }
     }

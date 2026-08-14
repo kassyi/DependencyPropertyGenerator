@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class ControlB
+    public sealed partial class ControlB
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty2"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyProperty2Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.ControlB), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyProperty2Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof(int), ownerType: typeof(ControlB), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.ControlB)sender).OnMyProperty2Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.ControlB)sender).OnMyProperty2Changed((int)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.ControlB)sender).OnMyProperty2Changed((int)args.OldValue, (int)args.NewValue);
+            ((ControlB)sender).OnMyProperty2Changed();
+            ((ControlB)sender).OnMyProperty2Changed((int)args.NewValue);
+            ((ControlB)sender).OnMyProperty2Changed((int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)

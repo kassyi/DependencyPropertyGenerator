@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "BrokenProfile1"/> dependency property.<br/>
         /// Default value: 0
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty BrokenProfile1Property = global::System.Windows.DependencyProperty.Register(name: "BrokenProfile1", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile(1.5, 48.0, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty BrokenProfile1Property = global::System.Windows.DependencyProperty.Register(name: "BrokenProfile1", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile(1.5, 48.0, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnBrokenProfile1Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnBrokenProfile1Changed((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnBrokenProfile1Changed((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.OldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.NewValue);
+            ((MyControl)sender).OnBrokenProfile1Changed();
+            ((MyControl)sender).OnBrokenProfile1Changed((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.NewValue);
+            ((MyControl)sender).OnBrokenProfile1Changed((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.OldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: 0

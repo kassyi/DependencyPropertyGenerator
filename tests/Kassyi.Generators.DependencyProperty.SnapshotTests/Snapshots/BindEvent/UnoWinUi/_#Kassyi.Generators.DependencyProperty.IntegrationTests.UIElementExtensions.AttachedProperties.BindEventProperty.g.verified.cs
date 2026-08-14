@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty BindEventPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "BindEventProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.UIElementExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty BindEventPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "BindEventProperty", propertyType: typeof(object), ownerType: typeof(UIElementExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
         {
             OnBindEventPropertyChanged();
             OnBindEventPropertyChanged((global::Microsoft.UI.Xaml.UIElement)sender);

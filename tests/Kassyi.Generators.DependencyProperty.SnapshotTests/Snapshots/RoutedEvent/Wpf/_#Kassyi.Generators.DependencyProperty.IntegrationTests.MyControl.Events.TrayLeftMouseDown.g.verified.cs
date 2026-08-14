@@ -2,12 +2,12 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.RoutedEvent TrayLeftMouseDownEvent = global::System.Windows.EventManager.RegisterRoutedEvent(name: "TrayLeftMouseDown", routingStrategy: global::System.Windows.RoutingStrategy.Bubble, handlerType: typeof(global::System.Windows.RoutedEventHandler), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl));
+        public static readonly global::System.Windows.RoutedEvent TrayLeftMouseDownEvent = global::System.Windows.EventManager.RegisterRoutedEvent(name: "TrayLeftMouseDown", routingStrategy: global::System.Windows.RoutingStrategy.Bubble, handlerType: typeof(global::System.Windows.RoutedEventHandler), ownerType: typeof(MyControl));
         /// <summary>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]

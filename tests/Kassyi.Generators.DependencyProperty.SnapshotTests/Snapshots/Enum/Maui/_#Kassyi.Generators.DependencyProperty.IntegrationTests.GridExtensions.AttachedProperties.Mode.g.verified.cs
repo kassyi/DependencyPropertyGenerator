@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: Mode2
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty ModeProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "Mode", returnType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty ModeProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "Mode", returnType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode), declaringType: typeof(GridExtensions), defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnModeChanged();
             OnModeChanged((global::Microsoft.Maui.Controls.Grid)sender);

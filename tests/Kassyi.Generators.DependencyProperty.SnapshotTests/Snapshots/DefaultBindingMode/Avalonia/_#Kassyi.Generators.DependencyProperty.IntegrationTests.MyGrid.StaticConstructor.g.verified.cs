@@ -8,9 +8,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         {
             IsSpinningProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<bool>>(static x =>
             {
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)x.Sender).OnIsSpinningChanged();
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)x.Sender).OnIsSpinningChanged((bool)x.NewValue.GetValueOrDefault());
-                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)x.Sender).OnIsSpinningChanged((bool)x.OldValue.GetValueOrDefault(), (bool)x.NewValue.GetValueOrDefault());
+                ((MyGrid)x.Sender).OnIsSpinningChanged();
+                ((MyGrid)x.Sender).OnIsSpinningChanged((bool)x.NewValue.GetValueOrDefault());
+                ((MyGrid)x.Sender).OnIsSpinningChanged((bool)x.OldValue.GetValueOrDefault(), (bool)x.NewValue.GetValueOrDefault());
             }));
         }
     }

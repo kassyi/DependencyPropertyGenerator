@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: Mode2
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode> ModeProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions, global::Avalonia.Controls.TreeView, global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode>(name: "Mode", defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.AttachedProperty<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode> ModeProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<TreeViewExtensions, global::Avalonia.Controls.TreeView, global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode>(name: "Mode", defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: Mode2
         /// </summary>

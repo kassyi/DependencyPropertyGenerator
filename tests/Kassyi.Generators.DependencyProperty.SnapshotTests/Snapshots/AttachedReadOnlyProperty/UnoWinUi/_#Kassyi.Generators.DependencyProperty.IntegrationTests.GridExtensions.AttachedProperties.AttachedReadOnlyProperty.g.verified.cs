@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty AttachedReadOnlyPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedReadOnlyProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty AttachedReadOnlyPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedReadOnlyProperty", propertyType: typeof(object), ownerType: typeof(GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
         {
             OnAttachedReadOnlyPropertyChanged();
             OnAttachedReadOnlyPropertyChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender);

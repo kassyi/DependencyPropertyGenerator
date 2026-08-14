@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = " class  "/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty classProperty = global::System.Windows.DependencyProperty.Register(name: "class", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty classProperty = global::System.Windows.DependencyProperty.Register(name: "class", propertyType: typeof(int), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnclassChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnclassChanged((int)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnclassChanged((int)args.OldValue, (int)args.NewValue);
+            ((MyControl)sender).OnclassChanged();
+            ((MyControl)sender).OnclassChanged((int)args.NewValue);
+            ((MyControl)sender).OnclassChanged((int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)

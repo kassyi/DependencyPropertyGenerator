@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGird
+    public partial class MyGird
     {
         /// <summary>
         /// Identifies the MyColumn dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyColumnProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyColumnProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(MyGird), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             OnMyColumnChanged();
             OnMyColumnChanged((global::System.Windows.FrameworkElement)sender);

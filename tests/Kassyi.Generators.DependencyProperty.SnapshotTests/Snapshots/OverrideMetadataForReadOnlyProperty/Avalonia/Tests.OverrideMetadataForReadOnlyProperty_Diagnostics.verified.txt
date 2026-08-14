@@ -20,51 +20,15 @@
     MessageFormat: Unnecessary using directive.
   },
   {
-    Id: CS8600,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (13,109)-(13,159),
-    MessageFormat: Converting null literal or possible null value to non-nullable type.
+    Id: DPG0004,
+    Severity: Error,
+    Span: (7,2)-(8,96),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
   },
   {
-    Id: CS8604,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (13,109)-(13,159),
-    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
-  },
-  {
-    Id: CS8600,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (14,109)-(14,159),
-    MessageFormat: Converting null literal or possible null value to non-nullable type.
-  },
-  {
-    Id: CS8604,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (14,109)-(14,159),
-    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
-  },
-  {
-    Id: CS8600,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (14,161)-(14,211),
-    MessageFormat: Converting null literal or possible null value to non-nullable type.
-  },
-  {
-    Id: CS8604,
-    Severity: Warning,
-    WarningLevel: 1,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium.StaticConstructor.g.cs,
-    Span: (14,161)-(14,211),
-    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
+    Id: DPG0004,
+    Severity: Error,
+    Span: (7,2)-(8,96),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
   }
 ]

@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class UnrelatedStateControl
+    public partial class UnrelatedStateControl
     {
         /// <summary>
         /// Identifies the <see cref = "Text"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty TextProperty = global::System.Windows.Controls.TextBox.TextProperty.AddOwner(ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.UnrelatedStateControl), null);
+        public static readonly global::System.Windows.DependencyProperty TextProperty = global::System.Windows.Controls.TextBox.TextProperty.AddOwner(ownerType: typeof(UnrelatedStateControl), null);
         /// <summary>
         /// Default value: default(string)
         /// </summary>

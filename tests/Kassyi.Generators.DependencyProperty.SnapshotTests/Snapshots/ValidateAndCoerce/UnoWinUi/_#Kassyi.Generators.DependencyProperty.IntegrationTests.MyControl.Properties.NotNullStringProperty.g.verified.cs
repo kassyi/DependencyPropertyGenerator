@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "NotNullStringProperty"/> dependency property.<br/>
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
+            ((MyControl)sender).OnNotNullStringPropertyChanged();
+            ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
+            ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
         }));
         /// <summary>
         /// Default value: ""

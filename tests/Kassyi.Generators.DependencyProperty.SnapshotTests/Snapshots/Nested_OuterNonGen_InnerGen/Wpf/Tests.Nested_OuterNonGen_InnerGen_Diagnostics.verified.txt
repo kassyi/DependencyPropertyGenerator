@@ -5,47 +5,5 @@
     WarningLevel: 1,
     Span: (2,1)-(2,44),
     MessageFormat: Unnecessary using directive.
-  },
-  {
-    Id: CS0122,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (16,92)-(16,107),
-    MessageFormat: '{0}' is inaccessible due to its protection level
-  },
-  {
-    Id: CS0122,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (22,76)-(22,91),
-    MessageFormat: '{0}' is inaccessible due to its protection level
-  },
-  {
-    Id: CS0122,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (23,76)-(23,91),
-    MessageFormat: '{0}' is inaccessible due to its protection level
-  },
-  {
-    Id: CS0122,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (24,76)-(24,91),
-    MessageFormat: '{0}' is inaccessible due to its protection level
-  },
-  {
-    Id: CS0103,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (37,17)-(37,25),
-    MessageFormat: The name '{0}' does not exist in the current context
-  },
-  {
-    Id: CS0103,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterClass.InnerControl_lt_T_gt_.Properties.MyProperty.g.cs,
-    Span: (38,8)-(38,16),
-    MessageFormat: The name '{0}' does not exist in the current context
   }
 ]

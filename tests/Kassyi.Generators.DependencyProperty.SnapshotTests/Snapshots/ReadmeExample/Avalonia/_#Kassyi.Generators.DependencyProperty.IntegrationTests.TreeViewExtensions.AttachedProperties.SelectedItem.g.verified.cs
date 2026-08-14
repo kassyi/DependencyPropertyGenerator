@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<object?> SelectedItemProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions, global::Avalonia.Controls.TreeView, object?>(name: "SelectedItem", defaultValue: default(object), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.AttachedProperty<object?> SelectedItemProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<TreeViewExtensions, global::Avalonia.Controls.TreeView, object?>(name: "SelectedItem", defaultValue: default(object), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

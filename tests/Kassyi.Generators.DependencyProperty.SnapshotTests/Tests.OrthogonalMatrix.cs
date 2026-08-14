@@ -226,7 +226,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-            [AttachedDependencyProperty("MyProperty", typeof(int), BrowsableForType = typeof(DependencyObject))]
+            [AttachedDependencyProperty("MyProperty", typeof(int), BrowsableForType = typeof(global::System.Windows.DependencyObject))]
             public static partial class MyHelper
             {
             }
@@ -268,10 +268,12 @@ public class OrthogonalMatrixTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task RefStruct_PropertyType_Rejection(Framework framework)
     {
-        // This should skip generation or emit a diagnostic because ReadOnlySpan is a ref struct
+        // This should skip generation or emit a diagnostic because MyRefStruct is a ref struct
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + """
 
-            [DependencyProperty("MyProperty", typeof(ReadOnlySpan<byte>))]
+            public ref struct MyRefStruct { }
+
+            [DependencyProperty("MyProperty", typeof(MyRefStruct))]
             public partial class MyControl : UserControl
             {
             }
@@ -301,6 +303,115 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
             [DependencyProperty("@event", typeof(string))]
             [DependencyProperty("class", typeof(int))]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    // 20. allows ref struct
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task Generic_AllowsRefStruct(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + """
+
+            [DependencyProperty("MyProperty", typeof(object))]
+            public partial class MyControl<T> : UserControl where T : allows ref struct
+            {
+            }
+            """, framework);
+    }
+
+    // 21. new modifier for inherited properties
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task Inheritance_NewModifier(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            public partial class ParentControl : UserControl
+            {
+                public string MyProperty { get; set; } = string.Empty;
+            }
+
+            [DependencyProperty("MyProperty", typeof(int))]
+            public partial class MyControl : ParentControl
+            {
+            }
+            """, framework);
+    }
+
+    // 22. Collection expression default value
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task DefaultValue_CollectionExpression(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+
+            [DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "[]")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    // 23. required / init properties
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task RequiredInit_Properties(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Runtime.CompilerServices") + """
+
+            namespace System.Runtime.CompilerServices
+            {
+                internal static class IsExternalInit {}
+            }
+
+            [DependencyProperty("MyProperty", typeof(int))]
+            public partial class MyControl : UserControl
+            {
+                public required partial int MyProperty { get; init; }
+            }
+            """, framework);
+    }
+
+    // 24. Tuple Type
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task PropertyType_Tuple(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<(int id, string name)>("MyProperty")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    // 25. Complex Array/Nullable
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task PropertyType_ComplexNullableArray(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+
+            [DependencyProperty("MyProperty", typeof(List<int?>?[]))]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    // DPG0004: Reference Type Default Value Sharing
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task ReferenceType_DefaultValue_Rejection(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+
+            [DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "new List<int>()")]
             public partial class MyControl : UserControl
             {
             }

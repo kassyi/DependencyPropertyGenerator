@@ -2,19 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "NotNullStringProperty"/> dependency property.<br/>
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty NotNullStringPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (string)"", flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty NotNullStringPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (string)"", flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
-        }, coerceValueCallback: static (sender, value) => ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).CoerceNotNullStringProperty((string? )value), isAnimationProhibited: false), validateValueCallback: static value => IsNotNullStringPropertyValid((string? )value));
+            ((MyControl)sender).OnNotNullStringPropertyChanged();
+            ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
+            ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
+        }, coerceValueCallback: static (sender, value) => ((MyControl)sender).CoerceNotNullStringProperty((string? )value), isAnimationProhibited: false), validateValueCallback: static value => IsNotNullStringPropertyValid((string? )value));
         /// <summary>
         /// Default value: ""
         /// </summary>

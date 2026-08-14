@@ -11,7 +11,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (13,116)-(13,154),
+    Span: (13,54)-(13,92),
     MessageFormat: Converting null literal or possible null value to non-nullable type.
   },
   {
@@ -19,7 +19,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (13,116)-(13,154),
+    Span: (13,54)-(13,92),
     MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
   },
   {
@@ -27,7 +27,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (14,116)-(14,154),
+    Span: (14,54)-(14,92),
     MessageFormat: Converting null literal or possible null value to non-nullable type.
   },
   {
@@ -35,7 +35,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (14,116)-(14,154),
+    Span: (14,54)-(14,92),
     MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
   },
   {
@@ -43,7 +43,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (14,156)-(14,194),
+    Span: (14,94)-(14,132),
     MessageFormat: Converting null literal or possible null value to non-nullable type.
   },
   {
@@ -51,7 +51,7 @@
     Severity: Warning,
     WarningLevel: 1,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
-    Span: (14,156)-(14,194),
+    Span: (14,94)-(14,132),
     MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
   }
 ]

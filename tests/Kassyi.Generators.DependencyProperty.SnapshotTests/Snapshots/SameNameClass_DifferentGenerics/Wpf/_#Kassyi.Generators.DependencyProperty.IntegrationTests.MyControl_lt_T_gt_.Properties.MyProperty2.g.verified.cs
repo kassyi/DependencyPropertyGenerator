@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl<T>
+    public partial class MyControl<T>
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty2"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyProperty2Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl<T>), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyProperty2Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof(string), ownerType: typeof(MyControl<T>), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl<T>)sender).OnMyProperty2Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl<T>)sender).OnMyProperty2Changed((string? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl<T>)sender).OnMyProperty2Changed((string? )args.OldValue, (string? )args.NewValue);
+            ((MyControl<T>)sender).OnMyProperty2Changed();
+            ((MyControl<T>)sender).OnMyProperty2Changed((string? )args.NewValue);
+            ((MyControl<T>)sender).OnMyProperty2Changed((string? )args.OldValue, (string? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(string)

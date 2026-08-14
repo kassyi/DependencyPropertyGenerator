@@ -2,7 +2,7 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         private static global::Microsoft.Maui.WeakEventManager CompletedWeakEventManager { get; } = new global::Microsoft.Maui.WeakEventManager();
 

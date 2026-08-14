@@ -1,0 +1,32 @@
+﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs
+#nullable enable
+namespace Kassyi.Generators.DependencyProperty.IntegrationTests
+{
+    public partial class MyControl
+    {
+        /// <summary>
+        /// Identifies the <see cref = "MyProperty"/> dependency property.<br/>
+        /// Default value: default(int)
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        public static readonly global::System.Windows.DependencyProperty MyPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnMyPropertyChanged();
+            ((MyControl)sender).OnMyPropertyChanged((int)args.NewValue);
+            ((MyControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        /// <summary>
+        /// Default value: default(int)
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public new int MyProperty { get => (int)GetValue(MyPropertyProperty); set => SetValue(MyPropertyProperty, value); }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        partial void OnMyPropertyChanged();
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        partial void OnMyPropertyChanged(int newValue);
+        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+        partial void OnMyPropertyChanged(int oldValue, int newValue);
+    }
+}

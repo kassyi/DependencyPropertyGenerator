@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGird
+    public partial class MyGird
     {
         /// <summary>
         /// Identifies the MyColumn dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyColumnProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "MyColumn", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyColumnProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "MyColumn", returnType: typeof(int), declaringType: typeof(MyGird), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnMyColumnChanged();
             OnMyColumnChanged((global::Microsoft.Maui.Controls.VisualElement)sender);

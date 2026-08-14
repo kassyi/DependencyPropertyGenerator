@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<string> NotNullStringPropertyProperty = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl, string>(name: "NotNullStringProperty", defaultValue: (string)"", inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: static value => IsNotNullStringPropertyValid((string? )value), coerce: static (sender, value) => ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).CoerceNotNullStringProperty((string? )value));
+        public static readonly global::Avalonia.StyledProperty<string> NotNullStringPropertyProperty = global::Avalonia.AvaloniaProperty.Register<MyControl, string>(name: "NotNullStringProperty", defaultValue: (string)"", inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: static value => IsNotNullStringPropertyValid((string? )value), coerce: static (sender, value) => ((MyControl)sender).CoerceNotNullStringProperty((string? )value));
         /// <summary>
         /// Default value: ""
         /// </summary>

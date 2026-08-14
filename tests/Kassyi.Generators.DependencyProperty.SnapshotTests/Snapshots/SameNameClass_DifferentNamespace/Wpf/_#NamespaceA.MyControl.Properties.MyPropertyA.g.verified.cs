@@ -2,18 +2,18 @@
 #nullable enable
 namespace NamespaceA
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "MyPropertyA"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyPropertyAProperty = global::System.Windows.DependencyProperty.Register(name: "MyPropertyA", propertyType: typeof(int), ownerType: typeof(global::NamespaceA.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyPropertyAProperty = global::System.Windows.DependencyProperty.Register(name: "MyPropertyA", propertyType: typeof(int), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::NamespaceA.MyControl)sender).OnMyPropertyAChanged();
-            ((global::NamespaceA.MyControl)sender).OnMyPropertyAChanged((int)args.NewValue);
-            ((global::NamespaceA.MyControl)sender).OnMyPropertyAChanged((int)args.OldValue, (int)args.NewValue);
+            ((MyControl)sender).OnMyPropertyAChanged();
+            ((MyControl)sender).OnMyPropertyAChanged((int)args.NewValue);
+            ((MyControl)sender).OnMyPropertyAChanged((int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)

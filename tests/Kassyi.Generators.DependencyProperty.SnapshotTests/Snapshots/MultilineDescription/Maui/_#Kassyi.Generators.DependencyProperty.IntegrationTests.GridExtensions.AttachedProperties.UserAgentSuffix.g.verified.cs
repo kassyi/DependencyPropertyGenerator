@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty UserAgentSuffixProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "UserAgentSuffix", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty UserAgentSuffixProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "UserAgentSuffix", returnType: typeof(string), declaringType: typeof(GridExtensions), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnUserAgentSuffixChanged();
             OnUserAgentSuffixChanged((global::Microsoft.Maui.Controls.Grid)sender);

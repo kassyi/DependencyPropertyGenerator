@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class AnotherControl
+    public partial class AnotherControl
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty3"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyProperty3Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty3", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyProperty3Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty3", propertyType: typeof(int), ownerType: typeof(AnotherControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty3Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty3Changed((int)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty3Changed((int)args.OldValue, (int)args.NewValue);
+            ((AnotherControl)sender).OnMyProperty3Changed();
+            ((AnotherControl)sender).OnMyProperty3Changed((int)args.NewValue);
+            ((AnotherControl)sender).OnMyProperty3Changed((int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty BindEventPropertyProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "BindEventProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.UIElementExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty BindEventPropertyProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "BindEventProperty", propertyType: typeof(object), ownerType: typeof(UIElementExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             OnBindEventPropertyChanged();
             OnBindEventPropertyChanged((global::System.Windows.UIElement)sender);

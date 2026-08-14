@@ -9,19 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyPropertyProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyHelper), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty MyPropertyProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(MyHelper), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             OnMyPropertyChanged();
-            OnMyPropertyChanged((DependencyObject)sender);
-            OnMyPropertyChanged((DependencyObject)sender, (int)args.NewValue);
-            OnMyPropertyChanged((DependencyObject)sender, (int)args.OldValue, (int)args.NewValue);
+            OnMyPropertyChanged((global::System.Windows.DependencyObject)sender);
+            OnMyPropertyChanged((global::System.Windows.DependencyObject)sender, (int)args.NewValue);
+            OnMyPropertyChanged((global::System.Windows.DependencyObject)sender, (int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static void SetMyProperty(DependencyObject element, int value)
+        public static void SetMyProperty(global::System.Windows.DependencyObject element, int value)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));
             element.SetValue(MyPropertyProperty, value);
@@ -30,10 +30,10 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: default(int)
         /// </summary>
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(DependencyObject))]
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static int GetMyProperty(DependencyObject element)
+        public static int GetMyProperty(global::System.Windows.DependencyObject element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));
             return (int)element.GetValue(MyPropertyProperty);
@@ -42,10 +42,10 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         static partial void OnMyPropertyChanged();
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnMyPropertyChanged(DependencyObject dependencyObject);
+        static partial void OnMyPropertyChanged(global::System.Windows.DependencyObject dependencyObject);
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnMyPropertyChanged(DependencyObject dependencyObject, int newValue);
+        static partial void OnMyPropertyChanged(global::System.Windows.DependencyObject dependencyObject, int newValue);
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnMyPropertyChanged(DependencyObject dependencyObject, int oldValue, int newValue);
+        static partial void OnMyPropertyChanged(global::System.Windows.DependencyObject dependencyObject, int oldValue, int newValue);
     }
 }

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: -1
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty RowCountProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "RowCount", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (int)-1, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty RowCountProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "RowCount", propertyType: typeof(int), ownerType: typeof(GridHelpers), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (int)-1, propertyChangedCallback: static (sender, args) =>
         {
             OnRowCountChanged((global::Windows.UI.Xaml.Controls.Grid)sender, (int)args.NewValue);
         }));

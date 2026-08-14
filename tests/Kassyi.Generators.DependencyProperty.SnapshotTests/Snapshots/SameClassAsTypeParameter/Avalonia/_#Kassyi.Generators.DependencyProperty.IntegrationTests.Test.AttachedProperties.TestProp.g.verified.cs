@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Test)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test?> TestPropProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test, global::Avalonia.Controls.Grid, global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test?>(name: "TestProp", defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.AttachedProperty<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test?> TestPropProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<Test, global::Avalonia.Controls.Grid, global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test?>(name: "TestProp", defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(Test)
         /// </summary>

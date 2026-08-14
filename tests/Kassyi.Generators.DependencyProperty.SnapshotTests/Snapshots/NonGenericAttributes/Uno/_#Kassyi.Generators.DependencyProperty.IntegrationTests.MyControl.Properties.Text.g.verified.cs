@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "Text"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TextProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "Text", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TextProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "Text", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTextChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTextChanged((string? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTextChanged((string? )args.OldValue, (string? )args.NewValue);
+            ((MyControl)sender).OnTextChanged();
+            ((MyControl)sender).OnTextChanged((string? )args.NewValue);
+            ((MyControl)sender).OnTextChanged((string? )args.OldValue, (string? )args.NewValue);
         }));
         /// <summary>
         /// Default value: default(string)

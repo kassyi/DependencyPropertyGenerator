@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "IsSpinning5"/> dependency property.<br/>
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty IsSpinning5Property = global::Windows.UI.Xaml.DependencyProperty.Register(name: "IsSpinning5", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(bool), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty IsSpinning5Property = global::Windows.UI.Xaml.DependencyProperty.Register(name: "IsSpinning5", propertyType: typeof(bool), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(bool), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinning5Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinning5Changed((bool)args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinning5Changed((bool)args.OldValue, (bool)args.NewValue);
+            ((MyControl)sender).OnIsSpinning5Changed();
+            ((MyControl)sender).OnIsSpinning5Changed((bool)args.NewValue);
+            ((MyControl)sender).OnIsSpinning5Changed((bool)args.OldValue, (bool)args.NewValue);
         }));
         /// <summary>
         /// Default value: default(bool)

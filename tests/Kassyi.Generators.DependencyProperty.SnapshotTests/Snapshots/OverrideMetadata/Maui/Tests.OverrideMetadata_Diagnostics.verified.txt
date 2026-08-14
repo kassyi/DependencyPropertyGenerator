@@ -18,5 +18,17 @@
     WarningLevel: 1,
     Span: (4,1)-(4,44),
     MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (8,2)-(9,96),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (8,2)-(9,96),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
   }
 ]

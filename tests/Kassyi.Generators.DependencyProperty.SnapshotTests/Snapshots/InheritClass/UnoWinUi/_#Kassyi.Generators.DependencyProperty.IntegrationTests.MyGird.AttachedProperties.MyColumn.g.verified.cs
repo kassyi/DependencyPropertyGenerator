@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGird
+    public partial class MyGird
     {
         /// <summary>
         /// Identifies the MyColumn dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyColumnProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyColumnProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(MyGird), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
         {
             OnMyColumnChanged();
             OnMyColumnChanged((global::Microsoft.UI.Xaml.FrameworkElement)sender);

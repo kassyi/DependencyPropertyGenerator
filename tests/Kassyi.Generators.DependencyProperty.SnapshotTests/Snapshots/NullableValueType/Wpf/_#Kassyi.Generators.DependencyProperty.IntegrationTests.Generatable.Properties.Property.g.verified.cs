@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class Generatable
+    public partial class Generatable
     {
         /// <summary>
         /// Identifies the <see cref = "Property"/> dependency property.<br/>
         /// Default value: default(int?)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty PropertyProperty = global::System.Windows.DependencyProperty.Register(name: "Property", propertyType: typeof(int? ), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int? ), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty PropertyProperty = global::System.Windows.DependencyProperty.Register(name: "Property", propertyType: typeof(int? ), ownerType: typeof(Generatable), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int? ), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )args.OldValue, (int? )args.NewValue);
+            ((Generatable)sender).OnPropertyChanged();
+            ((Generatable)sender).OnPropertyChanged((int? )args.NewValue);
+            ((Generatable)sender).OnPropertyChanged((int? )args.OldValue, (int? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int?)

@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class Test
+    public partial class Test
     {
         /// <summary>
         /// Identifies the TestProp dependency property.<br/>
         /// Default value: default(Test)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TestPropProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "TestProp", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TestPropProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "TestProp", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), ownerType: typeof(Test), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), propertyChangedCallback: static (sender, args) =>
         {
             TestChanged((global::Windows.UI.Xaml.Controls.Grid)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )args.NewValue);
         }));

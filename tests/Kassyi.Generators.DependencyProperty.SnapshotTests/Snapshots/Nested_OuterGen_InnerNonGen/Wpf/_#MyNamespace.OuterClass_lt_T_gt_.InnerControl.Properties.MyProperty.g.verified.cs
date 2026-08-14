@@ -2,31 +2,34 @@
 #nullable enable
 namespace MyNamespace
 {
-    partial class InnerControl
+    internal partial class OuterClass<T>
     {
-        /// <summary>
-        /// Identifies the <see cref = "MyProperty"/> dependency property.<br/>
-        /// Default value: default(int)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty MyPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::MyNamespace.OuterClass<T>.InnerControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        internal partial class InnerControl
         {
-            ((global::MyNamespace.OuterClass<T>.InnerControl)sender).OnMyPropertyChanged();
-            ((global::MyNamespace.OuterClass<T>.InnerControl)sender).OnMyPropertyChanged((int)args.NewValue);
-            ((global::MyNamespace.OuterClass<T>.InnerControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
-        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
-        /// <summary>
-        /// Default value: default(int)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public int MyProperty { get => (int)GetValue(MyPropertyProperty); set => SetValue(MyPropertyProperty, value); }
+            /// <summary>
+            /// Identifies the <see cref = "MyProperty"/> dependency property.<br/>
+            /// Default value: default(int)
+            /// </summary>
+            [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+            public static readonly global::System.Windows.DependencyProperty MyPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(InnerControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+            {
+                ((InnerControl)sender).OnMyPropertyChanged();
+                ((InnerControl)sender).OnMyPropertyChanged((int)args.NewValue);
+                ((InnerControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
+            }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+            /// <summary>
+            /// Default value: default(int)
+            /// </summary>
+            [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+            [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+            public int MyProperty { get => (int)GetValue(MyPropertyProperty); set => SetValue(MyPropertyProperty, value); }
 
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnMyPropertyChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnMyPropertyChanged(int newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnMyPropertyChanged(int oldValue, int newValue);
+            [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+            partial void OnMyPropertyChanged();
+            [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+            partial void OnMyPropertyChanged(int newValue);
+            [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+            partial void OnMyPropertyChanged(int oldValue, int newValue);
+        }
     }
 }

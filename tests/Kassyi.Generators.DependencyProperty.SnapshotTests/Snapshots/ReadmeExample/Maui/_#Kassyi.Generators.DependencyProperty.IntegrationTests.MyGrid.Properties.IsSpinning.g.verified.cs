@@ -2,23 +2,23 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "IsSpinning"/> dependency property.<br/>
         /// Default value: true
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (bool)true, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(MyGrid), defaultValue: (bool)true, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)oldValue, (bool)newValue);
+            ((MyGrid)sender).OnIsSpinningChanged();
+            ((MyGrid)sender).OnIsSpinningChanged((bool)newValue);
+            ((MyGrid)sender).OnIsSpinningChanged((bool)oldValue, (bool)newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging((bool)newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging((bool)oldValue, (bool)newValue);
+            ((MyGrid)sender).OnIsSpinningChanging();
+            ((MyGrid)sender).OnIsSpinningChanging((bool)newValue);
+            ((MyGrid)sender).OnIsSpinningChanging((bool)oldValue, (bool)newValue);
         }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Description<br/>

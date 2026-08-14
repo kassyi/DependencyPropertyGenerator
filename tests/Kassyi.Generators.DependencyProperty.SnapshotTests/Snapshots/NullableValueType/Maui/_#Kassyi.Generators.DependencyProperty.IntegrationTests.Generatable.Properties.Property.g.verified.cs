@@ -2,23 +2,23 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class Generatable
+    public partial class Generatable
     {
         /// <summary>
         /// Identifies the <see cref = "Property"/> dependency property.<br/>
         /// Default value: default(int?)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty PropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Property", returnType: typeof(int? ), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), defaultValue: default(int? ), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty PropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Property", returnType: typeof(int? ), declaringType: typeof(Generatable), defaultValue: default(int? ), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )oldValue, (int? )newValue);
+            ((Generatable)sender).OnPropertyChanged();
+            ((Generatable)sender).OnPropertyChanged((int? )newValue);
+            ((Generatable)sender).OnPropertyChanged((int? )oldValue, (int? )newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanging();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanging((int? )newValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanging((int? )oldValue, (int? )newValue);
+            ((Generatable)sender).OnPropertyChanging();
+            ((Generatable)sender).OnPropertyChanging((int? )newValue);
+            ((Generatable)sender).OnPropertyChanging((int? )oldValue, (int? )newValue);
         }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int?)

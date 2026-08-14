@@ -2,11 +2,11 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// </summary>
-        public static readonly global::System.Windows.RoutedEvent TrayLeftMouseDownEvent = global::System.Windows.EventManager.RegisterRoutedEvent(name: "TrayLeftMouseDown", routingStrategy: global::System.Windows.RoutingStrategy.Bubble, handlerType: typeof(global::System.Windows.RoutedEventHandler), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl));
+        public static readonly global::System.Windows.RoutedEvent TrayLeftMouseDownEvent = global::System.Windows.EventManager.RegisterRoutedEvent(name: "TrayLeftMouseDown", routingStrategy: global::System.Windows.RoutingStrategy.Bubble, handlerType: typeof(global::System.Windows.RoutedEventHandler), ownerType: typeof(MyControl));
         /// <summary>
         /// </summary>
         public static void AddTrayLeftMouseDownHandler(global::System.Windows.DependencyObject element, global::System.Windows.RoutedEventHandler handler)

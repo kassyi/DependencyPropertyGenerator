@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty SelectedItemProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SelectedItem", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty SelectedItemProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SelectedItem", returnType: typeof(object), declaringType: typeof(GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnSelectedItemChanged();
             OnSelectedItemChanged((global::Microsoft.Maui.Controls.Grid)sender);

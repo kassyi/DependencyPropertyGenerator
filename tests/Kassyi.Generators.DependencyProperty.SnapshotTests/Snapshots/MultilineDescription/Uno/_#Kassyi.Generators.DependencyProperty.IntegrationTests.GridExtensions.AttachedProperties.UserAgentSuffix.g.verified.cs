@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty UserAgentSuffixProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty UserAgentSuffixProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(GridExtensions), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
         {
             OnUserAgentSuffixChanged();
             OnUserAgentSuffixChanged((global::Windows.UI.Xaml.Controls.Grid)sender);

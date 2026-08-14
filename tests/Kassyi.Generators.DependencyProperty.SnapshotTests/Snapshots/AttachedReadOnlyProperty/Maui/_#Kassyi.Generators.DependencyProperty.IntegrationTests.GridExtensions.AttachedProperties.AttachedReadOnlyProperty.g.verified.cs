@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindablePropertyKey AttachedReadOnlyPropertyPropertyKey = global::Microsoft.Maui.Controls.BindableProperty.CreateAttachedReadOnly(propertyName: "AttachedReadOnlyProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWayToSource, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindablePropertyKey AttachedReadOnlyPropertyPropertyKey = global::Microsoft.Maui.Controls.BindableProperty.CreateAttachedReadOnly(propertyName: "AttachedReadOnlyProperty", returnType: typeof(object), declaringType: typeof(GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWayToSource, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnAttachedReadOnlyPropertyChanged();
             OnAttachedReadOnlyPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender);

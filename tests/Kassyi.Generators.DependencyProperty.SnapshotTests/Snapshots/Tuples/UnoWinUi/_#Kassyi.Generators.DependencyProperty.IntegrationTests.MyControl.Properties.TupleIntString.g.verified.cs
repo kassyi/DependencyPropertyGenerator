@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TupleIntString"/> dependency property.<br/>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty TupleIntStringProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty TupleIntStringProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntStringChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.OldValue, (global::System.Tuple<int, string>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntStringChanged();
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.OldValue, (global::System.Tuple<int, string>? )args.NewValue);
         }));
         /// <summary>
         /// Default value: default(Tuple&lt;int, string&gt;)

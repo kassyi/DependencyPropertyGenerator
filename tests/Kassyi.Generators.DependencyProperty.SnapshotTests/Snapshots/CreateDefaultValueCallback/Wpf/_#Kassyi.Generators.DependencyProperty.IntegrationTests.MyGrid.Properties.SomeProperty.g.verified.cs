@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "SomeProperty"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty SomePropertyProperty = global::System.Windows.DependencyProperty.Register(name: "SomeProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty SomePropertyProperty = global::System.Windows.DependencyProperty.Register(name: "SomeProperty", propertyType: typeof(string), ownerType: typeof(MyGrid), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged((string? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged((string? )args.OldValue, (string? )args.NewValue);
+            ((MyGrid)sender).OnSomePropertyChanged();
+            ((MyGrid)sender).OnSomePropertyChanged((string? )args.NewValue);
+            ((MyGrid)sender).OnSomePropertyChanged((string? )args.OldValue, (string? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(string)

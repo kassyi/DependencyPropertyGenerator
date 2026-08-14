@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty SelectedItemProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "SelectedItem", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty SelectedItemProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "SelectedItem", propertyType: typeof(object), ownerType: typeof(TreeViewExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, propertyChangedCallback: static (sender, args) =>
         {
             OnSelectedItemChanged();
             OnSelectedItemChanged((global::System.Windows.Controls.TreeView)sender);

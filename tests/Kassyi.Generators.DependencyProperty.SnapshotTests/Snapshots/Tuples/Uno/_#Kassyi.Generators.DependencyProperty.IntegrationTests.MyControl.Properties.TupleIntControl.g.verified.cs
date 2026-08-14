@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TupleIntControl"/> dependency property.<br/>
         /// Default value: default(Tuple&lt;int, FrameworkElement&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleIntControlProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleIntControl", propertyType: typeof(global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleIntControlProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleIntControl", propertyType: typeof(global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.OldValue, (global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntControlChanged();
+            ((MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.OldValue, (global::System.Tuple<int, global::Windows.UI.Xaml.FrameworkElement>? )args.NewValue);
         }));
         /// <summary>
         /// Default value: default(Tuple&lt;int, FrameworkElement&gt;)

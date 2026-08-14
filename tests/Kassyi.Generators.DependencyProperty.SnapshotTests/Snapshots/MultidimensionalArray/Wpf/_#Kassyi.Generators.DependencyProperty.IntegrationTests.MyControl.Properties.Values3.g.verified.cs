@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "Values3"/> dependency property.<br/>
         /// Default value: default(int[,,])
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty Values3Property = global::System.Windows.DependencyProperty.Register(name: "Values3", propertyType: typeof(int[,, ]), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int[,, ]), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty Values3Property = global::System.Windows.DependencyProperty.Register(name: "Values3", propertyType: typeof(int[,, ]), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int[,, ]), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed((int[,, ]? )args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed((int[,, ]? )args.OldValue, (int[,, ]? )args.NewValue);
+            ((MyControl)sender).OnValues3Changed();
+            ((MyControl)sender).OnValues3Changed((int[,, ]? )args.NewValue);
+            ((MyControl)sender).OnValues3Changed((int[,, ]? )args.OldValue, (int[,, ]? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int[,,])

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: -1
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<int> RowCountProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers, global::Avalonia.Controls.Grid, int>(name: "RowCount", defaultValue: (int)-1, inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.AttachedProperty<int> RowCountProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<GridHelpers, global::Avalonia.Controls.Grid, int>(name: "RowCount", defaultValue: (int)-1, inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: -1
         /// </summary>

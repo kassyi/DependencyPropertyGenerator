@@ -2,23 +2,23 @@
 #nullable enable
 namespace Namespace1
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(global::Namespace1.MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged();
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged((int)newValue);
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged((int)oldValue, (int)newValue);
+            ((MyGrid)sender).OnMyPropertyChanged();
+            ((MyGrid)sender).OnMyPropertyChanged((int)newValue);
+            ((MyGrid)sender).OnMyPropertyChanged((int)oldValue, (int)newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>
         {
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging();
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging((int)newValue);
-            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging((int)oldValue, (int)newValue);
+            ((MyGrid)sender).OnMyPropertyChanging();
+            ((MyGrid)sender).OnMyPropertyChanging((int)newValue);
+            ((MyGrid)sender).OnMyPropertyChanging((int)oldValue, (int)newValue);
         }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)

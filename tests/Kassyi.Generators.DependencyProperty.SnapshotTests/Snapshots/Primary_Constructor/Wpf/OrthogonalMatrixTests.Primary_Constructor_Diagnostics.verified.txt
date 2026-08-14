@@ -1,0 +1,16 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS9113,
+    Severity: Warning,
+    WarningLevel: 1,
+    Span: (7,36)-(7,43),
+    MessageFormat: Parameter '{0}' is unread.
+  }
+]

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<string?> UserAgentSuffixProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions, global::Avalonia.Controls.Grid, string?>(name: "UserAgentSuffix", defaultValue: default(string), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.AttachedProperty<string?> UserAgentSuffixProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<GridExtensions, global::Avalonia.Controls.Grid, string?>(name: "UserAgentSuffix", defaultValue: default(string), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// A suffix that is added to the default user agent, surrounded by square brackets.
         Can be used to identify the web view as  belonging to a certain app /version on the server side. <br / >

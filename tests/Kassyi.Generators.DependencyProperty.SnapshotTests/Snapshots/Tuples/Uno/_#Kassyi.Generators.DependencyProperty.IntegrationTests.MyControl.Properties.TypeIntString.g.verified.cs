@@ -2,18 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TypeIntString"/> dependency property.<br/>
         /// Default value: default((int, string))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeIntStringProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeIntString", propertyType: typeof((int, string)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, string)), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeIntStringProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeIntString", propertyType: typeof((int, string)), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, string)), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeIntStringChanged();
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeIntStringChanged(((int, string))args.NewValue);
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeIntStringChanged(((int, string))args.OldValue, ((int, string))args.NewValue);
+            ((MyControl)sender).OnTypeIntStringChanged();
+            ((MyControl)sender).OnTypeIntStringChanged(((int, string))args.NewValue);
+            ((MyControl)sender).OnTypeIntStringChanged(((int, string))args.OldValue, ((int, string))args.NewValue);
         }));
         /// <summary>
         /// Default value: default((int, string))
