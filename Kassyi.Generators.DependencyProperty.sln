@@ -11,11 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.Dependenc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.Attributes", "src\Kassyi.Generators.DependencyProperty.Attributes\Kassyi.Generators.DependencyProperty.Attributes.csproj", "{90F8AD3B-1C24-447B-99A3-2FBF5066FECA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.DependencyProperty.Benchmarks", "tests\Kassyi.Generators.DependencyProperty.Benchmarks\Kassyi.Generators.DependencyProperty.Benchmarks.csproj", "{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.DependencyProperty.Benchmarks", "tests\Kassyi.Generators.DependencyProperty.Benchmarks\Kassyi.Generators.DependencyProperty.Benchmarks.csproj", "{83A2BD52-165D-4B97-A2C4-0FAFA1C23FED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Extensions", "src\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj", "{A78BBFDB-B522-4B30-A48C-266AF60C61A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.Extensions", "src\Kassyi.Generators.Extensions\Kassyi.Generators.Extensions.csproj", "{A78BBFDB-B522-4B30-A48C-266AF60C61A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kassyi.Generators.Tests.Extensions", "tests\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj", "{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kassyi.Generators.Tests.Extensions", "tests\Kassyi.Generators.Tests.Extensions\Kassyi.Generators.Tests.Extensions.csproj", "{05C6E7D7-39D4-43D1-BD18-41AC298B2AEE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
