@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty SomePropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "SomeProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), typeMetadata: global::Windows.UI.Xaml.PropertyMetadata.Create(createDefaultValueCallback: static () => GetSomePropertyDefaultValue(), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty SomePropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "SomeProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), typeMetadata: global::Windows.UI.Xaml.PropertyMetadata.Create(createDefaultValueCallback: static () => GetSomePropertyDefaultValue(), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged((string? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnSomePropertyChanged((string? )args.OldValue, (string? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(string)
         /// </summary>

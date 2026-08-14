@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Dictionary&lt;string, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty HeadersProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Headers", returnType: typeof(global::System.Collections.Generic.Dictionary<string, string>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), defaultValue: default(global::System.Collections.Generic.Dictionary<string, string>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty HeadersProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Headers", returnType: typeof(global::System.Collections.Generic.Dictionary<string, string>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), defaultValue: default(global::System.Collections.Generic.Dictionary<string, string>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanged((global::System.Collections.Generic.Dictionary<string, string>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanged((global::System.Collections.Generic.Dictionary<string, string>? )oldValue, (global::System.Collections.Generic.Dictionary<string, string>? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanging((global::System.Collections.Generic.Dictionary<string, string>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnHeadersChanging((global::System.Collections.Generic.Dictionary<string, string>? )oldValue, (global::System.Collections.Generic.Dictionary<string, string>? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(Dictionary&lt;string, string&gt;)
         /// </summary>

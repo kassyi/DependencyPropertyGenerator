@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(double[])
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty ValuesProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "Values", propertyType: typeof(double[]), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(double[]), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty ValuesProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "Values", propertyType: typeof(double[]), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(double[]), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValuesChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValuesChanged((double[]? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValuesChanged((double[]? )args.OldValue, (double[]? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(double[])
         /// </summary>

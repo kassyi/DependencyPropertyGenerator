@@ -9,7 +9,12 @@ namespace Namespace2
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty MyPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Namespace2.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty MyPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Namespace2.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Namespace2.MyControl)sender).OnMyPropertyChanged();
+            ((global::Namespace2.MyControl)sender).OnMyPropertyChanged((int)args.NewValue);
+            ((global::Namespace2.MyControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int)
         /// </summary>

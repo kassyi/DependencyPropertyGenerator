@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(bool), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneTime, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(bool), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneTime, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)oldValue, (bool)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging((bool)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanging((bool)oldValue, (bool)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(bool)
         /// </summary>

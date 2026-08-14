@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Tuple&lt;int, VisualElement&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty TupleIntControlProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TupleIntControl", returnType: typeof(global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty TupleIntControlProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TupleIntControl", returnType: typeof(global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )oldValue, (global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanging((global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntControlChanging((global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )oldValue, (global::System.Tuple<int, global::Microsoft.Maui.Controls.VisualElement>? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(Tuple&lt;int, VisualElement&gt;)
         /// </summary>

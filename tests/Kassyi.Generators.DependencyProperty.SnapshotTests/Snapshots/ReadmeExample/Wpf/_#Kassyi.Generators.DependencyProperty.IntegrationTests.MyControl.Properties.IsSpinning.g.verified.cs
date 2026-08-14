@@ -11,6 +11,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::System.Windows.DependencyProperty IsSpinningProperty = global::System.Windows.DependencyProperty.Register(name: "IsSpinning", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (bool)true, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged((bool)args.NewValue);
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged((bool)args.OldValue, (bool)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>

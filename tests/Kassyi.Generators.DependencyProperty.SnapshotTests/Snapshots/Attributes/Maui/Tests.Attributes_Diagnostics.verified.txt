@@ -11,7 +11,7 @@
     Severity: Warning,
     WarningLevel: 2,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid.Properties.AttributedProperty.g.cs,
-    Span: (37,16)-(37,34),
+    Span: (47,16)-(47,34),
     MessageFormat: '{0}' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
   }
 ]

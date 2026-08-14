@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: jpg")
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty AquariumGraphicProperty = global::System.Windows.DependencyProperty.Register(name: "AquariumGraphic", propertyType: typeof(global::System.Uri), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::System.Uri)new System.Uri("http://www.contoso.com/aquarium-graphic.jpg"), flags: global::System.Windows.FrameworkPropertyMetadataOptions.AffectsRender, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty AquariumGraphicProperty = global::System.Windows.DependencyProperty.Register(name: "AquariumGraphic", propertyType: typeof(global::System.Uri), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::System.Uri)new System.Uri("http://www.contoso.com/aquarium-graphic.jpg"), flags: global::System.Windows.FrameworkPropertyMetadataOptions.AffectsRender, propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.OldValue, (global::System.Uri)args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: jpg")
         /// </summary>

@@ -11,6 +11,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::System.Windows.DependencyProperty BindEventsPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "BindEventsProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement)sender).OnBindEventsPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.NewValue);
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.OldValue, (object? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>

@@ -17,14 +17,14 @@
     Id: CS1739,
     Severity: Error,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile1.g.cs,
-    Span: (23,1)-(23,22),
+    Span: (28,1)-(28,22),
     MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
   },
   {
     Id: CS1026,
     Severity: Error,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile1.g.cs,
-    Span: (23,29)-(23,30),
+    Span: (28,29)-(28,30),
     MessageFormat: ) expected
   },
   {
@@ -73,14 +73,14 @@
     Id: CS1739,
     Severity: Error,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
-    Span: (23,1)-(23,22),
+    Span: (28,1)-(28,22),
     MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
   },
   {
     Id: CS1026,
     Severity: Error,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
-    Span: (23,29)-(23,30),
+    Span: (28,29)-(28,30),
     MessageFormat: ) expected
   }
 ]

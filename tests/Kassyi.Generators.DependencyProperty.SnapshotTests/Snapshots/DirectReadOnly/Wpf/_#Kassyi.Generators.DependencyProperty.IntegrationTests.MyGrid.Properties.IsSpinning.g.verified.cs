@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        internal static readonly global::System.Windows.DependencyPropertyKey IsSpinningPropertyKey = global::System.Windows.DependencyProperty.RegisterReadOnly(name: "IsSpinning", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        internal static readonly global::System.Windows.DependencyPropertyKey IsSpinningPropertyKey = global::System.Windows.DependencyProperty.RegisterReadOnly(name: "IsSpinning", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnIsSpinningChanged((bool)args.OldValue, (bool)args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Identifies the <see cref = "IsSpinning"/> dependency property.<br/>
         /// Default value: default(bool)

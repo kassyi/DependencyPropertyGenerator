@@ -10,7 +10,7 @@
     Id: CS1513,
     Severity: Error,
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.OverrideMetadataGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium.Methods.RegisterPropertyChangedCallbacks.g.cs,
-    Span: (12,117)-(12,117),
+    Span: (14,229)-(14,229),
     MessageFormat: } expected
   }
 ]

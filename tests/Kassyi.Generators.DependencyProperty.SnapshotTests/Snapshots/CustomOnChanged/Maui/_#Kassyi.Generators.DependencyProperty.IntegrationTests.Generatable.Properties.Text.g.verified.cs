@@ -12,7 +12,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.Maui.Controls.BindableProperty TextProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Text", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnMyTextChanged((string? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanging((string? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanging((string? )oldValue, (string? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(string)
         /// </summary>

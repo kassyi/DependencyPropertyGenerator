@@ -9,6 +9,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
             AquariumGraphicProperty.OverrideMetadata(forType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::System.Uri)new System.Uri("http://www.contoso.com/tropical-aquarium-graphic.jpg"), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
             {
                 ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged();
+                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.NewValue);
+                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.OldValue, (global::System.Uri)args.NewValue);
             }, coerceValueCallback: null, isAnimationProhibited: false));
         }
 

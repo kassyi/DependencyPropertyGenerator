@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default((FrameworkElement, int))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeControlIntProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeControlInt", propertyType: typeof((global::Windows.UI.Xaml.FrameworkElement, int)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((global::Windows.UI.Xaml.FrameworkElement, int)), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeControlIntProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeControlInt", propertyType: typeof((global::Windows.UI.Xaml.FrameworkElement, int)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((global::Windows.UI.Xaml.FrameworkElement, int)), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeControlIntChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeControlIntChanged(((global::Windows.UI.Xaml.FrameworkElement, int))args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTypeControlIntChanged(((global::Windows.UI.Xaml.FrameworkElement, int))args.OldValue, ((global::Windows.UI.Xaml.FrameworkElement, int))args.NewValue);
+        }));
         /// <summary>
         /// Default value: default((FrameworkElement, int))
         /// </summary>

@@ -9,7 +9,12 @@ namespace Namespace1
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Namespace1.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Namespace1.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Namespace1.MyControl)sender).OnMyPropertyChanged();
+            ((global::Namespace1.MyControl)sender).OnMyPropertyChanged((int)args.NewValue);
+            ((global::Namespace1.MyControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int)
         /// </summary>

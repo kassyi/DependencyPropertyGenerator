@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: 42
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty FloatPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "FloatProperty", returnType: typeof(float), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (float)42, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty FloatPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "FloatProperty", returnType: typeof(float), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (float)42, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanged((float)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanged((float)oldValue, (float)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanging((float)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnFloatPropertyChanging((float)oldValue, (float)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: 42
         /// </summary>

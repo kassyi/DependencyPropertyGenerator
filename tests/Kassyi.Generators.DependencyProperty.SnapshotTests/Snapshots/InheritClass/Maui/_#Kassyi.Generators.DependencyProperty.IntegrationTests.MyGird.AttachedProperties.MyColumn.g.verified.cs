@@ -9,7 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyColumnProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "MyColumn", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyColumnProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "MyColumn", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            OnMyColumnChanged();
+            OnMyColumnChanged((global::Microsoft.Maui.Controls.VisualElement)sender);
+            OnMyColumnChanged((global::Microsoft.Maui.Controls.VisualElement)sender, (int)newValue);
+            OnMyColumnChanged((global::Microsoft.Maui.Controls.VisualElement)sender, (int)oldValue, (int)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnMyColumnChanging();
+            OnMyColumnChanging((global::Microsoft.Maui.Controls.VisualElement)sender);
+            OnMyColumnChanging((global::Microsoft.Maui.Controls.VisualElement)sender, (int)newValue);
+            OnMyColumnChanging((global::Microsoft.Maui.Controls.VisualElement)sender, (int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

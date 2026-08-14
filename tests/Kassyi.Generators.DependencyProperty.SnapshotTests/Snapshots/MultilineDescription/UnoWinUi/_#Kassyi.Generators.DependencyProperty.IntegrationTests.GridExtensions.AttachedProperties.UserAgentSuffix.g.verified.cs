@@ -9,7 +9,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty UserAgentSuffixProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty UserAgentSuffixProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
+        {
+            OnUserAgentSuffixChanged();
+            OnUserAgentSuffixChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender);
+            OnUserAgentSuffixChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender, (string? )args.NewValue);
+            OnUserAgentSuffixChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender, (string? )args.OldValue, (string? )args.NewValue);
+        }));
         /// <summary>
         /// A suffix that is added to the default user agent, surrounded by square brackets.
         Can be used to identify the web view as  belonging to a certain app /version on the server side. <br / >

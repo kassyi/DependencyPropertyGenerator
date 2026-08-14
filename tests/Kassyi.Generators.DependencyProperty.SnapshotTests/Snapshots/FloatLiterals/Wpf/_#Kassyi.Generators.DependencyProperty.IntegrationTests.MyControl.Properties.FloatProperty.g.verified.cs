@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: 42
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty FloatPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "FloatProperty", propertyType: typeof(float), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (float)42, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty FloatPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "FloatProperty", propertyType: typeof(float), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (float)42, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnFloatPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnFloatPropertyChanged((float)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnFloatPropertyChanged((float)args.OldValue, (float)args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: 42
         /// </summary>

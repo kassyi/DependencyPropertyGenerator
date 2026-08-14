@@ -9,7 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttachedPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "AttachedProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttachedPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "AttachedProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            OnAttachedPropertyChanged();
+            OnAttachedPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender);
+            OnAttachedPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
+            OnAttachedPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnAttachedPropertyChanging();
+            OnAttachedPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender);
+            OnAttachedPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
+            OnAttachedPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

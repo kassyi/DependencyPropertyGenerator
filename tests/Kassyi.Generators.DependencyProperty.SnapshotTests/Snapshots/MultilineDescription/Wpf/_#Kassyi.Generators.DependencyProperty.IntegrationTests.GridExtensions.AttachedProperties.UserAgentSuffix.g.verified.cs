@@ -9,7 +9,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty UserAgentSuffixProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty UserAgentSuffixProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "UserAgentSuffix", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(string), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            OnUserAgentSuffixChanged();
+            OnUserAgentSuffixChanged((global::System.Windows.Controls.Grid)sender);
+            OnUserAgentSuffixChanged((global::System.Windows.Controls.Grid)sender, (string? )args.NewValue);
+            OnUserAgentSuffixChanged((global::System.Windows.Controls.Grid)sender, (string? )args.OldValue, (string? )args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// A suffix that is added to the default user agent, surrounded by square brackets.
         Can be used to identify the web view as  belonging to a certain app /version on the server side. <br / >

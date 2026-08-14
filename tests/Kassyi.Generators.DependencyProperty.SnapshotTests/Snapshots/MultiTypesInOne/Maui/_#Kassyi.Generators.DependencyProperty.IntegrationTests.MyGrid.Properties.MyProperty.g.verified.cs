@@ -12,7 +12,14 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanged();
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanged((int)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanged((int)oldValue, (int)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanging((int)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyPropertyChanging((int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

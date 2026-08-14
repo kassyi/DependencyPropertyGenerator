@@ -12,6 +12,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.UI.Xaml.DependencyProperty IsSpinningProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "IsSpinning", propertyType: typeof(bool), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(bool), propertyChangedCallback: static (sender, args) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged((bool)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnIsSpinningChanged((bool)args.OldValue, (bool)args.NewValue);
         }));
         /// <summary>
         /// Default value: default(bool)

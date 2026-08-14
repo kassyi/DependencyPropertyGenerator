@@ -12,7 +12,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.Maui.Controls.BindableProperty RowCountProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "RowCount", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers), defaultValue: (int)-1, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnRowCountChanged((global::Microsoft.Maui.Controls.Grid)sender, (int)newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnRowCountChanging();
+            OnRowCountChanging((global::Microsoft.Maui.Controls.Grid)sender);
+            OnRowCountChanging((global::Microsoft.Maui.Controls.Grid)sender, (int)newValue);
+            OnRowCountChanging((global::Microsoft.Maui.Controls.Grid)sender, (int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: -1
         /// </summary>

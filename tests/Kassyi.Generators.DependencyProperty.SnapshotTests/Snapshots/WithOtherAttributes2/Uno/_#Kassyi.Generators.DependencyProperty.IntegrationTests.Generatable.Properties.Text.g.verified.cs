@@ -11,6 +11,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::Windows.UI.Xaml.DependencyProperty TextProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "Text", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
         {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanged((string? )args.NewValue);
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanged((string? )args.OldValue, (string? )args.NewValue);
         }));
         /// <summary>

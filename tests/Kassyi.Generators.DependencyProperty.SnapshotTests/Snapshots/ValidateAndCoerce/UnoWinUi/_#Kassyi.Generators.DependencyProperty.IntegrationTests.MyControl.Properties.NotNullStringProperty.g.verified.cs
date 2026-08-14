@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
+        }));
         /// <summary>
         /// Default value: ""
         /// </summary>

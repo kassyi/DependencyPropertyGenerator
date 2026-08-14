@@ -11,6 +11,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::Microsoft.UI.Xaml.DependencyProperty ModeProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "Mode", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, propertyChangedCallback: static (sender, args) =>
         {
+            OnModeChanged();
+            OnModeChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender);
+            OnModeChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.NewValue);
             OnModeChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.OldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.NewValue);
         }));
         /// <summary>

@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: jpg")
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty AquariumGraphicProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "AquariumGraphic", propertyType: typeof(global::System.Uri), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (global::System.Uri)new System.Uri("http://www.contoso.com/aquarium-graphic.jpg"), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty AquariumGraphicProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "AquariumGraphic", propertyType: typeof(global::System.Uri), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (global::System.Uri)new System.Uri("http://www.contoso.com/aquarium-graphic.jpg"), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Aquarium)sender).OnAquariumGraphicChanged((global::System.Uri)args.OldValue, (global::System.Uri)args.NewValue);
+        }));
         /// <summary>
         /// Default value: jpg")
         /// </summary>

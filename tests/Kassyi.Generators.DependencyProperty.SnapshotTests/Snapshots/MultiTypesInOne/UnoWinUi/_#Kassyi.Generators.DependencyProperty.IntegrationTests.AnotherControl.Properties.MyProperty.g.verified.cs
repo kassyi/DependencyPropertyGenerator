@@ -12,6 +12,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "MyProperty", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyPropertyChanged((int)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyPropertyChanged((int)args.OldValue, (int)args.NewValue);
         }));
         /// <summary>
         /// Default value: default(int)

@@ -12,7 +12,14 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.Maui.Controls.BindableProperty MyProperty2Property = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty2", returnType: typeof((int, string)), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), defaultValue: default((int, string)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed();
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed(((int, string))newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed(((int, string))oldValue, ((int, string))newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing(((int, string))newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changing(((int, string))oldValue, ((int, string))newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default((int, string))
         /// </summary>

@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty TupleIntStringProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TupleIntString", returnType: typeof(global::System.Tuple<int, string>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(global::System.Tuple<int, string>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty TupleIntStringProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TupleIntString", returnType: typeof(global::System.Tuple<int, string>), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(global::System.Tuple<int, string>), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )oldValue, (global::System.Tuple<int, string>? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanging((global::System.Tuple<int, string>? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnTupleIntStringChanging((global::System.Tuple<int, string>? )oldValue, (global::System.Tuple<int, string>? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>

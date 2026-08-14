@@ -11,8 +11,15 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::Microsoft.Maui.Controls.BindableProperty BindEventsPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "BindEventsProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanged((object? )newValue);
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanged((object? )oldValue, (object? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanging((object? )newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanging((object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

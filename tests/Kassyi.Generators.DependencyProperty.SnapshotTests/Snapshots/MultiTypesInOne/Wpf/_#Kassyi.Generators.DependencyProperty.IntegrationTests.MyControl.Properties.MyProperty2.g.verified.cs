@@ -12,6 +12,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::System.Windows.DependencyProperty MyProperty2Property = global::System.Windows.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(int), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnMyProperty2Changed();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnMyProperty2Changed((int)args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnMyProperty2Changed((int)args.OldValue, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(int)

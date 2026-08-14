@@ -11,6 +11,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::System.Windows.DependencyProperty ModeProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "Mode", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)1, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
+            OnModeChanged();
+            OnModeChanged((global::System.Windows.Controls.TreeView)sender);
+            OnModeChanged((global::System.Windows.Controls.TreeView)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.NewValue);
             OnModeChanged((global::System.Windows.Controls.TreeView)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.OldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>

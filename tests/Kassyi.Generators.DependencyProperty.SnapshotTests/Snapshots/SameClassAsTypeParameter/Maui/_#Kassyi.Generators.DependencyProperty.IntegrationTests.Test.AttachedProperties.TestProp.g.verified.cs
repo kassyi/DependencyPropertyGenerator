@@ -12,7 +12,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         public static readonly global::Microsoft.Maui.Controls.BindableProperty TestPropProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "TestProp", returnType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
             TestChanged((global::Microsoft.Maui.Controls.Grid)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnTestPropChanging();
+            OnTestPropChanging((global::Microsoft.Maui.Controls.Grid)sender);
+            OnTestPropChanging((global::Microsoft.Maui.Controls.Grid)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )newValue);
+            OnTestPropChanging((global::Microsoft.Maui.Controls.Grid)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )oldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(Test)
         /// </summary>

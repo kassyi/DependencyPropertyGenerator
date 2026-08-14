@@ -9,7 +9,17 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty NotNullStringPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "NotNullStringProperty", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (string)"", defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: static (sender, value) => IsNotNullStringPropertyValid((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender, (string? )value), propertyChanged: null, propertyChanging: null, coerceValue: static (sender, value) => ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).CoerceNotNullStringProperty((string? )value), defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty NotNullStringPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "NotNullStringProperty", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (string)"", defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: static (sender, value) => IsNotNullStringPropertyValid((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender, (string? )value), propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanged((string)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanged((string)oldValue, (string)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanging();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanging((string)newValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnNotNullStringPropertyChanging((string)oldValue, (string)newValue);
+        }, coerceValue: static (sender, value) => ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).CoerceNotNullStringProperty((string? )value), defaultValueCreator: null);
         /// <summary>
         /// Default value: ""
         /// </summary>

@@ -9,6 +9,8 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
             _ = this.RegisterPropertyChangedCallback(dp: AquariumGraphicProperty, callback: static (sender, dependencyProperty) =>
             {
                 ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged();
+                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged((global::System.Uri)sender.GetValue(dependencyProperty));
+                ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.TropicalAquarium)sender).OnAquariumGraphicChanged((global::System.Uri)sender.GetValue(dependencyProperty), (global::System.Uri)sender.GetValue(dependencyProperty));
             );
         }
 

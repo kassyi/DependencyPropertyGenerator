@@ -9,7 +9,17 @@ namespace Namespace1
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(global::Namespace1.MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(global::Namespace1.MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged();
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged((int)newValue);
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanged((int)oldValue, (int)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging();
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging((int)newValue);
+            ((global::Namespace1.MyGrid)sender).OnMyPropertyChanging((int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

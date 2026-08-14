@@ -11,6 +11,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::Microsoft.UI.Xaml.DependencyProperty SelectedItemProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "SelectedItem", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.TreeViewExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
         {
+            OnSelectedItemChanged();
+            OnSelectedItemChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender);
+            OnSelectedItemChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender, (object? )args.NewValue);
             OnSelectedItemChanged((global::Microsoft.UI.Xaml.Controls.TreeView)sender, (object? )args.OldValue, (object? )args.NewValue);
         }));
         /// <summary>

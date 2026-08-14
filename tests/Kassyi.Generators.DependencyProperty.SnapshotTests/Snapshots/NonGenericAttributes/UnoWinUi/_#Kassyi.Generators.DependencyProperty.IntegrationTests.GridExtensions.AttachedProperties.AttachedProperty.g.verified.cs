@@ -9,7 +9,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty AttachedPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty AttachedPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
+        {
+            OnAttachedPropertyChanged();
+            OnAttachedPropertyChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender);
+            OnAttachedPropertyChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender, (object? )args.NewValue);
+            OnAttachedPropertyChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender, (object? )args.OldValue, (object? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(object)
         /// </summary>

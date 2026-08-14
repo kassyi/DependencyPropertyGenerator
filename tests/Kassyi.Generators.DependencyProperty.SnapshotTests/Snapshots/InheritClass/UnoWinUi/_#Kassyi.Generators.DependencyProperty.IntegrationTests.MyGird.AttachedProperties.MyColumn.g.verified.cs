@@ -9,7 +9,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyColumnProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty MyColumnProperty = global::Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
+        {
+            OnMyColumnChanged();
+            OnMyColumnChanged((global::Microsoft.UI.Xaml.FrameworkElement)sender);
+            OnMyColumnChanged((global::Microsoft.UI.Xaml.FrameworkElement)sender, (int)args.NewValue);
+            OnMyColumnChanged((global::Microsoft.UI.Xaml.FrameworkElement)sender, (int)args.OldValue, (int)args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int)
         /// </summary>

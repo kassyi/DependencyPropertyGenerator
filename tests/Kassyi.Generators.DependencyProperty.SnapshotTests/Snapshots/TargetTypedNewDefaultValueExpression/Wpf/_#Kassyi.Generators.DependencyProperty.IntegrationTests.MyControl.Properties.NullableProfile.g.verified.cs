@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: 0)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty NullableProfileProperty = global::System.Windows.DependencyProperty.Register(name: "NullableProfile", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? ), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? )new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile(1.5, 48.0), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty NullableProfileProperty = global::System.Windows.DependencyProperty.Register(name: "NullableProfile", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? ), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? )new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile(1.5, 48.0), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNullableProfileChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNullableProfileChanged((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnNullableProfileChanged((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? )args.OldValue, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyProfile? )args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: 0)
         /// </summary>

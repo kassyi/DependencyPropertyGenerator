@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int?)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty PropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "Property", propertyType: typeof(int? ), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int? ), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty PropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "Property", propertyType: typeof(int? ), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int? ), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnPropertyChanged((int? )args.OldValue, (int? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int?)
         /// </summary>

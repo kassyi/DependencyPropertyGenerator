@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Tuple&lt;int, FrameworkElement&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty TupleIntControlProperty = global::System.Windows.DependencyProperty.Register(name: "TupleIntControl", propertyType: typeof(global::System.Tuple<int, global::System.Windows.FrameworkElement>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::System.Tuple<int, global::System.Windows.FrameworkElement>), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty TupleIntControlProperty = global::System.Windows.DependencyProperty.Register(name: "TupleIntControl", propertyType: typeof(global::System.Tuple<int, global::System.Windows.FrameworkElement>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::System.Tuple<int, global::System.Windows.FrameworkElement>), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::System.Windows.FrameworkElement>? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnTupleIntControlChanged((global::System.Tuple<int, global::System.Windows.FrameworkElement>? )args.OldValue, (global::System.Tuple<int, global::System.Windows.FrameworkElement>? )args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(Tuple&lt;int, FrameworkElement&gt;)
         /// </summary>

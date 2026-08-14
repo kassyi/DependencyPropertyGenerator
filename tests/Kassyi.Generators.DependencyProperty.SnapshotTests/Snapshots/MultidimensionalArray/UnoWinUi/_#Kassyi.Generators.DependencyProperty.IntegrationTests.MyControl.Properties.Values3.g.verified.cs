@@ -9,7 +9,12 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int[,,])
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty Values3Property = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "Values3", propertyType: typeof(int[,, ]), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int[,, ]), propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty Values3Property = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "Values3", propertyType: typeof(int[,, ]), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: default(int[,, ]), propertyChangedCallback: static (sender, args) =>
+        {
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed();
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed((int[,, ]? )args.NewValue);
+            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl)sender).OnValues3Changed((int[,, ]? )args.OldValue, (int[,, ]? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int[,,])
         /// </summary>

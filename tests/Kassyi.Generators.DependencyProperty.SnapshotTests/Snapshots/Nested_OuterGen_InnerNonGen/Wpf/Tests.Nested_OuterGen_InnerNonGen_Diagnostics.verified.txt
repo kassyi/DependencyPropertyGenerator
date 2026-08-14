@@ -1,0 +1,65 @@
+﻿[
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (16,50)-(16,51),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (22,34)-(22,35),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (22,58)-(22,77),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (23,34)-(23,35),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (23,58)-(23,77),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (24,34)-(24,35),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (24,58)-(24,77),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (37,13)-(37,21),
+    MessageFormat: The name '{0}' does not exist in the current context
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyNamespace.OuterClass_lt_T_gt_.InnerControl.Properties.MyProperty.g.cs,
+    Span: (38,8)-(38,16),
+    MessageFormat: The name '{0}' does not exist in the current context
+  }
+]
