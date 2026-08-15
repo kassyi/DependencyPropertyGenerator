@@ -57,6 +57,29 @@ public class OverrideMetadataTests : SnapshotTestBase
             }
             """, framework, skipE2EValidation: true, additionalGenerators: new DependencyPropertyGenerator());
     }
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Avalonia)]
+    public Task OverrideMetadataWithOldAndNewValue_EmitsError(Framework framework)
+    {
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
+
+            [DependencyProperty<int>("AquariumSize", IsReadOnly = true, DefaultValue = 10)]
+            public partial class Aquarium : UIElement
+            {
+            }
+
+            [OverrideMetadata<int>("AquariumSize", IsReadOnly = true, DefaultValue = 20)]
+            public partial class TropicalAquarium : Aquarium
+            {
+                partial void OnAquariumSizeChanged(int oldValue, int newValue)
+                {
+                }
+            }
+            """, framework, skipE2EValidation: true, additionalGenerators: new DependencyPropertyGenerator());
+    }
 }
 
 

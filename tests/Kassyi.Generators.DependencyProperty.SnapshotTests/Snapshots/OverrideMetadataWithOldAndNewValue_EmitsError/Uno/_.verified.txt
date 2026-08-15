@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[OverrideMetadata<int>("AquariumSize", IsReadOnly = true, DefaultValue = 20)]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class TropicalAquarium : Aquarium
+*/
+ : (11,1)-(11,76),
+      Message: The OldAndNewValue signature is not supported for OverrideMetadata in Uno because RegisterPropertyChangedCallback does not provide the old value,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0005,
+        Title: Invalid Callback Signature,
+        MessageFormat: The OldAndNewValue signature is not supported for OverrideMetadata in {0} because RegisterPropertyChangedCallback does not provide the old value,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

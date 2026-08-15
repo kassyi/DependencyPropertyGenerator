@@ -158,7 +158,29 @@ internal sealed class DependencyPropertyDataBuilder
             out _isRequired,
             out _isInitOnly);
 
-        return this;
+        var isOverrideMetadata = attribute.AttributeClass?.Name.Contains("OverrideMetadata") == true;
+
+        if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
+            !isOverrideMetadata ||
+            !_validationAndCallbacks.Callbacks.ChangedSignatures.HasFlag(CallbackSignature.OldAndNewValue))
+        {
+            return this;
+        }
+
+        var location = classSymbol?.Locations.FirstOrDefault() ?? Location.None;
+        if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } syntax)
+        {
+            location = syntax.GetLocation();
+        }
+        var descriptor = new DiagnosticDescriptor(
+            id: "DPG0005",
+            title: "Invalid Callback Signature",
+            messageFormat: "The OldAndNewValue signature is not supported for OverrideMetadata in {0} because RegisterPropertyChangedCallback does not provide the old value",
+            category: "Usage",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+        throw new DiagnosticException(Diagnostic.Create(descriptor, location, _framework.ToString()));
+
     }
 
     public DependencyPropertyData Build()

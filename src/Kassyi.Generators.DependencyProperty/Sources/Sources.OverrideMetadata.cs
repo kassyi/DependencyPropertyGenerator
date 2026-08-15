@@ -48,7 +48,7 @@ internal static partial class SourceGenerationHelper
 
                     if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
                     {
-                        writer.AppendLine($"{senderCast}.{name}({getValue}, {getValue});");
+                        writer.AppendLine($"{senderCast}.{name}(default({type}), {getValue});");
                     }
                 }
             }
