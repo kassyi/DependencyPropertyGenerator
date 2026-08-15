@@ -54,6 +54,7 @@ public static class PrepareData
                 continue;
             }
 
+            match.HasMethod = true;
             foreach (var rule in s_signatureRules)
             {
                 rule.Evaluate(method, targetType, senderType, match);
