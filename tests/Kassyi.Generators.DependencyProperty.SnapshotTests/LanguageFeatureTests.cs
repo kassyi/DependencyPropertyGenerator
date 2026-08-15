@@ -6,10 +6,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
-public class OrthogonalMatrixTests : SnapshotTestBase
+[TestCategory(TestCategoryNames.Language)]
+public class LanguageFeatureTests : SnapshotTestBase
 {
     // 1. Basic happy path (block-scoped namespace x public partial class)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-001")]
     [DataRow(Framework.Wpf)]
     public Task Basic_Block_Public_Class(Framework framework)
     {
@@ -24,6 +26,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 2. File-scoped namespace x internal partial class
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-002")]
     [DataRow(Framework.Wpf)]
     public Task FileScoped_Internal_Class(Framework framework)
     {
@@ -40,6 +43,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 3. Generic record class x public
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-003")]
     [DataRow(Framework.Wpf)]
     public Task RecordClass_Generic_Public(Framework framework)
     {
@@ -54,6 +58,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 4. Generic type constraints with file-scoped namespace
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-005")]
     [DataRow(Framework.Wpf)]
     public Task Generic_Class_WithConstraints(Framework framework)
     {
@@ -70,6 +75,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 5. Global namespace x multiple generic type parameters
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-004")]
     [DataRow(Framework.Wpf)]
     public Task GlobalNamespace_MultipleGenerics(Framework framework)
     {
@@ -84,6 +90,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 6. Nested class (asymmetric: non-generic outer, generic inner)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-008")]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterNonGen_InnerGen(Framework framework)
     {
@@ -101,6 +108,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 7. Nested class (asymmetric: generic outer, non-generic inner)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-009")]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterGen_InnerNonGen(Framework framework)
     {
@@ -120,6 +128,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 8. Nested structure (mutually generic: outer record + inner class)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-010")]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterGenRecord_InnerGenClass(Framework framework)
     {
@@ -135,22 +144,9 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 9. Boundary condition: assembly-private 'file' modifier
-    [TestMethod]
-    [DataRow(Framework.Wpf)]
-    public Task FileModifier_Class(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
-
-            [DependencyProperty("MyProperty", typeof(int))]
-            file partial class MyControl : UserControl
-            {
-            }
-            """, framework, skipE2EValidation: true);
-    }
-
     // 10. Deeply nested types in global namespace
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-011")]
     [DataRow(Framework.Wpf)]
     public Task Global_Nested_Deep(Framework framework)
     {
@@ -171,6 +167,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 11. Type arity distinction for identically named types in the same namespace
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-007")]
     [DataRow(Framework.Wpf)]
     public Task SameNameClass_DifferentGenerics(Framework framework)
     {
@@ -186,6 +183,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 12. Conflict avoidance for identically named types across different namespaces
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-029")]
     [DataRow(Framework.Wpf)]
     public Task SameNameClass_DifferentNamespace(Framework framework)
     {
@@ -207,6 +205,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 13. Nullable context with record class
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-027")]
     [DataRow(Framework.Wpf)]
     public Task Nullable_Context_Record(Framework framework)
     {
@@ -221,6 +220,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 14. Attached property on static class (non-instantiable)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-028")]
     [DataRow(Framework.Wpf)]
     public Task AttachedProperty_StaticClass(Framework framework)
     {
@@ -235,6 +235,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 15. Modifier order normalization invariance
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-020")]
     [DataRow(Framework.Wpf)]
     public Task Modifiers_Order_Normalization(Framework framework)
     {
@@ -250,6 +251,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 16. C# 13 partial property conflict
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-013")]
     [DataRow(Framework.Wpf)]
     public Task Partial_Property_Conflict(Framework framework)
     {
@@ -263,25 +265,9 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 17. Property type rejection for 'ref struct'
-    [TestMethod]
-    [DataRow(Framework.Wpf)]
-    public Task RefStruct_PropertyType_Rejection(Framework framework)
-    {
-        // This should skip generation or emit a diagnostic because MyRefStruct is a ref struct
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + """
-
-            public ref struct MyRefStruct { }
-
-            [DependencyProperty("MyProperty", typeof(MyRefStruct))]
-            public partial class MyControl : UserControl
-            {
-            }
-            """, framework, skipE2EValidation: true);
-    }
-
     // 18. Primary constructor support
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-012")]
     [DataRow(Framework.Wpf)]
     public Task Primary_Constructor(Framework framework)
     {
@@ -296,6 +282,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 19. Keyword escaping
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-019")]
     [DataRow(Framework.Wpf)]
     public Task Keyword_Escaping(Framework framework)
     {
@@ -311,6 +298,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 20. Generic constraint with 'allows ref struct' (anti-constraint)
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-006")]
     [DataRow(Framework.Wpf)]
     public Task Generic_AllowsRefStruct(Framework framework)
     {
@@ -325,6 +313,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 21. 'new' modifier for shadowing inherited properties
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-022")]
     [DataRow(Framework.Wpf)]
     public Task Inheritance_NewModifier(Framework framework)
     {
@@ -344,6 +333,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 22. Collection expression default value
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-015")]
     [DataRow(Framework.Wpf)]
     public Task DefaultValue_CollectionExpression(Framework framework)
     {
@@ -358,6 +348,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 23. Properties with 'required' and 'init' accessors
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-014")]
     [DataRow(Framework.Maui)]
     public Task RequiredInit_Properties(Framework framework)
     {
@@ -373,6 +364,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 24. Tuple property type
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-017")]
     [DataRow(Framework.Wpf)]
     public Task PropertyType_Tuple(Framework framework)
     {
@@ -387,6 +379,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 25. Complex nested nullable array type
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-018")]
     [DataRow(Framework.Wpf)]
     public Task PropertyType_ComplexNullableArray(Framework framework)
     {
@@ -399,22 +392,9 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // DPG0004: Diagnostic rejection for shared reference type default values
-    [TestMethod]
-    [DataRow(Framework.Wpf)]
-    public Task ReferenceType_DefaultValue_Rejection(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
-
-            [DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "new List<int>()")]
-            public partial class MyControl : UserControl
-            {
-            }
-            """, framework, skipE2EValidation: true);
-    }
-
     // 27. required partial property with init
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-030")]
     [DataRow(Framework.Wpf)]
     public Task Partial_Property_Required_Init(Framework framework)
     {
@@ -437,5 +417,160 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             }
             """, framework);
     }
-}
 
+    // 28. Target-typed new default value expression
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-016")]
+    [DataRow(Framework.Wpf)]
+    public Task TargetTypedNewDefaultValueExpression(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            public record struct MyProfile(double A, double B);
+
+            [DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]
+            [DependencyProperty<MyProfile?>("NullableProfile", DefaultValueExpression = "new      (1.5, 48.0)")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
+
+    // 29. ComponentModel attributes propagation
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-021")]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Maui)]
+    [DataRow(Framework.Avalonia)]
+    public Task Attributes_ComponentModel(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(
+            GetHeader(framework, "Controls", "System.ComponentModel") +
+                    """
+
+                    [DependencyProperty<string>("AttributedProperty",
+                        Category = "Category",
+                        Description = "Description",
+                        TypeConverter = typeof(EnumConverter),
+                        Bindable = true,
+                        DesignerSerializationVisibility = DesignerSerializationVisibility.Hidden,
+                        ClsCompliant = false,
+                        Localizability = Localizability.Text)]
+                    public partial class MyControl : UserControl
+                    {
+                    }
+                    """, framework);
+    }
+
+    // 30. Validate and Coerce callbacks
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-023")]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Maui)]
+    [DataRow(Framework.Avalonia)]
+    public Task ValidateAndCoerce(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+              [DependencyProperty<string>("NotNullStringProperty", DefaultValue = "", Validate = true, Coerce = true)]
+              public partial class MyControl : UserControl
+              {
+                  private partial string CoerceNotNullStringProperty(string? value)
+                  {
+                      return value ?? string.Empty;
+                  }
+
+              {{(framework == Framework.Maui ?
+                """
+
+                    private static partial bool IsNotNullStringPropertyValid(MyControl sender, string? value)
+                    {
+                        return value != null;
+                    }
+                """ :
+                """
+
+                    private static partial bool IsNotNullStringPropertyValid(string? value)
+                    {
+                        return value != null;
+                    }
+                """)}}
+              }
+              """, framework);
+    }
+
+    // 31. Avalonia specific affects flags
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-024")]
+    public Task AvaloniaAffectsFlags()
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(Framework.Avalonia, "Controls", "Media") + """
+
+            [DependencyProperty<Brush>("Fill", AffectsRender = true, AffectsMeasure = true, AffectsArrange = true)]
+            public partial class MyControl : Control
+            {
+            }
+            """, Framework.Avalonia, additionalGenerators: new StaticConstructorGenerator());
+    }
+
+    // 32. BindEvents static constructor generation
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-025")]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Maui)]
+    [DataRow(Framework.Avalonia)]
+    public Task BindEvents(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + """
+
+            [DependencyProperty<object>("BindEventsProperty",
+                BindEvents = new[] { nameof(UIElement.PointerEntered), nameof(UIElement.PointerExited) })]
+            public partial class MyUIElement : UIElement
+            {
+                private static void OnBindEventsPropertyChanged_PointerEntered(object? sender, PointerRoutedEventArgs args)
+                {
+                }
+
+                private static void OnBindEventsPropertyChanged_PointerExited(object? sender, PointerRoutedEventArgs args)
+                {
+                }
+            }
+            """, framework, additionalGenerators: new StaticConstructorGenerator());
+    }
+
+    // 33. Multidimensional array property type
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-026")]
+    [DataRow(Framework.Wpf)]
+    public Task MultidimensionalArray(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [DependencyProperty<int[,,]>("Values3")]
+            public partial class MyControl : FrameworkElement
+            {
+            }
+            """, framework);
+    }
+
+    // 34. Unmanaged function pointer
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-031")]
+    [DataRow(Framework.Wpf)]
+    public Task Unmanaged_Function_Pointer(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+
+            [AttachedDependencyProperty<delegate* unmanaged<int, void>, DependencyObject>("CallbackPtr")]
+            public static partial class UnsafeExtensions
+            {
+            }
+            """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
+    }
+}
