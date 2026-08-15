@@ -172,6 +172,28 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x.Value!);
     }
 
+    /// <summary>Transforms values while capturing unhandled exceptions without reporting them.</summary>
+    public static IncrementalValuesProvider<TResult> SelectAndCatchExceptions<TSource, TResult>(
+        this IncrementalValuesProvider<TSource> source,
+        Func<TSource, TResult> selector)
+    {
+        return source
+            .Select<TSource, (TResult? Value, Exception? Exception)>((value, cancellationToken) =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    return (Value: selector(value), Exception: null);
+                }
+                catch (Exception exception)
+                {
+                    return (Value: default, Exception: exception);
+                }
+            })
+            .Where(static x => x.Exception is null)
+            .Select(static (x, _) => x.Value!);
+    }
+
     /// <summary>Transforms values while capturing and reporting unhandled exceptions as compiler diagnostics.</summary>
     public static IncrementalValuesProvider<TResult> SelectAndReportExceptions<TSource, TResult>(
         this IncrementalValuesProvider<TSource> source,
