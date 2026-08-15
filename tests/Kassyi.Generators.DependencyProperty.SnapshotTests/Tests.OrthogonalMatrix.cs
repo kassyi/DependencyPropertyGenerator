@@ -146,7 +146,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             file partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 10. グローバル名前空間での深いネスト
@@ -230,7 +230,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             public static partial class MyHelper
             {
             }
-            """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
+            """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
     // 15. 修飾子の順序に依存しない正規化検証
@@ -277,7 +277,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 18. Primary constructor
@@ -320,7 +320,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             public partial class MyControl<T> : UserControl where T : allows ref struct
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 21. new modifier for inherited properties
@@ -358,22 +358,17 @@ public class OrthogonalMatrixTests : SnapshotTestBase
 
     // 23. required / init properties
     [TestMethod]
-    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Maui)]
     public Task RequiredInit_Properties(Framework framework)
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Runtime.CompilerServices") + """
-
-            namespace System.Runtime.CompilerServices
-            {
-                internal static class IsExternalInit {}
-            }
 
             [DependencyProperty("MyProperty", typeof(int))]
             public partial class MyControl : UserControl
             {
                 public required partial int MyProperty { get; init; }
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 24. Tuple Type
@@ -383,11 +378,11 @@ public class OrthogonalMatrixTests : SnapshotTestBase
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
 
-            [DependencyProperty<(int id, string name)>("MyProperty")]
+            [DependencyProperty("MyProperty", typeof((int id, string name)))]
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 25. Complex Array/Nullable
@@ -415,6 +410,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 }
+

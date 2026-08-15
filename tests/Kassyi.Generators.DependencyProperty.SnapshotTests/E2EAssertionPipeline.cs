@@ -15,24 +15,11 @@ public static class E2EAssertionPipeline
         Framework framework,
         Compilation compilation,
         ImmutableArray<Diagnostic> diagnostics,
-        string callerName)
+        string callerName,
+        bool skipE2EValidation = false)
     {
         // 意図的なエラーや特殊なエッジケースを検証するテストはアサーションパイプラインをスキップ
-        var skipTests = new[] {
-            "InvalidDefaultValueExpression",
-            "RefStruct_PropertyType_Rejection",
-            "AttachedProperty_StaticClass",
-            "Generic_AllowsRefStruct",
-            "MultilineDescription",
-            "NoneFramework",
-            "FileModifier_Class",
-            "ReferenceType_DefaultValue_Rejection",
-            "OverrideMetadata",
-            "OverrideMetadataForReadOnlyProperty",
-            "PropertyType_Tuple",
-            "RequiredInit_Properties"
-        };
-        if (skipTests.Contains(callerName))
+        if (skipE2EValidation)
         {
             return;
         }
@@ -41,7 +28,7 @@ public static class E2EAssertionPipeline
         var outputRoots = generatedSources.Select(s => CSharpSyntaxTree.ParseText(s).GetCompilationUnitRoot()).ToArray();
 
         // Level 1: Ensure generator produced expected elements
-        VerifyCountMatching(inputRoot, outputRoots, framework, callerName);
+        VerifyCountMatching(inputRoot, outputRoots, framework);
 
         // Level 2: Signature and syntax validation
         VerifySignatureMatching(outputRoots, framework);
@@ -53,13 +40,8 @@ public static class E2EAssertionPipeline
         VerifyDiagnostics(diagnostics, callerName);
     }
 
-    private static void VerifyCountMatching(SyntaxNode inputRoot, SyntaxNode[] outputRoots, Framework framework, string callerName)
+    private static void VerifyCountMatching(SyntaxNode inputRoot, SyntaxNode[] outputRoots, Framework framework)
     {
-        if (callerName == "RefStruct_PropertyType_Rejection" || callerName == "FileModifier_Class")
-        {
-            return;
-        }
-
         // 1. Count target attributes in input
         var attributeNames = new[] { "DependencyProperty", "AttachedDependencyProperty" };
         var targetAttributes = inputRoot.DescendantNodes()

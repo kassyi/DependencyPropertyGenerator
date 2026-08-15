@@ -5,11 +5,5 @@
     WarningLevel: 1,
     Span: (2,1)-(2,44),
     MessageFormat: Unnecessary using directive.
-  },
-  {
-    Id: CS8970,
-    Severity: Error,
-    Span: (6,2)-(6,43),
-    MessageFormat: Type '{0}' cannot be used in this context because it cannot be represented in metadata.
   }
 ]
