@@ -1,8 +1,8 @@
-﻿using Kassyi.Generators.DependencyProperty.Generators;
+using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
-public partial class Tests
+public class PropertyTests : SnapshotTestBase
 {
     [TestMethod]
     [DataRow(Framework.Wpf)]
@@ -85,7 +85,7 @@ public partial class Tests
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
@@ -251,8 +251,8 @@ public partial class Tests
                                                         """;
         var generated = await GenerateSourceAsync<DependencyPropertyGenerator>(source, framework);
 
-        generated.Should().NotContain("double??");
-        generated.Should().Contain("CoerceValue(double? value)");
+        Assert.IsFalse(generated.Contains("double??"));
+        Assert.IsTrue(generated.Contains("CoerceValue(double? value)"));
     }
 
     [TestMethod]

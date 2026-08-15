@@ -5,12 +5,5 @@
     WarningLevel: 1,
     Span: (2,1)-(2,44),
     MessageFormat: Unnecessary using directive.
-  },
-  {
-    Id: CS1503,
-    Severity: Error,
-    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.WeakEventGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.WeakEvents.UrlChanged.g.cs,
-    Span: (51,22)-(51,26),
-    MessageFormat: Argument {0}: cannot convert from '{1}' to '{2}'
   }
 ]

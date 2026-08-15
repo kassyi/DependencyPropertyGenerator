@@ -30,113 +30,88 @@ public static class StringExtensions
     public static string ToParameterName(this string input)
     {
         input = input ?? throw new ArgumentNullException(nameof(input));
-#pragma warning disable CA1308 // [WHY] Lowercase conversion (ToLowerInvariant) is essential for escaping C# reserved keywords.
-        return input.ToLowerInvariant() switch
-#pragma warning restore CA1308
+        if (input.Length == 0)
         {
-            null => throw new ArgumentNullException(nameof(input)),
-            "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
-            
-            // [WHY] Reference for C# keywords that require '@' prefix: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
-            "abstract" => "@abstract",
-            "as" => "@as",
-            "base" => "@base",
-            "bool" => "@bool",
-            "break" => "@break",
-            "byte" => "@byte",
-            "case" => "@case",
-            "catch" => "@catch",
-            "cChar" => "@char",
-            "checked" => "@checked",
-            "class" => "@class",
-            "const" => "@const",
-            "continue" => "@continue",
-            "decimal" => "@decimal",
-            "default" => "@default",
-            "delegate" => "@delegate",
-            "do" => "@do",
-            "double" => "@double",
-            "else" => "@else",
-            "enum" => "@enum",
-            "event" => "@event",
-            "explicit" => "@explicit",
-            "extern" => "@extern",
-            "false" => "@false",
-            "finally" => "@finally",
-            "fixed" => "@fixed",
-            "float" => "@float",
-            "for" => "@for",
-            "foreach" => "@foreach",
-            "goto" => "@goto",
-            "if" => "@if",
-            "implicit" => "@implicit",
-            "in" => "@in",
-            "int" => "@int",
-            "interface" => "@interface",
-            "internal" => "@internal",
-            "is" => "@is",
-            "lock" => "@lock",
-            "long" => "@long",
-            "namespace" => "@namespace",
-            "new" => "@new",
-            "null" => "@null",
-            "object" => "@object",
-            "operator" => "@operator",
-            "out" => "@out",
-            "override" => "@override",
-            "params" => "@params",
-            "private" => "@private",
-            "protected" => "@protected",
-            "public" => "@public",
-            "readonly" => "@readonly",
-            "ref" => "@ref",
-            "return" => "@return",
-            "sbyte" => "@sbyte",
-            "sealed" => "@sealed",
-            "short" => "@short",
-            "sizeof" => "@sizeof",
-            "stackalloc" => "@stackalloc",
-            "static" => "@static",
-            "string" => "@string",
-            "struct" => "@struct",
-            "switch" => "@switch",
-            "this" => "@this",
-            "throw" => "@throw",
-            "true" => "@true",
-            "try" => "@try",
-            "typeof" => "@typeof",
-            "uint" => "@uint",
-            "ulong" => "@ulong",
-            "unchecked" => "@unchecked",
-            "unsafe" => "@unsafe",
-            "ushort" => "@ushort",
-            "using" => "@using",
-            "virtual" => "@virtual",
-            "void" => "@void",
-            "volatile" => "@volatile",
-            "while" => "@while",
-#if NET6_0_OR_GREATER
-            _ => string.Concat(input[0].ToString().ToLower(CultureInfo.InvariantCulture), input.AsSpan(1)),
-#else
-            _ => input[0].ToString().ToLower(CultureInfo.InvariantCulture) + input[1..],
-#endif
-#pragma warning restore CA1308 // Normalize strings to uppercase
+            throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
+        }
+
+        var camelCased = char.ToLower(input[0], CultureInfo.InvariantCulture) + input[1..];
+        return camelCased.EscapeKeyword();
+    }
+
+    private static bool IsCSharpKeyword(string input)
+    {
+        return input switch
+        {
+            "abstract" or "as" or "base" or "bool" or "break" or "byte" or "case" or
+            "catch" or "char" or "checked" or "class" or "const" or "continue" or
+            "decimal" or "default" or "delegate" or "do" or "double" or "else" or
+            "enum" or "event" or "explicit" or "extern" or "false" or "finally" or
+            "fixed" or "float" or "for" or "foreach" or "goto" or "if" or "implicit" or
+            "in" or "int" or "interface" or "internal" or "is" or "lock" or "long" or
+            "namespace" or "new" or "null" or "object" or "operator" or "out" or
+            "override" or "params" or "private" or "protected" or "public" or
+            "readonly" or "ref" or "return" or "sbyte" or "sealed" or "short" or
+            "sizeof" or "stackalloc" or "static" or "string" or "struct" or "switch" or
+            "this" or "throw" or "true" or "try" or "typeof" or "uint" or "ulong" or
+            "unchecked" or "unsafe" or "ushort" or "using" or "virtual" or "void" or
+            "volatile" or "while" => true,
+            _ => false
         };
     }
 
-    private static readonly char[] s_separator = ['\n'];
+    /// <summary>Escapes C# reserved keywords by prepending '@'.</summary>
+    public static string EscapeKeyword(this string input)
+    {
+        input = input ?? throw new ArgumentNullException(nameof(input));
+        
+        return IsCSharpKeyword(input) ? "@" + input : input;
+    }
 
     /// <summary>Removes whitespace-only lines to maintain clean generated source layout.</summary>
     public static string RemoveBlankLinesWhereOnlyWhitespaces(this string text)
     {
         text = text ?? throw new ArgumentNullException(nameof(text));
 
-        return string.Join(
-            separator: "\n",
-            values: text
-                .NormalizeLineEndings()
-                .Split(s_separator, StringSplitOptions.None)
-                .Where(static line => line.Length == 0 || !line.All(char.IsWhiteSpace)));
+        text = text.NormalizeLineEndings();
+        var builder = new StringBuilder(text.Length);
+        
+        var start = 0;
+        while (start < text.Length)
+        {
+            var index = text.IndexOf('\n', start);
+            var end = index >= 0 ? index : text.Length;
+            
+            var isWhiteSpaceLine = true;
+            for (var i = start; i < end; i++)
+            {
+                if (char.IsWhiteSpace(text[i]))
+                {
+                    continue;
+                }
+
+                isWhiteSpaceLine = false;
+                break;
+            }
+
+            if (!isWhiteSpaceLine || start == end)
+            {
+                builder.Append(text, start, end - start);
+                if (index >= 0)
+                {
+                    builder.Append('\n');
+                }
+            }
+
+            if (index < 0)
+            {
+                break;
+            }
+
+            start = index + 1;
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>Normalizes line endings to the specified newline sequence (defaulting to '\n').</summary>
@@ -190,7 +165,11 @@ public static class StringExtensions
         return $"global::{fullTypeName}";
     }
 
-    private static readonly char[] s_specialChars = ['<', '>', ',', ' ', '_'];
+#if NET8_0_OR_GREATER
+    private static readonly System.Buffers.SearchValues<char> s_specialChars = System.Buffers.SearchValues.Create("<>, _@");
+#else
+    private static readonly char[] s_specialChars = ['<', '>', ',', ' ', '_', '@'];
+#endif
 
     /// <summary>Sanitizes a type name or string injectively for use in Roslyn source generator hint names and file paths in a single pass without intermediate string allocations.</summary>
     public static string SanitizeFileName(this string input)
@@ -213,6 +192,7 @@ public static class StringExtensions
                 ',' => sb.Append("_comma_"),
                 ' ' => sb.Append("_space_"),
                 '_' => sb.Append("__"),
+                '@' => sb.Append("_at_"),
                 _ => sb.Append(ch)
             };
         }

@@ -2,17 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyVisualElement
+    public partial class MyVisualElement
     {
         /// <summary>
         /// Identifies the <see cref = "BindEventsProperty"/> dependency property.<br/>
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty BindEventsPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "BindEventsProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty BindEventsPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "BindEventsProperty", returnType: typeof(object), declaringType: typeof(MyVisualElement), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyVisualElement)sender).OnBindEventsPropertyChanged((object? )oldValue, (object? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((MyVisualElement)sender).OnBindEventsPropertyChanged();
+            ((MyVisualElement)sender).OnBindEventsPropertyChanged((object? )newValue);
+            ((MyVisualElement)sender).OnBindEventsPropertyChanged((object? )oldValue, (object? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyVisualElement)sender).OnBindEventsPropertyChanging();
+            ((MyVisualElement)sender).OnBindEventsPropertyChanging((object? )newValue);
+            ((MyVisualElement)sender).OnBindEventsPropertyChanging((object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

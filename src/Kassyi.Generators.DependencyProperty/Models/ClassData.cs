@@ -8,7 +8,10 @@ public readonly record struct ClassData(
     string Name,
     string FullName,
     string Type,
+    string Keyword,
+    string NameWithTypeParameters,
     string Modifiers,
     string Version,
     bool IsStatic,
-    Framework Framework);
+    Framework Framework,
+    EquatableArray<ParentClassData> ParentClasses);

@@ -9,7 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty SomePropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SomeProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty SomePropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SomeProperty", returnType: typeof(object), declaringType: typeof(GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            OnSomePropertyChanged();
+            OnSomePropertyChanged((global::Microsoft.Maui.Controls.BindableObject)sender);
+            OnSomePropertyChanged((global::Microsoft.Maui.Controls.BindableObject)sender, (object? )newValue);
+            OnSomePropertyChanged((global::Microsoft.Maui.Controls.BindableObject)sender, (object? )oldValue, (object? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnSomePropertyChanging();
+            OnSomePropertyChanging((global::Microsoft.Maui.Controls.BindableObject)sender);
+            OnSomePropertyChanging((global::Microsoft.Maui.Controls.BindableObject)sender, (object? )newValue);
+            OnSomePropertyChanging((global::Microsoft.Maui.Controls.BindableObject)sender, (object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

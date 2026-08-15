@@ -5,5 +5,53 @@
     WarningLevel: 1,
     Span: (2,1)-(2,44),
     MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8600,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (13,54)-(13,92),
+    MessageFormat: Converting null literal or possible null value to non-nullable type.
+  },
+  {
+    Id: CS8604,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (13,54)-(13,92),
+    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
+  },
+  {
+    Id: CS8600,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (14,54)-(14,92),
+    MessageFormat: Converting null literal or possible null value to non-nullable type.
+  },
+  {
+    Id: CS8604,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (14,54)-(14,92),
+    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
+  },
+  {
+    Id: CS8600,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (14,94)-(14,132),
+    MessageFormat: Converting null literal or possible null value to non-nullable type.
+  },
+  {
+    Id: CS8604,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.StaticConstructor.g.cs,
+    Span: (14,94)-(14,132),
+    MessageFormat: Possible null reference argument for parameter '{0}' in '{1}'.
   }
 ]

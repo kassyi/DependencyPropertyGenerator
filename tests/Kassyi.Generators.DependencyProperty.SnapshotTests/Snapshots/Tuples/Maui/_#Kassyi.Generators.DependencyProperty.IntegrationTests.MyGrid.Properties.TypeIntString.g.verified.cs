@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "TypeIntString"/> dependency property.<br/>
         /// Default value: default((int, string))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty TypeIntStringProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TypeIntString", returnType: typeof((int, string)), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default((int, string)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty TypeIntStringProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TypeIntString", returnType: typeof((int, string)), declaringType: typeof(MyGrid), defaultValue: default((int, string)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnTypeIntStringChanged();
+            ((MyGrid)sender).OnTypeIntStringChanged(((int, string))newValue);
+            ((MyGrid)sender).OnTypeIntStringChanged(((int, string))oldValue, ((int, string))newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnTypeIntStringChanging();
+            ((MyGrid)sender).OnTypeIntStringChanging(((int, string))newValue);
+            ((MyGrid)sender).OnTypeIntStringChanging(((int, string))oldValue, ((int, string))newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default((int, string))
         /// </summary>

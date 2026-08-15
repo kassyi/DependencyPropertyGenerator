@@ -1,0 +1,522 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,1)-(21,4),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,13)-(21,15),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,16)-(21,24),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,16)-(21,24),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,25)-(21,28),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,29)-(21,32),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,29)-(21,32),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,33)-(21,37),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1003,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,38)-(21,40),
+    MessageFormat: Syntax error, '{0}' expected
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,41)-(21,50),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,41)-(21,50),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,5)-(21,7),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,51)-(21,53),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,51)-(21,53),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,54)-(21,55),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,54)-(21,55),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,56)-(21,63),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,64)-(21,67),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,67)-(21,68),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,67)-(21,68),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,68)-(21,75),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,76)-(21,78),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,79)-(21,82),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,79)-(21,82),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,8)-(21,12),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,8)-(21,12),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,83)-(21,89),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,90)-(21,94),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS1001,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,95)-(21,96),
+    MessageFormat: Identifier expected
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,95)-(21,96),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,98)-(21,99),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (21,98)-(21,99),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,1)-(35,4),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,13)-(35,15),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,13)-(35,15),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,16)-(35,24),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,16)-(35,24),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,25)-(35,28),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,25)-(35,28),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,29)-(35,32),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,29)-(35,32),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,33)-(35,37),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,33)-(35,37),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1003,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,38)-(35,40),
+    MessageFormat: Syntax error, '{0}' expected
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,41)-(35,50),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,41)-(35,50),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,5)-(35,7),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,5)-(35,7),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,51)-(35,53),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,51)-(35,53),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,54)-(35,55),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,54)-(35,55),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,56)-(35,63),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,56)-(35,63),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,64)-(35,67),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,67)-(35,68),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,67)-(35,68),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,68)-(35,75),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,76)-(35,78),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,76)-(35,78),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,79)-(35,82),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,79)-(35,82),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,8)-(35,12),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,8)-(35,12),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS0102,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,83)-(35,89),
+    MessageFormat: The type '{0}' already contains a definition for '{1}'
+  },
+  {
+    Id: CS0169,
+    Severity: Warning,
+    WarningLevel: 3,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,83)-(35,89),
+    MessageFormat: The field '{0}' is never used
+  },
+  {
+    Id: CS1002,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,90)-(35,94),
+    MessageFormat: ; expected
+  },
+  {
+    Id: CS1001,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,95)-(35,96),
+    MessageFormat: Identifier expected
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,95)-(35,96),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,98)-(35,99),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  },
+  {
+    Id: CS1519,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions.AttachedProperties.UserAgentSuffix.g.cs,
+    Span: (35,98)-(35,99),
+    MessageFormat: Invalid token '{0}' in a member declaration
+  }
+]

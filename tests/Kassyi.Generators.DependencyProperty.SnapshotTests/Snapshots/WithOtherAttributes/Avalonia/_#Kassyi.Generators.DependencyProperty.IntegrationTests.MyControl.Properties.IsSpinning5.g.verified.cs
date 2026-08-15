@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<bool> IsSpinning5Property = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl, bool>(name: "IsSpinning5", defaultValue: default(bool), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<bool> IsSpinning5Property = global::Avalonia.AvaloniaProperty.Register<MyControl, bool>(name: "IsSpinning5", defaultValue: default(bool), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(bool)
         /// </summary>

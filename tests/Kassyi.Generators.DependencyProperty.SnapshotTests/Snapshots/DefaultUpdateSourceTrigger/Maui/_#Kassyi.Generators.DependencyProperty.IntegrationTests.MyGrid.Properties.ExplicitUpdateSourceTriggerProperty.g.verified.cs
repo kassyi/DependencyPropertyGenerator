@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "ExplicitUpdateSourceTriggerProperty"/> dependency property.<br/>
         /// Default value: default(bool)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty ExplicitUpdateSourceTriggerPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "ExplicitUpdateSourceTriggerProperty", returnType: typeof(bool), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(bool), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty ExplicitUpdateSourceTriggerPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "ExplicitUpdateSourceTriggerProperty", returnType: typeof(bool), declaringType: typeof(MyGrid), defaultValue: default(bool), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanged();
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)newValue);
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanged((bool)oldValue, (bool)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanging();
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanging((bool)newValue);
+            ((MyGrid)sender).OnExplicitUpdateSourceTriggerPropertyChanging((bool)oldValue, (bool)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(bool)
         /// </summary>

@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "AttributedProperty"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty AttributedPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "AttributedProperty", propertyType: typeof(string), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty AttributedPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "AttributedProperty", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(string), propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnAttributedPropertyChanged();
+            ((MyControl)sender).OnAttributedPropertyChanged((string? )args.NewValue);
+            ((MyControl)sender).OnAttributedPropertyChanged((string? )args.OldValue, (string? )args.NewValue);
+        }));
         /// <summary>
         /// Description<br/>
         /// Default value: default(string)

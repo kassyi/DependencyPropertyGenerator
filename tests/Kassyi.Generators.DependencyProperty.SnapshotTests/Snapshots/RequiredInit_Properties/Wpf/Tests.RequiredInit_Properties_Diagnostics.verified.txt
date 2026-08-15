@@ -1,0 +1,54 @@
+﻿[
+  {
+    Id: CS0656,
+    Severity: Error,
+    Span: (13,22)-(13,31),
+    MessageFormat: Missing compiler required member '{0}.{1}'
+  },
+  {
+    Id: CS0656,
+    Severity: Error,
+    Span: (13,22)-(13,31),
+    MessageFormat: Missing compiler required member '{0}.{1}'
+  },
+  {
+    Id: CS0518,
+    Severity: Error,
+    Span: (15,51)-(15,55),
+    MessageFormat: Predefined type '{0}' is not defined or imported
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,39),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (3,1)-(3,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8955,
+    Severity: Error,
+    Span: (7,11)-(7,42),
+    MessageFormat: Source file can not contain both file-scoped and normal namespace declarations.
+  },
+  {
+    Id: CS9257,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
+    Span: (35,20)-(35,30),
+    MessageFormat: Both partial property declarations must be required or neither may be required
+  },
+  {
+    Id: CS9254,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.MyProperty.g.cs,
+    Span: (38,1)-(38,4),
+    MessageFormat: Property accessor '{0}' must be '{1}' to match the definition part
+  }
+]

@@ -1,7 +1,8 @@
-﻿using Kassyi.Generators.DependencyProperty.Generators;
+using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
-public partial class Tests
+[TestClass]
+public class ErrorTests : SnapshotTestBase
 {
     [TestMethod]
     [DataRow(Framework.None)]
@@ -13,7 +14,7 @@ public partial class Tests
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
@@ -51,8 +52,8 @@ public partial class Tests
             """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
 
-        generated.Should().Contain("#error DPG0001: The specified OnChanged method 'OnTestChanged' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'.");
-        generated.Should().Contain("propertyChangedCallback: null");
+        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'OnTestChanged' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
+        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
     }
 }
 

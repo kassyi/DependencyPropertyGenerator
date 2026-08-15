@@ -2,16 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class AnotherControl
+    public partial class AnotherControl
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty2"/> dependency property.<br/>
         /// Default value: default((int, string))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty MyProperty2Property = global::Windows.UI.Xaml.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof((int, string)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, string)), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty MyProperty2Property = global::Windows.UI.Xaml.DependencyProperty.Register(name: "MyProperty2", propertyType: typeof((int, string)), ownerType: typeof(AnotherControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, string)), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyProperty2Changed();
+            ((AnotherControl)sender).OnMyProperty2Changed();
+            ((AnotherControl)sender).OnMyProperty2Changed(((int, string))args.NewValue);
+            ((AnotherControl)sender).OnMyProperty2Changed(((int, string))args.OldValue, ((int, string))args.NewValue);
         }));
         /// <summary>
         /// Default value: default((int, string))

@@ -9,7 +9,13 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        internal static readonly global::System.Windows.DependencyPropertyKey AttachedReadOnlyPropertyPropertyKey = global::System.Windows.DependencyProperty.RegisterAttachedReadOnly(name: "AttachedReadOnlyProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        internal static readonly global::System.Windows.DependencyPropertyKey AttachedReadOnlyPropertyPropertyKey = global::System.Windows.DependencyProperty.RegisterAttachedReadOnly(name: "AttachedReadOnlyProperty", propertyType: typeof(object), ownerType: typeof(GridExtensions), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            OnAttachedReadOnlyPropertyChanged();
+            OnAttachedReadOnlyPropertyChanged((global::System.Windows.Controls.Grid)sender);
+            OnAttachedReadOnlyPropertyChanged((global::System.Windows.Controls.Grid)sender, (object? )args.NewValue);
+            OnAttachedReadOnlyPropertyChanged((global::System.Windows.Controls.Grid)sender, (object? )args.OldValue, (object? )args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Identifies the AttachedReadOnlyProperty dependency property.<br/>
         /// Default value: default(object)

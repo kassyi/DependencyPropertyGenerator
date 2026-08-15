@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<global::System.Tuple<int, string>?> TupleIntStringProperty = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl, global::System.Tuple<int, string>?>(name: "TupleIntString", defaultValue: default(global::System.Tuple<int, string>), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<global::System.Tuple<int, string>?> TupleIntStringProperty = global::Avalonia.AvaloniaProperty.Register<MyControl, global::System.Tuple<int, string>?>(name: "TupleIntString", defaultValue: default(global::System.Tuple<int, string>), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>

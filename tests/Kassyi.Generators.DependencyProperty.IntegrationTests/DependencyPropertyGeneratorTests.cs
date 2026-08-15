@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
 
@@ -10,11 +10,11 @@ public class DependencyPropertyGeneratorTests
     {
         var window = new MyControl();
         window.SetValue(MyControl.IsSpinningProperty, false);
-        window.GetValue(MyControl.IsSpinningProperty).Should().BeFalse();
-        window.IsChanged.Should().BeTrue();
+        Assert.IsFalse((bool)window.GetValue(MyControl.IsSpinningProperty));
+        Assert.IsTrue(window.IsChanged);
 
         var treeView = new TreeView();
         TreeViewExtensions.SetSelectedItem(treeView, new object());
-        TreeViewExtensions.GetSelectedItem(treeView).Should().NotBeNull();
+        Assert.IsNotNull(TreeViewExtensions.GetSelectedItem(treeView));
     }
 }

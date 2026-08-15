@@ -1,0 +1,44 @@
+﻿[
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (22,37)-(22,56),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (23,37)-(23,56),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (24,37)-(24,56),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (37,17)-(37,25),
+    MessageFormat: The name '{0}' does not exist in the current context
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (38,8)-(38,16),
+    MessageFormat: The name '{0}' does not exist in the current context
+  },
+  {
+    Id: CS1001,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\MyControl_lt_T1_comma__space_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (4,10)-(4,10),
+    MessageFormat: Identifier expected
+  }
+]

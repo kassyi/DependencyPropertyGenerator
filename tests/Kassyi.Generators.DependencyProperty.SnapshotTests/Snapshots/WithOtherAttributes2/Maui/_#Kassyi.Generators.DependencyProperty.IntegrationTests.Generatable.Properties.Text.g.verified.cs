@@ -2,17 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class Generatable
+    public partial class Generatable
     {
         /// <summary>
         /// Identifies the <see cref = "Text"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty TextProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Text", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty TextProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "Text", returnType: typeof(string), declaringType: typeof(Generatable), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable)sender).OnTextChanged((string? )oldValue, (string? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((Generatable)sender).OnTextChanged();
+            ((Generatable)sender).OnTextChanged((string? )newValue);
+            ((Generatable)sender).OnTextChanged((string? )oldValue, (string? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((Generatable)sender).OnTextChanging();
+            ((Generatable)sender).OnTextChanging((string? )newValue);
+            ((Generatable)sender).OnTextChanging((string? )oldValue, (string? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(string)
         /// </summary>

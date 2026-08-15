@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "AttributedProperty"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttributedPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "AttributedProperty", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttributedPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "AttributedProperty", returnType: typeof(string), declaringType: typeof(MyGrid), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnAttributedPropertyChanged();
+            ((MyGrid)sender).OnAttributedPropertyChanged((string? )newValue);
+            ((MyGrid)sender).OnAttributedPropertyChanged((string? )oldValue, (string? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnAttributedPropertyChanging();
+            ((MyGrid)sender).OnAttributedPropertyChanging((string? )newValue);
+            ((MyGrid)sender).OnAttributedPropertyChanging((string? )oldValue, (string? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Description<br/>
         /// Default value: default(string)

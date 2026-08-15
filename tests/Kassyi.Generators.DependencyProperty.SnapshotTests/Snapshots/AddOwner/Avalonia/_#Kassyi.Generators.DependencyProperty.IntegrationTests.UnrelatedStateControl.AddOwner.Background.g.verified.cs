@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(IBrush)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<global::Avalonia.Media.IBrush?> BackgroundProperty = global::Avalonia.Controls.Border.BackgroundProperty.AddOwner<global::Kassyi.Generators.DependencyProperty.IntegrationTests.UnrelatedStateControl>(null);
+        public static readonly global::Avalonia.StyledProperty<global::Avalonia.Media.IBrush?> BackgroundProperty = global::Avalonia.Controls.Border.BackgroundProperty.AddOwner<UnrelatedStateControl>(null);
         /// <summary>
         /// Default value: default(IBrush)
         /// </summary>

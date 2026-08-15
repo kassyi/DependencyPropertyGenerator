@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "TypeIntControl"/> dependency property.<br/>
         /// Default value: default((int, VisualElement))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty TypeIntControlProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TypeIntControl", returnType: typeof((int, global::Microsoft.Maui.Controls.VisualElement)), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default((int, global::Microsoft.Maui.Controls.VisualElement)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty TypeIntControlProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "TypeIntControl", returnType: typeof((int, global::Microsoft.Maui.Controls.VisualElement)), declaringType: typeof(MyGrid), defaultValue: default((int, global::Microsoft.Maui.Controls.VisualElement)), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnTypeIntControlChanged();
+            ((MyGrid)sender).OnTypeIntControlChanged(((int, global::Microsoft.Maui.Controls.VisualElement))newValue);
+            ((MyGrid)sender).OnTypeIntControlChanged(((int, global::Microsoft.Maui.Controls.VisualElement))oldValue, ((int, global::Microsoft.Maui.Controls.VisualElement))newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnTypeIntControlChanging();
+            ((MyGrid)sender).OnTypeIntControlChanging(((int, global::Microsoft.Maui.Controls.VisualElement))newValue);
+            ((MyGrid)sender).OnTypeIntControlChanging(((int, global::Microsoft.Maui.Controls.VisualElement))oldValue, ((int, global::Microsoft.Maui.Controls.VisualElement))newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default((int, VisualElement))
         /// </summary>

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(Dictionary&lt;string, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<global::System.Collections.Generic.Dictionary<string, string>?> HeadersProperty = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Generatable, global::System.Collections.Generic.Dictionary<string, string>?>(name: "Headers", defaultValue: default(global::System.Collections.Generic.Dictionary<string, string>), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<global::System.Collections.Generic.Dictionary<string, string>?> HeadersProperty = global::Avalonia.AvaloniaProperty.Register<Generatable, global::System.Collections.Generic.Dictionary<string, string>?>(name: "Headers", defaultValue: default(global::System.Collections.Generic.Dictionary<string, string>), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(Dictionary&lt;string, string&gt;)
         /// </summary>

@@ -8,6 +8,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         {
             ModeProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode>>(static x =>
             {
+                OnModeChanged();
+                OnModeChanged((global::Avalonia.Controls.TreeView)x.Sender);
+                OnModeChanged((global::Avalonia.Controls.TreeView)x.Sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.NewValue.GetValueOrDefault());
                 OnModeChanged((global::Avalonia.Controls.TreeView)x.Sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.OldValue.GetValueOrDefault(), (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.NewValue.GetValueOrDefault());
             }));
         }

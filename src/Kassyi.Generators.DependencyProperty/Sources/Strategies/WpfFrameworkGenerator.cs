@@ -173,7 +173,14 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
 
             using (writer.Scope($"internal void On{eventName}(object? sender, {eventArgsType} args)"))
             {
-                writer.AppendLine("DeliverEvent(sender, args);");
+                if (eventArgsType == "global::System.EventArgs")
+                {
+                    writer.AppendLine("DeliverEvent(sender, args);");
+                }
+                else
+                {
+                    writer.AppendLine("DeliverEvent(sender, args as object as global::System.EventArgs ?? global::System.EventArgs.Empty);");
+                }
             }
         }
     }

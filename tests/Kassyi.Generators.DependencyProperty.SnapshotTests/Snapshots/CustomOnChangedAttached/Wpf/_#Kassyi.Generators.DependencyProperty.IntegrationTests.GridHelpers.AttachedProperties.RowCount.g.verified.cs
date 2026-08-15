@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: -1
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty RowCountProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "RowCount", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridHelpers), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (int)-1, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty RowCountProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "RowCount", propertyType: typeof(int), ownerType: typeof(GridHelpers), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: (int)-1, flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             OnRowCountChanged((global::System.Windows.Controls.Grid)sender, (int)args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);

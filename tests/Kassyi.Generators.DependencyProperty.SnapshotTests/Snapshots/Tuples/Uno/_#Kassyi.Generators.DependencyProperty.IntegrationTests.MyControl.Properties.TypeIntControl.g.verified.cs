@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TypeIntControl"/> dependency property.<br/>
         /// Default value: default((int, FrameworkElement))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeIntControlProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeIntControl", propertyType: typeof((int, global::Windows.UI.Xaml.FrameworkElement)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, global::Windows.UI.Xaml.FrameworkElement)), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TypeIntControlProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TypeIntControl", propertyType: typeof((int, global::Windows.UI.Xaml.FrameworkElement)), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default((int, global::Windows.UI.Xaml.FrameworkElement)), propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnTypeIntControlChanged();
+            ((MyControl)sender).OnTypeIntControlChanged(((int, global::Windows.UI.Xaml.FrameworkElement))args.NewValue);
+            ((MyControl)sender).OnTypeIntControlChanged(((int, global::Windows.UI.Xaml.FrameworkElement))args.OldValue, ((int, global::Windows.UI.Xaml.FrameworkElement))args.NewValue);
+        }));
         /// <summary>
         /// Default value: default((int, FrameworkElement))
         /// </summary>

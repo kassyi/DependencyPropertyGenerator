@@ -1,10 +1,12 @@
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-
+using Kassyi.Generators.DependencyProperty.Rules.Signatures;
+using System.Runtime.CompilerServices;
 
 
 namespace Kassyi.Generators.DependencyProperty;
@@ -25,7 +27,7 @@ public static class PrepareData
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
         return new DependencyPropertyDataBuilder()
-            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached)
+            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached, classSymbol)
             .WithMetadata(attribute)
             .WithDefaultValues(attribute, attributeSyntax)
             .WithXmlDocumentation(attribute)
@@ -35,10 +37,10 @@ public static class PrepareData
 
     private static readonly ImmutableArray<Rules.IMethodSignatureRule> s_signatureRules =
     [
-        new Rules.Signatures.NoParametersRule(),
-        new Rules.Signatures.SingleParameterRule(),
-        new Rules.Signatures.DoubleParameterRule(),
-        new Rules.Signatures.TripleParameterRule()
+        new NoParametersRule(),
+        new SingleParameterRule(),
+        new DoubleParameterRule(),
+        new TripleParameterRule()
     ];
 
     internal static MethodSignatureMatch CheckMethodsDirectly(
@@ -74,7 +76,7 @@ public static class PrepareData
 
         // [WHY] Avoid LINQ ElementAtOrDefault to prevent delegate allocations.
         var name = (attribute.ConstructorArguments is { Length: > 0 } ctorArgs0
-            ? ctorArgs0[0].Value?.ToString()
+            ? ctorArgs0[0].Value?.ToString()?.TrimStart('@')
             : null) ?? string.Empty;
 
         var arg1 = attribute.ConstructorArguments is { Length: > 1 } ctorArgs1
@@ -123,23 +125,94 @@ public static class PrepareData
     {
         classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
 
+        // [WHY] Avoid LINQ Any() to eliminate delegate and enumerator allocations during syntax tree exploration on every keystroke.
+        var isFileLocal = CheckIsFileLocal(classSymbol);
+
+        if (isFileLocal)
+        {
+            var location = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+            var descriptor = new DiagnosticDescriptor(
+                id: "DPG0002",
+                title: "Invalid Type Modifier",
+                messageFormat: "File scoped types are not supported by Source Generators ('{0}')",
+                category: "Usage",
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+            throw new DiagnosticException(
+                Diagnostic.Create(descriptor, location, classSymbol.Name));
+        }
+
         // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.
         var fullClassName = classSymbol.ToDisplayString().SanitizeFileName();
-        var type = classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var @namespace = classSymbol.ContainingNamespace.IsGlobalNamespace
             ? string.Empty
             : classSymbol.ContainingNamespace.ToDisplayString();
         var className = classSymbol.Name;
 
+        var keyword = classSymbol.IsRecord 
+            ? (classSymbol.IsValueType ? "record struct" : "record") 
+            : (classSymbol.IsValueType ? "struct" : "class");
+        var nameWithTypeParameters = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
+        var parentClasses = GetParentClasses(classSymbol);
+
+        // [WHY] Avoid LINQ Where() and string.Join to eliminate array allocations and enumerator allocations on every keystroke.
+        var modifiers = GetModifiers(classSymbol);
+
         return new ClassData(
             Namespace: @namespace,
             Name: className,
             FullName: fullClassName,
-            Type: type,
-            Modifiers: classSymbol.IsStatic ? "public static " : string.Empty,
+            Type: nameWithTypeParameters,
+            Keyword: keyword,
+            NameWithTypeParameters: nameWithTypeParameters,
+            Modifiers: modifiers,
             Version: version,
             IsStatic: classSymbol.IsStatic,
-            Framework: framework);
+            Framework: framework,
+            ParentClasses: parentClasses);
+    }
+
+    private static EquatableArray<ParentClassData> GetParentClasses(INamedTypeSymbol classSymbol)
+    {
+        var parentClassesBuilder = ImmutableArray.CreateBuilder<ParentClassData>();
+        var currentParent = classSymbol.ContainingType;
+        while (currentParent != null)
+        {
+            var parentKeyword = currentParent.IsRecord 
+                ? (currentParent.IsValueType ? "record struct" : "record") 
+                : (currentParent.IsValueType ? "struct" : "class");
+            var parentName = currentParent.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
+            var parentModifiers = string.Empty;
+            if (currentParent.DeclaringSyntaxReferences.Length > 0 && currentParent.DeclaringSyntaxReferences[0].GetSyntax() is TypeDeclarationSyntax parentSyntaxNode)
+            {
+                foreach (var m in parentSyntaxNode.Modifiers)
+                {
+                    if (!m.IsKind(SyntaxKind.PartialKeyword) && !m.IsKind(SyntaxKind.FileKeyword) && m.Text != "file")
+                    {
+                        parentModifiers += m.Text + " ";
+                    }
+                }
+            }
+            else
+            {
+                parentModifiers = currentParent.IsStatic ? "public static " : "public ";
+            }
+            if (string.IsNullOrWhiteSpace(parentModifiers))
+            {
+                parentModifiers = string.Empty;
+            }
+            else if (!parentModifiers.EndsWith(" ", StringComparison.Ordinal))
+            {
+                parentModifiers += " ";
+            }
+
+            parentClassesBuilder.Add(new ParentClassData(parentKeyword, parentName, parentModifiers));
+            currentParent = currentParent.ContainingType;
+        }
+
+        return parentClassesBuilder.ToImmutable().AsEquatableArray();
     }
 
     internal static bool? IsSpecialType(this ITypeSymbol? symbol)
@@ -200,11 +273,61 @@ public static class PrepareData
                     implicitNew.Initializer).ToFullString();
             }
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // [WHY] Fallback to raw string if Roslyn syntax parsing fails.
         }
 
         return defaultValue;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CheckIsFileLocal(INamedTypeSymbol classSymbol)
+    {
+        var current = classSymbol;
+        while (current != null)
+        {
+            foreach (var syntaxRef in current.DeclaringSyntaxReferences)
+            {
+                if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
+                {
+                    continue;
+                }
+
+                foreach (var modifier in typeDecl.Modifiers)
+                {
+                    if (modifier.IsKind(SyntaxKind.FileKeyword) || modifier.Text == "file")
+                    {
+                        return true;
+                    }
+                }
+            }
+            current = current.ContainingType;
+        }
+        return false;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string GetModifiers(INamedTypeSymbol classSymbol)
+    {
+        if (classSymbol.DeclaringSyntaxReferences.Length <= 0 ||
+            classSymbol.DeclaringSyntaxReferences[0].GetSyntax() is not TypeDeclarationSyntax syntaxNode)
+        {
+            return classSymbol.IsStatic ? "public static " : "public ";
+        }
+
+        var modifiers = string.Empty;
+        foreach (var m in syntaxNode.Modifiers)
+        {
+            if (!m.IsKind(SyntaxKind.PartialKeyword))
+            {
+                modifiers += m.Text + " ";
+            }
+        }
+        if (string.IsNullOrWhiteSpace(modifiers))
+        {
+            return string.Empty;
+        }
+        return modifiers.EndsWith(" ", StringComparison.Ordinal) ? modifiers : modifiers + " ";
     }
 }

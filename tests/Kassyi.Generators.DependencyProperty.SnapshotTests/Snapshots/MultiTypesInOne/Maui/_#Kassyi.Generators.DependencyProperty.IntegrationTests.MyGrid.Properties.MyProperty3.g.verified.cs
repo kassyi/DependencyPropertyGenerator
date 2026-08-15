@@ -2,17 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty3"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyProperty3Property = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty3", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyProperty3Property = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty3", returnType: typeof(int), declaringType: typeof(MyGrid), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid)sender).OnMyProperty3Changed();
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((MyGrid)sender).OnMyProperty3Changed();
+            ((MyGrid)sender).OnMyProperty3Changed((int)newValue);
+            ((MyGrid)sender).OnMyProperty3Changed((int)oldValue, (int)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnMyProperty3Changing();
+            ((MyGrid)sender).OnMyProperty3Changing((int)newValue);
+            ((MyGrid)sender).OnMyProperty3Changing((int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

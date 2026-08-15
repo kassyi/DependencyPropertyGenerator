@@ -2,14 +2,20 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGird
+    public partial class MyGird
     {
         /// <summary>
         /// Identifies the MyColumn dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty MyColumnProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGird), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty MyColumnProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "MyColumn", propertyType: typeof(int), ownerType: typeof(MyGird), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(int), propertyChangedCallback: static (sender, args) =>
+        {
+            OnMyColumnChanged();
+            OnMyColumnChanged((global::Windows.UI.Xaml.FrameworkElement)sender);
+            OnMyColumnChanged((global::Windows.UI.Xaml.FrameworkElement)sender, (int)args.NewValue);
+            OnMyColumnChanged((global::Windows.UI.Xaml.FrameworkElement)sender, (int)args.OldValue, (int)args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(int)
         /// </summary>

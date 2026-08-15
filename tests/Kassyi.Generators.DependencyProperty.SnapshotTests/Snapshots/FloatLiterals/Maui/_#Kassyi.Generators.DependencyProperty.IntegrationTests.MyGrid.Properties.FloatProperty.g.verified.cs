@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "FloatProperty"/> dependency property.<br/>
         /// Default value: 42
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty FloatPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "FloatProperty", returnType: typeof(float), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: (float)42, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty FloatPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "FloatProperty", returnType: typeof(float), declaringType: typeof(MyGrid), defaultValue: (float)42, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnFloatPropertyChanged();
+            ((MyGrid)sender).OnFloatPropertyChanged((float)newValue);
+            ((MyGrid)sender).OnFloatPropertyChanged((float)oldValue, (float)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnFloatPropertyChanging();
+            ((MyGrid)sender).OnFloatPropertyChanging((float)newValue);
+            ((MyGrid)sender).OnFloatPropertyChanging((float)oldValue, (float)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: 42
         /// </summary>

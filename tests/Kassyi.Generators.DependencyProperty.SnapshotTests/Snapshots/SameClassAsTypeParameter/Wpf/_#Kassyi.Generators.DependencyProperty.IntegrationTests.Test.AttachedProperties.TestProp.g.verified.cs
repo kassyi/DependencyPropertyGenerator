@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class Test
+    public partial class Test
     {
         /// <summary>
         /// Identifies the TestProp dependency property.<br/>
         /// Default value: default(Test)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty TestPropProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "TestProp", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        public static readonly global::System.Windows.DependencyProperty TestPropProperty = global::System.Windows.DependencyProperty.RegisterAttached(name: "TestProp", propertyType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), ownerType: typeof(Test), defaultMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
         {
             TestChanged((global::System.Windows.Controls.Grid)sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? )args.NewValue);
         }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);

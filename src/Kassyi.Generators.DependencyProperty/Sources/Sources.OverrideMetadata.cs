@@ -5,23 +5,7 @@ namespace Kassyi.Generators.DependencyProperty.Sources;
 
 internal static partial class SourceGenerationHelper
 {
-    private static IEnumerable<string[]> GetCallbackArgumentSets(CallbackSignature signatures, string getValue)
-    {
-        if (signatures.HasFlag(CallbackSignature.NoParameters))
-        {
-            yield return [];
-        }
 
-        if (signatures.HasFlag(CallbackSignature.NewValue))
-        {
-            yield return [getValue];
-        }
-
-        if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
-        {
-            yield return [getValue, getValue];
-        }
-    }
 
     public static void GenerateRegisterPropertyChangedCallbacksMethod(
         ref SourceWriter writer,
@@ -46,15 +30,24 @@ internal static partial class SourceGenerationHelper
 
                 var type = GenerateType(property);
                 
-                using (writer.Scope($"_ = this.RegisterPropertyChangedCallback(dp: {property.Name}Property, callback: static (sender, dependencyProperty) =>", ");"))
+                using (writer.Scope($"_ = this.RegisterPropertyChangedCallback(dp: {property.Name}Property, callback: static (sender, dependencyProperty) =>", "});"))
                 {
                     var senderCast = $"(({senderType})sender)";
                     var getValue = $"({type})sender.GetValue(dependencyProperty)";
 
-                    foreach (var args in GetCallbackArgumentSets(signatures, getValue))
+                    if (signatures.HasFlag(CallbackSignature.NoParameters))
                     {
-                        var argsString = string.Join(", ", args);
-                        writer.AppendLine($"{senderCast}.{name}({argsString});");
+                        writer.AppendLine($"{senderCast}.{name}();");
+                    }
+
+                    if (signatures.HasFlag(CallbackSignature.NewValue))
+                    {
+                        writer.AppendLine($"{senderCast}.{name}({getValue});");
+                    }
+
+                    if (signatures.HasFlag(CallbackSignature.OldAndNewValue))
+                    {
+                        writer.AppendLine($"{senderCast}.{name}(default({type}), {getValue});");
                     }
                 }
             }

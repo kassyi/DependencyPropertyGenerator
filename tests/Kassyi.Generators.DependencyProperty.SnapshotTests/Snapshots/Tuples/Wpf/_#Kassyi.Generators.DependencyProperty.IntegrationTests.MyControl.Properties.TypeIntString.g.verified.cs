@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TypeIntString"/> dependency property.<br/>
         /// Default value: default((int, string))
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty TypeIntStringProperty = global::System.Windows.DependencyProperty.Register(name: "TypeIntString", propertyType: typeof((int, string)), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default((int, string)), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty TypeIntStringProperty = global::System.Windows.DependencyProperty.Register(name: "TypeIntString", propertyType: typeof((int, string)), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default((int, string)), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnTypeIntStringChanged();
+            ((MyControl)sender).OnTypeIntStringChanged(((int, string))args.NewValue);
+            ((MyControl)sender).OnTypeIntStringChanged(((int, string))args.OldValue, ((int, string))args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default((int, string))
         /// </summary>

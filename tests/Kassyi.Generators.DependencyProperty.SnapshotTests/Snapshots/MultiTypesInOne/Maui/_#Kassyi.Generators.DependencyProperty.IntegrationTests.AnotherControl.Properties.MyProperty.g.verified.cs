@@ -2,17 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class AnotherControl
+    public partial class AnotherControl
     {
         /// <summary>
         /// Identifies the <see cref = "MyProperty"/> dependency property.<br/>
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty MyPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "MyProperty", returnType: typeof(int), declaringType: typeof(AnotherControl), defaultValue: default(int), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.AnotherControl)sender).OnMyPropertyChanged();
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+            ((AnotherControl)sender).OnMyPropertyChanged();
+            ((AnotherControl)sender).OnMyPropertyChanged((int)newValue);
+            ((AnotherControl)sender).OnMyPropertyChanged((int)oldValue, (int)newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((AnotherControl)sender).OnMyPropertyChanging();
+            ((AnotherControl)sender).OnMyPropertyChanging((int)newValue);
+            ((AnotherControl)sender).OnMyPropertyChanging((int)oldValue, (int)newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

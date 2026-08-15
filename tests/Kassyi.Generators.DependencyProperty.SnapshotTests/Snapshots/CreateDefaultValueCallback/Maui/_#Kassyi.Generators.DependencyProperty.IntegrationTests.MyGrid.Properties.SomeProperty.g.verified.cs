@@ -2,14 +2,24 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyGrid
+    public partial class MyGrid
     {
         /// <summary>
         /// Identifies the <see cref = "SomeProperty"/> dependency property.<br/>
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty SomePropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "SomeProperty", returnType: typeof(string), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: static _ => GetSomePropertyDefaultValue());
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty SomePropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "SomeProperty", returnType: typeof(string), declaringType: typeof(MyGrid), defaultValue: default(string), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnSomePropertyChanged();
+            ((MyGrid)sender).OnSomePropertyChanged((string? )newValue);
+            ((MyGrid)sender).OnSomePropertyChanged((string? )oldValue, (string? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            ((MyGrid)sender).OnSomePropertyChanging();
+            ((MyGrid)sender).OnSomePropertyChanging((string? )newValue);
+            ((MyGrid)sender).OnSomePropertyChanging((string? )oldValue, (string? )newValue);
+        }, coerceValue: null, defaultValueCreator: static _ => GetSomePropertyDefaultValue());
         /// <summary>
         /// Default value: default(string)
         /// </summary>

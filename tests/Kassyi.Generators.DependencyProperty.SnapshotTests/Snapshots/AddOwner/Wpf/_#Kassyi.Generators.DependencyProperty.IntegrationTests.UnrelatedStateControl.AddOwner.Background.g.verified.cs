@@ -2,14 +2,14 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class UnrelatedStateControl
+    public partial class UnrelatedStateControl
     {
         /// <summary>
         /// Identifies the <see cref = "Background"/> dependency property.<br/>
         /// Default value: default(Brush)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty BackgroundProperty = global::System.Windows.Controls.Border.BackgroundProperty.AddOwner(ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.UnrelatedStateControl), null);
+        public static readonly global::System.Windows.DependencyProperty BackgroundProperty = global::System.Windows.Controls.Border.BackgroundProperty.AddOwner(ownerType: typeof(UnrelatedStateControl), null);
         /// <summary>
         /// Default value: default(Brush)
         /// </summary>

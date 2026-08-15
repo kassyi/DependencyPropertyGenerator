@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(string)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<string?> TextProperty = global::Avalonia.Controls.TextBox.TextProperty.AddOwner<global::Kassyi.Generators.DependencyProperty.IntegrationTests.UnrelatedStateControl>(null);
+        public static readonly global::Avalonia.StyledProperty<string?> TextProperty = global::Avalonia.Controls.TextBox.TextProperty.AddOwner<UnrelatedStateControl>(null);
         /// <summary>
         /// Default value: default(string)
         /// </summary>

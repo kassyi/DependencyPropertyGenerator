@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TupleIntString"/> dependency property.<br/>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleIntStringProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleIntStringProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnTupleIntStringChanged();
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.OldValue, (global::System.Tuple<int, string>? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>

@@ -9,7 +9,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(int)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.StyledProperty<int> MyProperty3Property = global::Avalonia.AvaloniaProperty.Register<global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl, int>(name: "MyProperty3", defaultValue: default(int), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
+        public static readonly global::Avalonia.StyledProperty<int> MyProperty3Property = global::Avalonia.AvaloniaProperty.Register<MyControl, int>(name: "MyProperty3", defaultValue: default(int), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
         /// <summary>
         /// Default value: default(int)
         /// </summary>

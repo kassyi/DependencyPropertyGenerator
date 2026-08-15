@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TupleControlInt"/> dependency property.<br/>
         /// Default value: default(Tuple&lt;FrameworkElement, int&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleControlIntProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleControlInt", propertyType: typeof(global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>), propertyChangedCallback: null));
+        public static readonly global::Windows.UI.Xaml.DependencyProperty TupleControlIntProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "TupleControlInt", propertyType: typeof(global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>), propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnTupleControlIntChanged();
+            ((MyControl)sender).OnTupleControlIntChanged((global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>? )args.NewValue);
+            ((MyControl)sender).OnTupleControlIntChanged((global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>? )args.OldValue, (global::System.Tuple<global::Windows.UI.Xaml.FrameworkElement, int>? )args.NewValue);
+        }));
         /// <summary>
         /// Default value: default(Tuple&lt;FrameworkElement, int&gt;)
         /// </summary>

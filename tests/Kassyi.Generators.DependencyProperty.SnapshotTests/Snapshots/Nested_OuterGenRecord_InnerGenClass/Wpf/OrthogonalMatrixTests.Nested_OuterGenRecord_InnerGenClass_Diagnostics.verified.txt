@@ -1,0 +1,72 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (16,93)-(16,95),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (22,106)-(22,125),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (22,77)-(22,79),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (23,106)-(23,125),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (23,77)-(23,79),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS1061,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (24,106)-(24,125),
+    MessageFormat: '{0}' does not contain a definition for '{1}' and no accessible extension method '{1}' accepting a first argument of type '{0}' could be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0246,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (24,77)-(24,79),
+    MessageFormat: The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (37,17)-(37,25),
+    MessageFormat: The name '{0}' does not exist in the current context
+  },
+  {
+    Id: CS0103,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.OuterRecord_lt_T1_gt_.InnerControl_lt_T2_gt_.Properties.MyProperty.g.cs,
+    Span: (38,8)-(38,16),
+    MessageFormat: The name '{0}' does not exist in the current context
+  }
+]

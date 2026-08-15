@@ -9,10 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty SelectedItemProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SelectedItem", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty SelectedItemProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "SelectedItem", returnType: typeof(object), declaringType: typeof(GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.TwoWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
+            OnSelectedItemChanged();
+            OnSelectedItemChanged((global::Microsoft.Maui.Controls.Grid)sender);
+            OnSelectedItemChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
             OnSelectedItemChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
-        }, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnSelectedItemChanging();
+            OnSelectedItemChanging((global::Microsoft.Maui.Controls.Grid)sender);
+            OnSelectedItemChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
+            OnSelectedItemChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Default value: default(object)
         /// </summary>

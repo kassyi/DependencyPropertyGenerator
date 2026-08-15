@@ -20,4 +20,8 @@ public readonly record struct DependencyPropertyData(
     ComponentModelData ComponentModel,
     FrameworkMetadataData FrameworkMetadata,
     XmlDocumentationData XmlDocumentation,
-    ValidationAndCallbackData ValidationAndCallbacks);
+    ValidationAndCallbackData ValidationAndCallbacks,
+    bool IsPartialProperty,
+    bool HidesBaseProperty,
+    bool IsRequired,
+    bool IsInitOnly);

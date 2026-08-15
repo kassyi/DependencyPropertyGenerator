@@ -2,16 +2,18 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyUIElement
+    public partial class MyUIElement
     {
         /// <summary>
         /// Identifies the <see cref = "BindEventsProperty"/> dependency property.<br/>
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty BindEventsPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "BindEventsProperty", propertyType: typeof(object), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
+        public static readonly global::Windows.UI.Xaml.DependencyProperty BindEventsPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "BindEventsProperty", propertyType: typeof(object), ownerType: typeof(MyUIElement), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: default(object), propertyChangedCallback: static (sender, args) =>
         {
-            ((global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.OldValue, (object? )args.NewValue);
+            ((MyUIElement)sender).OnBindEventsPropertyChanged();
+            ((MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.NewValue);
+            ((MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.OldValue, (object? )args.NewValue);
         }));
         /// <summary>
         /// Default value: default(object)

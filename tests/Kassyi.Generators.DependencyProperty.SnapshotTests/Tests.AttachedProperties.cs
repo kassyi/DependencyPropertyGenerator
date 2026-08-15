@@ -1,7 +1,8 @@
-﻿using Kassyi.Generators.DependencyProperty.Generators;
+using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
-public partial class Tests
+[TestClass]
+public class AttachedPropertyTests : SnapshotTestBase
 {
     [TestMethod]
     [DataRow(Framework.Wpf)]
@@ -58,8 +59,8 @@ public partial class Tests
                                                             """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, Framework.Wpf);
 
-        generated.Should().Contain("SetGeneratedTest(global::System.Windows.Controls.Grid element, bool value)");
-        generated.Should().Contain("GetGeneratedTest(global::System.Windows.Controls.Grid element)");
+        Assert.IsTrue(generated.Contains("SetGeneratedTest(global::System.Windows.Controls.Grid element, bool value)"));
+        Assert.IsTrue(generated.Contains("GetGeneratedTest(global::System.Windows.Controls.Grid element)"));
     }
 
     [TestMethod]
@@ -116,7 +117,7 @@ public partial class Tests
             {
             }
 
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
@@ -192,10 +193,10 @@ public partial class Tests
                                                         """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
 
-        generated.Should().Contain("propertyChangedCallback: static (sender, args) =>");
-        generated.Should().Contain("OnTestChanged(");
-        generated.Should().Contain("(global::System.Windows.DependencyObject)sender,");
-        generated.Should().Contain("args);");
+        Assert.IsTrue(generated.Contains("propertyChangedCallback: static (sender, args) =>"));
+        Assert.IsTrue(generated.Contains("OnTestChanged("));
+        Assert.IsTrue(generated.Contains("(global::System.Windows.DependencyObject)sender,"));
+        Assert.IsTrue(generated.Contains("args);"));
     }
 
     [TestMethod]
@@ -211,8 +212,8 @@ public partial class Tests
                                                         """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
 
-        generated.Should().Contain("#error DPG0001: The specified OnChanged method 'NonExistentMethod' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'.");
-        generated.Should().Contain("propertyChangedCallback: null");
+        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'NonExistentMethod' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
+        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
     }
 }
 

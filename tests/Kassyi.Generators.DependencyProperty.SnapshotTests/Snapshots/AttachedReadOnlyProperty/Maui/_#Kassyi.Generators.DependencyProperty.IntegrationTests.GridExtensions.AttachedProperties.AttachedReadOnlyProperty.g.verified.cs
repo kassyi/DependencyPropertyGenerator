@@ -9,7 +9,19 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// Default value: default(object)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindablePropertyKey AttachedReadOnlyPropertyPropertyKey = global::Microsoft.Maui.Controls.BindableProperty.CreateAttachedReadOnly(propertyName: "AttachedReadOnlyProperty", returnType: typeof(object), declaringType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWayToSource, validateValue: null, propertyChanged: null, propertyChanging: null, coerceValue: null, defaultValueCreator: null);
+        public static readonly global::Microsoft.Maui.Controls.BindablePropertyKey AttachedReadOnlyPropertyPropertyKey = global::Microsoft.Maui.Controls.BindableProperty.CreateAttachedReadOnly(propertyName: "AttachedReadOnlyProperty", returnType: typeof(object), declaringType: typeof(GridExtensions), defaultValue: default(object), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWayToSource, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        {
+            OnAttachedReadOnlyPropertyChanged();
+            OnAttachedReadOnlyPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender);
+            OnAttachedReadOnlyPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
+            OnAttachedReadOnlyPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
+        }, propertyChanging: static (sender, oldValue, newValue) =>
+        {
+            OnAttachedReadOnlyPropertyChanging();
+            OnAttachedReadOnlyPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender);
+            OnAttachedReadOnlyPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )newValue);
+            OnAttachedReadOnlyPropertyChanging((global::Microsoft.Maui.Controls.Grid)sender, (object? )oldValue, (object? )newValue);
+        }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
         /// Identifies the AttachedReadOnlyProperty dependency property.<br/>
         /// Default value: default(object)

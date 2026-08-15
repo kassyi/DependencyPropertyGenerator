@@ -38,7 +38,7 @@ public static class SyntaxValueProviderExtensions
             .Select(static (context, _) => new ClassWithAttributesContext(
                 SemanticModel: context.SemanticModel,
                 Attributes: context.Attributes,
-                ClassSyntax: (ClassDeclarationSyntax)context.TargetNode,
+                ClassSyntax: (TypeDeclarationSyntax)context.TargetNode,
                 ClassSymbol: (INamedTypeSymbol)context.TargetSymbol));
     }
 
@@ -55,7 +55,7 @@ public static class SyntaxValueProviderExtensions
     
     /// <summary>Finds the attribute syntax corresponding to the specified attribute data on a class declaration.</summary>
     public static AttributeSyntax? TryFindAttributeSyntax(
-        this ClassDeclarationSyntax classSyntax,
+        this TypeDeclarationSyntax classSyntax,
         AttributeData attribute)
     {
         classSyntax = classSyntax ?? throw new ArgumentNullException(nameof(classSyntax));
@@ -101,7 +101,7 @@ public static class SyntaxValueProviderExtensions
         return source
             .SelectMany(static (context, _) =>
             {
-                var classSyntax = (ClassDeclarationSyntax)context.TargetNode;
+                var classSyntax = (TypeDeclarationSyntax)context.TargetNode;
                 var classSymbol = (INamedTypeSymbol)context.TargetSymbol;
                 
                 // [WHY] Use foreach and ImmutableArray.Builder instead of LINQ Where/Select to minimize GC pressure during IDE typing.

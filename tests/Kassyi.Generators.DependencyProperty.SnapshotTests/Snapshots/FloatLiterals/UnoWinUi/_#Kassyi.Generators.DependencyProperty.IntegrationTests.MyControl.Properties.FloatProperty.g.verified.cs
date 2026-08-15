@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "FloatProperty"/> dependency property.<br/>
         /// Default value: 42
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.UI.Xaml.DependencyProperty FloatPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "FloatProperty", propertyType: typeof(float), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (float)42, propertyChangedCallback: null));
+        public static readonly global::Microsoft.UI.Xaml.DependencyProperty FloatPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "FloatProperty", propertyType: typeof(float), ownerType: typeof(MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (float)42, propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnFloatPropertyChanged();
+            ((MyControl)sender).OnFloatPropertyChanged((float)args.NewValue);
+            ((MyControl)sender).OnFloatPropertyChanged((float)args.OldValue, (float)args.NewValue);
+        }));
         /// <summary>
         /// Default value: 42
         /// </summary>

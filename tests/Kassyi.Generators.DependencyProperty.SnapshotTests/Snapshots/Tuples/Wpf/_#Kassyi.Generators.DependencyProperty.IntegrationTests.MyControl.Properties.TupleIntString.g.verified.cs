@@ -2,14 +2,19 @@
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class MyControl
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "TupleIntString"/> dependency property.<br/>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty TupleIntStringProperty = global::System.Windows.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: null, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
+        public static readonly global::System.Windows.DependencyProperty TupleIntStringProperty = global::System.Windows.DependencyProperty.Register(name: "TupleIntString", propertyType: typeof(global::System.Tuple<int, string>), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(global::System.Tuple<int, string>), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
+        {
+            ((MyControl)sender).OnTupleIntStringChanged();
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.NewValue);
+            ((MyControl)sender).OnTupleIntStringChanged((global::System.Tuple<int, string>? )args.OldValue, (global::System.Tuple<int, string>? )args.NewValue);
+        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
         /// <summary>
         /// Default value: default(Tuple&lt;int, string&gt;)
         /// </summary>

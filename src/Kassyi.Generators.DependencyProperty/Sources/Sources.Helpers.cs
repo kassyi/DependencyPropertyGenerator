@@ -119,54 +119,42 @@ internal static partial class SourceGenerationHelper
     private const string OptionsPrefix = "global::System.Windows.FrameworkPropertyMetadataOptions.";
     internal static string GenerateOptions(DependencyPropertyData property)
     {
-        var writer = new SourceWriter();
-        try
-        {
-            GenerateOptions(ref writer, property);
-            return writer.ToString();
-        }
-        finally
-        {
-            writer.Dispose();
-        }
-    }
-
-    private static void GenerateOptions(ref SourceWriter writer, DependencyPropertyData property)
-    {
+        var builder = new System.Text.StringBuilder();
         var hasOption = false;
-        var options = new (bool Condition, string Name)[]
-        {
-            (property.FrameworkMetadata.AffectsMeasure, nameof(FrameworkMetadataData.AffectsMeasure)),
-            (property.FrameworkMetadata.AffectsArrange, nameof(FrameworkMetadataData.AffectsArrange)),
-            (property.FrameworkMetadata.AffectsParentMeasure, nameof(FrameworkMetadataData.AffectsParentMeasure)),
-            (property.FrameworkMetadata.AffectsParentArrange, nameof(FrameworkMetadataData.AffectsParentArrange)),
-            (property.FrameworkMetadata.AffectsRender, nameof(FrameworkMetadataData.AffectsRender)),
-            (property.FrameworkMetadata.Inherits, nameof(FrameworkMetadataData.Inherits)),
-            (property.FrameworkMetadata.OverridesInheritanceBehavior, nameof(FrameworkMetadataData.OverridesInheritanceBehavior)),
-            (property.FrameworkMetadata.NotDataBindable, nameof(FrameworkMetadataData.NotDataBindable)),
-            (property.FrameworkMetadata.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault"),
-            (property.FrameworkMetadata.Journal, nameof(FrameworkMetadataData.Journal)),
-            (property.FrameworkMetadata.SubPropertiesDoNotAffectRender, nameof(FrameworkMetadataData.SubPropertiesDoNotAffectRender))
-        };
 
-        foreach (var (condition, name) in options)
-        {
-            if (!condition)
-            {
-                continue;
-            }
-            if (hasOption)
-            {
-                writer.Append(" | ");
-            }
-            writer.Append(OptionsPrefix);
-            writer.Append(name);
-            hasOption = true;
-        }
+        addOption(property.FrameworkMetadata.AffectsMeasure, nameof(FrameworkMetadataData.AffectsMeasure));
+        addOption(property.FrameworkMetadata.AffectsArrange, nameof(FrameworkMetadataData.AffectsArrange));
+        addOption(property.FrameworkMetadata.AffectsParentMeasure, nameof(FrameworkMetadataData.AffectsParentMeasure));
+        addOption(property.FrameworkMetadata.AffectsParentArrange, nameof(FrameworkMetadataData.AffectsParentArrange));
+        addOption(property.FrameworkMetadata.AffectsRender, nameof(FrameworkMetadataData.AffectsRender));
+        addOption(property.FrameworkMetadata.Inherits, nameof(FrameworkMetadataData.Inherits));
+        addOption(property.FrameworkMetadata.OverridesInheritanceBehavior, nameof(FrameworkMetadataData.OverridesInheritanceBehavior));
+        addOption(property.FrameworkMetadata.NotDataBindable, nameof(FrameworkMetadataData.NotDataBindable));
+        addOption(property.FrameworkMetadata.DefaultBindingMode == "TwoWay", "BindsTwoWayByDefault");
+        addOption(property.FrameworkMetadata.Journal, nameof(FrameworkMetadataData.Journal));
+        addOption(property.FrameworkMetadata.SubPropertiesDoNotAffectRender, nameof(FrameworkMetadataData.SubPropertiesDoNotAffectRender));
 
         if (!hasOption)
         {
-            writer.Append("global::System.Windows.FrameworkPropertyMetadataOptions.None");
+            return "global::System.Windows.FrameworkPropertyMetadataOptions.None";
+        }
+
+        return builder.ToString();
+
+        void addOption(bool condition, string name)
+        {
+            if (!condition)
+            {
+                return;
+            }
+
+            if (hasOption)
+            {
+                builder.Append(" | ");
+            }
+
+            builder.Append(OptionsPrefix).Append(name);
+            hasOption = true;
         }
     }
 
@@ -296,23 +284,50 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine();
         writer.AppendLine("#nullable enable");
         writer.AppendLine();
-        writer.AppendLine($"namespace {@class.Namespace}");
+        
+        var hasNamespace = !string.IsNullOrWhiteSpace(@class.Namespace) && @class.Namespace != "<global namespace>";
+        if (hasNamespace)
+        {
+            writer.AppendLine($"namespace {@class.Namespace}");
+            writer.AppendLine("{");
+        }
+
+        var parentCount = 0;
+        var parentArray = @class.ParentClasses.AsImmutableArray();
+        if (!parentArray.IsEmpty)
+        {
+            for (var i = parentArray.Length - 1; i >= 0; i--)
+            {
+                var parent = parentArray[i];
+                var parentModifiers = string.IsNullOrWhiteSpace(parent.Modifiers) ? string.Empty : parent.Modifiers;
+                writer.AppendLine($"{parentModifiers}partial {parent.Keyword} {parent.NameWithTypeParameters}");
+                writer.AppendLine("{");
+                parentCount++;
+            }
+        }
+
+        writer.AppendLine($"{GenerateModifiers(@class)}partial {@class.Keyword} {@class.NameWithTypeParameters}");
         writer.AppendLine("{");
-        writer.AppendLine($"{GenerateModifiers(@class)}partial class {@class.Name}");
-        writer.AppendLine("{");
-        return new SourceWriterClassScope(writer);
+        return new SourceWriterClassScope(writer, hasNamespace, parentCount);
     }
 
     internal static string GenerateEventArgsType(EventData @event) =>
         string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
 }
 
-internal readonly ref struct SourceWriterClassScope(SourceWriter writer) : IDisposable
+internal readonly ref struct SourceWriterClassScope(SourceWriter writer, bool hasNamespace, int parentCount) : IDisposable
 {
     public void Dispose()
     {
         writer.AppendLine("}");
-        writer.AppendLine("}");
+        for (var i = 0; i < parentCount; i++)
+        {
+            writer.AppendLine("}");
+        }
+        if (hasNamespace)
+        {
+            writer.AppendLine("}");
+        }
     }
 }
 
