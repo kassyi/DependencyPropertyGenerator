@@ -8,7 +8,7 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 [TestClass]
 public class OrthogonalMatrixTests : SnapshotTestBase
 {
-    // 1. 基本ハッピーパス (ブロック名前空間 x public partial class)
+    // 1. Basic happy path (block-scoped namespace x public partial class)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Basic_Block_Public_Class(Framework framework)
@@ -22,7 +22,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 2. File-scoped x internal partial class
+    // 2. File-scoped namespace x internal partial class
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task FileScoped_Internal_Class(Framework framework)
@@ -38,7 +38,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 3. Record Class x Generic x public
+    // 3. Generic record class x public
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task RecordClass_Generic_Public(Framework framework)
@@ -52,7 +52,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
-    // 4. ジェネリック制約 (ファイルスコープ)
+    // 4. Generic type constraints with file-scoped namespace
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Generic_Class_WithConstraints(Framework framework)
@@ -68,7 +68,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 5. Global名前空間 x 複数ジェネリクス
+    // 5. Global namespace x multiple generic type parameters
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task GlobalNamespace_MultipleGenerics(Framework framework)
@@ -82,7 +82,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 6. ネスト構造 (非対称: 外側非ジェネリック、内側ジェネリック)
+    // 6. Nested class (asymmetric: non-generic outer, generic inner)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterNonGen_InnerGen(Framework framework)
@@ -99,7 +99,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 7. ネスト構造 (非対称: 外側ジェネリック、内側非ジェネリック)
+    // 7. Nested class (asymmetric: generic outer, non-generic inner)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterGen_InnerNonGen(Framework framework)
@@ -118,7 +118,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 8. ネスト構造 (相互ジェネリック + RecordとClassの混合)
+    // 8. Nested structure (mutually generic: outer record + inner class)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Nested_OuterGenRecord_InnerGenClass(Framework framework)
@@ -135,7 +135,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 9. file 修飾子によるアセンブリ内非公開の境界条件
+    // 9. Boundary condition: assembly-private 'file' modifier
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task FileModifier_Class(Framework framework)
@@ -149,7 +149,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 10. グローバル名前空間での深いネスト
+    // 10. Deeply nested types in global namespace
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Global_Nested_Deep(Framework framework)
@@ -169,7 +169,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
-    // 11. 同一名前空間におけるメタデータアリティ(ジェネリクス引数)の違い
+    // 11. Type arity distinction for identically named types in the same namespace
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task SameNameClass_DifferentGenerics(Framework framework)
@@ -184,7 +184,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 12. 異なる名前空間における同名クラスの衝突回避
+    // 12. Conflict avoidance for identically named types across different namespaces
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task SameNameClass_DifferentNamespace(Framework framework)
@@ -205,7 +205,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 13. Nullableコンテキストとレコード
+    // 13. Nullable context with record class
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Nullable_Context_Record(Framework framework)
@@ -219,7 +219,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
-    // 14. 添付プロパティ x スタティッククラス (インスタンス化不可)
+    // 14. Attached property on static class (non-instantiable)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task AttachedProperty_StaticClass(Framework framework)
@@ -233,7 +233,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
 
-    // 15. 修飾子の順序に依存しない正規化検証
+    // 15. Modifier order normalization invariance
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Modifiers_Order_Normalization(Framework framework)
@@ -248,7 +248,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 16. C# 13 partial properties conflict
+    // 16. C# 13 partial property conflict
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Partial_Property_Conflict(Framework framework)
@@ -263,7 +263,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 17. ref struct type rejection
+    // 17. Property type rejection for 'ref struct'
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task RefStruct_PropertyType_Rejection(Framework framework)
@@ -280,7 +280,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 18. Primary constructor
+    // 18. Primary constructor support
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Primary_Constructor(Framework framework)
@@ -309,7 +309,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // 20. allows ref struct
+    // 20. Generic constraint with 'allows ref struct' (anti-constraint)
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Generic_AllowsRefStruct(Framework framework)
@@ -323,7 +323,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 21. new modifier for inherited properties
+    // 21. 'new' modifier for shadowing inherited properties
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task Inheritance_NewModifier(Framework framework)
@@ -356,7 +356,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 23. required / init properties
+    // 23. Properties with 'required' and 'init' accessors
     [TestMethod]
     [DataRow(Framework.Maui)]
     public Task RequiredInit_Properties(Framework framework)
@@ -371,7 +371,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 24. Tuple Type
+    // 24. Tuple property type
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task PropertyType_Tuple(Framework framework)
@@ -385,7 +385,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework, skipE2EValidation: true);
     }
 
-    // 25. Complex Array/Nullable
+    // 25. Complex nested nullable array type
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task PropertyType_ComplexNullableArray(Framework framework)
@@ -399,7 +399,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             """, framework);
     }
 
-    // DPG0004: Reference Type Default Value Sharing
+    // DPG0004: Diagnostic rejection for shared reference type default values
     [TestMethod]
     [DataRow(Framework.Wpf)]
     public Task ReferenceType_DefaultValue_Rejection(Framework framework)
@@ -411,6 +411,31 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             {
             }
             """, framework, skipE2EValidation: true);
+    }
+
+    // 27. required partial property with init
+    [TestMethod]
+    [DataRow(Framework.Wpf)]
+    public Task Partial_Property_Required_Init(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + """
+
+            namespace System.Runtime.CompilerServices
+            {
+                internal static class IsExternalInit {}
+                public class RequiredMemberAttribute : Attribute {}
+                public class CompilerFeatureRequiredAttribute : Attribute { public CompilerFeatureRequiredAttribute(string name) {} }
+            }
+
+            namespace Kassyi.Generators.DependencyProperty.IntegrationTests
+            {
+                [DependencyProperty("MyProperty", typeof(int))]
+                public partial class MyControl : UserControl
+                {
+                    public required partial int MyProperty { get; init; }
+                }
+            }
+            """, framework);
     }
 }
 

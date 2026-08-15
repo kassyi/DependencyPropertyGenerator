@@ -124,7 +124,7 @@ public abstract class SnapshotTestBase : VerifyBase
         _ => source
     };
 
-    private static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
+    protected static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
         string source,
         Framework framework,
         CancellationToken cancellationToken,

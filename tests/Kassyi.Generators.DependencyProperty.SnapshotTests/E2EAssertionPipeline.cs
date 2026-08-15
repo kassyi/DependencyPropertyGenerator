@@ -40,7 +40,7 @@ public static class E2EAssertionPipeline
         VerifyDiagnostics(diagnostics, callerName);
     }
 
-    private static void VerifyCountMatching(SyntaxNode inputRoot, SyntaxNode[] outputRoots, Framework framework)
+    internal static void VerifyCountMatching(SyntaxNode inputRoot, SyntaxNode[] outputRoots, Framework framework)
     {
         // 1. Count target attributes in input
         var attributeNames = new[] { "DependencyProperty", "AttachedDependencyProperty" };
