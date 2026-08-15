@@ -41,7 +41,7 @@ internal abstract class FrameworkGenerator :
     public virtual string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property) =>
         $"{property.ComponentModel.FromType}.{property.Name}Property.AddOwner(ownerType: typeof({@class.Type}), {GeneratePropertyMetadata(@class, property)});";
 
-    public string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
+    public virtual string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
     {
         var (name, callbacks) = SourceGenerationHelper.CheckOnChangedMethods(@class, property);
         
