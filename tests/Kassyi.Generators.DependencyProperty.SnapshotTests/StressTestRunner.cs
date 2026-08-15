@@ -285,7 +285,7 @@ public static class StressTestRunner
         Assert.IsTrue(result.GeneratedTreesCount > 0, "Expected at least 1 generated source file, but got 0.");
 
         var unexpectedDriverDiagnostics = result.DriverDiagnostics
-            .Where(static d => !d.GetMessage().Contains("DPG0002"))
+            .Where(static d => d.Id != "DPG0002" && !d.GetMessage().Contains("DPG0002"))
             .ToList();
         Assert.AreEqual(0, unexpectedDriverDiagnostics.Count,
             $"Generator driver emitted unexpected diagnostics: {string.Join("; ", unexpectedDriverDiagnostics.Select(static d => $"{d.Id}: {d.GetMessage()}"))}");

@@ -45,8 +45,8 @@ public class RoutedEventTests : SnapshotTestBase
                                                         }
                                                         """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
-        generated.Should().NotContain("publicpublic");
-        generated.Should().Contain("public static partial class ImageRoutedEvents");
+        Assert.IsFalse(generated.Contains("publicpublic"));
+        Assert.IsTrue(generated.Contains("public static partial class ImageRoutedEvents"));
     }
     [TestMethod]
     [DataRow(Framework.Wpf)]
@@ -63,8 +63,8 @@ public class RoutedEventTests : SnapshotTestBase
                                                         }
                                                         """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
-        generated.Should().NotContain("global::global::");
-        generated.Should().Contain("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler");
+        Assert.IsFalse(generated.Contains("global::global::"));
+        Assert.IsTrue(generated.Contains("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler"));
     }
     [TestMethod]
     [DataRow(Framework.Wpf)]
@@ -81,8 +81,8 @@ public class RoutedEventTests : SnapshotTestBase
                                                         }
                                                         """;
         var generated = await GenerateSourceAsync<RoutedEventGenerator>(source, framework);
-        generated.Should().NotContain("global::global::");
-        generated.Should().Contain("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler");
+        Assert.IsFalse(generated.Contains("global::global::"));
+        Assert.IsTrue(generated.Contains("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler"));
     }
     [TestMethod]
     public async Task Cs0436Suppressor_SuppressesOnlyGeneratedAttributeConflicts()
@@ -113,7 +113,7 @@ public class RoutedEventTests : SnapshotTestBase
         projectA = RunRoutedEventGenerator(projectA, parseOptions);
         using var projectAAssembly = new MemoryStream();
         var projectAEmitResult = projectA.Emit(projectAAssembly);
-        projectAEmitResult.Success.Should().BeTrue(string.Join(Environment.NewLine, projectAEmitResult.Diagnostics));
+        Assert.IsTrue(projectAEmitResult.Success, string.Join(Environment.NewLine, projectAEmitResult.Diagnostics));
         projectAAssembly.Position = 0;
         var projectB = CreateCompilation(
             assemblyName: "ProjectB",
@@ -142,10 +142,10 @@ public class RoutedEventTests : SnapshotTestBase
         var rawCs0436Diagnostics = projectB.GetDiagnostics()
             .Where(static diagnostic => diagnostic.Id == "CS0436")
             .ToArray();
-        rawCs0436Diagnostics.Should().Contain(static diagnostic =>
-            diagnostic.GetMessage().Contains("RoutedEventAttribute", StringComparison.Ordinal));
-        rawCs0436Diagnostics.Should().Contain(static diagnostic =>
-            diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal));
+        Assert.IsTrue(rawCs0436Diagnostics.Any(static diagnostic =>
+            diagnostic.GetMessage().Contains("RoutedEventAttribute", StringComparison.Ordinal)));
+        Assert.IsTrue(rawCs0436Diagnostics.Any(static diagnostic =>
+            diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal)));
         var diagnostics = await Microsoft.CodeAnalysis.Diagnostics.DiagnosticAnalyzerExtensions
             .WithAnalyzers(
                 projectB,
@@ -155,12 +155,8 @@ public class RoutedEventTests : SnapshotTestBase
                 new Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions(
                     System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.AdditionalText>.Empty))
             .GetAllDiagnosticsAsync();
-        diagnostics.Where(static diagnostic => diagnostic.Id == "CS0436")
-            .Should()
-            .ContainSingle(static diagnostic => diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal));
-        diagnostics.Where(static diagnostic => diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error)
-            .Should()
-            .BeEmpty();
+        Assert.AreEqual(1, diagnostics.Count(static diagnostic => diagnostic.Id == "CS0436" && diagnostic.GetMessage().Contains("SharedType", StringComparison.Ordinal)));
+        Assert.IsFalse(diagnostics.Any(static diagnostic => diagnostic.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error));
     }
     private static Microsoft.CodeAnalysis.Compilation CreateCompilation(
         string assemblyName,

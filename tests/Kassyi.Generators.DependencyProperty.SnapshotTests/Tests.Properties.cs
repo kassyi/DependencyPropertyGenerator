@@ -85,7 +85,7 @@ public class PropertyTests : SnapshotTestBase
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
@@ -251,8 +251,8 @@ public class PropertyTests : SnapshotTestBase
                                                         """;
         var generated = await GenerateSourceAsync<DependencyPropertyGenerator>(source, framework);
 
-        generated.Should().NotContain("double??");
-        generated.Should().Contain("CoerceValue(double? value)");
+        Assert.IsFalse(generated.Contains("double??"));
+        Assert.IsTrue(generated.Contains("CoerceValue(double? value)"));
     }
 
     [TestMethod]

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -12,7 +12,6 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="MSTest.TestAdapter" />
         <PackageReference Include="MSTest.TestFramework" />
-        <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.MSTest" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
         <PackageReference Include="Verify.MSTest" />
@@ -23,7 +22,6 @@
 
     <ItemGroup Label="GlobalUsings">
         <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
-        <Using Include="FluentAssertions" />
         <Using Include="Kassyi.Generators.Extensions" />
     </ItemGroup>
 

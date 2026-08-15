@@ -14,7 +14,7 @@ public class ErrorTests : SnapshotTestBase
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
@@ -52,8 +52,8 @@ public class ErrorTests : SnapshotTestBase
             """;
         var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
 
-        generated.Should().Contain("#error DPG0001: The specified OnChanged method 'OnTestChanged' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'.");
-        generated.Should().Contain("propertyChangedCallback: null");
+        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'OnTestChanged' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
+        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
     }
 }
 

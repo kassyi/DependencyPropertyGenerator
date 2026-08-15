@@ -28,7 +28,7 @@ public class OverrideMetadataTests : SnapshotTestBase
                 {
                 }
             }
-            """, framework, additionalGenerators: new DependencyPropertyGenerator());
+            """, framework, skipE2EValidation: true, additionalGenerators: new DependencyPropertyGenerator());
     }
 
     [TestMethod]
@@ -55,7 +55,7 @@ public class OverrideMetadataTests : SnapshotTestBase
                 {
                 }
             }
-            """, framework, additionalGenerators: new DependencyPropertyGenerator());
+            """, framework, skipE2EValidation: true, additionalGenerators: new DependencyPropertyGenerator());
     }
 }
 

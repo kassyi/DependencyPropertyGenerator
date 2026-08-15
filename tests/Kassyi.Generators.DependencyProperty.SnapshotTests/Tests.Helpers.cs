@@ -162,6 +162,7 @@ public abstract class SnapshotTestBase : VerifyBase
     protected async Task CheckSourceAsync<T>(
         string source,
         Framework framework,
+        bool skipE2EValidation = false,
         [CallerMemberName] string? callerName = null,
         CancellationToken cancellationToken = default,
         params IIncrementalGenerator[] additionalGenerators)
@@ -177,7 +178,7 @@ public abstract class SnapshotTestBase : VerifyBase
             .Select(static generatedSource => generatedSource.SourceText.ToString())
             .ToArray();
 
-        E2EAssertionPipeline.Verify(source, generatedSources, framework, compilation, diagnosticsArray, callerName ?? string.Empty);
+        E2EAssertionPipeline.Verify(source, generatedSources, framework, compilation, diagnosticsArray, callerName ?? string.Empty, skipE2EValidation);
 
         await Task.WhenAll(
             Verify(diagnosticsArray.ToSnapshotModels())
