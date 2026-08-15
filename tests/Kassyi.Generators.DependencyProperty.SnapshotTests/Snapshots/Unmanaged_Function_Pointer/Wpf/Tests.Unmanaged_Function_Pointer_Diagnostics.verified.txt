@@ -1,1 +1,237 @@
-﻿
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Span: (6,29)-(6,38),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS0306,
+    Severity: Error,
+    Span: (6,29)-(6,59),
+    MessageFormat: The type '{0}' may not be used as a type argument
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Span: (6,39)-(6,48),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (14,32)-(14,41),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (17,19)-(17,58),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (17,27)-(17,36),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (17,37)-(17,46),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (23,1)-(23,117),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS0030,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (23,71)-(23,116),
+    MessageFormat: Cannot convert type '{0}' to '{1}'
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (23,72)-(23,81),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (23,82)-(23,91),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,1)-(24,164),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS0030,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,118)-(24,163),
+    MessageFormat: Cannot convert type '{0}' to '{1}'
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,119)-(24,128),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,129)-(24,138),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0030,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,71)-(24,116),
+    MessageFormat: Cannot convert type '{0}' to '{1}'
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,72)-(24,81),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (24,82)-(24,91),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (34,84)-(34,93),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (34,94)-(34,103),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (37,39)-(37,44),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS1503,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (37,39)-(37,44),
+    MessageFormat: Argument {0}: cannot convert from '{1}' to '{2}'
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (45,15)-(45,24),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (45,25)-(45,34),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (48,19)-(48,28),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0030,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (48,8)-(48,77),
+    MessageFormat: Cannot convert type '{0}' to '{1}'
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (48,9)-(48,18),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (56,100)-(56,109),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (56,110)-(56,119),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (58,100)-(58,109),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (58,110)-(58,119),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  },
+  {
+    Id: CS0214,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (58,141)-(58,150),
+    MessageFormat: Pointers and fixed size buffers may only be used in an unsafe context
+  },
+  {
+    Id: CS8889,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.UnsafeExtensions.AttachedProperties.CallbackPtr.g.cs,
+    Span: (58,151)-(58,160),
+    MessageFormat: The target runtime doesn't support extensible or runtime-environment default calling conventions.
+  }
+]

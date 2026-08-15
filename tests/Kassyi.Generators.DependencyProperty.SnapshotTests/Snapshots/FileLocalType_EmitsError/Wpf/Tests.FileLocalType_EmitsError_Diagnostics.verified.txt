@@ -11,11 +11,5 @@
     Severity: Error,
     Span: (6,1)-(9,2),
     MessageFormat: File scoped types are not supported by Source Generators ('{0}')
-  },
-  {
-    Id: DPG0002,
-    Severity: Error,
-    Span: (6,1)-(9,2),
-    MessageFormat: File scoped types are not supported by Source Generators ('{0}')
   }
 ]

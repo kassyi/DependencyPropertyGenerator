@@ -23,30 +23,6 @@ file partial class MyControl : UserControl
         DefaultSeverity: Error,
         IsEnabledByDefault: true
       }
-    },
-    {
-      Location: /*
-namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
-[DependencyProperty("MyProperty", typeof(int))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-file partial class MyControl : UserControl
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-{
-^
-}
-^
-*/
- : (5,0)-(8,1),
-      Message: File scoped types are not supported by Source Generators ('MyControl'),
-      Severity: Error,
-      Descriptor: {
-        Id: DPG0002,
-        Title: Invalid Type Modifier,
-        MessageFormat: File scoped types are not supported by Source Generators ('{0}'),
-        Category: Usage,
-        DefaultSeverity: Error,
-        IsEnabledByDefault: true
-      }
     }
   ]
 }

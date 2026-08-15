@@ -8,9 +8,9 @@ public class ErrorTests : SnapshotTestBase
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Error}-001")]
     [DataRow(Framework.Wpf)]
-    public async Task AttachedCustomOnChangedUnsupportedSignature(Framework framework)
+    public Task AttachedCustomOnChangedUnsupportedSignature(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls", "System.Windows") + """
 
             [AttachedDependencyProperty<string>("Test", OnChanged = nameof(OnTestChanged))]
             public static partial class TestHelper
@@ -21,16 +21,13 @@ public class ErrorTests : SnapshotTestBase
                 }
             }
             """;
-        var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
-
-        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'OnTestChanged' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
-        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(source, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Error}-001B")]
     [DataRow(Framework.Wpf)]
-    public async Task AttachedCustomOnChangedNotFound(Framework framework)
+    public Task AttachedCustomOnChangedNotFound(Framework framework)
     {
         var source = GetHeader(framework, "Controls") + """
 
@@ -39,10 +36,7 @@ public class ErrorTests : SnapshotTestBase
             {
             }
             """;
-        var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
-
-        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'NonExistentMethod' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
-        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(source, framework, skipE2EValidation: true);
     }
 
     [TestMethod]
