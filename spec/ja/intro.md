@@ -1,19 +1,24 @@
-# DependencyPropertyGenerator 仕様書概要 (Introduction)
+# DependencyPropertyGenerator 仕様書概要
 
 [English](../en/intro.md) | [日本語](./intro.md)
 
-このドキュメント群は、C# Incremental Source Generator である **DependencyPropertyGenerator (`Kassyi.Generators.DependencyProperty`)** の全体アーキテクチャ、ドメイン仕様、インクリメンタル・パイプライン構造、コード生成エンジン、およびパフォーマンス最適化戦略をまとめた公式仕様書です。
+このドキュメント群は、C# Incremental Source Generator である **DependencyPropertyGenerator (`Kassyi.Generators.DependencyProperty`)** の全体アーキテクチャ、ドメイン仕様、インクリメンタルパイプライン構造、コード生成エンジン、およびパフォーマンス最適化戦略をまとめた公式仕様書です。
 
-ソースジェネレーターの実行パフォーマンス（ビルド時間、メモリ消費、IDE応答速度）改善や新機能追加の際、システム全体を掌握し、Roslyn API との正しいやり取りやキャッシュ戦略を維持するために活用してください。
+ソースジェネレーターのパフォーマンス（ビルド時間、メモリ消費、IDE応答速度）の改善や新機能を追加する際に、システム全体の設計方針や Roslyn API との連携、キャッシュ戦略を正しく理解するためのリファレンスとして活用します。
 
-## インデックス
+## 仕様書インデックス
 
-- [01. 基盤とドメインデータ (Foundation & Domain)](./01_foundation_and_domain.md)
-  - プロジェクトの目的、モジュール構成、対象プラットフォーム、ユビキタス言語、構造化データモデル（DTO）
-- [02. パイプラインとアーキテクチャ (Pipeline & Architecture)](./02_pipeline_architecture.md)
-  - Incremental Generatorのアーキテクチャ、データフロー、抽出最適化、等価性(キャッシュ)戦略
-- [03. 生成戦略と最適化 (Generation & Optimization)](./03_generation_and_optimization.md)
-  - `SourceWriter` によるゼロアロケーション出力 (`ClassScope`)、コールバック解決ルール、Dos & Don'ts、プロファイリング手法
-- [04. インクリメンタル・ジェネレーターの計算量モデル (Complexity Model)](./04_mathematical_model.md)
-  - 最悪時間・メモリ計算量の数理分析、パイプラインのキャッシュスケーリング限界、および設計的対策
+以下のドキュメントを通して、システムの内部構造を深く理解できます。
 
+- **[01. 基盤とドメインデータ](./01_foundation_and_domain.md)**
+  プロジェクトの目的やモジュール構成、対象プラットフォームを定義しています。ユビキタス言語や構造化データモデル（DTO）に関する基本情報もここで確認できます。
+- **[02. パイプラインとアーキテクチャ](./02_pipeline_architecture.md)**
+  Incremental Generator のアーキテクチャやデータフローを解説しています。抽出プロセスにおける最適化や、キャッシュを効率的に機能させるための等価性判定戦略を記載しています。
+- **[03. 生成戦略と最適化](./03_generation_and_optimization.md)**
+  `SourceWriter` を利用したゼロアロケーションの出力手法 (`ClassScope`) や、コールバックの解決ルールをまとめています。実装時の Dos & Don'ts やプロファイリング手法についても触れています。
+- **[04. インクリメンタル・ジェネレーターの計算量モデル](./04_mathematical_model.md)**
+  最悪時間・メモリ計算量の数理分析を通じて、パイプラインのキャッシュスケーリングの限界と、その限界を突破するための設計的なアプローチを解説しています。
+- **[05. テスト仕様書](./05_test_specification.md)**
+  本プロジェクトにおけるテスト戦略、品質目標、直交表パラメータ、テストケース一覧、および合否判定基準を定義しています。
+- **[06. フレームワーク別生成マッピング仕様](./06_framework_strategies.md)**
+  各UIフレームワーク間のプロパティ登録APIの違いと、自律型エージェント向けの拡張・バグ修正ガイドライン (Ground Truth) を定義しています。

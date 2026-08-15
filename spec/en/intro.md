@@ -1,19 +1,24 @@
-# DependencyPropertyGenerator Specification (Introduction)
+# DependencyPropertyGenerator Specification
 
 [English](./intro.md) | [日本語](../ja/intro.md)
 
-This documentation contains the official specification, domain models, incremental pipeline architecture, code generation design, and performance optimization guidelines for **DependencyPropertyGenerator (`Kassyi.Generators.DependencyProperty`)**, a Roslyn Incremental Source Generator.
+This documentation provides the official specification, domain models, incremental pipeline architecture, code generation design, and performance optimization guidelines for **DependencyPropertyGenerator (`Kassyi.Generators.DependencyProperty`)**, a Roslyn Incremental Source Generator.
 
-Use this documentation as the architectural source of truth when extending features, optimizing compilation performance, or refining Roslyn pipeline caching behavior.
+Use this documentation as an architectural reference when extending features, optimizing compilation performance (build time, memory footprint, IDE responsiveness), or refining Roslyn pipeline caching strategies.
 
 ## Specification Index
 
-- [01. Foundation & Domain](./01_foundation_and_domain.md)
-  - Purpose, modular design, target platforms, ubiquitous language, and structured DTO models.
-- [02. Pipeline & Architecture](./02_pipeline_architecture.md)
-  - Incremental generator pipeline, dataflow, extraction caching, and model equality strategies.
-- [03. Generation & Optimization](./03_generation_and_optimization.md)
-  - Zero-allocation code generation with `SourceWriter` (`ClassScope`), callback matching rules, Dos & Don'ts, and profiling.
-- [04. Complexity Model of Incremental Generator](./04_mathematical_model.md)
-  - Worst-case time/memory complexity analysis, caching scaling limits, and architectural mitigation.
+The following documents explain the internal workings of the system.
 
+- **[01. Foundation and Domain](./01_foundation_and_domain.md)**
+  Defines the project's purpose, modular design, and target platforms. It also covers the ubiquitous language and structured DTO models used throughout the codebase.
+- **[02. Pipeline and Architecture](./02_pipeline_architecture.md)**
+  Explains the Incremental Generator pipeline and dataflow. It details extraction optimization techniques and model equality strategies necessary for efficient caching.
+- **[03. Generation and Optimization](./03_generation_and_optimization.md)**
+  Covers zero-allocation code generation techniques using `SourceWriter` (`ClassScope`) and callback matching rules. It also provides implementation Dos & Don'ts alongside profiling methods.
+- **[04. Complexity Model of Incremental Generator](./04_mathematical_model.md)**
+  Analyzes worst-case time and memory complexities. It explains pipeline cache scaling limits and the architectural mitigations required to overcome them.
+- **[05. Test Specification](./05_test_specification.md)**
+  Defines the testing strategy, quality targets, combinatorial matrix parameters, test cases, and pass criteria for the project.
+- **[06. Framework Strategies](./06_framework_strategies.md)**
+  Defines the platform API mapping differences among UI frameworks and provides troubleshooting guidelines (Agentic Ground Truth) for autonomous agents.
