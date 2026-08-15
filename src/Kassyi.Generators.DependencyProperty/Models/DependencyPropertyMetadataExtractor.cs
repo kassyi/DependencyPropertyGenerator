@@ -211,7 +211,7 @@ internal static class DependencyPropertyMetadataExtractor
         return signatures;
     }
 
-    private static string GetTargetSenderType(INamedTypeSymbol? classSymbol, bool isAttached, string? browsableForType, Framework framework)
+    internal static string GetTargetSenderType(INamedTypeSymbol? classSymbol, bool isAttached, string? browsableForType, Framework framework)
     {
         if (classSymbol == null)
         {

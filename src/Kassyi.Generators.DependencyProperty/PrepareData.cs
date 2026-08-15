@@ -189,7 +189,7 @@ public static class PrepareData
             {
                 foreach (var m in parentSyntaxNode.Modifiers)
                 {
-                    if (!m.IsKind(SyntaxKind.PartialKeyword))
+                    if (!m.IsKind(SyntaxKind.PartialKeyword) && !m.IsKind(SyntaxKind.FileKeyword) && m.Text != "file")
                     {
                         parentModifiers += m.Text + " ";
                     }
@@ -284,20 +284,25 @@ public static class PrepareData
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool CheckIsFileLocal(INamedTypeSymbol classSymbol)
     {
-        foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+        var current = classSymbol;
+        while (current != null)
         {
-            if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
+            foreach (var syntaxRef in current.DeclaringSyntaxReferences)
             {
-                continue;
-            }
-
-            foreach (var modifier in typeDecl.Modifiers)
-            {
-                if (modifier.IsKind(SyntaxKind.FileKeyword) || modifier.Text == "file")
+                if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
                 {
-                    return true;
+                    continue;
+                }
+
+                foreach (var modifier in typeDecl.Modifiers)
+                {
+                    if (modifier.IsKind(SyntaxKind.FileKeyword) || modifier.Text == "file")
+                    {
+                        return true;
+                    }
                 }
             }
+            current = current.ContainingType;
         }
         return false;
     }

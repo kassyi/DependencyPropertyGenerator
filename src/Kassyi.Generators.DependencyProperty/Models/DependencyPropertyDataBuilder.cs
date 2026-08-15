@@ -162,12 +162,24 @@ internal sealed class DependencyPropertyDataBuilder
 
         if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
             !isOverrideMetadata ||
-            !_validationAndCallbacks.Callbacks.ChangedSignatures.HasFlag(CallbackSignature.OldAndNewValue))
+            classSymbol == null)
         {
             return this;
         }
 
-        var location = classSymbol?.Locations.FirstOrDefault() ?? Location.None;
+        var isCustomOnChanged = !string.IsNullOrWhiteSpace(_validationAndCallbacks.OnChanged);
+        var onChangedName = isCustomOnChanged ? _validationAndCallbacks.OnChanged : $"On{_name}Changed";
+        var targetType = _type.Replace("global::", string.Empty).Replace("?", string.Empty);
+        var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _isAttached, _componentModel.BrowsableForType, _framework);
+
+        var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);
+        if (!matchChanged.Signatures.HasFlag(CallbackSignature.OldAndNewValue) &&
+            !(_isAttached && matchChanged.Signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue)))
+        {
+            return this;
+        }
+
+        var location = classSymbol.Locations.FirstOrDefault() ?? Location.None;
         if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } syntax)
         {
             location = syntax.GetLocation();
@@ -180,7 +192,6 @@ internal sealed class DependencyPropertyDataBuilder
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
         throw new DiagnosticException(Diagnostic.Create(descriptor, location, _framework.ToString()));
-
     }
 
     public DependencyPropertyData Build()

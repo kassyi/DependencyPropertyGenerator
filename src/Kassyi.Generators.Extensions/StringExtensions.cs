@@ -30,10 +30,13 @@ public static class StringExtensions
     public static string ToParameterName(this string input)
     {
         input = input ?? throw new ArgumentNullException(nameof(input));
-        if (input.Length == 0) throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
+        if (input.Length == 0)
+        {
+            throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
+        }
 
         var camelCased = char.ToLower(input[0], CultureInfo.InvariantCulture) + input[1..];
-        return EscapeKeyword(camelCased);
+        return camelCased.EscapeKeyword();
     }
 
     private static bool IsCSharpKeyword(string input)
