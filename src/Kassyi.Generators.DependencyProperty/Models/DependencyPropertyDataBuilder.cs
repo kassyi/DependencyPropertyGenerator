@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.ComponentModel;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,6 +30,8 @@ internal sealed class DependencyPropertyDataBuilder
     private ValidationAndCallbackData _validationAndCallbacks;
     private bool _isPartialProperty;
     private bool _hidesBaseProperty;
+    private bool _isRequired;
+    private bool _isInitOnly;
 
     private TypedConstant GetNamedArgument(string name) => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
@@ -77,16 +78,7 @@ internal sealed class DependencyPropertyDataBuilder
         _isReadOnly = GetNamedArgument(nameof(DependencyPropertyAttribute.IsReadOnly)).ToBoolean();
         _isDirect = GetNamedArgument(nameof(DependencyPropertyAttribute.IsDirect)).ToBoolean();
 
-        var browsableForTypeSymbol = attribute.GetGenericTypeArgument(1) ??
-            (GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.BrowsableForType)).Value as ITypeSymbol);
-        var fromTypeSymbol = attribute.GetGenericTypeArgument(1) ??
-            (GetNamedArgument(nameof(AddOwnerAttribute.FromType)).Value as ITypeSymbol);
-
-        _componentModel = _componentModel with
-        {
-            BrowsableForType = browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            FromType = fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-        };
+        _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
 
         if (!_isAttached && classSymbol != null)
         {
@@ -107,41 +99,9 @@ internal sealed class DependencyPropertyDataBuilder
 
     public DependencyPropertyDataBuilder WithMetadata(AttributeData attribute)
     {
-        _componentModel = _componentModel with
-        {
-            Description = GetNamedArgument(nameof(DependencyPropertyAttribute.Description)).Value?.ToString(),
-            Category = GetNamedArgument(nameof(DependencyPropertyAttribute.Category)).Value?.ToString(),
-            TypeConverter = GetNamedArgument(nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(),
-            Bindable = GetNamedArgument(nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(),
-            Browsable = GetNamedArgument(nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(),
-            DesignerSerializationVisibility = GetNamedArgument(nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"),
-            ClsCompliant = GetNamedArgument(nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(),
-            Localizability = GetNamedArgument(nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G")
-        };
-
-        _frameworkMetadata = new FrameworkMetadataData(
-            AffectsMeasure: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsMeasure)).ToBoolean(),
-            AffectsArrange: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsArrange)).ToBoolean(),
-            AffectsParentMeasure: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentMeasure)).ToBoolean(),
-            AffectsParentArrange: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsParentArrange)).ToBoolean(),
-            AffectsRender: GetNamedArgument(nameof(DependencyPropertyAttribute.AffectsRender)).ToBoolean(),
-            Inherits: GetNamedArgument(nameof(DependencyPropertyAttribute.Inherits)).ToBoolean(),
-            OverridesInheritanceBehavior: GetNamedArgument(nameof(DependencyPropertyAttribute.OverridesInheritanceBehavior)).ToBoolean(),
-            NotDataBindable: GetNamedArgument(nameof(DependencyPropertyAttribute.NotDataBindable)).ToBoolean(),
-            Journal: GetNamedArgument(nameof(DependencyPropertyAttribute.Journal)).ToBoolean(),
-            SubPropertiesDoNotAffectRender: GetNamedArgument(nameof(DependencyPropertyAttribute.SubPropertiesDoNotAffectRender)).ToBoolean(),
-            IsAnimationProhibited: GetNamedArgument(nameof(DependencyPropertyAttribute.IsAnimationProhibited)).ToBoolean(),
-            DefaultUpdateSourceTrigger: GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultUpdateSourceTrigger)).ToEnum<SourceTrigger>()?.ToString("G"),
-            DefaultBindingMode: GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultBindingMode)).ToEnum<DefaultBindingMode>()?.ToString("G")
-        );
-
-        _validationAndCallbacks = _validationAndCallbacks with
-        {
-            EnableDataValidation = GetNamedArgument(nameof(DependencyPropertyAttribute.EnableDataValidation)).ToBoolean(),
-            Coerce = GetNamedArgument(nameof(DependencyPropertyAttribute.Coerce)).ToBoolean(),
-            Validate = GetNamedArgument(nameof(DependencyPropertyAttribute.Validate)).ToBoolean(),
-            CreateDefaultValueCallback = GetNamedArgument(nameof(DependencyPropertyAttribute.CreateDefaultValueCallback)).ToBoolean()
-        };
+        _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
+        _frameworkMetadata = DependencyPropertyMetadataExtractor.ExtractFrameworkMetadata(_namedArguments);
+        _validationAndCallbacks = DependencyPropertyMetadataExtractor.ExtractValidationFlags(_namedArguments, _validationAndCallbacks);
 
         return this;
     }
@@ -182,124 +142,26 @@ internal sealed class DependencyPropertyDataBuilder
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
     {
-        var propertyXmlDoc = GetNamedArgument(nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value?.ToString();
-        var getterXmlDoc = GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.GetterXmlDocumentation)).Value?.ToString();
-        
-        _xmlDocumentation = new XmlDocumentationData(
-            XmlDocumentation: GetNamedArgument(nameof(DependencyPropertyAttribute.XmlDocumentation)).Value?.ToString(),
-            GetterXmlDocumentation: getterXmlDoc ?? propertyXmlDoc,
-            SetterXmlDocumentation: GetNamedArgument(nameof(AttachedDependencyPropertyAttribute.SetterXmlDocumentation)).Value?.ToString()
-        );
-        
+        _xmlDocumentation = DependencyPropertyMetadataExtractor.ExtractXmlDocumentation(_namedArguments);
         return this;
     }
 
     public DependencyPropertyDataBuilder WithCallbacks(AttributeData attribute, INamedTypeSymbol? classSymbol)
     {
-        var bindEvent = GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvent)).Value?.ToString();
-        var bindEvents = GetNamedArgument(nameof(DependencyPropertyAttribute.BindEvents));
-        var onChanged = GetNamedArgument(nameof(DependencyPropertyAttribute.OnChanged)).Value?.ToString() ?? string.Empty;
+        _validationAndCallbacks = DependencyPropertyMetadataExtractor.ExtractCallbacks(
+            _namedArguments,
+            _name,
+            _type,
+            _isAttached,
+            _framework,
+            classSymbol,
+            _componentModel.BrowsableForType,
+            _validationAndCallbacks,
+            out _isPartialProperty,
+            out _isRequired,
+            out _isInitOnly);
 
-        var isCustomOnChanged = !string.IsNullOrWhiteSpace(onChanged);
-        var onChangedName = isCustomOnChanged ? onChanged : $"On{_name}Changed";
-        var onChangingName = $"On{_name}Changing";
-
-        var targetType = _type.Replace("global::", string.Empty).Replace("?", string.Empty);
-        var targetSenderType = GetTargetSenderType(classSymbol);
-
-        _isPartialProperty = classSymbol != null && classSymbol.DeclaringSyntaxReferences
-            .Select(x => x.GetSyntax())
-            .OfType<TypeDeclarationSyntax>()
-            .SelectMany(c => c.Members)
-            .OfType<PropertyDeclarationSyntax>()
-            .Any(p => p.Identifier.Text == _name && p.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword) || m.Text == "partial"));
-
-        var matchChanged = classSymbol != null
-            ? PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
-            : new MethodSignatureMatch();
-
-        if (!isCustomOnChanged)
-        {
-            matchChanged.Signatures = _isAttached
-                ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
-                : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
-        }
-
-        var matchChanging = classSymbol != null
-            ? PrepareData.CheckMethodsDirectly(classSymbol, onChangingName, targetType, targetSenderType)
-            : new MethodSignatureMatch();
-
-        matchChanging.Signatures = _isAttached
-            ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
-            : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
-
-        var bindEventsArray = GetBindEventsArray(bindEvent, bindEvents);
-
-        _validationAndCallbacks = _validationAndCallbacks with
-        {
-            BindEvents = bindEventsArray,
-            OnChanged = onChanged,
-            Callbacks = new EventCallbackData(
-                ChangedSignatures: GetChangedSignatureFlags(matchChanged.Signatures, isCustomOnChanged, _isAttached, !bindEventsArray.IsEmpty),
-                ChangingSignatures: matchChanging.Signatures
-            )
-        };
         return this;
-    }
-
-    private static CallbackSignature GetChangedSignatureFlags(
-        CallbackSignature currentSignatures,
-        bool isCustomOnChanged,
-        bool isAttached,
-        bool hasBindEvents)
-    {
-        var signatures = currentSignatures;
-        if (!isCustomOnChanged && hasBindEvents)
-        {
-            signatures |= isAttached
-                ? CallbackSignature.SenderAndOldAndNewValue
-                : CallbackSignature.OldAndNewValue;
-        }
-        return signatures;
-    }
-
-    private string GetTargetSenderType(INamedTypeSymbol? classSymbol)
-    {
-        if (classSymbol == null)
-        {
-            return string.Empty;
-        }
-
-        var typeString = _isAttached
-            ? (_componentModel.BrowsableForType ?? PrepareData.GenerateDependencyObjectType(_framework))
-            : classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-        return typeString.Replace("global::", string.Empty).Replace("?", string.Empty);
-    }
-
-    private static EquatableArray<string> GetBindEventsArray(string? bindEvent, TypedConstant bindEvents)
-    {
-        if (bindEvent != null)
-        {
-            return new[] { bindEvent }.ToImmutableArray().AsEquatableArray();
-        }
-
-        // [WHY] Avoid LINQ Select/Where chains to prevent array and enumerator allocations.
-        if (bindEvents is { Kind: TypedConstantKind.Array, Values.IsDefaultOrEmpty: false })
-        {
-            var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
-            foreach (var value in bindEvents.Values)
-            {
-                var str = value.Value?.ToString();
-                if (!string.IsNullOrWhiteSpace(str))
-                {
-                    builder.Add(str!);
-                }
-            }
-            return builder.ToImmutable().AsEquatableArray();
-        }
-
-        return Array.Empty<string>().ToImmutableArray().AsEquatableArray();
     }
 
     public DependencyPropertyData Build()
@@ -323,8 +185,9 @@ internal sealed class DependencyPropertyDataBuilder
             XmlDocumentation: _xmlDocumentation,
             ValidationAndCallbacks: _validationAndCallbacks,
             IsPartialProperty: _isPartialProperty,
-            HidesBaseProperty: _hidesBaseProperty
+            HidesBaseProperty: _hidesBaseProperty,
+            IsRequired: _isRequired,
+            IsInitOnly: _isInitOnly
         );
     }
 }
-

@@ -1,5 +1,6 @@
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -130,7 +131,16 @@ public static class PrepareData
 
         if (isFileLocal)
         {
-            throw new InvalidOperationException($"DPG0002: File scoped types are not supported by Source Generators ('{classSymbol.Name}').");
+            var location = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation() ?? Location.None;
+            var descriptor = new DiagnosticDescriptor(
+                id: "DPG0002",
+                title: "Invalid Type Modifier",
+                messageFormat: "File scoped types are not supported by Source Generators ('{0}')",
+                category: "Usage",
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+            throw new DiagnosticException(
+                Diagnostic.Create(descriptor, location, classSymbol.Name));
         }
 
         // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.
@@ -145,6 +155,36 @@ public static class PrepareData
             : (classSymbol.IsValueType ? "struct" : "class");
         var nameWithTypeParameters = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
+        var parentClasses = GetParentClasses(classSymbol);
+
+        var modifiers = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax syntaxNode 
+            ? string.Join(" ", syntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
+            : (classSymbol.IsStatic ? "public static " : "public ");
+        if (string.IsNullOrWhiteSpace(modifiers))
+        {
+            modifiers = string.Empty;
+        }
+        else if (!modifiers.EndsWith(" ", StringComparison.Ordinal))
+        {
+            modifiers += " ";
+        }
+
+        return new ClassData(
+            Namespace: @namespace,
+            Name: className,
+            FullName: fullClassName,
+            Type: nameWithTypeParameters,
+            Keyword: keyword,
+            NameWithTypeParameters: nameWithTypeParameters,
+            Modifiers: modifiers,
+            Version: version,
+            IsStatic: classSymbol.IsStatic,
+            Framework: framework,
+            ParentClasses: parentClasses);
+    }
+
+    private static EquatableArray<ParentClassData> GetParentClasses(INamedTypeSymbol classSymbol)
+    {
         var parentClassesBuilder = ImmutableArray.CreateBuilder<ParentClassData>();
         var currentParent = classSymbol.ContainingType;
         while (currentParent != null)
@@ -170,30 +210,7 @@ public static class PrepareData
             currentParent = currentParent.ContainingType;
         }
 
-        var modifiers = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax syntaxNode 
-            ? string.Join(" ", syntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
-            : (classSymbol.IsStatic ? "public static " : "public ");
-        if (string.IsNullOrWhiteSpace(modifiers))
-        {
-            modifiers = string.Empty;
-        }
-        else if (!modifiers.EndsWith(" ", StringComparison.Ordinal))
-        {
-            modifiers += " ";
-        }
-
-        return new ClassData(
-            Namespace: @namespace,
-            Name: className,
-            FullName: fullClassName,
-            Type: nameWithTypeParameters,
-            Keyword: keyword,
-            NameWithTypeParameters: nameWithTypeParameters,
-            Modifiers: modifiers,
-            Version: version,
-            IsStatic: classSymbol.IsStatic,
-            Framework: framework,
-            ParentClasses: parentClassesBuilder.ToImmutable().AsEquatableArray());
+        return parentClassesBuilder.ToImmutable().AsEquatableArray();
     }
 
     internal static bool? IsSpecialType(this ITypeSymbol? symbol)
@@ -254,7 +271,7 @@ public static class PrepareData
                     implicitNew.Initializer).ToFullString();
             }
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // [WHY] Fallback to raw string if Roslyn syntax parsing fails.
         }
