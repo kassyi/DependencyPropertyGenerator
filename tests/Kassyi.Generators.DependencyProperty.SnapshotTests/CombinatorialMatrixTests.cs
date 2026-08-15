@@ -14,33 +14,50 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 /// <summary>Validates all valid permutations of dependency property generation across target UI frameworks.</summary>
 [TestClass]
+[TestCategory(TestCategoryNames.Matrix)]
 public class CombinatorialMatrixTests : SnapshotTestBase
 {
-    private enum AttrType { Normal, Attached }
-    private enum ClassMode { PublicClass, InternalGenericClass, PublicRecord }
-    private enum PropType { Int, NullableInt, String, GenericList }
-    private enum ReadOnlyMode { False, True }
-    private enum DefaultMode { None, Literal, Expression }
-    private enum DirectMode { False, True }
+    public enum AttrType { Normal, Attached }
+    public enum ClassMode { PublicClass, InternalGenericClass, PublicRecord, StaticClass }
+    public enum PropType { Int, NullableInt, String, GenericList }
+    public enum ReadOnlyMode { False, True }
+    public enum DefaultMode { None, Literal, Expression }
+    public enum DirectMode { False, True }
 
-    private readonly record struct TestCase(
-        int Id,
-        AttrType Attr,
-        ClassMode ClassMode,
-        PropType PropType,
-        ReadOnlyMode ReadOnly,
-        DefaultMode DefaultValue,
-        DirectMode Direct);
-
-    [TestMethod]
-    [DataRow(Framework.Wpf)]
-    [DataRow(Framework.Uno)]
-    [DataRow(Framework.UnoWinUi)]
-    [DataRow(Framework.Maui)]
-    [DataRow(Framework.Avalonia)]
-    public async Task RunCombinatorialMatrix(Framework framework)
+    public static IEnumerable<object[]> GetMatrixData()
     {
-        var source = BuildMatrixSource(framework);
+        var supportedFrameworks = new[] { Framework.Wpf, Framework.Uno, Framework.UnoWinUi, Framework.Maui, Framework.Avalonia };
+        foreach (var framework in supportedFrameworks)
+        {
+
+            foreach (AttrType attr in Enum.GetValues<AttrType>())
+            foreach (ClassMode cls in Enum.GetValues<ClassMode>())
+            foreach (PropType prop in Enum.GetValues<PropType>())
+            foreach (ReadOnlyMode ro in Enum.GetValues<ReadOnlyMode>())
+            foreach (DefaultMode def in Enum.GetValues<DefaultMode>())
+            foreach (DirectMode dir in Enum.GetValues<DirectMode>())
+            {
+                if (IsValidCombination(framework, attr, cls, prop, ro, def, dir))
+                {
+                    yield return new object[] { framework, attr, cls, prop, ro, def, dir };
+                }
+            }
+        }
+    }
+
+    [DataTestMethod]
+    [TestCategory($"{TestCategoryNames.Matrix}-001")]
+    [DynamicData(nameof(GetMatrixData), DynamicDataSourceType.Method)]
+    public async Task RunCombinatorialMatrix(
+        Framework framework,
+        AttrType attr,
+        ClassMode cls,
+        PropType prop,
+        ReadOnlyMode ro,
+        DefaultMode def,
+        DirectMode dir)
+    {
+        var source = BuildSingleMatrixSource(framework, attr, cls, prop, ro, def, dir);
 
         var (compilation, driver) = await CreateCompilationAndDriverAsync<DependencyPropertyGenerator>(
             source,
@@ -56,7 +73,7 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         var errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
         if (errors.Length > 0)
         {
-            Assert.Fail($"Found {errors.Length} compilation errors.\nFirst error: {errors[0].GetMessage()}\n\nSource snippet:\n{source[..Math.Min(1000, source.Length)]}...");
+            Assert.Fail($"Found {errors.Length} compilation errors.\nFirst error: {errors[0].GetMessage()}\n\nSource snippet:\n{source}");
         }
 
         var generatedSources = driver.GetRunResult().Results.SelectMany(r => r.GeneratedSources).ToArray();
@@ -68,7 +85,14 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         E2EAssertionPipeline.VerifyCountMatching(inputRoot, outputRoots, framework);
     }
 
-    private string BuildMatrixSource(Framework framework)
+    private static string BuildSingleMatrixSource(
+        Framework framework,
+        AttrType attr,
+        ClassMode cls,
+        PropType prop,
+        ReadOnlyMode ro,
+        DefaultMode def,
+        DirectMode dir)
     {
         // [WHY] Uses SourceWriter and Scope() to eliminate heap allocations and prevent structural brace-mismatch errors.
         using var writer = new SourceWriter();
@@ -78,54 +102,49 @@ public class CombinatorialMatrixTests : SnapshotTestBase
 
         using (writer.Scope("namespace MyControls"))
         {
-            foreach (var testCase in EnumerateValidCombinations(framework))
-            {
-                GenerateClass(writer, testCase);
-            }
+            GenerateClass(writer, attr, cls, prop, ro, def, dir);
         }
 
         return writer.ToString();
     }
 
-    private static IEnumerable<TestCase> EnumerateValidCombinations(Framework framework)
-    {
-        int id = 0;
-        foreach (AttrType attr in Enum.GetValues<AttrType>())
-        foreach (ClassMode cls in Enum.GetValues<ClassMode>())
-        foreach (PropType prop in Enum.GetValues<PropType>())
-        foreach (ReadOnlyMode ro in Enum.GetValues<ReadOnlyMode>())
-        foreach (DefaultMode def in Enum.GetValues<DefaultMode>())
-        foreach (DirectMode dir in Enum.GetValues<DirectMode>())
-        {
-            var testCase = new TestCase(id, attr, cls, prop, ro, def, dir);
-            if (IsValidCombination(framework, testCase))
-            {
-                yield return testCase;
-                id++;
-            }
-        }
-    }
-
-    private static bool IsValidCombination(Framework framework, TestCase test) =>
+    private static bool IsValidCombination(
+        Framework framework,
+        AttrType attr,
+        ClassMode cls,
+        PropType prop,
+        ReadOnlyMode ro,
+        DefaultMode def,
+        DirectMode dir) =>
         // [WHY] DirectProperty is only valid for normal properties on Avalonia.
-        (test.Direct, framework) is not (DirectMode.True, not Framework.Avalonia)
-        && (test.Direct, test.Attr) is not (DirectMode.True, not AttrType.Normal)
+        (dir, framework) is not (DirectMode.True, not Framework.Avalonia)
+        && (dir, attr) is not (DirectMode.True, not AttrType.Normal)
 
         // [WHY] Records cannot inherit from UserControl, so normal DPs are not supported.
-        && (test.ClassMode, test.Attr) is not (ClassMode.PublicRecord, AttrType.Normal)
+        && (cls, attr) is not (ClassMode.PublicRecord, AttrType.Normal)
 
-        // [WHY] GenericList cannot have default values (DPG0004: shared instance bug).
-        && (test.PropType, test.DefaultValue) is not (PropType.GenericList, not DefaultMode.None)
+        // [WHY] Static class can only be used with Attached properties.
+        && (cls, attr) is not (ClassMode.StaticClass, not AttrType.Attached)
+
+        // [WHY] GenericList cannot have Literal or Expression default values (they are reference types and trigger DPG0004). Only None is valid.
+        && (prop, def) is not (PropType.GenericList, not DefaultMode.None)
 
         // [WHY] Value types like int use constant literals, not expressions.
-        && (test.PropType, test.DefaultValue) is not (PropType.Int, DefaultMode.Expression);
+        && (prop, def) is not (PropType.Int, DefaultMode.Expression);
 
-    private static void GenerateClass(SourceWriter writer, TestCase testCase)
+    private static void GenerateClass(
+        SourceWriter writer,
+        AttrType attr,
+        ClassMode cls,
+        PropType prop,
+        ReadOnlyMode ro,
+        DefaultMode def,
+        DirectMode dir)
     {
-        var attrName = testCase.Attr == AttrType.Normal ? "DependencyProperty" : "AttachedDependencyProperty";
-        var typeName = GetTypeName(testCase.PropType);
-        var attributeArgs = BuildAttributeArguments(testCase);
-        var classDeclaration = GetClassDeclaration(testCase.ClassMode, testCase.Id);
+        var attrName = attr == AttrType.Normal ? "DependencyProperty" : "AttachedDependencyProperty";
+        var typeName = GetTypeName(prop);
+        var attributeArgs = BuildAttributeArguments(ro, def, dir, prop);
+        var classDeclaration = GetClassDeclaration(cls);
 
         var attributeDeclaration = $"[{attrName}(\"MyProperty\", typeof({typeName}){attributeArgs})]";
 
@@ -144,13 +163,13 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         _ => "object"
     };
 
-    private static string BuildAttributeArguments(TestCase test)
+    private static string BuildAttributeArguments(ReadOnlyMode ro, DefaultMode def, DirectMode dir, PropType prop)
     {
         var args = new List<string>();
-        if (test.ReadOnly == ReadOnlyMode.True) args.Add("IsReadOnly = true");
-        if (test.Direct == DirectMode.True) args.Add("IsDirect = true");
+        if (ro == ReadOnlyMode.True) args.Add("IsReadOnly = true");
+        if (dir == DirectMode.True) args.Add("IsDirect = true");
 
-        var defaultValueArg = GetDefaultValueArgument(test.DefaultValue, test.PropType);
+        var defaultValueArg = GetDefaultValueArgument(def, prop);
         if (defaultValueArg is not null)
         {
             args.Add(defaultValueArg);
@@ -168,11 +187,12 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         _ => null
     };
 
-    private static string GetClassDeclaration(ClassMode mode, int id) => mode switch
+    private static string GetClassDeclaration(ClassMode mode) => mode switch
     {
-        ClassMode.PublicClass          => $"public partial class TestClass{id} : UserControl",
-        ClassMode.InternalGenericClass => $"internal partial class TestClass{id}<T> : UserControl",
-        ClassMode.PublicRecord         => $"public partial record TestClass{id}",
+        ClassMode.PublicClass          => $"public partial class TestClass : UserControl",
+        ClassMode.InternalGenericClass => $"internal partial class TestClass<T> : UserControl",
+        ClassMode.PublicRecord         => $"public partial record TestClass",
+        ClassMode.StaticClass          => $"public static partial class TestClass",
         _                              => string.Empty
     };
 }

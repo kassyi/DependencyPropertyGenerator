@@ -1,46 +1,48 @@
-# 01. Foundation & Domain
+# 01. Foundation and Domain
 
 [English](./01_foundation_and_domain.md) | [日本語](../ja/01_foundation_and_domain.md) | [Index (Intro)](./intro.md)
 
-## I. Purpose & Philosophy
+## Ⅰ. Purpose and Philosophy
 
-The primary objective of **DependencyPropertyGenerator** (`Kassyi.Generators.DependencyProperty`) is to **automate the declaration of boilerplate-heavy Dependency Properties, Routed Events, and Weak Events** across multiple .NET UI frameworks including WPF, UWP, WinUI, Uno, Avalonia, and MAUI.
+The primary purpose of **DependencyPropertyGenerator** (`Kassyi.Generators.DependencyProperty`) is to automatically generate boilerplate declaration code for DependencyProperties, RoutedEvents, and WeakEvents across multiple .NET UI frameworks (WPF, UWP, WinUI, Uno, Avalonia, MAUI).
 
-### Modular Architecture
-- **`Kassyi.Generators.DependencyProperty`**: The core Roslyn Incremental Source Generator. Extracts metadata during compilation and generates C# source code tailored for each UI framework.
-- **`Kassyi.Generators.DependencyProperty.Attributes`**: Provides compile-time declaration attributes (`[DependencyProperty]`, `[AttachedDependencyProperty]`, `[RoutedEvent]`, `[WeakEvent]`, etc.) consumed by user code.
-- **`Kassyi.Generators.Extensions`**: Core zero-allocation infrastructure library providing foundational utilities (`SourceWriter`, `EquatableArray<T>`, `HashCode`, etc.) shared across generators.
+### Module Architecture
 
-### Technical Constraints & Guidelines
-- **Roslyn Incremental Source Generator**: Targets `.NET Standard 2.0` and must execute at ultra-low allocation rates with maximum incremental caching efficiency during live IDE typing.
-- **Cross-Framework Abstraction**: Hides the API disparities across various UI frameworks (managed via the `Framework` enum) and generates framework-specific implementations from a single unified attribute (`[DependencyProperty]`).
-- **`partial` Classes and Methods**: Generated code is appended as `partial` class definitions and provides hooks like `partial void On...Changed(...)` methods.
+- **`Kassyi.Generators.DependencyProperty`**: The core Roslyn Incremental Source Generator. It extracts metadata at compile time and generates source code tailored to each UI framework.
+- **`Kassyi.Generators.DependencyProperty.Attributes`**: Provides the declarative attributes (`[DependencyProperty]`, `[AttachedDependencyProperty]`, `[RoutedEvent]`, `[WeakEvent]`, etc.) that developers apply in their code.
+- **`Kassyi.Generators.Extensions`**: The core library providing a zero-allocation foundation (`SourceWriter`, `EquatableArray<T>`, `HashCode`, etc.) shared across source generators.
 
----
+### Technical Constraints and Policies
 
-## II. Ubiquitous Language (Glossary)
-
-Common terminology unified across the entire generator codebase.
-
-| Name (Japanese) | Name (Code / English) | Description |
-|---|---|---|
-| UIフレームワーク | `Framework` | Enumeration identifying target platforms (WPF, Uno, MAUI, Avalonia, WinUI, etc.) |
-| 依存関係プロパティ | `DependencyProperty` | Property system enabling data binding, styles, and animation in UI controls |
-| 添付プロパティ | `AttachedDependencyProperty` | Property mechanism allowing child elements to set values on parent/other elements |
-| クラスデータ | `ClassData` | Metadata representing the declaring target class/owner (type name, namespace, modifiers, etc.) |
-| プロパティデータ | `DependencyPropertyData` | Root DTO consolidating all metadata for a generated dependency property |
-| コンポーネントモデルデータ | `ComponentModelData` | UI/designer metadata such as `[Description]`, `[Category]`, `[TypeConverter]` |
-| フレームワークメタデータ | `FrameworkMetadataData` | Framework property metadata options (e.g., `AffectsMeasure`, `AffectsRender`) |
-| バリデーション＆コールバック | `ValidationAndCallbackData` | Validation, coercion, and change notification callback settings (`OnChanged`) |
-| イベントデータ | `EventData` | Metadata for routed events (`RoutedEvent`) and weak events (`WeakEvent`) |
+- **Roslyn Incremental Source Generator**: Targets `.NET Standard 2.0` and operates with high speed and ultra-low allocation during incremental evaluations (such as typing in the IDE).
+- **Framework Abstraction**: Absorbs API differences among various UI frameworks internally, generating the appropriate code from a single attribute (`[DependencyProperty]`).
+- **Leveraging `partial` Classes and Methods**: Adds generated code as `partial` classes and provides `partial void On...Changed(...)` methods for event hooking.
 
 ---
 
-## III. Domain & Data Models
+## Ⅱ. Ubiquitous Language Glossary
 
-Pure Data Transfer Objects (DTOs) extracted from Roslyn `SyntaxNode` and `ISymbol` that traverse the incremental pipeline. **To maximize caching efficiency, all models are defined as `readonly record struct` with deep `IEquatable<T>` equality comparison.**
+The following terms are standardized across the generator's codebase.
 
-### Core Domain Model (Mermaid Class Diagram)
+| Term (English)        | Term (Code)                  | Description                                                                                      |
+| --------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| UI Framework          | `Framework`                  | Enum identifying the target platform (e.g., WPF, Uno, MAUI, Avalonia, WinUI).                    |
+| Dependency Property   | `DependencyProperty`         | Extended property mechanism for UI controls to retain state and support data binding.            |
+| Attached Property     | `AttachedDependencyProperty` | Property mechanism allowing child elements to set values on parent elements.                     |
+| Class Data            | `ClassData`                  | Metadata (type name, namespace, modifiers, etc.) of the target class (owner) with the attribute. |
+| Property Data         | `DependencyPropertyData`     | The root data model encapsulating complete metadata for the property to be generated.            |
+| Component Model Data  | `ComponentModelData`         | UI/designer metadata such as `[Description]`, `[Category]`, and `[TypeConverter]`.               |
+| Framework Metadata    | `FrameworkMetadataData`      | Settings for `FrameworkPropertyMetadataOptions` (e.g., `AffectsMeasure`) in WPF and others.      |
+| Validation & Callback | `ValidationAndCallbackData`  | Configuration for behavior such as validation, coercion, and change callbacks (`OnChanged`).     |
+| Event Data            | `EventData`                  | Metadata for `RoutedEvent` and `WeakEvent`.                                                      |
+
+---
+
+## Ⅲ. Domain Data Models
+
+These are pure data models (DTOs) extracted from Roslyn's `SyntaxNode` and `ISymbol` to flow through the incremental pipeline. **To maximize cache efficiency, they are exclusively defined as `readonly record struct` and support strict equality comparison via `IEquatable<T>`.**
+
+### Main Data Models (DTOs)
 
 ```mermaid
 classDiagram
@@ -147,7 +149,66 @@ classDiagram
     DependencyPropertyData *-- ValidationAndCallbackData
 ```
 
-### Data Model Design Principles
-- **Structured Decomposition**: Breaks down large metadata models into cohesive sub-models (component model, framework metadata, XML docs, validation & callbacks) for clear responsibility separation and maintainability.
-- **Early Primitive Projection**: Storing Roslyn `INamedTypeSymbol` or `IPropertySymbol` in DTOs prevents GC of previous compilation states and invalidates generator caching. Metadata is strictly projected into primitive types (`string`, `bool`), enums, or `EquatableArray<T>`.
-- **Structural Collection Equality**: Collections (e.g., `BindEvents`) use `EquatableArray<T>` instead of raw arrays or `List<T>` to guarantee value-based sequence equality.
+### Data Structure Design Guidelines
+
+- **Structural Separation by Responsibility**: `DependencyPropertyData`, which contains many properties, is structured into sub-models such as component models, UI metadata, XML documentation, and validation/callbacks. This improves maintainability and clarity.
+- **Early Conversion to Primitive Types**: Retaining Roslyn's `INamedTypeSymbol` or `IPropertySymbol` directly causes memory leaks and invalidates the generator cache. Therefore, they must be converted into primitive types like `string` and `bool`, or `EquatableArray<T>`, during the extraction phase.
+- **Collection Equality**: Collection data (e.g., `BindEvents`) uses `EquatableArray<T>` (a custom implementation) that guarantees structural equality, rather than standard arrays or `List<T>`.
+
+---
+
+## IV. Agentic DTO Mapping Specification (Agentic Ground Truth)
+
+To allow autonomous agents (AI assistants) to investigate and modify the code, this section documents the mapping between C# attributes and their corresponding DTO properties. Use this specification as a structural map when performing bug fixes or feature additions.
+
+### 1. `[DependencyProperty]` Attribute Mapping
+
+Attributes defined in user code such as `[DependencyProperty<string>("Text", DefaultValue = "Foo")]` are parsed by `DependencyPropertyDataBuilder.cs` and `PrepareData.cs`, and stored in the following DTO fields.
+
+#### Root Properties (DependencyPropertyData)
+
+| Attribute Argument / Property | DTO Target Field                      | Type      | Description                                                                  |
+| ----------------------------- | ------------------------------------- | --------- | ---------------------------------------------------------------------------- |
+| Type Argument `<T>`           | `DependencyPropertyData.Type`         | `string`  | The property type (fully qualified).                                         |
+| 1st Argument (Constructor)    | `DependencyPropertyData.Name`         | `string`  | The name of the dependency property (e.g., `"Text"`).                        |
+| `DefaultValue`                | `DependencyPropertyData.DefaultValue` | `string?` | The default value such as string literals.                                   |
+| `DefaultValueExpression`      | `DependencyPropertyData.DefaultValue` | `string?` | The default value as a C# expression like `new()`.                           |
+| `IsReadOnly`                  | `DependencyPropertyData.IsReadOnly`   | `bool`    | Generates a read-only property using `DependencyPropertyKey` if `true`.      |
+| `IsDirect`                    | `DependencyPropertyData.IsDirect`     | `bool`    | Avalonia-specific. Indicates if it should be generated as a direct property. |
+
+#### Mapping to ValidationAndCallbackData
+
+| Attribute Argument / Property | DTO Target Field                    | Type                     | Description                                                         |
+| ----------------------------- | ----------------------------------- | ------------------------ | ------------------------------------------------------------------- |
+| `OnChanged`                   | `ValidationAndCallbacks.OnChanged`  | `string`                 | Custom change callback method name.                                 |
+| `Coerce`                      | `ValidationAndCallbacks.Coerce`     | `bool`                   | Indicates whether to generate value coercion (CoerceValueCallback). |
+| `Validate`                    | `ValidationAndCallbacks.Validate`   | `bool`                   | Indicates whether to generate validation (ValidateValueCallback).   |
+| `BindEvents`                  | `ValidationAndCallbacks.BindEvents` | `EquatableArray<string>` | List of control events to wire up.                                  |
+
+#### Mapping to ComponentModelData
+
+| Attribute Argument / Property | DTO Target Field               | Type      | Description                                        |
+| ----------------------------- | ------------------------------ | --------- | -------------------------------------------------- |
+| `Description`                 | `ComponentModel.Description`   | `string?` | Generated as the `[Description("...")]` attribute. |
+| `Category`                    | `ComponentModel.Category`      | `string?` | Generated as the `[Category("...")]` attribute.    |
+| `TypeConverter`               | `ComponentModel.TypeConverter` | `string?` | Converter type name in the `typeof(...)` format.   |
+
+#### Mapping to FrameworkMetadataData (For WPF)
+
+| Attribute Argument / Property | DTO Target Field                       | Type      | Description                                |
+| ----------------------------- | -------------------------------------- | --------- | ------------------------------------------ |
+| `AffectsMeasure`              | `FrameworkMetadata.AffectsMeasure`     | `bool`    | Requests a layout update (Measure pass).   |
+| `AffectsRender`               | `FrameworkMetadata.AffectsRender`      | `bool`    | Requests a redraw (Render pass).           |
+| `BindsTwoWayByDefault`        | `FrameworkMetadata.DefaultBindingMode` | `string?` | The default binding mode (e.g., `TwoWay`). |
+
+### 2. Mapping to `ClassData`
+
+Information about the parent class itself, where the properties are defined, is extracted into `ClassData`.
+
+| Target              | DTO Target Field                   | Type        | Description                                           |
+| ------------------- | ---------------------------------- | ----------- | ----------------------------------------------------- |
+| Enclosing Namespace | `ClassData.Namespace`              | `string`    | The outer `namespace` declaration.                    |
+| Class Name          | `ClassData.Name`                   | `string`    | The name of the `partial class` or `partial record`.  |
+| Type Parameters     | `ClassData.NameWithTypeParameters` | `string`    | Generic type signature like `MyControl<T>`.           |
+| Class Modifiers     | `ClassData.Modifiers`              | `string`    | Modifiers such as `public`, `internal`, `sealed`.     |
+| `[AvaloniaObject]`  | `ClassData.Framework`              | `Framework` | The type of framework used (`WPF`, `Avalonia`, etc.). |

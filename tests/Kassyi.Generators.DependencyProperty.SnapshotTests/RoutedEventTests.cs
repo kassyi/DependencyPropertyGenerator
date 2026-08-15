@@ -2,9 +2,11 @@ using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
+[TestCategory(TestCategoryNames.Routed)]
 public class RoutedEventTests : SnapshotTestBase
 {
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-001")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -19,7 +21,9 @@ public class RoutedEventTests : SnapshotTestBase
             }
             """, framework);
     }
+
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-002")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -34,7 +38,9 @@ public class RoutedEventTests : SnapshotTestBase
             }
             """, framework);
     }
+
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-003")]
     public async Task AttachedRoutedEvent_StaticClass_DoesNotDuplicatePublicModifier()
     {
         const Framework framework = Framework.Wpf;
@@ -48,7 +54,9 @@ public class RoutedEventTests : SnapshotTestBase
         Assert.IsFalse(generated.Contains("publicpublic"));
         Assert.IsTrue(generated.Contains("public static partial class ImageRoutedEvents"));
     }
+
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-004")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -66,7 +74,9 @@ public class RoutedEventTests : SnapshotTestBase
         Assert.IsFalse(generated.Contains("global::global::"));
         Assert.IsTrue(generated.Contains("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler"));
     }
+
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-004B")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -84,7 +94,9 @@ public class RoutedEventTests : SnapshotTestBase
         Assert.IsFalse(generated.Contains("global::global::"));
         Assert.IsTrue(generated.Contains("global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyRoutedEventHandler"));
     }
+
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Routed}-005")]
     public async Task Cs0436Suppressor_SuppressesOnlyGeneratedAttributeConflicts()
     {
         var parseOptions = Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default
@@ -186,4 +198,3 @@ public class RoutedEventTests : SnapshotTestBase
         return updatedCompilation;
     }
 }
-

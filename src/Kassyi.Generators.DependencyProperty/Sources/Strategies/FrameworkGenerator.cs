@@ -41,7 +41,7 @@ internal abstract class FrameworkGenerator :
     public virtual string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property) =>
         $"{property.ComponentModel.FromType}.{property.Name}Property.AddOwner(ownerType: typeof({@class.Type}), {GeneratePropertyMetadata(@class, property)});";
 
-    public string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
+    public virtual string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
     {
         var (name, callbacks) = SourceGenerationHelper.CheckOnChangedMethods(@class, property);
         
@@ -121,8 +121,8 @@ internal abstract class FrameworkGenerator :
         return GenerateCoerceValueCallbackInternal(@class, property);
     }
 
-    protected virtual string CoerceAttachedCallbackSignature => "static (sender, args) =>";
-    protected virtual string CoerceAttachedValueExpression => "args.Value";
+    protected virtual string CoerceAttachedCallbackSignature => "static (sender, value) =>";
+    protected virtual string CoerceAttachedValueExpression => "value";
 
     protected virtual string GenerateCoerceValueCallbackInternal(ClassData @class, DependencyPropertyData property)
     {
@@ -148,14 +148,9 @@ internal abstract class FrameworkGenerator :
     
     protected virtual string GenerateValidateValueCallbackInternal(ClassData @class, DependencyPropertyData property)
     {
-        var senderType = property.IsAttached
-            ? SourceGenerationHelper.GenerateBrowsableForType(property)
-            : @class.Type;
         var propertyType = SourceGenerationHelper.GenerateType(property, canBeNull: true);
 
-        return property.IsAttached
-            ? $"static (sender, args) => Is{property.Name}Valid(({senderType})sender, ({propertyType})args.Value)"
-            : $"static value => Is{property.Name}Valid(({propertyType})value)";
+        return $"static value => Is{property.Name}Valid(({propertyType})value)";
     }
     
     public virtual string GenerateCreateDefaultValueCallback(DependencyPropertyData property) =>

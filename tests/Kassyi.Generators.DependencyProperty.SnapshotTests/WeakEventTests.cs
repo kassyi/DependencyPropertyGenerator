@@ -2,9 +2,11 @@ using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
+[TestCategory(TestCategoryNames.Weak)]
 public class WeakEventTests : SnapshotTestBase
 {
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Weak}-001")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -22,6 +24,7 @@ public class WeakEventTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Weak}-002")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -39,6 +42,7 @@ public class WeakEventTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Weak}-003")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -56,6 +60,7 @@ public class WeakEventTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Weak}-004")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -73,6 +78,7 @@ public class WeakEventTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Weak}-005")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -89,4 +95,3 @@ public class WeakEventTests : SnapshotTestBase
             """, framework);
     }
 }
-

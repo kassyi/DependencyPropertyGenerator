@@ -158,11 +158,7 @@ internal sealed class DependencyPropertyDataBuilder
             out _isRequired,
             out _isInitOnly);
 
-        var isOverrideMetadata = attribute.AttributeClass?.Name.Contains("OverrideMetadata") == true;
-
-        if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
-            !isOverrideMetadata ||
-            classSymbol == null)
+        if (classSymbol == null)
         {
             return this;
         }
@@ -173,6 +169,32 @@ internal sealed class DependencyPropertyDataBuilder
         var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _isAttached, _componentModel.BrowsableForType, _framework);
 
         var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);
+        
+        if (matchChanged.HasMethod && matchChanged.Signatures == CallbackSignature.None)
+        {
+            var methodLocation = classSymbol.Locations.FirstOrDefault() ?? Location.None;
+            if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } syntaxForLocation)
+            {
+                methodLocation = syntaxForLocation.GetLocation();
+            }
+            var unsupportedDescriptor = new DiagnosticDescriptor(
+                id: "DPG0007",
+                title: "Unsupported Callback Signature",
+                messageFormat: "Method '{0}' matches the naming convention but has an unsupported signature.",
+                category: "Usage",
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+            throw new DiagnosticException(Diagnostic.Create(unsupportedDescriptor, methodLocation, onChangedName));
+        }
+
+        var isOverrideMetadata = attribute.AttributeClass?.Name.Contains("OverrideMetadata") == true;
+
+        if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
+            !isOverrideMetadata)
+        {
+            return this;
+        }
+
         if (!matchChanged.Signatures.HasFlag(CallbackSignature.OldAndNewValue) &&
             !(_isAttached && matchChanged.Signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue)))
         {

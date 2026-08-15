@@ -1,0 +1,15 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: DPG0002,
+    Severity: Error,
+    Span: (6,1)-(9,2),
+    MessageFormat: File scoped types are not supported by Source Generators ('{0}')
+  }
+]

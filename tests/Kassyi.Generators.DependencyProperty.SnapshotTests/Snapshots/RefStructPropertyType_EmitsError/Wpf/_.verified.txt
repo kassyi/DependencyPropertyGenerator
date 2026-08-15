@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[DependencyProperty("MyProperty", typeof(MyRefStruct))]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class MyControl : UserControl
+*/
+ : (8,1)-(8,54),
+      Message: The property type 'Kassyi.Generators.DependencyProperty.IntegrationTests.MyRefStruct' is a ref struct and cannot be used as a DependencyProperty,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0003,
+        Title: Invalid Property Type,
+        MessageFormat: The property type '{0}' is a ref struct and cannot be used as a DependencyProperty,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

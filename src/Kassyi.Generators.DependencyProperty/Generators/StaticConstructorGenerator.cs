@@ -144,7 +144,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
-            .SelectAndReportExceptions((x, _) => PrepareData(x, isAttached: isAttached), context, Id)
+            .SelectAndCatchExceptions(x => PrepareData(x, isAttached: isAttached))
             .WhereNotNull()
             .CollectAsEquatableArray();
     }

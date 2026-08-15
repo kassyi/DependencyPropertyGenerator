@@ -5,6 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="coverlet.collector">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="GitHubActionsTestLogger">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +27,7 @@
     <ItemGroup Label="GlobalUsings">
         <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
         <Using Include="Kassyi.Generators.Extensions" />
+        <Using Include="Kassyi.Generators.DependencyProperty.Tests" />
     </ItemGroup>
 
     <ItemGroup>

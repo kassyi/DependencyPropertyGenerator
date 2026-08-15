@@ -155,19 +155,6 @@ public static class E2EAssertionPipeline
     {
         var errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         
-        // --- 既知のジェネレータバグ (TODO: 将来のPRで修正) ---
-        // WeakEventGenerator: WeakEvent<T> が EventArgs を継承していない型の場合の CS1503
-        errors = errors.Where(d => d.Id != "CS1503").ToList();
-        
-        // OverrideMetadataGenerator: partial void On...Changed() の定義側を生成しないことによる CS0759 / CS8795
-        errors = errors.Where(d => d.Id != "CS8795" && d.Id != "CS0759").ToList();
-
-        // OverrideMetadataGenerator (UnoWinUi等): } の出力漏れによる構文エラー CS1513 / CS1022
-        if (callerName.StartsWith("OverrideMetadata"))
-        {
-            errors = errors.Where(d => d.Id != "CS1022" && d.Id != "CS1513").ToList();
-        }
-        
         if (errors.Any())
         {
             throw new Exception($"Level 4 Assertion Failed: Found {errors.Count} compilation errors. First error: {errors.First().GetMessage()}");

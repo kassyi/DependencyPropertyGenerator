@@ -1,0 +1,22 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (1,1)-(1,31),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (3,1)-(3,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: DPG0007,
+    Severity: Error,
+    Span: (7,2)-(7,79),
+    MessageFormat: Method '{0}' matches the naming convention but has an unsupported signature.
+  }
+]

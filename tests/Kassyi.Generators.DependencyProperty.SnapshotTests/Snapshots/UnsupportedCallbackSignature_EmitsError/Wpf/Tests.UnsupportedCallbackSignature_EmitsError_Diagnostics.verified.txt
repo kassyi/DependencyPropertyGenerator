@@ -1,0 +1,15 @@
+﻿[
+  {
+    Id: CS0759,
+    Severity: Error,
+    Span: (10,18)-(10,37),
+    MessageFormat: No defining declaration found for implementing declaration of partial method '{0}'
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  }
+]

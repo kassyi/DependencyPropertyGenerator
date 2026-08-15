@@ -356,5 +356,6 @@ MigrationBackup/
 **/*.received.*
 
 tmp/
+coverage/
 .agents/workflows/
 .agents/skills/

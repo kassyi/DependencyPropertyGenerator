@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
+[AttachedDependencyProperty<string>("Test", OnChanged = nameof(OnTestChanged))]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial class TestHelper
+*/
+ : (6,1)-(6,78),
+      Message: Method 'OnTestChanged' matches the naming convention but has an unsupported signature.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0007,
+        Title: Unsupported Callback Signature,
+        MessageFormat: Method '{0}' matches the naming convention but has an unsupported signature.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

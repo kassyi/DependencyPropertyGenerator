@@ -2,7 +2,7 @@
   {
     Id: CS0759,
     Severity: Error,
-    Span: (18,18)-(18,42),
+    Span: (16,18)-(16,39),
     MessageFormat: No defining declaration found for implementing declaration of partial method '{0}'
   },
   {
@@ -16,19 +16,14 @@
     Id: CS8019,
     Severity: Hidden,
     WarningLevel: 1,
-    Span: (4,1)-(4,44),
+    Span: (3,1)-(3,14),
     MessageFormat: Unnecessary using directive.
   },
   {
-    Id: DPG0004,
-    Severity: Error,
-    Span: (8,2)-(9,96),
-    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
-  },
-  {
-    Id: DPG0004,
-    Severity: Error,
-    Span: (8,2)-(9,96),
-    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (4,1)-(4,44),
+    MessageFormat: Unnecessary using directive.
   }
 ]

@@ -1,0 +1,86 @@
+﻿[
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (2,1)-(2,44),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS1739,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile1.g.cs,
+    Span: (19,5)-(19,10),
+    MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
+  },
+  {
+    Id: CS1739,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile1.g.cs,
+    Span: (28,1)-(28,22),
+    MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
+  },
+  {
+    Id: CS1026,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile1.g.cs,
+    Span: (28,29)-(28,30),
+    MessageFormat: ) expected
+  },
+  {
+    Id: CS1525,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (18,168)-(18,170),
+    MessageFormat: Invalid expression term '{0}'
+  },
+  {
+    Id: CS1525,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (18,170)-(18,171),
+    MessageFormat: Invalid expression term '{0}'
+  },
+  {
+    Id: CS1003,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (18,171)-(18,172),
+    MessageFormat: Syntax error, '{0}' expected
+  },
+  {
+    Id: CS1525,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (18,171)-(18,172),
+    MessageFormat: Invalid expression term '{0}'
+  },
+  {
+    Id: CS1525,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (18,171)-(18,172),
+    MessageFormat: Invalid expression term '{0}'
+  },
+  {
+    Id: CS1739,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (19,5)-(19,10),
+    MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
+  },
+  {
+    Id: CS1739,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (28,1)-(28,22),
+    MessageFormat: The best overload for '{0}' does not have a parameter named '{1}'
+  },
+  {
+    Id: CS1026,
+    Severity: Error,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.DependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.BrokenProfile2.g.cs,
+    Span: (28,29)-(28,30),
+    MessageFormat: ) expected
+  }
+]

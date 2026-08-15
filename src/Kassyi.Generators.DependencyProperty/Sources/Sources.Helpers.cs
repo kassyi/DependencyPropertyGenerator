@@ -330,9 +330,3 @@ internal readonly ref struct SourceWriterClassScope(SourceWriter writer, bool ha
         }
     }
 }
-
-internal static class StringExtensions
-{
-    public static string If(this string text, bool condition) =>
-        condition ? text : string.Empty;
-}

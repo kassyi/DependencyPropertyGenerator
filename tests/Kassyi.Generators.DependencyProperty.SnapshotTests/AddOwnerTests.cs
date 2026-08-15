@@ -2,9 +2,11 @@ using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
+[TestCategory(TestCategoryNames.Metadata)]
 public class AddOwnerTests : SnapshotTestBase
 {
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Metadata}-002")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -22,6 +24,7 @@ public class AddOwnerTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Metadata}-002B")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -38,4 +41,3 @@ public class AddOwnerTests : SnapshotTestBase
             """, framework);
     }
 }
-
