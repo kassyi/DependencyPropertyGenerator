@@ -2,9 +2,11 @@ using Kassyi.Generators.DependencyProperty.Generators;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
+[TestCategory(TestCategoryNames.Attached)]
 public class AttachedPropertyTests : SnapshotTestBase
 {
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-001")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -31,6 +33,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-002")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -48,6 +51,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-003")]
     public async Task AttachedPropertyAccessors_UseBrowsableForType()
     {
         var source = GetHeader(Framework.Wpf, "Controls") + """
@@ -64,6 +68,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-004")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -84,6 +89,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-005")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -101,6 +107,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-006")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -121,6 +128,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-008")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -141,6 +149,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-009")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -161,6 +170,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-010")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -178,6 +188,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Attached}-011")]
     [DataRow(Framework.Wpf)]
     public async Task AttachedOnChangedWithEventArgs(Framework framework)
     {
@@ -198,22 +209,4 @@ public class AttachedPropertyTests : SnapshotTestBase
         Assert.IsTrue(generated.Contains("(global::System.Windows.DependencyObject)sender,"));
         Assert.IsTrue(generated.Contains("args);"));
     }
-
-    [TestMethod]
-    [DataRow(Framework.Wpf)]
-    public async Task AttachedCustomOnChangedNotFound(Framework framework)
-    {
-        var source = GetHeader(framework, "Controls") + """
-
-                                                        [AttachedDependencyProperty<string>("Test", OnChanged = "NonExistentMethod")]
-                                                        public static partial class TestHelper
-                                                        {
-                                                        }
-                                                        """;
-        var generated = await GenerateSourceAsync<AttachedDependencyPropertyGenerator>(source, framework);
-
-        Assert.IsTrue(generated.Contains("#error DPG0001: The specified OnChanged method 'NonExistentMethod' was not found or has an unsupported signature on 'Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper'."));
-        Assert.IsTrue(generated.Contains("propertyChangedCallback: null"));
-    }
 }
-

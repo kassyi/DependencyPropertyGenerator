@@ -3,9 +3,13 @@ using Avalonia.Controls;
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests;
 
 [TestClass]
+[TestCategory(TestCategoryNames.Integration)]
 public class DependencyPropertyGeneratorTests
 {
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Integration}-001")]
+    [TestCategory($"{TestCategoryNames.Integration}-002")]
+    [TestCategory($"{TestCategoryNames.Integration}-003")]
     public void GeneratesCorrectly()
     {
         var window = new MyControl();
