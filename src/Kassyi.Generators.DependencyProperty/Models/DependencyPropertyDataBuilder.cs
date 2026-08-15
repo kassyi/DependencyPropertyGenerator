@@ -123,24 +123,25 @@ internal sealed class DependencyPropertyDataBuilder
         var trimmedDefaultValue = _defaultValue?.Trim();
         var isCollectionExpression = trimmedDefaultValue != null && trimmedDefaultValue.StartsWith("[", StringComparison.Ordinal) && trimmedDefaultValue.EndsWith("]", StringComparison.Ordinal);
 
-        if (_defaultValue != null && 
-            (_defaultValue.Contains("new ") || _defaultValue.Contains("new(") || isCollectionExpression) && 
-            !_isValueType && 
-            _type != "string" && _type != "global::System.String")
+        if (_defaultValue == null ||
+            (!_defaultValue.Contains("new ") && !_defaultValue.Contains("new(") && !isCollectionExpression) ||
+            _isValueType ||
+            _type == "string" || _type == "global::System.String")
         {
-            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-            var descriptor = new DiagnosticDescriptor(
-                id: "DPG0004",
-                title: "Reference Type Default Value Sharing",
-                messageFormat: "Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.",
-                category: "Usage",
-                defaultSeverity: DiagnosticSeverity.Error,
-                isEnabledByDefault: true);
-            throw new DiagnosticException(
-                Diagnostic.Create(descriptor, location, _defaultValue));
+            return this;
         }
 
-        return this;
+        var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+        var descriptor = new DiagnosticDescriptor(
+            id: "DPG0004",
+            title: "Reference Type Default Value Sharing",
+            messageFormat: "Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.",
+            category: "Usage",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+        throw new DiagnosticException(
+            Diagnostic.Create(descriptor, location, _defaultValue));
+
     }
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
