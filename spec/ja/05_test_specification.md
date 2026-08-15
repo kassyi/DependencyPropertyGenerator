@@ -74,7 +74,7 @@ Source Generator はホスト環境の差異（OS、ファイルパス区切り�
 
 - **Framework (5)**: `Wpf`, `Uno`, `UnoWinUi`, `Maui`, `Avalonia`
 - **AttrType (2)**: `Normal` (通常プロパティ), `Attached` (添付プロパティ)
-- **ClassMode (3)**: `PublicClass`, `InternalGenericClass`, `PublicRecord`
+- **ClassMode (4)**: `PublicClass`, `InternalGenericClass`, `PublicRecord`, `StaticClass`
 - **PropType (4)**: `Int` (値型), `NullableInt` (Null許容値型), `String` (参照型), `GenericList` (コレクション)
 - **ReadOnlyMode (2)**: `False` (読み書き可能), `True` (読み取り専用)
 - **DefaultMode (3)**: `None` (デフォルト値なし), `Literal` (リテラル初期値), `Expression` (式による初期値)
@@ -82,7 +82,7 @@ Source Generator はホスト環境の差異（OS、ファイルパス区切り�
 
 ### 4.2 組み合わせに関する制約
 
-いくつかの組み合わせは言語仕様やフレームワークの制約により除外します。`DirectMode.True` は `Framework.Avalonia` かつ `AttrType.Normal` の場合にのみ適用します。`PublicRecord` はコントロール基底クラスを継承できないため、`AttrType.Attached` のみに適用します。
+いくつかの組み合わせは言語仕様やフレームワークの制約により除外します。`DirectMode.True` は `Framework.Avalonia` かつ `AttrType.Normal` の場合にのみ適用します。`PublicRecord` および `StaticClass` はコントロール基底クラスを継承できないため、`AttrType.Attached` のみに適用します。
 また、参照共有バグ（DPG0004）を防ぐため、`PropType.GenericList` には `DefaultMode.None` のみを適用します。単純な値型である `PropType.Int` などは `DefaultMode.Expression` を除外してテストします。
 
 ---
@@ -202,7 +202,7 @@ WPF などのルーティングイベントインフラストラクチャに基�
 
 ## 8. ランタイム統合テスト仕様 (`Integration`)
 
-生成したコードが実アセンブリに組み込まれ、実行時（Runtime）に正しく動作することを検証します。カテゴリ名は `Integration` です。
+生成したコードが実アセンブリに組み込まれ、Avalonia および WinUI (Uno) 環境などの実行時（Runtime）に正しく動作することを検証します。カテゴリ名は `Integration` です。
 
 - **Integration-001 (GetValue / SetValue 状態遷移)**:
   `window.SetValue(MyControl.IsSpinningProperty, false)` 実行後、`window.GetValue(...)` で `false` が取得できることを確認します。
@@ -210,6 +210,8 @@ WPF などのルーティングイベントインフラストラクチャに基�
   プロパティ値の変更時に、部分メソッド `partial void OnIsSpinningChanged(...)` が呼び出され、内部状態 `window.IsChanged == true` に更新されることを確認します。
 - **Integration-003 (添付プロパティアクセサ)**:
   `TreeViewExtensions.SetSelectedItem(treeView, obj)` で設定したインスタンスが `GetSelectedItem` で正確に取得できることを確認します。
+- **Integration-004 (WinUI Runtime Coerce Validation)**:
+  無限ループや再入を防ぎ、値が正しくクランプされることを検証します。
 
 ---
 

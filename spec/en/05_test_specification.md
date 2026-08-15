@@ -66,14 +66,14 @@ The test suite validates all valid permutations of dependency property attribute
 ### 4.1 Factors and Levels
 * **Framework (5)**: `Wpf`, `Uno`, `UnoWinUi`, `Maui`, `Avalonia`
 * **AttrType (2)**: `Normal` (standard DP), `Attached` (attached DP)
-* **ClassMode (3)**: `PublicClass`, `InternalGenericClass`, `PublicRecord`
+* **ClassMode (4)**: `PublicClass`, `InternalGenericClass`, `PublicRecord`, `StaticClass`
 * **PropType (4)**: `Int` (value), `NullableInt` (nullable value), `String` (reference), `GenericList` (collection)
 * **ReadOnlyMode (2)**: `False` (read-write), `True` (read-only)
 * **DefaultMode (3)**: `None`, `Literal`, `Expression`
 * **DirectMode (2)**: `False`, `True` (Avalonia DirectProperty only)
 
 ### 4.2 Exclusion Constraints
-Certain permutations are excluded due to framework limitations. `DirectMode.True` is only valid when combined with `Framework.Avalonia` and `AttrType.Normal`. Since `PublicRecord` cannot inherit from UI control base classes, it is only valid with `AttrType.Attached`.
+Certain permutations are excluded due to framework limitations. `DirectMode.True` is only valid when combined with `Framework.Avalonia` and `AttrType.Normal`. Since `PublicRecord` and `StaticClass` cannot inherit from UI control base classes, they are only valid with `AttrType.Attached`.
 To prevent instance-sharing bugs (`DPG0004`), `PropType.GenericList` requires `DefaultMode.None`. Plain value types such as `PropType.Int` exclude `DefaultMode.Expression`.
 
 ---
@@ -183,11 +183,12 @@ The generator must ensure that invalid user input triggers clean compile-time di
 
 ## 8. Runtime Integration Specification (`Integration`)
 
-Tests verify that the generated code builds into real assemblies and behaves correctly at runtime within an Avalonia environment. The test category is `Integration`.
+Tests verify that the generated code builds into real assemblies and behaves correctly at runtime within Avalonia and WinUI (Uno) environments. The test category is `Integration`.
 
 * **Integration-001 (GetValue / SetValue Validation)**: Setting a value updates the `GetValue(...)` return value correctly.
 * **Integration-002 (OnChanged Callback Execution)**: Value modifications invoke the partial method `partial void OnIsSpinningChanged(...)` and update the internal state.
 * **Integration-003 (Attached Property Accessors)**: `SetSelectedItem` and `GetSelectedItem` store and retrieve values correctly.
+* **Integration-004 (WinUI Runtime Coerce Validation)**: Verifies that values are correctly clamped and infinite loops or re-entrancy are prevented.
 
 ---
 
