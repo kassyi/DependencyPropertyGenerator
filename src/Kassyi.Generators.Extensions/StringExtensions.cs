@@ -65,8 +65,6 @@ public static class StringExtensions
         return IsCSharpKeyword(input) ? "@" + input : input;
     }
 
-    private static readonly char[] s_separator = ['\n'];
-
     /// <summary>Removes whitespace-only lines to maintain clean generated source layout.</summary>
     public static string RemoveBlankLinesWhereOnlyWhitespaces(this string text)
     {
