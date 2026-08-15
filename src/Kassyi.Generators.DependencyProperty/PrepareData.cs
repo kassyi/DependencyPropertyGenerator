@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Rules.Signatures;
+using System.Runtime.CompilerServices;
 
 
 namespace Kassyi.Generators.DependencyProperty;
@@ -124,14 +125,12 @@ public static class PrepareData
     {
         classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
 
-        var isFileLocal = classSymbol.DeclaringSyntaxReferences
-            .Select(x => x.GetSyntax())
-            .OfType<TypeDeclarationSyntax>()
-            .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.FileKeyword) || m.Text == "file"));
+        // [WHY] Avoid LINQ Any() to eliminate delegate and enumerator allocations during syntax tree exploration on every keystroke.
+        var isFileLocal = CheckIsFileLocal(classSymbol);
 
         if (isFileLocal)
         {
-            var location = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation() ?? Location.None;
+            var location = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
             var descriptor = new DiagnosticDescriptor(
                 id: "DPG0002",
                 title: "Invalid Type Modifier",
@@ -157,17 +156,8 @@ public static class PrepareData
 
         var parentClasses = GetParentClasses(classSymbol);
 
-        var modifiers = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax syntaxNode 
-            ? string.Join(" ", syntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
-            : (classSymbol.IsStatic ? "public static " : "public ");
-        if (string.IsNullOrWhiteSpace(modifiers))
-        {
-            modifiers = string.Empty;
-        }
-        else if (!modifiers.EndsWith(" ", StringComparison.Ordinal))
-        {
-            modifiers += " ";
-        }
+        // [WHY] Avoid LINQ Where() and string.Join to eliminate array allocations and enumerator allocations on every keystroke.
+        var modifiers = GetModifiers(classSymbol);
 
         return new ClassData(
             Namespace: @namespace,
@@ -194,9 +184,21 @@ public static class PrepareData
                 : (currentParent.IsValueType ? "struct" : "class");
             var parentName = currentParent.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
-            var parentModifiers = currentParent.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is TypeDeclarationSyntax parentSyntaxNode 
-                ? string.Join(" ", parentSyntaxNode.Modifiers.Where(m => !m.IsKind(SyntaxKind.PartialKeyword))) + " " 
-                : (currentParent.IsStatic ? "public static " : "public ");
+            var parentModifiers = string.Empty;
+            if (currentParent.DeclaringSyntaxReferences.Length > 0 && currentParent.DeclaringSyntaxReferences[0].GetSyntax() is TypeDeclarationSyntax parentSyntaxNode)
+            {
+                foreach (var m in parentSyntaxNode.Modifiers)
+                {
+                    if (!m.IsKind(SyntaxKind.PartialKeyword))
+                    {
+                        parentModifiers += m.Text + " ";
+                    }
+                }
+            }
+            else
+            {
+                parentModifiers = currentParent.IsStatic ? "public static " : "public ";
+            }
             if (string.IsNullOrWhiteSpace(parentModifiers))
             {
                 parentModifiers = string.Empty;
@@ -277,5 +279,50 @@ public static class PrepareData
         }
 
         return defaultValue;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CheckIsFileLocal(INamedTypeSymbol classSymbol)
+    {
+        foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+        {
+            if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
+            {
+                continue;
+            }
+
+            foreach (var modifier in typeDecl.Modifiers)
+            {
+                if (modifier.IsKind(SyntaxKind.FileKeyword) || modifier.Text == "file")
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string GetModifiers(INamedTypeSymbol classSymbol)
+    {
+        if (classSymbol.DeclaringSyntaxReferences.Length <= 0 ||
+            classSymbol.DeclaringSyntaxReferences[0].GetSyntax() is not TypeDeclarationSyntax syntaxNode)
+        {
+            return classSymbol.IsStatic ? "public static " : "public ";
+        }
+
+        var modifiers = string.Empty;
+        foreach (var m in syntaxNode.Modifiers)
+        {
+            if (!m.IsKind(SyntaxKind.PartialKeyword))
+            {
+                modifiers += m.Text + " ";
+            }
+        }
+        if (string.IsNullOrWhiteSpace(modifiers))
+        {
+            return string.Empty;
+        }
+        return modifiers.EndsWith(" ", StringComparison.Ordinal) ? modifiers : modifiers + " ";
     }
 }

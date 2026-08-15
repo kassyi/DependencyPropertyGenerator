@@ -63,11 +63,32 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)> array,
         CancellationToken _)
     {
-        return array.Where(static x => x.Class.Framework is Framework.Avalonia)
-                    .GroupBy(static x => x.Class, static x => x.DependencyProperty)
-                    .Select(static g => new StaticConstructorData(
-                        Class: g.Key,
-                        Properties: g.ToImmutableArray().AsEquatableArray()));
+        var dictionary = new Dictionary<ClassData, ImmutableArray<DependencyPropertyData>.Builder>();
+        
+        foreach (var item in array)
+        {
+            if (item.Class.Framework != Framework.Avalonia)
+            {
+                continue;
+            }
+
+            if (!dictionary.TryGetValue(item.Class, out var builder))
+            {
+                builder = ImmutableArray.CreateBuilder<DependencyPropertyData>();
+                dictionary.Add(item.Class, builder);
+            }
+            builder.Add(item.DependencyProperty);
+        }
+
+        var result = new List<StaticConstructorData>(dictionary.Count);
+        foreach (var kvp in dictionary)
+        {
+            result.Add(new StaticConstructorData(
+                Class: kvp.Key,
+                Properties: kvp.Value.ToImmutable().AsEquatableArray()));
+        }
+
+        return result;
     }
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(

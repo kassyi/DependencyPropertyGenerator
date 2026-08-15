@@ -1,10 +1,10 @@
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
-using Kassyi.Generators.Extensions.Models;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -20,19 +20,7 @@ internal static class DependencyPropertyMetadataExtractor
         var fromTypeSymbol = attribute.GetGenericTypeArgument(1) ??
             (GetNamedArgument(namedArgs, nameof(AddOwnerAttribute.FromType)).Value as ITypeSymbol);
 
-        return initial with
-        {
-            BrowsableForType = browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            FromType = fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            Description = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Description)).Value?.ToString(),
-            Category = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Category)).Value?.ToString(),
-            TypeConverter = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(),
-            Bindable = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(),
-            Browsable = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(),
-            DesignerSerializationVisibility = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"),
-            ClsCompliant = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(),
-            Localizability = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G")
-        };
+        return new ComponentModelData(BrowsableForType: browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), FromType: fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), Description: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Description)).Value?.ToString(), Category: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Category)).Value?.ToString(), TypeConverter: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(), Bindable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(), Browsable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(), DesignerSerializationVisibility: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"), ClsCompliant: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(), Localizability: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G"));
     }
 
     public static FrameworkMetadataData ExtractFrameworkMetadata(Dictionary<string, TypedConstant> namedArgs)
@@ -103,16 +91,14 @@ internal static class DependencyPropertyMetadataExtractor
         var targetType = propertyType.Replace("global::", string.Empty).Replace("?", string.Empty);
         var targetSenderType = GetTargetSenderType(classSymbol, isAttached, browsableForType, framework);
 
-        var propertySyntax = classSymbol != null ? classSymbol.DeclaringSyntaxReferences
-            .Select(x => x.GetSyntax())
-            .OfType<TypeDeclarationSyntax>()
-            .SelectMany(c => c.Members)
-            .OfType<PropertyDeclarationSyntax>()
-            .FirstOrDefault(p => p.Identifier.Text == propertyName && p.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword) || m.Text == "partial")) : null;
+        isPartialProperty = false;
+        isRequired = false;
+        isInitOnly = false;
 
-        isPartialProperty = propertySyntax != null;
-        isRequired = propertySyntax?.Modifiers.Any(m => m.IsKind(SyntaxKind.RequiredKeyword) || m.Text == "required") ?? false;
-        isInitOnly = propertySyntax?.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.InitAccessorDeclaration) || a.Keyword.Text == "init") ?? false;
+        if (classSymbol != null)
+        {
+            TryGetPropertyModifiers(classSymbol, propertyName, ref isPartialProperty, ref isRequired, ref isInitOnly);
+        }
 
         var matchChanged = classSymbol != null
             ? PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
@@ -144,6 +130,69 @@ internal static class DependencyPropertyMetadataExtractor
                 ChangingSignatures: matchChanging.Signatures
             )
         };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void TryGetPropertyModifiers(
+        INamedTypeSymbol classSymbol,
+        string propertyName,
+        ref bool isPartialProperty,
+        ref bool isRequired,
+        ref bool isInitOnly)
+    {
+        foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+        {
+            if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
+            {
+                continue;
+            }
+
+            foreach (var member in typeDecl.Members)
+            {
+                if (member is not PropertyDeclarationSyntax p || p.Identifier.Text != propertyName)
+                {
+                    continue;
+                }
+
+                var hasPartial = false;
+                foreach (var modifier in p.Modifiers)
+                {
+                    if (modifier.IsKind(SyntaxKind.PartialKeyword) || modifier.Text == "partial")
+                    {
+                        hasPartial = true;
+                    }
+                    else if (modifier.IsKind(SyntaxKind.RequiredKeyword) || modifier.Text == "required")
+                    {
+                        isRequired = true;
+                    }
+                }
+
+                if (!hasPartial)
+                {
+                    continue;
+                }
+
+                isPartialProperty = true;
+
+                if (p.AccessorList == null)
+                {
+                    return;
+                }
+
+                foreach (var accessor in p.AccessorList.Accessors)
+                {
+                    if (!accessor.IsKind(SyntaxKind.InitAccessorDeclaration) && accessor.Keyword.Text != "init")
+                    {
+                        continue;
+                    }
+
+                    isInitOnly = true;
+                    break;
+                }
+
+                return;
+            }
+        }
     }
 
     private static CallbackSignature GetChangedSignatureFlags(

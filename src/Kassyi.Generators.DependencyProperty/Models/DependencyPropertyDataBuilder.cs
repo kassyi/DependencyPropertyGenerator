@@ -1,6 +1,5 @@
-using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
@@ -80,19 +79,13 @@ internal sealed class DependencyPropertyDataBuilder
 
         _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
 
-        if (!_isAttached && classSymbol != null)
+        if (_isAttached || classSymbol == null)
         {
-            var baseType = classSymbol.BaseType;
-            while (baseType != null)
-            {
-                if (baseType.GetMembers(_name).Any(m => m is IPropertySymbol))
-                {
-                    _hidesBaseProperty = true;
-                    break;
-                }
-                baseType = baseType.BaseType;
-            }
+            return this;
         }
+
+        // [WHY] Avoid LINQ Any() to eliminate delegate and enumerator allocations during metadata extraction.
+        _hidesBaseProperty = CheckHidesBaseProperty(classSymbol, _name);
 
         return this;
     }
@@ -193,5 +186,23 @@ internal sealed class DependencyPropertyDataBuilder
             IsRequired: _isRequired,
             IsInitOnly: _isInitOnly
         );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CheckHidesBaseProperty(INamedTypeSymbol classSymbol, string name)
+    {
+        var baseType = classSymbol.BaseType;
+        while (baseType != null)
+        {
+            foreach (var member in baseType.GetMembers(name))
+            {
+                if (member is IPropertySymbol)
+                {
+                    return true;
+                }
+            }
+            baseType = baseType.BaseType;
+        }
+        return false;
     }
 }
