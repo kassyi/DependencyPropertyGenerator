@@ -503,6 +503,44 @@ public class LanguageFeatureTests : SnapshotTestBase
               """, framework);
     }
 
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-023B")]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Maui)]
+    [DataRow(Framework.Avalonia)]
+    public Task AttachedValidateAndCoerce(Framework framework)
+    {
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+              [AttachedDependencyProperty<string, UserControl>("AttachedNotNullStringProperty", DefaultValue = "", Validate = true, Coerce = true)]
+              public static partial class MyControlHelper
+              {
+                  private static partial string CoerceAttachedNotNullStringProperty(UserControl sender, string? value)
+                  {
+                      return value ?? string.Empty;
+                  }
+
+              {{(framework == Framework.Maui ?
+                """
+
+                    private static partial bool IsAttachedNotNullStringPropertyValid(UserControl sender, string? value)
+                    {
+                        return value != null;
+                    }
+                """ :
+                """
+
+                    private static partial bool IsAttachedNotNullStringPropertyValid(string? value)
+                    {
+                        return value != null;
+                    }
+                """)}}
+              }
+              """, framework);
+    }
+
     // 31. Avalonia specific affects flags
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-024")]

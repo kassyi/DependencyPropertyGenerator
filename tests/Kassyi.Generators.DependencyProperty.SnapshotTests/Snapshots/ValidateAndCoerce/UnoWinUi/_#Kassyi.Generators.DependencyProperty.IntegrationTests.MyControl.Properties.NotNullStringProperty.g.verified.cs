@@ -11,22 +11,20 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         public static readonly global::Microsoft.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Microsoft.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
         {
+            var coercedValue = ((MyControl)sender).CoerceNotNullStringProperty((string? )args.NewValue);
+            if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
             {
-                var coercedValue = ((MyControl)sender).CoerceNotNullStringProperty((string? )args.NewValue);
-                if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
-                {
-                    ((MyControl)sender).SetValue(NotNullStringPropertyProperty, coercedValue);
-                    return;
-                }
-
-                var callback = new global::Microsoft.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
-                {
-                    ((MyControl)sender).OnNotNullStringPropertyChanged();
-                    ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
-                    ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
-                });
-                callback(sender, args);
+                ((MyControl)sender).SetValue(NotNullStringPropertyProperty, coercedValue);
+                return;
             }
+
+            var callback = new global::Microsoft.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
+            {
+                ((MyControl)sender).OnNotNullStringPropertyChanged();
+                ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
+                ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
+            });
+            callback(sender, args);
         }));
         /// <summary>
         /// Default value: ""
