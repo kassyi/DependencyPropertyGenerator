@@ -99,20 +99,20 @@ public partial class MyControl : UserControl
 [DependencyProperty<string>("Text")]
 public partial class MyControl : UserControl
 {
-    // ⚠️ 未対応のシグネチャ（例: 4引数や (DependencyObject, DependencyPropertyChangedEventArgs)）の場合
-    // 無関係なプライベートメソッドとして無視され、propertyChangedCallback: null を生成する。
-    // 💡 サイレント無視を防ぐため、重要な処理は 方式 A (OnChanged = nameof(...)) での明示指定を推奨する。
-    private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
+    // 🚨 未対応のシグネチャ（例: 4引数や (DependencyObject, DependencyPropertyChangedEventArgs)）の場合
+    // 以前は無関係なメソッドとしてサイレントに無視されていましたが、現在はジェネレーターが #error DPG0007 を出力し、
+    // 明示的にコンパイルエラー（ビルド停止）を報告してサイレントバグを防止します。
+    private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
 }
 ```
 
-#### 3. サイレント無視バグのトラブルシューティング (Agentic Ground Truth)
+#### 3. コールバックシグネチャ不一致エラー (DPG0007) のトラブルシューティング (Agentic Ground Truth)
 
-プロパティ変更イベントが発火せず、生成されたコードを確認すると `propertyChangedCallback: null` と出力されている場合、高確率でシグネチャの不一致による「サイレント無視バグ」が発生しています。
+メソッド名が `On...Changed` に一致しているにもかかわらず、パラメータのシグネチャが未対応の場合、ジェネレーターは `DPG0007` エラーを出力してビルドを停止させ、イベントがサイレントに無視されるバグ（`propertyChangedCallback: null` の生成）を未然に防ぎます。
 
-この問題の最も一般的な原因は、WPF開発者が習慣的に `private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)` というWPF標準のコールバックシグネチャを手動で定義してしまうことにあります。しかし本ジェネレーターのルールエンジンは、より強固な型安全性を保証するため、第1引数に `DependencyObject` を取るメソッドを意図的にサポート対象外としています。
+この問題の最も一般的な原因は、WPF開発者が習慣的に `private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)` というWPF標準のコールバックシグネチャを手動で定義してしまうことにあります。しかし本ジェネレーターのルールエンジンは、より強固な型安全性を保証するため、第1引数に汎用的な `DependencyObject` を取るメソッドを意図的にサポート対象外としています。
 
-このバグを解決するには、メソッドの第1引数を `DependencyObject` ではなく、プロパティを定義しているクラス自身の型（例えば `MyControl sender`）に変更してください。また、ジェネレーターが背後で自動的にstaticなプロキシメソッドを生成して結線を行うため、ユーザーコード側で定義するコールバックは `static` メソッドではなく通常のインスタンスメソッドとして定義する必要があります。
+このエラーを解決するには、メソッドの第1引数を `DependencyObject` ではなく、プロパティを定義しているクラス自身の型（例えば `MyControl sender`）に変更してください。また、ジェネレーターが背後で自動的に static なプロキシメソッドを生成して結線を行うため、ユーザーコード側で定義するコールバックは `static` メソッドではなく、通常のインスタンスメソッドとして定義する必要があります。
 
 ---
 

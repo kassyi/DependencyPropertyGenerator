@@ -99,20 +99,20 @@ public partial class MyControl : UserControl
 [DependencyProperty<string>("Text")]
 public partial class MyControl : UserControl
 {
-    // ⚠️ Unmatched signature (e.g. WPF standard static (DependencyObject, DependencyPropertyChangedEventArgs)):
-    // Treated as an unrelated method, producing propertyChangedCallback: null.
-    // 💡 To avoid silent misses, prefer explicit declaration (Pattern A).
-    private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
+    // 🚨 Unmatched signature (e.g. WPF standard (DependencyObject, DependencyPropertyChangedEventArgs)):
+    // Previously treated as an unrelated method (silently ignored), but now emits compile error #error DPG0007
+    // to immediately fail the build and prevent silent callback bugs.
+    private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
 }
 ```
 
-#### 3. Troubleshooting Silent Callback Bugs (Agentic Ground Truth)
+#### 3. Troubleshooting Callback Signature Mismatch Errors (DPG0007) (Agentic Ground Truth)
 
-If a property change event fails to fire and the generated code emits `propertyChangedCallback: null`, you are likely encountering a silent callback bug caused by a signature mismatch.
+If a method matches the `On...Changed` naming convention but has an unsupported parameter signature, the generator emits a `DPG0007` error to stop the build, preventing a silent bug where the event is ignored (resulting in `propertyChangedCallback: null`).
 
-The most common cause of this issue is when developers habitually define a callback using the standard WPF signature, `private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)`. However, to enforce strict type safety, the generator's rule engine intentionally does not support methods where the first argument is a generic `DependencyObject`.
+The most common cause of this issue is when developers habitually define a callback using the standard WPF signature, `private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)`. However, to enforce strict type safety, the generator's rule engine intentionally does not support methods where the first argument is a generic `DependencyObject`.
 
-To resolve this bug, you must change the first argument of your method from `DependencyObject` to the specific type of the class defining the property (for example, `MyControl sender`). Furthermore, since the generator automatically emits a static proxy method behind the scenes to wire up the event, your custom callback must be defined as a standard instance method rather than a static one.
+To resolve this error, you must change the first argument of your method from `DependencyObject` to the specific type of the class defining the property (for example, `MyControl sender`). Furthermore, since the generator automatically emits a static proxy method behind the scenes to wire up the event, your custom callback must be defined as a standard instance method rather than a static one.
 
 ---
 
