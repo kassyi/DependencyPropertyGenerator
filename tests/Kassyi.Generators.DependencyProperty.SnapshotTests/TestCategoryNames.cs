@@ -1,4 +1,4 @@
-namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
+namespace Kassyi.Generators.DependencyProperty.Tests;
 
 /// <summary>
 /// Defines standardized test category names using nameof expressions.

@@ -21,6 +21,11 @@
 
     <ItemGroup Label="GlobalUsings">
         <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+        <Using Include="Kassyi.Generators.DependencyProperty.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Kassyi.Generators.DependencyProperty.SnapshotTests\TestCategoryNames.cs" Link="TestCategoryNames.cs" />
     </ItemGroup>
 
     <ItemGroup>

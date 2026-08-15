@@ -47,7 +47,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1A2B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\auto-merge.yml = .github\workflows\auto-merge.yml
 		.github\workflows\main.yml = .github\workflows\main.yml
 		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 	EndProjectSection

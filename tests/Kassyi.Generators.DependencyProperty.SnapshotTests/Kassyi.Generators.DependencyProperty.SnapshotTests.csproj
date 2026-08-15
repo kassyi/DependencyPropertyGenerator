@@ -27,6 +27,7 @@
     <ItemGroup Label="GlobalUsings">
         <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
         <Using Include="Kassyi.Generators.Extensions" />
+        <Using Include="Kassyi.Generators.DependencyProperty.Tests" />
     </ItemGroup>
 
     <ItemGroup>
