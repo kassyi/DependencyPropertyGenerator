@@ -13,37 +13,48 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
             return baseCallback;
         }
 
+        return GenerateCoercionWrappingCallback(@class, property, baseCallback);
+    }
+
+    private static string GenerateCoercionWrappingCallback(
+        ClassData @class,
+        DependencyPropertyData property,
+        string baseCallback)
+    {
         var senderType = property.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
         var propertyType = SourceGenerationHelper.GenerateType(property);
         var propCallbackType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "PropertyChangedCallback");
-        
-        using var writer = new SourceWriter();
-        writer.AppendLine("static (sender, args) =>");
-        writer.AppendLine("{");
-        using (writer.Scope())
-        {
-            var senderExpr = property.IsAttached ? $"({senderType})sender" : $"(({senderType})sender)";
-            var argsValue = $"({SourceGenerationHelper.GenerateType(property, canBeNull: true)})args.NewValue";
-            var coerceCall = property.IsAttached
-                ? $"Coerce{property.Name}({senderExpr}, {argsValue})"
-                : $"{senderExpr}.Coerce{property.Name}({argsValue})";
 
+        var senderCast = $"({senderType})sender";
+        var senderInstance = $"(({senderType})sender)";
+        var rawNewValue = $"({SourceGenerationHelper.GenerateType(property, canBeNull: true)})args.NewValue";
+        var typedNewValue = $"({propertyType})args.NewValue";
+
+        var coerceCall = property.IsAttached
+            ? $"Coerce{property.Name}({senderCast}, {rawNewValue})"
+            : $"{senderInstance}.Coerce{property.Name}({rawNewValue})";
+
+        var equalityCheck = $"if (!global::System.Collections.Generic.EqualityComparer<{propertyType}>.Default.Equals({typedNewValue}, coercedValue))";
+
+        using var writer = new SourceWriter();
+        using (writer.Scope("static (sender, args) =>"))
+        {
             writer.AppendLine($"var coercedValue = {coerceCall};");
-            writer.AppendLine($"if (!global::System.Collections.Generic.EqualityComparer<{propertyType}>.Default.Equals(({propertyType})args.NewValue, coercedValue))");
-            using (writer.Scope())
+            using (writer.Scope(equalityCheck))
             {
-                writer.AppendLine($"{senderExpr}.SetValue({property.Name}Property, coercedValue);");
+                writer.AppendLine($"{senderInstance}.SetValue({property.Name}Property, coercedValue);");
                 writer.AppendLine("return;");
             }
+
             if (baseCallback != "null")
             {
                 writer.AppendLine($"var callback = new {propCallbackType}({baseCallback});");
                 writer.AppendLine("callback(sender, args);");
             }
         }
-        writer.Append("}");
+
         return writer.ToString();
     }
 
