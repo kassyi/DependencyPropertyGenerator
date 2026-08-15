@@ -122,49 +122,57 @@ public class CombinatorialMatrixTests : SnapshotTestBase
 
     private static void GenerateClass(SourceWriter writer, TestCase testCase)
     {
-        var (id, attr, cls, prop, ro, def, dir) = testCase;
+        var attrName = testCase.Attr == AttrType.Normal ? "DependencyProperty" : "AttachedDependencyProperty";
+        var typeName = GetTypeName(testCase.PropType);
+        var attributeArgs = BuildAttributeArguments(testCase);
+        var classDeclaration = GetClassDeclaration(testCase.ClassMode, testCase.Id);
 
-        var attrName = attr == AttrType.Normal ? "DependencyProperty" : "AttachedDependencyProperty";
+        var attributeDeclaration = $"[{attrName}(\"MyProperty\", typeof({typeName}){attributeArgs})]";
 
-        var typeStr = prop switch
-        {
-            PropType.Int => "int",
-            PropType.NullableInt => "int?",
-            PropType.String => "string",
-            PropType.GenericList => "List<int>",
-            _ => "object"
-        };
-
-        var props = new List<string>();
-        if (ro == ReadOnlyMode.True) props.Add("IsReadOnly = true");
-        if (dir == DirectMode.True) props.Add("IsDirect = true");
-
-        if (def == DefaultMode.Literal)
-        {
-            if (prop is PropType.Int or PropType.NullableInt) props.Add("DefaultValue = 123");
-            else if (prop == PropType.String) props.Add("DefaultValue = \"abc\"");
-        }
-        else if (def == DefaultMode.Expression)
-        {
-            if (prop == PropType.String) props.Add("DefaultValueExpression = \"\\\"def\\\"\"");
-            else if (prop == PropType.GenericList) props.Add("DefaultValueExpression = \"[]\"");
-        }
-
-        var propsStr = props.Count > 0 ? ", " + string.Join(", ", props) : string.Empty;
-
-        var classDecl = cls switch
-        {
-            ClassMode.PublicClass => $"public partial class TestClass{id} : UserControl",
-            ClassMode.InternalGenericClass => $"internal partial class TestClass{id}<T> : UserControl",
-            ClassMode.PublicRecord => $"public partial record TestClass{id}",
-            _ => string.Empty
-        };
-
-        var attrDecl = $"[{attrName}(\"MyProperty\", typeof({typeStr}){propsStr})]";
-
-        writer.AppendLine($"    {attrDecl}");
-        using (writer.Scope($"    {classDecl}"))
+        writer.AppendLine($"    {attributeDeclaration}");
+        using (writer.Scope($"    {classDeclaration}"))
         {
         }
     }
+
+    private static string GetTypeName(PropType type) => type switch
+    {
+        PropType.Int => "int",
+        PropType.NullableInt => "int?",
+        PropType.String => "string",
+        PropType.GenericList => "List<int>",
+        _ => "object"
+    };
+
+    private static string BuildAttributeArguments(TestCase test)
+    {
+        var args = new List<string>();
+        if (test.ReadOnly == ReadOnlyMode.True) args.Add("IsReadOnly = true");
+        if (test.Direct == DirectMode.True) args.Add("IsDirect = true");
+
+        var defaultValueArg = GetDefaultValueArgument(test.DefaultValue, test.PropType);
+        if (defaultValueArg is not null)
+        {
+            args.Add(defaultValueArg);
+        }
+
+        return args.Count > 0 ? ", " + string.Join(", ", args) : string.Empty;
+    }
+
+    private static string? GetDefaultValueArgument(DefaultMode mode, PropType type) => (mode, type) switch
+    {
+        (DefaultMode.Literal, PropType.Int or PropType.NullableInt) => "DefaultValue = 123",
+        (DefaultMode.Literal, PropType.String)                     => "DefaultValue = \"abc\"",
+        (DefaultMode.Expression, PropType.String)                  => "DefaultValueExpression = \"\\\"def\\\"\"", // Generates: DefaultValueExpression = "\"def\""
+        (DefaultMode.Expression, PropType.GenericList)             => "DefaultValueExpression = \"[]\"",
+        _ => null
+    };
+
+    private static string GetClassDeclaration(ClassMode mode, int id) => mode switch
+    {
+        ClassMode.PublicClass          => $"public partial class TestClass{id} : UserControl",
+        ClassMode.InternalGenericClass => $"internal partial class TestClass{id}<T> : UserControl",
+        ClassMode.PublicRecord         => $"public partial record TestClass{id}",
+        _                              => string.Empty
+    };
 }
