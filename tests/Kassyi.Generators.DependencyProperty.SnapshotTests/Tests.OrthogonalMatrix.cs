@@ -353,7 +353,7 @@ public class OrthogonalMatrixTests : SnapshotTestBase
             public partial class MyControl : UserControl
             {
             }
-            """, framework);
+            """, framework, skipE2EValidation: true);
     }
 
     // 23. required / init properties

@@ -120,8 +120,11 @@ internal sealed class DependencyPropertyDataBuilder
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, typeSymbol);
         _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, typeSymbol);
 
+        var trimmedDefaultValue = _defaultValue?.Trim();
+        var isCollectionExpression = trimmedDefaultValue != null && trimmedDefaultValue.StartsWith("[", StringComparison.Ordinal) && trimmedDefaultValue.EndsWith("]", StringComparison.Ordinal);
+
         if (_defaultValue != null && 
-            (_defaultValue.Contains("new ") || _defaultValue.Contains("new(")) && 
+            (_defaultValue.Contains("new ") || _defaultValue.Contains("new(") || isCollectionExpression) && 
             !_isValueType && 
             _type != "string" && _type != "global::System.String")
         {
