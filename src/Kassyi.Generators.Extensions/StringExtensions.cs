@@ -72,12 +72,45 @@ public static class StringExtensions
     {
         text = text ?? throw new ArgumentNullException(nameof(text));
 
-        return string.Join(
-            separator: "\n",
-            values: text
-                .NormalizeLineEndings()
-                .Split(s_separator, StringSplitOptions.None)
-                .Where(static line => line.Length == 0 || !line.All(char.IsWhiteSpace)));
+        text = text.NormalizeLineEndings();
+        var builder = new StringBuilder(text.Length);
+        
+        var start = 0;
+        while (start < text.Length)
+        {
+            var index = text.IndexOf('\n', start);
+            var end = index >= 0 ? index : text.Length;
+            
+            var isWhiteSpaceLine = true;
+            for (var i = start; i < end; i++)
+            {
+                if (char.IsWhiteSpace(text[i]))
+                {
+                    continue;
+                }
+
+                isWhiteSpaceLine = false;
+                break;
+            }
+
+            if (!isWhiteSpaceLine || start == end)
+            {
+                builder.Append(text, start, end - start);
+                if (index >= 0)
+                {
+                    builder.Append('\n');
+                }
+            }
+
+            if (index < 0)
+            {
+                break;
+            }
+
+            start = index + 1;
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>Normalizes line endings to the specified newline sequence (defaulting to '\n').</summary>
