@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -46,15 +48,17 @@ public static class E2EAssertionPipeline
         var attributeNames = new[] { "DependencyProperty", "AttachedDependencyProperty" };
         var targetAttributes = inputRoot.DescendantNodes()
             .OfType<AttributeSyntax>()
-            .Where(a => attributeNames.Any(n => a.Name.ToString().Contains(n)))
+            .Where(a => attributeNames.Contains(GetSimpleName(a.Name)))
             .ToList();
 
         // 2. Count generated fields in outputs
         // Exclude DependencyPropertyKey since it generates alongside DependencyProperty for ReadOnly properties
         var dpFieldsCount = outputRoots.SelectMany(r => r.DescendantNodes().OfType<FieldDeclarationSyntax>())
             .Count(f => {
-                var typeStr = f.Declaration.Type.ToString();
-                return (typeStr.Contains("Property") || typeStr.Contains("StyledProperty") || typeStr.Contains("DirectProperty") || typeStr.Contains("AttachedProperty")) && !typeStr.Contains("PropertyKey");
+                var typeName = GetSimpleName(f.Declaration.Type);
+                return (typeName is "DependencyProperty" or "StyledProperty" or "DirectProperty" or "AttachedProperty" ||
+                        typeName.EndsWith("Property", StringComparison.Ordinal)) &&
+                       !typeName.EndsWith("PropertyKey", StringComparison.Ordinal);
             });
 
         int dpAttributesCount = targetAttributes.Count;
@@ -83,7 +87,7 @@ public static class E2EAssertionPipeline
             {
                 // Name argument
                 var nameArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "name") ?? args[0];
-                if (!(nameArg.Expression is InvocationExpressionSyntax || nameArg.Expression is LiteralExpressionSyntax))
+                if (nameArg.Expression is not InvocationExpressionSyntax && nameArg.Expression is not LiteralExpressionSyntax)
                 {
                     throw new Exception("Level 2 Assertion Failed: Name argument is not a nameof expression or literal.");
                 }
@@ -102,21 +106,18 @@ public static class E2EAssertionPipeline
                 var propTypeArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "propertyType" || a.NameColon?.Name.Identifier.Text == "returnType");
                 if (propTypeArg == null && args.Count > 1) propTypeArg = args[1];
 
-                if (propTypeArg != null && !(propTypeArg.Expression is TypeOfExpressionSyntax))
+                if (propTypeArg != null && !IsTypeOfExpression(propTypeArg.Expression))
                 {
-                    // Allow typeof or similar constructs
-                    if (!propTypeArg.Expression.ToString().StartsWith("typeof("))
-                        throw new Exception($"Level 2 Assertion Failed: PropertyType argument is not typeof. Found: {propTypeArg.Expression}");
+                    throw new Exception($"Level 2 Assertion Failed: PropertyType argument is not typeof. Found: {propTypeArg.Expression}");
                 }
 
                 // OwnerType argument
                 var ownerTypeArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "ownerType" || a.NameColon?.Name.Identifier.Text == "declaringType");
                 if (ownerTypeArg == null && args.Count > 2) ownerTypeArg = args[2];
 
-                if (ownerTypeArg != null && !(ownerTypeArg.Expression is TypeOfExpressionSyntax))
+                if (ownerTypeArg != null && !IsTypeOfExpression(ownerTypeArg.Expression))
                 {
-                    if (!ownerTypeArg.Expression.ToString().StartsWith("typeof("))
-                        throw new Exception($"Level 2 Assertion Failed: OwnerType argument is not typeof. Found: {ownerTypeArg.Expression}");
+                    throw new Exception($"Level 2 Assertion Failed: OwnerType argument is not typeof. Found: {ownerTypeArg.Expression}");
                 }
             }
         }
@@ -135,20 +136,97 @@ public static class E2EAssertionPipeline
 
                 if (get != null && get.Body == null && get.ExpressionBody != null)
                 {
-                    var expr = get.ExpressionBody.Expression.ToString();
-                    // Avalonia Direct properties return backing fields (e.g., _isSpinning)
-                    if (!expr.Contains("GetValue") && !expr.StartsWith("_"))
+                    if (!IsValidGetterExpression(get.ExpressionBody.Expression))
                         throw new Exception("Level 3 Assertion Failed: Getter does not call GetValue or return a backing field.");
                 }
 
                 if (set != null && set.Body == null && set.ExpressionBody != null)
                 {
-                    var expr = set.ExpressionBody.Expression.ToString();
-                    if (!expr.Contains("SetValue") && !expr.Contains("SetAndRaise"))
+                    if (!IsValidSetterExpression(set.ExpressionBody.Expression))
                         throw new Exception("Level 3 Assertion Failed: Setter does not call SetValue or SetAndRaise.");
                 }
             }
         }
+    }
+
+    private static bool IsTypeOfExpression(ExpressionSyntax expression)
+    {
+        var unwrapped = UnwrapExpression(expression);
+        return unwrapped is TypeOfExpressionSyntax;
+    }
+
+    private static bool IsValidGetterExpression(ExpressionSyntax expression)
+    {
+        var expr = UnwrapExpression(expression);
+
+        // Check for GetValue invocation
+        if (expr is InvocationExpressionSyntax invocation)
+        {
+            var methodName = GetMethodName(invocation);
+            if (methodName == "GetValue")
+            {
+                return true;
+            }
+        }
+
+        // Backing field access: e.g. _isSpinning or this._isSpinning
+        if (expr is IdentifierNameSyntax id && id.Identifier.ValueText.StartsWith("_", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (expr is MemberAccessExpressionSyntax memberAccess && memberAccess.Name.Identifier.ValueText.StartsWith("_", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsValidSetterExpression(ExpressionSyntax expression)
+    {
+        var expr = UnwrapExpression(expression);
+
+        if (expr is InvocationExpressionSyntax invocation)
+        {
+            var methodName = GetMethodName(invocation);
+            if (methodName is "SetValue" or "SetAndRaise")
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static ExpressionSyntax UnwrapExpression(ExpressionSyntax expression)
+    {
+        while (true)
+        {
+            if (expression is ParenthesizedExpressionSyntax parenthesized)
+            {
+                expression = parenthesized.Expression;
+            }
+            else if (expression is CastExpressionSyntax cast)
+            {
+                expression = cast.Expression;
+            }
+            else
+            {
+                return expression;
+            }
+        }
+    }
+
+    private static string? GetMethodName(InvocationExpressionSyntax invocation)
+    {
+        return invocation.Expression switch
+        {
+            IdentifierNameSyntax id => id.Identifier.ValueText,
+            MemberAccessExpressionSyntax mae => mae.Name.Identifier.ValueText,
+            GenericNameSyntax gn => gn.Identifier.ValueText,
+            _ => null
+        };
     }
 
     private static void VerifyDiagnostics(ImmutableArray<Diagnostic> diagnostics, string callerName)
@@ -165,5 +243,17 @@ public static class E2EAssertionPipeline
         {
             throw new Exception("Level 4 Assertion Failed: Found CS0108 (Member hides inherited member) warning.");
         }
+    }
+
+    private static string GetSimpleName(TypeSyntax type)
+    {
+        return type switch
+        {
+            IdentifierNameSyntax id => id.Identifier.ValueText,
+            QualifiedNameSyntax qn => qn.Right.Identifier.ValueText,
+            GenericNameSyntax gn => gn.Identifier.ValueText,
+            AliasQualifiedNameSyntax alias => alias.Name.Identifier.ValueText,
+            _ => type.ToString()
+        };
     }
 }
