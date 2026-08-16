@@ -159,4 +159,34 @@ public class ErrorTests : SnapshotTestBase
             }
             """, framework, skipE2EValidation: true);
     }
+
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Error}-004B")]
+    [DataRow(Framework.Wpf)]
+    public Task NestedReferenceTypeDefaultValue_EmitsError(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+
+            public static class ExternalConfig
+            {
+                public static readonly List<int> SharedList = new();
+            }
+
+            public record struct MyStruct(List<int> Items, int Id);
+
+            [DependencyProperty("MyProperty1", typeof(MyStruct), DefaultValueExpression = "new(new List<int>(), 2)")]
+            [DependencyProperty("MyProperty2", typeof(MyStruct), DefaultValueExpression = "new MyStruct { Items = [] }")]
+            [DependencyProperty<List<int>>("MyProperty3", DefaultValueExpression = "[]")]
+            [DependencyProperty<List<int>>("MyProperty4", DefaultValueExpression = "s_items")]
+            [DependencyProperty<MyStruct>("MyProperty5", DefaultValueExpression = "new(s_items, 2)")]
+            [DependencyProperty<List<int>>("MyProperty6", DefaultValueExpression = "new List<int>(")]
+            [DependencyProperty<List<int>>("MyProperty7", DefaultValueExpression = "invalid expression %%%")]
+            [DependencyProperty<List<int>>("MyProperty8", DefaultValueExpression = "MyControl.s_items")]
+            [DependencyProperty<List<int>>("MyProperty9", DefaultValueExpression = "ExternalConfig.SharedList")]
+            public partial class MyControl : UserControl
+            {
+                public static readonly List<int> s_items = new();
+            }
+            """, framework, skipE2EValidation: true);
+    }
 }

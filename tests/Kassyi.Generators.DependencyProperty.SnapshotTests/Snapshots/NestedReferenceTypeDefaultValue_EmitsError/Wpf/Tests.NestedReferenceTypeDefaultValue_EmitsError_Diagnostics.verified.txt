@@ -1,0 +1,63 @@
+[
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (14,2)-(14,105),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (15,2)-(15,109),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (16,2)-(16,77),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (17,2)-(17,82),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (18,2)-(18,89),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (19,2)-(19,89),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (20,2)-(20,97),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (21,2)-(21,92),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: DPG0004,
+    Severity: Error,
+    Span: (22,2)-(22,100),
+    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Span: (3,1)-(3,44),
+    MessageFormat: Unnecessary using directive.
+  }
+]

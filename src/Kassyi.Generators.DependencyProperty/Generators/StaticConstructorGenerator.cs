@@ -97,14 +97,15 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             string version) tuple,
         bool isAttached)
     {
-        var (((_, attributes, _, classSymbol), framework), version) = tuple;
+        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
         if (attributes.FirstOrDefault() is not { } attribute)
         {
             return null;
         }
 
         var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version, classSymbol, isAttached: isAttached);
+        var dependencyPropertyData = attribute.GetDependencyPropertyData(
+            framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAttached: isAttached, semanticModel: semanticModel);
 
         return (classData, dependencyPropertyData);
     }
