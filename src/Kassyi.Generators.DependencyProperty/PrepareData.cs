@@ -259,6 +259,18 @@ public static class PrepareData
             ? nullableType.TypeArguments[0]
             : typeSymbol;
 
+        if (expression == null)
+        {
+            try
+            {
+                expression = SyntaxFactory.ParseExpression(defaultValue!);
+            }
+            catch
+            {
+                // Fallback to raw string if Roslyn syntax parsing fails.
+            }
+        }
+
         if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
         {
             var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
