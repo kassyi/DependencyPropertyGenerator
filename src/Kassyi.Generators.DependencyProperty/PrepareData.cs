@@ -248,7 +248,7 @@ public static class PrepareData
         return attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
     }
 
-    internal static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
+    internal static string? ExpandDefaultValueExpression(string? defaultValue, ExpressionSyntax? expression, ITypeSymbol? typeSymbol)
     {
         if (typeSymbol == null || string.IsNullOrWhiteSpace(defaultValue))
         {
@@ -259,21 +259,13 @@ public static class PrepareData
             ? nullableType.TypeArguments[0]
             : typeSymbol;
 
-        try
+        if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
         {
-            var expression = SyntaxFactory.ParseExpression(defaultValue!);
-            if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
-            {
-                return SyntaxFactory.ObjectCreationExpression(
-                    SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
-                    SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
-                    implicitNew.ArgumentList,
-                    implicitNew.Initializer).ToFullString();
-            }
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // [WHY] Fallback to raw string if Roslyn syntax parsing fails.
+            return SyntaxFactory.ObjectCreationExpression(
+                SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
+                SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
+                implicitNew.ArgumentList,
+                implicitNew.Initializer).ToFullString();
         }
 
         return defaultValue;

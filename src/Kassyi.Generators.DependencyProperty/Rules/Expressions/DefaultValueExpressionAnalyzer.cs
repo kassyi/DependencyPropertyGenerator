@@ -67,33 +67,6 @@ internal static class DefaultValueExpressionAnalyzer
         };
     }
 
-    /// <summary>
-    /// Evaluates whether the given default value expression string is a reference type instantiation or shared reference member.
-    /// </summary>
-    public static bool IsReferenceTypeExpression(
-        string? defaultValue,
-        ITypeSymbol? propertyTypeSymbol,
-        INamedTypeSymbol? containingClassSymbol,
-        SemanticModel? semanticModel,
-        int? position)
-    {
-        if (string.IsNullOrWhiteSpace(defaultValue))
-        {
-            return false;
-        }
-
-        ExpressionSyntax expression;
-        try
-        {
-            expression = SyntaxFactory.ParseExpression(defaultValue!);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return IsConservativeReferenceTypeFallback(defaultValue, propertyTypeSymbol);
-        }
-
-        return IsReferenceTypeExpression(expression, propertyTypeSymbol, containingClassSymbol, semanticModel, position);
-    }
 
     private static bool IsConservativeReferenceTypeFallback(string? rawExpression, ITypeSymbol? propertyTypeSymbol)
     {
