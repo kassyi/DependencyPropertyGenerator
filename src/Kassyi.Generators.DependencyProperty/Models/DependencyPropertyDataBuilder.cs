@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
+using Kassyi.Generators.DependencyProperty.Rules.Expressions;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -32,6 +33,9 @@ internal sealed class DependencyPropertyDataBuilder
     private bool _isRequired;
     private bool _isInitOnly;
 
+    private INamedTypeSymbol? _classSymbol;
+    private ITypeSymbol? _typeSymbol;
+
     private TypedConstant GetNamedArgument(string name) => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
     public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached, INamedTypeSymbol? classSymbol = null)
@@ -47,6 +51,7 @@ internal sealed class DependencyPropertyDataBuilder
         _version = version;
         _isAddOwner = isAddOwner;
         _isAttached = isAttached;
+        _classSymbol = classSymbol;
 
         _name = attribute.ConstructorArguments is { Length: > 0 } ctorArgs
             ? ctorArgs[0].Value?.ToString()?.TrimStart('@') ?? string.Empty
@@ -54,6 +59,7 @@ internal sealed class DependencyPropertyDataBuilder
 
         var typeSymbol = attribute.GetGenericTypeArgument(0) ??
             (attribute.ConstructorArguments is { Length: > 1 } ctorArgs2 ? ctorArgs2[1].Value as ITypeSymbol : null);
+        _typeSymbol = typeSymbol;
         
         if (typeSymbol is { IsRefLikeType: true })
         {
@@ -99,29 +105,42 @@ internal sealed class DependencyPropertyDataBuilder
         return this;
     }
 
-    public DependencyPropertyDataBuilder WithDefaultValues(AttributeData attribute, AttributeSyntax? attributeSyntax)
+    public DependencyPropertyDataBuilder WithDefaultValues(
+        AttributeData attribute,
+        AttributeSyntax? attributeSyntax,
+        SemanticModel? semanticModel = null)
     {
-        var typeSymbol = attribute.GetGenericTypeArgument(0) ??
-            (attribute.ConstructorArguments is { Length: > 1 } ctorArgs ? ctorArgs[1].Value as ITypeSymbol : null);
-        
-        var defaultValue = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
-                           GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
-                           
-        var defaultValueDoc = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString() ??
-                              attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
+        ExtractDefaultValueStrings(attributeSyntax);
+        ValidateReferenceTypeDefaultValue(attribute, attributeSyntax, semanticModel);
 
-        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, typeSymbol);
-        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, typeSymbol);
+        return this;
+    }
 
-        var trimmedDefaultValue = _defaultValue?.Trim();
-        var isCollectionExpression = trimmedDefaultValue != null && trimmedDefaultValue.StartsWith("[", StringComparison.Ordinal) && trimmedDefaultValue.EndsWith("]", StringComparison.Ordinal);
+    private void ExtractDefaultValueStrings(AttributeSyntax? attributeSyntax)
+    {
+        var defaultValueExpression = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString();
+        var defaultValue = defaultValueExpression ?? GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
+        var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        if (_defaultValue == null ||
-            (!_defaultValue.Contains("new ") && !_defaultValue.Contains("new(") && !isCollectionExpression) ||
-            _isValueType ||
-            _type == "string" || _type == "global::System.String")
+        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, _typeSymbol);
+        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, _typeSymbol);
+    }
+
+    private void ValidateReferenceTypeDefaultValue(
+        AttributeData attribute,
+        AttributeSyntax? attributeSyntax,
+        SemanticModel? semanticModel)
+    {
+        int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
+        var directExpressionSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
+
+        var isReferenceType = directExpressionSyntax != null
+            ? DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position)
+            : DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(_defaultValue, _typeSymbol, _classSymbol, semanticModel, position);
+
+        if (!isReferenceType)
         {
-            return this;
+            return;
         }
 
         var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
@@ -132,9 +151,8 @@ internal sealed class DependencyPropertyDataBuilder
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
-        throw new DiagnosticException(
-            Diagnostic.Create(descriptor, location, _defaultValue));
 
+        throw new DiagnosticException(Diagnostic.Create(descriptor, location, _defaultValue));
     }
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
