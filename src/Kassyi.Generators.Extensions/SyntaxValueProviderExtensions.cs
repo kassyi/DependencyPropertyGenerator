@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -42,15 +43,39 @@ public static class SyntaxValueProviderExtensions
                 ClassSymbol: (INamedTypeSymbol)context.TargetSymbol));
     }
 
-    /// <summary>Strips the <c>nameof(...)</c> wrapper from an expression string if present.</summary>
-    public static string RemoveNameof(this string value)
+    /// <summary>Extracts the string name from an attribute argument syntax without allocating strings.</summary>
+    private static string? ExtractArgumentName(AttributeArgumentSyntax arg)
     {
-        value = value ?? throw new ArgumentNullException(nameof(value));
+        var expr = arg.Expression;
 
-        return value.Contains("nameof(")
-            ? value[(value.LastIndexOf('.') + 1)..]
-                .TrimEnd(')', ' ')
-            : value;
+        // [DependencyProperty("MyProperty")]
+        if (expr is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
+        {
+            return literal.Token.ValueText;
+        }
+
+        // [DependencyProperty(nameof(MyProperty))]
+        if (expr is InvocationExpressionSyntax invocation &&
+            invocation.Expression is IdentifierNameSyntax idName &&
+            idName.Identifier.ValueText == "nameof" &&
+            invocation.ArgumentList.Arguments.Count == 1)
+        {
+            var innerExpr = invocation.ArgumentList.Arguments[0].Expression;
+
+            // nameof(MyProperty)
+            if (innerExpr is IdentifierNameSyntax innerId)
+            {
+                return innerId.Identifier.ValueText;
+            }
+            
+            // nameof(MyClass.MyProperty)
+            if (innerExpr is MemberAccessExpressionSyntax memberAccess)
+            {
+                return memberAccess.Name.Identifier.ValueText;
+            }
+        }
+
+        return null;
     }
     
     /// <summary>Finds the attribute syntax corresponding to the specified attribute data on a class declaration.</summary>
@@ -82,7 +107,7 @@ public static class SyntaxValueProviderExtensions
                 }
 
                 var firstArg = argList.Arguments[0];
-                var argName = firstArg.ToString().Trim('"').RemoveNameof();
+                var argName = ExtractArgumentName(firstArg);
                 if (argName == name)
                 {
                     return attr;
