@@ -53,7 +53,7 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
             Framework framework) left,
             string version) tuple)
     {
-        var (((_, attributes, _, classSymbol), framework), version) = tuple;
+        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
         if (framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
         {
             return null;
@@ -61,7 +61,8 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
 
         var classData = classSymbol.GetClassData(framework, version);
         var overrideMetadata = attributes
-            .Select(attribute => attribute.GetDependencyPropertyData(framework, version, classSymbol))
+            .Select(attribute => attribute.GetDependencyPropertyData(
+                framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), semanticModel: semanticModel))
             .ToImmutableArray()
             .AsEquatableArray();
 

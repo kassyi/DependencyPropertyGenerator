@@ -27,7 +27,7 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
         ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
-        var (((_, attributes, classSyntax, classSymbol), framework), version) = tuple;
+        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
         if (attributes.FirstOrDefault() is not { } attribute)
         {
             return null;
@@ -36,7 +36,7 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
         var classData = classSymbol.GetClassData(framework, version);
         var dependencyPropertyData =
             attribute.GetDependencyPropertyData(framework, version, classSymbol,
-                classSyntax.TryFindAttributeSyntax(attribute));
+                classSyntax.TryFindAttributeSyntax(attribute), semanticModel: semanticModel);
 
         return (classData, dependencyPropertyData);
     }

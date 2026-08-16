@@ -27,7 +27,7 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
         ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
     {
-        var (((_, attributes, _, classSymbol), framework), version) = tuple;
+        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
         if (framework is not (Framework.Avalonia or Framework.Wpf) ||
             attributes.FirstOrDefault() is not { } attribute)
         {
@@ -36,7 +36,8 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
 
         var classData = classSymbol.GetClassData(framework, version);
         var dependencyPropertyData =
-            attribute.GetDependencyPropertyData(framework, version, classSymbol, isAddOwner: true);
+            attribute.GetDependencyPropertyData(
+                framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAddOwner: true, semanticModel: semanticModel);
 
         return (classData, dependencyPropertyData);
     }
