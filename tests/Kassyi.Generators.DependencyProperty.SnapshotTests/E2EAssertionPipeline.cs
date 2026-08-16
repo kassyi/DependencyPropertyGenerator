@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Kassyi.Generators.DependencyProperty.Generators;
 
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
@@ -45,10 +46,12 @@ public static class E2EAssertionPipeline
     internal static void VerifyCountMatching(SyntaxNode inputRoot, SyntaxNode[] outputRoots, Framework framework)
     {
         // 1. Count target attributes in input
-        var attributeNames = new[] { "DependencyProperty", "AttachedDependencyProperty" };
         var targetAttributes = inputRoot.DescendantNodes()
             .OfType<AttributeSyntax>()
-            .Where(a => attributeNames.Contains(GetSimpleName(a.Name)))
+            .Where(a => GetSimpleName(a.Name) is KnownAttributeShortNames.DependencyProperty 
+                                              or KnownAttributes.DependencyPropertyAttribute
+                                              or KnownAttributeShortNames.AttachedDependencyProperty 
+                                              or KnownAttributes.AttachedDependencyPropertyAttribute)
             .ToList();
 
         // 2. Count generated fields in outputs
@@ -56,7 +59,11 @@ public static class E2EAssertionPipeline
         var dpFieldsCount = outputRoots.SelectMany(r => r.DescendantNodes().OfType<FieldDeclarationSyntax>())
             .Count(f => {
                 var typeName = GetSimpleName(f.Declaration.Type);
-                return (typeName is "DependencyProperty" or "StyledProperty" or "DirectProperty" or "AttachedProperty" ||
+                return (typeName is KnownPropertyTypes.DependencyProperty 
+                                 or KnownPropertyTypes.StyledProperty 
+                                 or KnownPropertyTypes.DirectProperty 
+                                 or KnownPropertyTypes.AttachedProperty 
+                                 or KnownPropertyTypes.BindableProperty ||
                         typeName.EndsWith("Property", StringComparison.Ordinal)) &&
                        !typeName.EndsWith("PropertyKey", StringComparison.Ordinal);
             });
@@ -75,9 +82,15 @@ public static class E2EAssertionPipeline
         // Find InvocationExpression for Register / RegisterAttached / Create / CreateAttached
         var invocations = outputRoots.SelectMany(r => r.DescendantNodes().OfType<InvocationExpressionSyntax>())
             .Where(i => i.Expression is MemberAccessExpressionSyntax mae && 
-                        (mae.Name.Identifier.Text == "Register" || mae.Name.Identifier.Text == "RegisterAttached" || 
-                         mae.Name.Identifier.Text == "RegisterReadOnly" || mae.Name.Identifier.Text == "RegisterAttachedReadOnly" ||
-                         mae.Name.Identifier.Text == "Create" || mae.Name.Identifier.Text == "CreateAttached" || mae.Name.Identifier.Text == "CreateReadOnly" || mae.Name.Identifier.Text == "CreateAttachedReadOnly"))
+                        mae.Name.Identifier.ValueText is KnownMethodNames.Register 
+                                                     or KnownMethodNames.RegisterAttached 
+                                                     or KnownMethodNames.RegisterReadOnly 
+                                                     or KnownMethodNames.RegisterAttachedReadOnly 
+                                                     or KnownMethodNames.RegisterDirect 
+                                                     or KnownMethodNames.Create 
+                                                     or KnownMethodNames.CreateAttached 
+                                                     or KnownMethodNames.CreateReadOnly 
+                                                     or KnownMethodNames.CreateAttachedReadOnly)
             .ToList();
 
         foreach (var inv in invocations)
@@ -163,7 +176,7 @@ public static class E2EAssertionPipeline
         if (expr is InvocationExpressionSyntax invocation)
         {
             var methodName = GetMethodName(invocation);
-            if (methodName == "GetValue")
+            if (methodName == KnownMethodNames.GetValue)
             {
                 return true;
             }
@@ -190,7 +203,7 @@ public static class E2EAssertionPipeline
         if (expr is InvocationExpressionSyntax invocation)
         {
             var methodName = GetMethodName(invocation);
-            if (methodName is "SetValue" or "SetAndRaise")
+            if (methodName is KnownMethodNames.SetValue or KnownMethodNames.SetAndRaise)
             {
                 return true;
             }
