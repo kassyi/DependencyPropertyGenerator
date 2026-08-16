@@ -19,6 +19,7 @@ internal sealed class DependencyPropertyDataBuilder
     private bool _isSpecialType;
     private string? _defaultValue;
     private string? _defaultValueDocumentation;
+    private ExpressionSyntax? _parsedDefaultValueExpressionSyntax;
     private bool _isReadOnly;
     private bool _isDirect;
     private bool _isAttached;
@@ -116,8 +117,22 @@ internal sealed class DependencyPropertyDataBuilder
         var defaultValue = defaultValueExpression ?? GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
         var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, _typeSymbol);
-        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, _typeSymbol);
+        if (defaultValueExpression != null && _parsedDefaultValueExpressionSyntax == null)
+        {
+            try
+            {
+                _parsedDefaultValueExpressionSyntax = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseExpression(defaultValueExpression);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+            }
+        }
+
+        var directExpressionSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
+        var expressionSyntax = _parsedDefaultValueExpressionSyntax ?? directExpressionSyntax;
+
+        _defaultValue = PrepareData.ExpandDefaultValueExpression(expressionSyntax, defaultValue, _typeSymbol);
+        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(expressionSyntax, defaultValueDoc, _typeSymbol);
     }
 
     private void ValidateReferenceTypeDefaultValue(
@@ -128,9 +143,11 @@ internal sealed class DependencyPropertyDataBuilder
         int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
         var directExpressionSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        var isReferenceType = directExpressionSyntax != null
-            ? DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position)
-            : DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(_defaultValue, _typeSymbol, _classSymbol, semanticModel, position);
+        var expressionToAnalyze = _parsedDefaultValueExpressionSyntax ?? directExpressionSyntax;
+
+        var isReferenceType = expressionToAnalyze != null
+            ? DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(expressionToAnalyze, _typeSymbol, _classSymbol, semanticModel, position)
+            : DefaultValueExpressionAnalyzer.IsConservativeReferenceTypeFallback(_defaultValue, _typeSymbol);
 
         if (!isReferenceType)
         {

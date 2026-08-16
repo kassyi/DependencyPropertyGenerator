@@ -248,7 +248,7 @@ public static class PrepareData
         return attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
     }
 
-    internal static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
+    internal static string? ExpandDefaultValueExpression(ExpressionSyntax? expression, string? defaultValue, ITypeSymbol? typeSymbol)
     {
         if (typeSymbol == null || string.IsNullOrWhiteSpace(defaultValue))
         {
@@ -261,7 +261,7 @@ public static class PrepareData
 
         try
         {
-            var expression = SyntaxFactory.ParseExpression(defaultValue!);
+            expression ??= SyntaxFactory.ParseExpression(defaultValue!);
             if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
             {
                 return SyntaxFactory.ObjectCreationExpression(
