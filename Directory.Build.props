@@ -1,9 +1,16 @@
-﻿<Project>
+<Project>
 
     <PropertyGroup Label="Common">
         <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Signing">
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile Condition="Exists('$(MSBuildThisFileDirectory)key.snk')">$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile Condition="!Exists('$(MSBuildThisFileDirectory)key.snk')">$(MSBuildThisFileDirectory)key.pub</AssemblyOriginatorKeyFile>
+        <PublicSign Condition="!Exists('$(MSBuildThisFileDirectory)key.snk')">true</PublicSign>
     </PropertyGroup>
 
 </Project>
