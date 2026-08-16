@@ -22,14 +22,15 @@ public static class PrepareData
         INamedTypeSymbol? classSymbol = null,
         AttributeSyntax? attributeSyntax = null,
         bool isAddOwner = false,
-        bool isAttached = false)
+        bool isAttached = false,
+        SemanticModel? semanticModel = null)
     {
         attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
 
         return new DependencyPropertyDataBuilder()
             .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached, classSymbol)
             .WithMetadata(attribute)
-            .WithDefaultValues(attribute, attributeSyntax)
+            .WithDefaultValues(attribute, attributeSyntax, semanticModel)
             .WithXmlDocumentation(attribute)
             .WithCallbacks(attribute, classSymbol)
             .Build();
@@ -229,7 +230,7 @@ public static class PrepareData
         };
     }
 
-    internal static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name)
+    internal static ExpressionSyntax? GetNamedArgumentExpressionSyntax(this AttributeSyntax attributeSyntax, string name)
     {
         attributeSyntax = attributeSyntax ?? throw new ArgumentNullException(nameof(attributeSyntax));
 
@@ -238,17 +239,20 @@ public static class PrepareData
             return null;
         }
 
-        // [WHY] Avoid LINQ FirstOrDefault(predicate) to eliminate delegate allocations during syntax tree analysis.
         foreach (var argument in attributeSyntax.ArgumentList.Arguments)
         {
-            var nameEquals = argument.NameEquals?.ToFullString().Trim('=', ' ', '\t', '\r', '\n');
-            if (nameEquals == name)
+            if (argument.NameEquals?.Name.Identifier.ValueText == name)
             {
-                return argument.Expression.ToFullString();
+                return argument.Expression;
             }
         }
 
         return null;
+    }
+
+    internal static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name)
+    {
+        return attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
     }
 
     internal static string? ExpandDefaultValueExpression(string? defaultValue, ITypeSymbol? typeSymbol)
