@@ -100,7 +100,6 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
     {
         if (!property.IsDirect)
         {
-            writer.Append(" ");
             return;
         }
 

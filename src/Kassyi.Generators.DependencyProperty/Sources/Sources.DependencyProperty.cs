@@ -22,19 +22,29 @@ internal static partial class SourceGenerationHelper
     public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         using var _ = writer.ClassScope(@class);
+        var strategy = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
+
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
         var propertyModifier = GeneratePropertyModifier(property);
-        var propertyType = GeneratePropertyType(@class, property);
+        var propertyType = strategy.GeneratePropertyType(@class, property);
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
 
         writer.Append($"{propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
-        GenerateDependencyPropertyCreateCall(ref writer, @class, property);
+        if (property.IsAddOwner)
+        {
+            GenerateAddOwnerCreateCall(ref writer, @class, property);
+        }
+        else
+        {
+            writer.AppendLine();
+            writer.AppendLine($"{strategy.GenerateManagerType(@class)}.{strategy.GenerateRegisterMethod(@class, property)}({strategy.GenerateRegisterMethodArguments(@class, property)});");
+        }
         writer.AppendLine();
 
-        GenerateAdditionalFieldForDirectProperties(ref writer, property);
-        GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
+        strategy.GenerateAdditionalFieldForDirectProperties(ref writer, property);
+        strategy.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
         GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
         GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
@@ -101,42 +111,11 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static void GenerateDependencyPropertyCreateCall(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
-    {
-        if (property.IsAddOwner)
-        {
-            GenerateAddOwnerCreateCall(ref writer, @class, property);
-        }
-        else
-        {
-            writer.AppendLine();
-            writer.AppendLine($"{GenerateManagerType(@class)}.{GenerateRegisterMethod(@class, property)}({GenerateRegisterMethodArguments(@class, property)});");
-        }
-    }
 
-
-    private static string GenerateManagerType(ClassData @class)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(@class.Framework);
-        return generator.GenerateManagerType(@class);
-    }
-    
-    private static string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        return generator.GenerateRegisterMethodArguments(@class, property);
-    }
-
-    private static string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        return generator.GenerateRegisterMethod(@class, property);
-    }
     private static void GenerateCoercePartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
         if (!property.ValidationAndCallbacks.Coerce)
         {
-            writer.Append(" ");
             return;
         }
 
@@ -150,18 +129,6 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static void GenerateAdditionalFieldForDirectProperties(ref SourceWriter writer, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        generator.GenerateAdditionalFieldForDirectProperties(ref writer, property);
-    }
 
-
-
-    private static void GenerateAdditionalPropertyForReadOnlyProperties(ref SourceWriter writer, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        generator.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
-    }
 }
 
