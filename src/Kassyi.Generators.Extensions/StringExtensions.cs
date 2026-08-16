@@ -17,10 +17,15 @@ public static class StringExtensions
         {
             null => throw new ArgumentNullException(nameof(input)),
             "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
+            _ when char.IsUpper(input[0]) => input,
 #if NET6_0_OR_GREATER
-            _ => string.Concat(input[0].ToString().ToUpper(CultureInfo.InvariantCulture), input.AsSpan(1)),
+            _ => string.Create(input.Length, input, static (span, str) =>
+            {
+                span[0] = char.ToUpperInvariant(str[0]);
+                str.AsSpan(1).CopyTo(span[1..]);
+            }),
 #else
-            _ => input[0].ToString().ToUpper(CultureInfo.InvariantCulture) + input[1..],
+            _ => char.ToUpperInvariant(input[0]) + input[1..],
 #endif
         };
     }
@@ -35,7 +40,20 @@ public static class StringExtensions
             throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
         }
 
-        var camelCased = char.ToLower(input[0], CultureInfo.InvariantCulture) + input[1..];
+        if (char.IsLower(input[0]))
+        {
+            return input.EscapeKeyword();
+        }
+
+#if NET6_0_OR_GREATER
+        var camelCased = string.Create(input.Length, input, static (span, str) =>
+        {
+            span[0] = char.ToLowerInvariant(str[0]);
+            str.AsSpan(1).CopyTo(span[1..]);
+        });
+#else
+        var camelCased = char.ToLowerInvariant(input[0]) + input[1..];
+#endif
         return camelCased.EscapeKeyword();
     }
 
@@ -161,6 +179,11 @@ public static class StringExtensions
     public static string WithGlobalPrefix(this string fullTypeName)
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
+
+        if (fullTypeName.StartsWith("global::", StringComparison.Ordinal))
+        {
+            return fullTypeName;
+        }
 
         return $"global::{fullTypeName}";
     }
