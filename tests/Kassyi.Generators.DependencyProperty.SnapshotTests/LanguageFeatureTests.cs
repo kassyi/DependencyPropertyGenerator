@@ -611,4 +611,23 @@ public class LanguageFeatureTests : SnapshotTestBase
             }
             """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
     }
+
+    // 35. String default value with expressions (nameof, string.Concat) should not emit DPG0004
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-032")]
+    [DataRow(Framework.Wpf)]
+    public Task String_DefaultValue_Expressions(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+
+            [DependencyProperty<string>("Name1", DefaultValue = "nameof(MyControl)")]
+            [DependencyProperty<string>("Name2", DefaultValueExpression = "string.Concat(\"A\", \"B\")")]
+            [DependencyProperty<string>("Name3", DefaultValue = "string.Empty")]
+            public partial class MyControl : UserControl
+            {
+            }
+            """, framework);
+    }
 }
+
+

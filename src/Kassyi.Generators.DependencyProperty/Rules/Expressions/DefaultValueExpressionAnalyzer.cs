@@ -174,7 +174,7 @@ internal static class DefaultValueExpressionAnalyzer
     {
         if (isTopLevel && propertyTypeSymbol != null)
         {
-            return propertyTypeSymbol.IsValueType;
+            return propertyTypeSymbol.IsValueType || IsSpecialSafeType(propertyTypeSymbol);
         }
 
         // [WHY] Speculative binding requires a valid syntax position context; skip if position is unavailable
