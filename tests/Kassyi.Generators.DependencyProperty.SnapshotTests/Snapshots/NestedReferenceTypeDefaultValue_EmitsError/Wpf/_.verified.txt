@@ -1,0 +1,175 @@
+{
+  Diagnostics: [
+    {
+      Location: /*
+
+[DependencyProperty("MyProperty1", typeof(MyStruct), DefaultValueExpression = "new(new List<int>(), 2)")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty("MyProperty2", typeof(MyStruct), DefaultValueExpression = "new MyStruct { Items = [] }")]
+*/
+ : (13,1)-(13,104),
+      Message: Default value 'new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyStruct(new List<int>(), 2)' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty("MyProperty1", typeof(MyStruct), DefaultValueExpression = "new(new List<int>(), 2)")]
+[DependencyProperty("MyProperty2", typeof(MyStruct), DefaultValueExpression = "new MyStruct { Items = [] }")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty3", DefaultValueExpression = "[]")]
+*/
+ : (14,1)-(14,108),
+      Message: Default value 'new MyStruct { Items = [] }' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty("MyProperty2", typeof(MyStruct), DefaultValueExpression = "new MyStruct { Items = [] }")]
+[DependencyProperty<List<int>>("MyProperty3", DefaultValueExpression = "[]")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty4", DefaultValueExpression = "s_items")]
+*/
+ : (15,1)-(15,76),
+      Message: Default value '[]' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<List<int>>("MyProperty3", DefaultValueExpression = "[]")]
+[DependencyProperty<List<int>>("MyProperty4", DefaultValueExpression = "s_items")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<MyStruct>("MyProperty5", DefaultValueExpression = "new(s_items, 2)")]
+*/
+ : (16,1)-(16,81),
+      Message: Default value 's_items' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<List<int>>("MyProperty4", DefaultValueExpression = "s_items")]
+[DependencyProperty<MyStruct>("MyProperty5", DefaultValueExpression = "new(s_items, 2)")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty6", DefaultValueExpression = "new List<int>(")]
+*/
+ : (17,1)-(17,88),
+      Message: Default value 'new global::Kassyi.Generators.DependencyProperty.IntegrationTests.MyStruct(s_items, 2)' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<MyStruct>("MyProperty5", DefaultValueExpression = "new(s_items, 2)")]
+[DependencyProperty<List<int>>("MyProperty6", DefaultValueExpression = "new List<int>(")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty7", DefaultValueExpression = "invalid expression %%%")]
+*/
+ : (18,1)-(18,88),
+      Message: Default value 'new List<int>(' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<List<int>>("MyProperty6", DefaultValueExpression = "new List<int>(")]
+[DependencyProperty<List<int>>("MyProperty7", DefaultValueExpression = "invalid expression %%%")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty8", DefaultValueExpression = "MyControl.s_items")]
+*/
+ : (19,1)-(19,96),
+      Message: Default value 'invalid expression %%%' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<List<int>>("MyProperty7", DefaultValueExpression = "invalid expression %%%")]
+[DependencyProperty<List<int>>("MyProperty8", DefaultValueExpression = "MyControl.s_items")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<List<int>>("MyProperty9", DefaultValueExpression = "ExternalConfig.SharedList")]
+*/
+ : (20,1)-(20,91),
+      Message: Default value 'MyControl.s_items' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<List<int>>("MyProperty8", DefaultValueExpression = "MyControl.s_items")]
+[DependencyProperty<List<int>>("MyProperty9", DefaultValueExpression = "ExternalConfig.SharedList")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class MyControl : UserControl
+*/
+ : (21,1)-(21,99),
+      Message: Default value 'ExternalConfig.SharedList' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
