@@ -248,7 +248,7 @@ public static class PrepareData
         return attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
     }
 
-    internal static string? ExpandDefaultValueExpression(ExpressionSyntax? expression, string? defaultValue, ITypeSymbol? typeSymbol)
+    internal static string? ExpandDefaultValueExpression(string? defaultValue, ExpressionSyntax? expression, ITypeSymbol? typeSymbol)
     {
         if (typeSymbol == null || string.IsNullOrWhiteSpace(defaultValue))
         {
@@ -259,21 +259,29 @@ public static class PrepareData
             ? nullableType.TypeArguments[0]
             : typeSymbol;
 
-        try
+        if (expression == null)
         {
-            expression ??= SyntaxFactory.ParseExpression(defaultValue!);
-            if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
+            try
             {
-                return SyntaxFactory.ObjectCreationExpression(
-                    SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
-                    SyntaxFactory.ParseTypeName(targetSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).TrimEnd('?')),
-                    implicitNew.ArgumentList,
-                    implicitNew.Initializer).ToFullString();
+                expression = SyntaxFactory.ParseExpression(defaultValue!);
+            }
+            catch
+            {
+                // Fallback to raw string if Roslyn syntax parsing fails.
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+
+        if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
         {
-            // [WHY] Fallback to raw string if Roslyn syntax parsing fails.
+            var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            return SyntaxFactory.ObjectCreationExpression(
+                SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
+                SyntaxFactory.ParseTypeName(typeString),
+                implicitNew.ArgumentList,
+                implicitNew.Initializer)
+                .WithLeadingTrivia(implicitNew.GetLeadingTrivia())
+                .WithTrailingTrivia(implicitNew.GetTrailingTrivia())
+                .ToFullString();
         }
 
         return defaultValue;

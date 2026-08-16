@@ -181,7 +181,6 @@ internal static partial class SourceGenerationHelper
     {
         if (!property.ValidationAndCallbacks.Validate)
         {
-            writer.Append(" ");
             return;
         }
 
@@ -202,7 +201,6 @@ internal static partial class SourceGenerationHelper
     {
         if (!property.ValidationAndCallbacks.CreateDefaultValueCallback)
         {
-            writer.Append(" ");
             return;
         }
 
@@ -233,7 +231,6 @@ internal static partial class SourceGenerationHelper
     {
         if (property.ValidationAndCallbacks.BindEvents.IsEmpty)
         {
-            writer.Append(" ");
             return;
         }
 
@@ -273,11 +270,7 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static string GeneratePropertyType(ClassData @class, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        return generator.GeneratePropertyType(@class, property);
-    }
+
     
     internal static SourceWriterClassScope ClassScope(ref this SourceWriter writer, ClassData @class)
     {

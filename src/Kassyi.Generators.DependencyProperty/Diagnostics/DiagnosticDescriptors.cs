@@ -80,4 +80,15 @@ internal static class DiagnosticDescriptors
         category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
+
+    /// <summary>
+    /// DPG0008: DefaultValueExpression contains invalid syntax.
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidDefaultValueExpression = new(
+        id: "DPG0008",
+        title: "Invalid Default Value Expression",
+        messageFormat: "The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.",
+        category: UsageCategory,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

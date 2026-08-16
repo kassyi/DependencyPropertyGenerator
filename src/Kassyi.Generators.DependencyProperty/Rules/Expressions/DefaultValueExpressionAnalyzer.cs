@@ -68,7 +68,7 @@ internal static class DefaultValueExpressionAnalyzer
     }
 
 
-    internal static bool IsConservativeReferenceTypeFallback(string? rawExpression, ITypeSymbol? propertyTypeSymbol)
+    private static bool IsConservativeReferenceTypeFallback(string? rawExpression, ITypeSymbol? propertyTypeSymbol)
     {
         // [WHY] Value types and strings are safe regardless of expression syntax errors
         if (propertyTypeSymbol != null && (propertyTypeSymbol.IsValueType || IsSpecialSafeType(propertyTypeSymbol)))

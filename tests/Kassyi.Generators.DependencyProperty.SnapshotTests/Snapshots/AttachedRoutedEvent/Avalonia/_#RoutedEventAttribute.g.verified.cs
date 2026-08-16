@@ -25,7 +25,7 @@ internal sealed class RoutedEventAttribute : global::System.Attribute
     public string XmlDocumentation { get; set; } = string.Empty;
     /// <summary>The event add/remove xml documentation. Default - "&lt;summary&gt; &lt;/summary&gt;".</summary>
     public string EventXmlDocumentation { get; set; } = string.Empty;
-    /// <summary>WinRT events are disabled by default due to a series of issues with them in Windows 10: <see href="https://github.com/HavenDV/H.NotifyIcon/issues/36"/> <see href="https://github.com/HavenDV/H.NotifyIcon/issues/31"/></summary>
+    /// <summary>WinRT events are disabled by default due to known event registration and lifetime issues in Windows 10. Default - <see langword="false"/>.</summary>
     public bool WinRtEvents { get; set; }
 
     public RoutedEventAttribute(string name, RoutedEventStrategy strategy)
@@ -57,7 +57,7 @@ internal sealed class RoutedEventAttribute<T> : global::System.Attribute
     public string XmlDocumentation { get; set; } = string.Empty;
     /// <summary>The event add/remove xml documentation. Default - "&lt;summary&gt; &lt;/summary&gt;".</summary>
     public string EventXmlDocumentation { get; set; } = string.Empty;
-    /// <summary>WinRT events are disabled by default due to a series of issues with them in Windows 10: <see href="https://github.com/HavenDV/H.NotifyIcon/issues/36"/> <see href="https://github.com/HavenDV/H.NotifyIcon/issues/31"/></summary>
+    /// <summary>WinRT events are disabled by default due to known event registration and lifetime issues in Windows 10. Default - <see langword="false"/>.</summary>
     public bool WinRtEvents { get; set; }
 
     public RoutedEventAttribute(string name, RoutedEventStrategy strategy)

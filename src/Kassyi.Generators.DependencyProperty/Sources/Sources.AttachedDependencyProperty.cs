@@ -25,17 +25,19 @@ internal static partial class SourceGenerationHelper
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
         GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
+        var strategy = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
+
         var propertyModifier = GeneratePropertyModifier(property);
-        var propertyType = GeneratePropertyType(@class, property);
+        var propertyType = strategy.GeneratePropertyType(@class, property);
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
-        var managerType = GenerateManagerType(@class);
-        var registerMethod = GenerateRegisterMethod(@class, property);
-        var registerAttachedMethodArguments = GenerateRegisterAttachedMethodArguments(@class, property);
+        var managerType = strategy.GenerateManagerType(@class);
+        var registerMethod = strategy.GenerateRegisterMethod(@class, property);
+        var registerAttachedMethodArguments = strategy.GenerateRegisterMethodArguments(@class, property);
 
         writer.Append($"{propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
         writer.AppendLine($"{managerType}.{registerMethod}({registerAttachedMethodArguments});");
 
-        GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
+        strategy.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.SetterXmlDocumentation, property, isProperty: true);
         GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
@@ -86,11 +88,7 @@ internal static partial class SourceGenerationHelper
         GenerateBindEventMethod(ref writer, property);
     }
     
-    private static string GenerateRegisterAttachedMethodArguments(ClassData @class, DependencyPropertyData property)
-    {
-        var generator = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-        return generator.GenerateRegisterMethodArguments(@class, property);
-    }
+
 
     internal static string GenerateModifiers(ClassData @class)
     {
