@@ -26,17 +26,17 @@ We rebuilt the pipeline from the ground up for maximum throughput:
 <details>
 <summary><b>View Benchmark Results (AMD Ryzen 9 7900X / .NET 9)</b></summary>
 
-| Metric | Upstream Baseline | This Fork | Improvement |
-| :--- | :--- | :--- | :--- |
-| **Initial Generation (WPF)** | 5.349 ms (2.87 MB) | **3.922 ms (2.28 MB)** | **-26.7% time / -20.6% memory** |
-| **Incremental Gen (WPF)** | 7.176 ms (3.59 MB) | **5.783 ms (3.02 MB)** | **-19.4% time / -15.9% memory** |
-| **Initial Generation (WinUI)** | 5.720 ms (2.81 MB) | **4.218 ms (2.27 MB)** | **-26.3% time / -19.2% memory** |
-| **Incremental Gen (WinUI)** | 7.412 ms (3.55 MB) | **6.420 ms (3.02 MB)** | **-13.4% time / -14.9% memory** |
-| **Initial Generation (Avalonia)**| 5.282 ms (2.86 MB) | **4.574 ms (2.33 MB)** | **-13.4% time / -18.5% memory** |
-| **Incremental Gen (Avalonia)**| 7.103 ms (3.62 MB) | **5.884 ms (3.09 MB)** | **-17.2% time / -14.6% memory** |
-| **Initial Generation (MAUI)** | 5.533 ms (2.90 MB) | **4.528 ms (2.30 MB)** | **-18.2% time / -20.7% memory** |
-| **Incremental Gen (MAUI)** | 7.095 ms (3.67 MB) | **6.112 ms (3.09 MB)** | **-13.9% time / -15.8% memory** |
-| **GC Gen2 (Initial)** | 7.8–15.6 / 1k ops | **0.0000 / 1k ops** | **100% Eliminated** |
+| Metric                            | Upstream Baseline  | This Fork              | Improvement                     |
+| :-------------------------------- | :----------------- | :--------------------- | :------------------------------ |
+| **Initial Generation (WPF)**      | 5.349 ms (2.87 MB) | **3.922 ms (2.28 MB)** | **-26.7% time / -20.6% memory** |
+| **Incremental Gen (WPF)**         | 7.176 ms (3.59 MB) | **5.783 ms (3.02 MB)** | **-19.4% time / -15.9% memory** |
+| **Initial Generation (WinUI)**    | 5.720 ms (2.81 MB) | **4.218 ms (2.27 MB)** | **-26.3% time / -19.2% memory** |
+| **Incremental Gen (WinUI)**       | 7.412 ms (3.55 MB) | **6.420 ms (3.02 MB)** | **-13.4% time / -14.9% memory** |
+| **Initial Generation (Avalonia)** | 5.282 ms (2.86 MB) | **4.574 ms (2.33 MB)** | **-13.4% time / -18.5% memory** |
+| **Incremental Gen (Avalonia)**    | 7.103 ms (3.62 MB) | **5.884 ms (3.09 MB)** | **-17.2% time / -14.6% memory** |
+| **Initial Generation (MAUI)**     | 5.533 ms (2.90 MB) | **4.528 ms (2.30 MB)** | **-18.2% time / -20.7% memory** |
+| **Incremental Gen (MAUI)**        | 7.095 ms (3.67 MB) | **6.112 ms (3.09 MB)** | **-13.9% time / -15.8% memory** |
+| **GC Gen2 (Initial)**             | 7.8–15.6 / 1k ops  | **0.0000 / 1k ops**    | **100% Eliminated**             |
 
 </details>
 
@@ -118,12 +118,15 @@ namespace MyApp.Controls
     }
 }
 ```
-*(Note: Code shortened for brevity)*
+
+_(Note: Code shortened for brevity)_
+
 </details>
 
 ## Advanced Features
 
 ### Target-Typed `new(...)` in Default Values
+
 You can cleanly define default values using C# 9.0+ target-typed `new()` expressions. The generator safely expands it to the full type:
 
 ```csharp
@@ -137,6 +140,7 @@ public readonly record struct Data(int Value);
 ```
 
 ### Event Binding
+
 The generator can automatically manage properties tied to UI events:
 
 ```csharp
@@ -149,13 +153,17 @@ public static partial class GridExtensions
     }
 }
 ```
+
 When the property value changes, it automatically unsubscribes the old value and subscribes the new value to `sender.MouseWheel += OnBindEventPropertyChanged_MouseWheel;`.
 
 ### XML Documentation
+
 The easiest way to generate XML documentation is via the `Description` property:
+
 ```csharp
 [DependencyProperty<bool>("IsSpinning", Description = "Indicates whether the element is spinning.")]
 ```
+
 This adds the `[Description]` attribute and embeds the text directly into the generated XML docs. For raw XML, use the `XmlDocumentation` or `PropertyXmlDocumentation` properties.
 
 ### Platform Setup
@@ -178,12 +186,12 @@ For UWP, WinUI, and Uno, the generator creates a `RegisterPropertyChangedCallbac
 ## Prerequisites
 
 - To use generic attributes (`[DependencyProperty<T>]`), ensure `LangVersion` is set to `11.0` or higher (or `preview`) in your `.csproj`:
-  ```xml
-  <LangVersion>preview</LangVersion>
-  ```
+    ```xml
+    <LangVersion>preview</LangVersion>
+    ```
 - Non-generic attributes are also available for older language versions.
 
 ## Support & Feedback
- 
+
 - **Bug Reports & Issues**: [GitHub Issues](https://github.com/kassyi/DependencyPropertyGenerator/issues)
 - **Discussions & Ideas**: [GitHub Discussions](https://github.com/kassyi/DependencyPropertyGenerator/discussions)

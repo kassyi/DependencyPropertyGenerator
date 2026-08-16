@@ -10,13 +10,13 @@ This section was generated from the GitHub repository inventory and local checko
 
 ### Repository Metadata
 
-- Remote: https://github.com/HavenDV/DependencyPropertyGenerator
+- Remote: https://github.com/kassyi/DependencyPropertyGenerator
 - Visibility: public
 - Type: original; active
 - Primary language: C#
 - Topics: csharp, dependency-property, dotnet, dp, generator, net5, net6, source-generator, incrementral-generator, avalonia, avaloniaui, routed-event, uno, uno-platform, uwp, winui, wpf, csharp-sourcegenerator, maui
 - Last pushed: 2026-06-01T06:25:40Z
-- Local path: /Users/havendv/GitHub/HavenDV/DependencyPropertyGenerator
+- Local path: /Users/kassyi/GitHub/kassyi/DependencyPropertyGenerator
 - Local note: standard checkout
 - Classification: Public developer tooling/library
 
