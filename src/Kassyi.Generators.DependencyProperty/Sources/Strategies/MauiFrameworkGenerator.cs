@@ -77,7 +77,6 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
     {
         if (!property.IsReadOnly)
         {
-            writer.Append(" ");
             return;
         }
 

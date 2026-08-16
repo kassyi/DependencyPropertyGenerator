@@ -176,8 +176,9 @@ internal abstract class FrameworkGenerator :
         DependencyPropertyData property) =>
         GenerateEmptySpace(ref writer);
 
-    protected static void GenerateEmptySpace(ref SourceWriter writer) =>
-        writer.Append(" ");
+    protected static void GenerateEmptySpace(ref SourceWriter writer)
+    {
+    }
     
     public virtual string GenerateCreateDefaultValueCallbackValueCallback(DependencyPropertyData property)
     {
@@ -207,10 +208,8 @@ internal abstract class FrameworkGenerator :
         {
             writer.AppendLine("/// <summary>");
             writer.AppendLine($"/// A helper method to raise the {@event.Name} event. <br/>");
-            writer.AppendLine("/// WinRT events are disabled by default due to a series of issues with them in Windows 10:");
-            writer.AppendLine("/// https://github.com/HavenDV/H.NotifyIcon/issues/36");
-            writer.AppendLine("/// https://github.com/HavenDV/H.NotifyIcon/issues/31");
-            writer.AppendLine("/// Use the WinRTEvents = true option to enable them.");
+            writer.AppendLine("/// WinRT events are disabled by default due to known event registration and lifetime issues in Windows 10.<br/>");
+            writer.AppendLine("/// Use the WinRtEvents = true option to enable them.");
             writer.AppendLine("/// </summary>");
             using (writer.Scope($"protected {routedEventArgsType}? On{@event.Name}()"))
             {

@@ -1,0 +1,42 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[DependencyProperty<MyProfile>("BrokenProfile1", DefaultValueExpression = "new(1.5, 48.0")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[DependencyProperty<MyProfile>("BrokenProfile2", DefaultValueExpression = "new(???")]
+*/
+ : (7,1)-(7,90),
+      Message: The DefaultValueExpression 'new(1.5, 48.0' contains invalid syntax and could not be parsed.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0008,
+        Title: Invalid Default Value Expression,
+        MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+[DependencyProperty<MyProfile>("BrokenProfile1", DefaultValueExpression = "new(1.5, 48.0")]
+[DependencyProperty<MyProfile>("BrokenProfile2", DefaultValueExpression = "new(???")]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial class MyControl : UserControl
+*/
+ : (8,1)-(8,84),
+      Message: The DefaultValueExpression 'new(???' contains invalid syntax and could not be parsed.,
+      Severity: Error,
+      Descriptor: {
+        Id: DPG0008,
+        Title: Invalid Default Value Expression,
+        MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.,
+        Category: Usage,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

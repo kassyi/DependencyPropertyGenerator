@@ -17,7 +17,7 @@ internal sealed class SingleParameterRule : IMethodSignatureRule
                 match.Signatures |= CallbackSignature.NewValue;
             }
             
-            if (SignatureRuleHelper.IsEventArgsType(p.Type.Name))
+            if (SignatureRuleHelper.IsEventArgsType(p.Type))
             {
                 match.Signatures |= CallbackSignature.EventArgs;
             }

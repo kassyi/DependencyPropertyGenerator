@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
+using Kassyi.Generators.DependencyProperty.Rules;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -20,7 +21,17 @@ internal static class DependencyPropertyMetadataExtractor
         var fromTypeSymbol = attribute.GetGenericTypeArgument(1) ??
             (GetNamedArgument(namedArgs, nameof(AddOwnerAttribute.FromType)).Value as ITypeSymbol);
 
-        return new ComponentModelData(BrowsableForType: browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), FromType: fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), Description: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Description)).Value?.ToString(), Category: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Category)).Value?.ToString(), TypeConverter: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.TypeConverter)).Value?.ToString(), Bindable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(), Browsable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(), DesignerSerializationVisibility: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"), ClsCompliant: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(), Localizability: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G"));
+        return new ComponentModelData(
+            BrowsableForType: browsableForTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            FromType: fromTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            Description: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Description)).Value as string,
+            Category: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Category)).Value as string,
+            TypeConverter: GetStringOrTypeString(GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.TypeConverter))),
+            Bindable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Bindable)).ToNullableBoolean(),
+            Browsable: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Browsable)).ToNullableBoolean(),
+            DesignerSerializationVisibility: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.DesignerSerializationVisibility)).ToEnum<DesignerSerializationVisibility>()?.ToString("G"),
+            ClsCompliant: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.ClsCompliant)).ToNullableBoolean(),
+            Localizability: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G"));
     }
 
     public static FrameworkMetadataData ExtractFrameworkMetadata(Dictionary<string, TypedConstant> namedArgs)
@@ -44,13 +55,13 @@ internal static class DependencyPropertyMetadataExtractor
 
     public static XmlDocumentationData ExtractXmlDocumentation(Dictionary<string, TypedConstant> namedArgs)
     {
-        var propertyXmlDoc = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value?.ToString();
-        var getterXmlDoc = GetNamedArgument(namedArgs, nameof(AttachedDependencyPropertyAttribute.GetterXmlDocumentation)).Value?.ToString();
+        var propertyXmlDoc = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value as string;
+        var getterXmlDoc = GetNamedArgument(namedArgs, nameof(AttachedDependencyPropertyAttribute.GetterXmlDocumentation)).Value as string;
 
         return new XmlDocumentationData(
-            XmlDocumentation: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.XmlDocumentation)).Value?.ToString(),
+            XmlDocumentation: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.XmlDocumentation)).Value as string,
             GetterXmlDocumentation: getterXmlDoc ?? propertyXmlDoc,
-            SetterXmlDocumentation: GetNamedArgument(namedArgs, nameof(AttachedDependencyPropertyAttribute.SetterXmlDocumentation)).Value?.ToString()
+            SetterXmlDocumentation: GetNamedArgument(namedArgs, nameof(AttachedDependencyPropertyAttribute.SetterXmlDocumentation)).Value as string
         );
     }
 
@@ -80,15 +91,15 @@ internal static class DependencyPropertyMetadataExtractor
         out bool isRequired,
         out bool isInitOnly)
     {
-        var bindEvent = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.BindEvent)).Value?.ToString();
+        var bindEvent = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.BindEvent)).Value as string;
         var bindEvents = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.BindEvents));
-        var onChanged = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.OnChanged)).Value?.ToString() ?? string.Empty;
+        var onChanged = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.OnChanged)).Value as string ?? string.Empty;
 
         var isCustomOnChanged = !string.IsNullOrWhiteSpace(onChanged);
         var onChangedName = isCustomOnChanged ? onChanged : $"On{propertyName}Changed";
         var onChangingName = $"On{propertyName}Changing";
 
-        var targetType = propertyType.Replace("global::", string.Empty).Replace("?", string.Empty);
+        var targetType = SignatureRuleHelper.NormalizeTypeName(propertyType);
         var targetSenderType = GetTargetSenderType(classSymbol, isAttached, browsableForType, framework);
 
         isPartialProperty = false;
@@ -140,16 +151,24 @@ internal static class DependencyPropertyMetadataExtractor
         ref bool isRequired,
         ref bool isInitOnly)
     {
-        foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+        var members = classSymbol.GetMembers(propertyName);
+        if (members.IsDefaultOrEmpty)
         {
-            if (syntaxRef.GetSyntax() is not TypeDeclarationSyntax typeDecl)
+            return;
+        }
+
+        foreach (var member in members)
+        {
+            if (member is not IPropertySymbol propertySymbol)
             {
                 continue;
             }
 
-            foreach (var member in typeDecl.Members)
+            isInitOnly = propertySymbol.SetMethod?.IsInitOnly == true;
+
+            foreach (var syntaxRef in propertySymbol.DeclaringSyntaxReferences)
             {
-                if (member is not PropertyDeclarationSyntax p || p.Identifier.Text != propertyName)
+                if (syntaxRef.GetSyntax() is not PropertyDeclarationSyntax p)
                 {
                     continue;
                 }
@@ -173,23 +192,6 @@ internal static class DependencyPropertyMetadataExtractor
                 }
 
                 isPartialProperty = true;
-
-                if (p.AccessorList == null)
-                {
-                    return;
-                }
-
-                foreach (var accessor in p.AccessorList.Accessors)
-                {
-                    if (!accessor.IsKind(SyntaxKind.InitAccessorDeclaration) && accessor.Keyword.Text != "init")
-                    {
-                        continue;
-                    }
-
-                    isInitOnly = true;
-                    break;
-                }
-
                 return;
             }
         }
@@ -211,18 +213,26 @@ internal static class DependencyPropertyMetadataExtractor
         return signatures;
     }
 
-    internal static string GetTargetSenderType(INamedTypeSymbol? classSymbol, bool isAttached, string? browsableForType, Framework framework)
+
+
+    internal static string GetTargetSenderType(
+        INamedTypeSymbol? classSymbol,
+        bool isAttached,
+        string? browsableForType,
+        Framework framework)
     {
         if (classSymbol == null)
         {
             return string.Empty;
         }
 
-        var typeString = isAttached
-            ? (browsableForType ?? PrepareData.GenerateDependencyObjectType(framework))
-            : classSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        if (isAttached)
+        {
+            var typeString = browsableForType ?? PrepareData.GenerateDependencyObjectType(framework);
+            return SignatureRuleHelper.NormalizeTypeName(typeString);
+        }
 
-        return typeString.Replace("global::", string.Empty).Replace("?", string.Empty);
+        return SignatureRuleHelper.GetNormalizedTypeName(classSymbol);
     }
 
     private static EquatableArray<string> GetBindEventsArray(string? bindEvent, TypedConstant bindEvents)
@@ -238,7 +248,7 @@ internal static class DependencyPropertyMetadataExtractor
             var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
             foreach (var value in bindEvents.Values)
             {
-                var str = value.Value?.ToString();
+                var str = value.Value as string;
                 if (!string.IsNullOrWhiteSpace(str))
                 {
                     builder.Add(str!);
@@ -248,6 +258,17 @@ internal static class DependencyPropertyMetadataExtractor
         }
 
         return Array.Empty<string>().ToImmutableArray().AsEquatableArray();
+    }
+
+    private static string? GetStringOrTypeString(TypedConstant constant)
+    {
+        return constant.Value switch
+        {
+            null => null,
+            string str => str,
+            ITypeSymbol typeSymbol => typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            var other => other.ToString()
+        };
     }
 
     private static TypedConstant GetNamedArgument(Dictionary<string, TypedConstant> namedArgs, string name) =>

@@ -20,7 +20,7 @@ internal sealed class DoubleParameterRule : IMethodSignatureRule
                 match.Signatures |= CallbackSignature.OldAndNewValue;
             }
             
-            if (SignatureRuleHelper.IsEventArgsType(p1.Type.Name))
+            if (SignatureRuleHelper.IsEventArgsType(p1.Type))
             {
                 match.Signatures |= CallbackSignature.SenderAndEventArgs;
             }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net4.5.1</TargetFrameworks>
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Kassyi.Generators.DependencyProperty" PublicKey="00240000048000009400000006020000002400005253413100040000010001001f19b61333e1eb711068408b81d6b1c75f72c3c87c0395f3aa057a917677d4bb6e6e50904842c62c8bef6633723c97df81f47ee772246fe89858fd7d7e68902cdc67919265616cc74593771e83b3534dde9993eb0ed7e119be2996aca3149326e0dec36bdc6084b93de79d32e6a8b3c55f8da727c52a08f9c3ab7d9af6e0ecca" />
+        <InternalsVisibleTo Include="Kassyi.Generators.DependencyProperty" PublicKey="0024000004800000940000000602000000240000525341310004000001000100ada24e42cb0bff239c179aacb191914944e2ded085cd90ccd5d4e6a3b2ba318010787074835efdb34e20234970769b640b043d9d5bcbd878d160bee7422ed77f44e00d909cb4ac8565a2cbc3897115450f244bf6a405ec5c143647e30456957776612c0e1e017173fda4edab9824dece49fe2596fa8fa144754c6ca7876c20c3" />
     </ItemGroup>
 
 </Project>

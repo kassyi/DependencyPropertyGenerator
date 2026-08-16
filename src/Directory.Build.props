@@ -2,11 +2,6 @@
 
     <Import Project="..\Directory.Build.props" />
 
-    <PropertyGroup Label="Signing">
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
-    </PropertyGroup>
-
     <ItemGroup Label="CLSCompliant">
         <AssemblyAttribute Include="System.CLSCompliantAttribute">
             <_Parameter1>false</_Parameter1>
@@ -16,7 +11,7 @@
     <PropertyGroup Label="Nuget">
         <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Authors>kassyi;havendv</Authors>
+        <Authors>kassyi</Authors>
         <PackageProjectUrl>https://github.com/kassyi/DependencyPropertyGenerator</PackageProjectUrl>
         <RepositoryUrl>https://github.com/kassyi/DependencyPropertyGenerator</RepositoryUrl>
         <RepositoryType>git</RepositoryType>

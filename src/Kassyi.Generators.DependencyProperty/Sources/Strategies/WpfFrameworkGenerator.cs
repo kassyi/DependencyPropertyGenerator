@@ -62,7 +62,6 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
     {
         if (!property.IsReadOnly)
         {
-            writer.Append(" ");
             return;
         }
 
