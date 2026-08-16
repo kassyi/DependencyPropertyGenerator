@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Tests.Extensions;
@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 namespace Kassyi.Generators.DependencyProperty.Benchmarks;
 [MemoryDiagnoser]
+[ShortRunJob]
 public class GeneratorBenchmark
 {
     [Params(Framework.Wpf, Framework.WinUi, Framework.Maui, Framework.Avalonia)]
