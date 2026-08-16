@@ -9,8 +9,8 @@
     <PropertyGroup Label="Signing">
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile Condition="Exists('$(MSBuildThisFileDirectory)key.snk')">$(MSBuildThisFileDirectory)key.snk</AssemblyOriginatorKeyFile>
-        <AssemblyOriginatorKeyFile Condition="!Exists('$(MSBuildThisFileDirectory)key.snk')">$(MSBuildThisFileDirectory)key.pub</AssemblyOriginatorKeyFile>
-        <PublicSign Condition="!Exists('$(MSBuildThisFileDirectory)key.snk')">true</PublicSign>
+        <AssemblyOriginatorKeyFile Condition="!Exists('$(MSBuildThisFileDirectory)key.snk') and '$(Configuration)' != 'Release'">$(MSBuildThisFileDirectory)key.pub</AssemblyOriginatorKeyFile>
+        <PublicSign Condition="!Exists('$(MSBuildThisFileDirectory)key.snk') and '$(Configuration)' != 'Release'">true</PublicSign>
     </PropertyGroup>
 
 </Project>
