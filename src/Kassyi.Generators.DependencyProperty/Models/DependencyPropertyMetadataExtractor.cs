@@ -99,7 +99,7 @@ internal static class DependencyPropertyMetadataExtractor
         var onChangedName = isCustomOnChanged ? onChanged : $"On{propertyName}Changed";
         var onChangingName = $"On{propertyName}Changing";
 
-        var targetType = NormalizeTypeName(propertyType);
+        var targetType = SignatureRuleHelper.NormalizeTypeName(propertyType);
         var targetSenderType = GetTargetSenderType(classSymbol, isAttached, browsableForType, framework);
 
         isPartialProperty = false;
@@ -213,25 +213,7 @@ internal static class DependencyPropertyMetadataExtractor
         return signatures;
     }
 
-    internal static string NormalizeTypeName(string typeName)
-    {
-        if (string.IsNullOrEmpty(typeName))
-        {
-            return string.Empty;
-        }
 
-        var span = typeName.AsSpan();
-        if (span.StartsWith("global::".AsSpan(), StringComparison.Ordinal))
-        {
-            span = span.Slice("global::".Length);
-        }
-        if (span.EndsWith("?".AsSpan(), StringComparison.Ordinal))
-        {
-            span = span.Slice(0, span.Length - 1);
-        }
-
-        return span.Length == typeName.Length ? typeName : span.ToString();
-    }
 
     internal static string GetTargetSenderType(
         INamedTypeSymbol? classSymbol,
@@ -247,7 +229,7 @@ internal static class DependencyPropertyMetadataExtractor
         if (isAttached)
         {
             var typeString = browsableForType ?? PrepareData.GenerateDependencyObjectType(framework);
-            return NormalizeTypeName(typeString);
+            return SignatureRuleHelper.NormalizeTypeName(typeString);
         }
 
         return SignatureRuleHelper.GetNormalizedTypeName(classSymbol);

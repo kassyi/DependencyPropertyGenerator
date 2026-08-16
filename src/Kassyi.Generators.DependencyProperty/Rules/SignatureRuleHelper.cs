@@ -5,7 +5,7 @@ namespace Kassyi.Generators.DependencyProperty.Rules;
 
 internal static class SignatureRuleHelper
 {
-    public static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat
+    internal static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat
         .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
     public static string GetNormalizedTypeName(ITypeSymbol typeSymbol)
@@ -14,18 +14,41 @@ internal static class SignatureRuleHelper
         return str.EndsWith("?", StringComparison.Ordinal) ? str.Substring(0, str.Length - 1) : str;
     }
 
+    internal static string NormalizeTypeName(string typeName)
+    {
+        if (string.IsNullOrEmpty(typeName))
+        {
+            return string.Empty;
+        }
+
+        var span = typeName.AsSpan();
+        if (span.StartsWith("global::".AsSpan(), StringComparison.Ordinal))
+        {
+            span = span.Slice("global::".Length);
+        }
+        if (span.EndsWith("?".AsSpan(), StringComparison.Ordinal))
+        {
+            span = span.Slice(0, span.Length - 1);
+        }
+
+        return span.Length == typeName.Length ? typeName : span.ToString();
+    }
+
     public static bool IsEventArgsType(ITypeSymbol typeSymbol)
     {
-        // Recursively check base types to see if it inherits from EventArgs
-        // or has EventArgs in its name
         var current = typeSymbol;
         while (current != null)
         {
-            if (current.Name is nameof(EventArgs) or "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs" ||
-                current.Name.EndsWith(nameof(EventArgs), StringComparison.Ordinal))
+            if (current.Name is "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs")
             {
                 return true;
             }
+
+            if (current.Name == nameof(EventArgs) && current.ContainingNamespace?.ToDisplayString() == "System")
+            {
+                return true;
+            }
+
             current = current.BaseType;
         }
 
