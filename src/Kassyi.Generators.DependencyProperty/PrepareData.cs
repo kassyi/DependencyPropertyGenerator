@@ -133,15 +133,8 @@ public static class PrepareData
         if (isFileLocal)
         {
             var location = classSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
-            var descriptor = new DiagnosticDescriptor(
-                id: "DPG0002",
-                title: "Invalid Type Modifier",
-                messageFormat: "File scoped types are not supported by Source Generators ('{0}')",
-                category: "Usage",
-                defaultSeverity: DiagnosticSeverity.Error,
-                isEnabledByDefault: true);
             throw new DiagnosticException(
-                Diagnostic.Create(descriptor, location, classSymbol.Name));
+                Diagnostic.Create(Diagnostics.DiagnosticDescriptors.FileScopedTypeNotSupported, location, classSymbol.Name));
         }
 
         // [WHY] Sanitize invalid filename characters (<, >, ,, spaces) in a single pass to ensure valid Roslyn hint names without heap allocations for non-generic types.

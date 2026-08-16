@@ -1,3 +1,4 @@
+using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 
@@ -22,7 +23,7 @@ internal static partial class SourceGenerationHelper
                 if (callbacks.ChangedSignatures == CallbackSignature.None)
                 {
                     writer.AppendLine(
-                        $"#error DPG0001: The specified OnChanged method '{property.ValidationAndCallbacks.OnChanged}' was not found or has an unsupported signature on '{@class.FullName}'.");
+                        DiagnosticDescriptors.FormatDpg0001Error(property.ValidationAndCallbacks.OnChanged, @class.FullName));
                 }
 
                 return;

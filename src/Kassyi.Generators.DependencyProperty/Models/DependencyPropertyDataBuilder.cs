@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
+using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Rules.Expressions;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
@@ -64,15 +65,8 @@ internal sealed class DependencyPropertyDataBuilder
         if (typeSymbol is { IsRefLikeType: true })
         {
             var location = attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-            var descriptor = new DiagnosticDescriptor(
-                id: "DPG0003",
-                title: "Invalid Property Type",
-                messageFormat: "The property type '{0}' is a ref struct and cannot be used as a DependencyProperty",
-                category: "Usage",
-                defaultSeverity: DiagnosticSeverity.Error,
-                isEnabledByDefault: true);
             throw new DiagnosticException(
-                Diagnostic.Create(descriptor, location, typeSymbol.ToDisplayString()));
+                Diagnostic.Create(DiagnosticDescriptors.RefStructPropertyTypeNotSupported, location, typeSymbol.ToDisplayString()));
         }
 
         _type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
@@ -144,15 +138,7 @@ internal sealed class DependencyPropertyDataBuilder
         }
 
         var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-        var descriptor = new DiagnosticDescriptor(
-            id: "DPG0004",
-            title: "Reference Type Default Value Sharing",
-            messageFormat: "Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.",
-            category: "Usage",
-            defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
-
-        throw new DiagnosticException(Diagnostic.Create(descriptor, location, _defaultValue));
+        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
     }
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
@@ -195,14 +181,7 @@ internal sealed class DependencyPropertyDataBuilder
             {
                 methodLocation = syntaxForLocation.GetLocation();
             }
-            var unsupportedDescriptor = new DiagnosticDescriptor(
-                id: "DPG0007",
-                title: "Unsupported Callback Signature",
-                messageFormat: "Method '{0}' matches the naming convention but has an unsupported signature.",
-                category: "Usage",
-                defaultSeverity: DiagnosticSeverity.Error,
-                isEnabledByDefault: true);
-            throw new DiagnosticException(Diagnostic.Create(unsupportedDescriptor, methodLocation, onChangedName));
+            throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.UnsupportedCallbackSignature, methodLocation, onChangedName));
         }
 
         var isOverrideMetadata = attribute.AttributeClass?.Name.Contains("OverrideMetadata") == true;
@@ -224,14 +203,7 @@ internal sealed class DependencyPropertyDataBuilder
         {
             location = syntax.GetLocation();
         }
-        var descriptor = new DiagnosticDescriptor(
-            id: "DPG0005",
-            title: "Invalid Callback Signature",
-            messageFormat: "The OldAndNewValue signature is not supported for OverrideMetadata in {0} because RegisterPropertyChangedCallback does not provide the old value",
-            category: "Usage",
-            defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
-        throw new DiagnosticException(Diagnostic.Create(descriptor, location, _framework.ToString()));
+        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.OverrideMetadataOldAndNewValueNotSupported, location, _framework.ToString()));
     }
 
     public DependencyPropertyData Build()
