@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Kassyi.Generators.DependencyProperty.Diagnostics;
+using Kassyi.Generators.DependencyProperty.Rules;
 using Kassyi.Generators.DependencyProperty.Rules.Expressions;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
@@ -234,7 +235,9 @@ internal sealed class DependencyPropertyDataBuilder
 
         var isCustomOnChanged = !string.IsNullOrWhiteSpace(_validationAndCallbacks.OnChanged);
         var onChangedName = isCustomOnChanged ? _validationAndCallbacks.OnChanged : $"On{_name}Changed";
-        var targetType = _type.Replace("global::", string.Empty).Replace("?", string.Empty);
+        var targetType = _typeSymbol != null
+            ? SignatureRuleHelper.GetNormalizedTypeName(_typeSymbol)
+            : _type.Replace("global::", string.Empty).Replace("?", string.Empty);
         var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _isAttached, _componentModel.BrowsableForType, _framework);
 
         var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);
@@ -249,7 +252,7 @@ internal sealed class DependencyPropertyDataBuilder
             throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.UnsupportedCallbackSignature, methodLocation, onChangedName));
         }
 
-        var isOverrideMetadata = attribute.AttributeClass?.Name is "OverrideMetadata" or "OverrideMetadataAttribute";
+        var isOverrideMetadata = attribute.AttributeClass?.Name is nameof(OverrideMetadataAttribute) or "OverrideMetadata";
 
         if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
             !isOverrideMetadata)

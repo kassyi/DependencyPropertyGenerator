@@ -1,15 +1,16 @@
+using System;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules;
 
 internal static class SignatureRuleHelper
 {
-    private static readonly SymbolDisplayFormat s_typeFormat = SymbolDisplayFormat.FullyQualifiedFormat
+    public static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat
         .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
     public static string GetNormalizedTypeName(ITypeSymbol typeSymbol)
     {
-        var str = typeSymbol.ToDisplayString(s_typeFormat);
+        var str = typeSymbol.ToDisplayString(TypeFormat);
         return str.EndsWith("?", StringComparison.Ordinal) ? str.Substring(0, str.Length - 1) : str;
     }
 
@@ -20,8 +21,8 @@ internal static class SignatureRuleHelper
         var current = typeSymbol;
         while (current != null)
         {
-            if (current.Name is "EventArgs" or "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs" ||
-                current.Name.EndsWith("EventArgs", StringComparison.Ordinal))
+            if (current.Name is nameof(EventArgs) or "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs" ||
+                current.Name.EndsWith(nameof(EventArgs), StringComparison.Ordinal))
             {
                 return true;
             }
