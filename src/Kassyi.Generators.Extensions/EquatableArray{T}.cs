@@ -13,22 +13,10 @@ public static class EquatableArray
 {
     /// <summary>Gets an empty <see cref="EquatableArray{T}"/>.</summary>
     public static EquatableArray<T> Empty<T>()
-        where T : IEquatable<T> => default;
-
-    /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
-    public static EquatableArray<T> Create<T>(ImmutableArray<T> array)
-        where T : IEquatable<T> => [with(array)];
-
-    /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
-    public static EquatableArray<T> FromImmutableArray<T>(ImmutableArray<T> array)
-        where T : IEquatable<T> => [with(array)];
+        where T : IEquatable<T> => [with(ImmutableArray<T>.Empty)];
 
     /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
     public static EquatableArray<T> AsEquatableArray<T>(this ImmutableArray<T> array)
-        where T : IEquatable<T> => [with(array)];
-
-    /// <summary>Creates an <see cref="EquatableArray{T}"/> instance from a given <see cref="ImmutableArray{T}"/>.</summary>
-    public static EquatableArray<T> ToEquatableArray<T>(this ImmutableArray<T> array)
         where T : IEquatable<T> => [with(array)];
 }
 
