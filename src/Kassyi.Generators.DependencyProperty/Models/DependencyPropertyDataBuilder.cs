@@ -140,24 +140,6 @@ internal sealed class DependencyPropertyDataBuilder
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
         _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
 
-        var isReferenceType = false;
-        if (directExpressionSyntax != null && !parseFailed)
-        {
-            var position = attributeSyntax?.GetLocation().SourceSpan.Start;
-            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
-        }
-        else if (defaultValueExpression != null && parseFailed)
-        {
-            // Conservative fallback for invalid string expressions
-            isReferenceType = _typeSymbol is { IsValueType: false } && _typeSymbol.SpecialType != SpecialType.System_String;
-        }
-            
-        if (isReferenceType)
-        {
-            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-            throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
-        }
-
         if (parseFailed)
         {
             var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
@@ -165,6 +147,19 @@ internal sealed class DependencyPropertyDataBuilder
                 DiagnosticDescriptors.InvalidDefaultValueExpression,
                 location,
                 defaultValueExpression));
+        }
+
+        var isReferenceType = false;
+        if (directExpressionSyntax != null)
+        {
+            var position = attributeSyntax?.GetLocation().SourceSpan.Start;
+            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
+        }
+            
+        if (isReferenceType)
+        {
+            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+            throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
         }
 
         return this;

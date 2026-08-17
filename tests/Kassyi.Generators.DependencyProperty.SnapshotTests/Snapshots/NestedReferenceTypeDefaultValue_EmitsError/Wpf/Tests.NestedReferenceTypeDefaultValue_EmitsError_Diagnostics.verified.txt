@@ -30,16 +30,16 @@
     MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
   },
   {
-    Id: DPG0004,
+    Id: DPG0008,
     Severity: Error,
     Span: (19,2)-(19,89),
-    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed
   },
   {
-    Id: DPG0004,
+    Id: DPG0008,
     Severity: Error,
     Span: (20,2)-(20,97),
-    MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.
+    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed
   },
   {
     Id: DPG0004,
