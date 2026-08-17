@@ -24,10 +24,11 @@ public class CombinatorialMatrixTests : SnapshotTestBase
     public enum DefaultMode { None, Literal, Expression }
     public enum DirectMode { False, True }
 
+    private static readonly Framework[] SupportedFrameworks = { Framework.Wpf, Framework.Uno, Framework.UnoWinUi, Framework.Maui, Framework.Avalonia };
+
     public static IEnumerable<object[]> GetMatrixData()
     {
-        var supportedFrameworks = new[] { Framework.Wpf, Framework.Uno, Framework.UnoWinUi, Framework.Maui, Framework.Avalonia };
-        foreach (var framework in supportedFrameworks)
+        foreach (var framework in SupportedFrameworks)
         {
 
             foreach (AttrType attr in Enum.GetValues<AttrType>())
@@ -108,6 +109,31 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         return writer.ToString();
     }
 
+    private delegate bool MatrixRule(Framework framework, AttrType attr, ClassMode cls, PropType prop, ReadOnlyMode ro, DefaultMode def, DirectMode dir);
+
+    private static readonly MatrixRule[] ValidationRules = 
+    {
+        // [WHY] DirectProperty is only valid for normal properties on Avalonia.
+        (framework, attr, _, _, _, _, dir) => 
+            dir == DirectMode.False || (framework == Framework.Avalonia && attr == AttrType.Normal),
+
+        // [WHY] Records cannot inherit from UserControl, so normal DPs are not supported.
+        (_, attr, cls, _, _, _, _) => 
+            !(cls == ClassMode.PublicRecord && attr == AttrType.Normal),
+
+        // [WHY] Static class can only be used with Attached properties.
+        (_, attr, cls, _, _, _, _) => 
+            !(cls == ClassMode.StaticClass && attr != AttrType.Attached),
+
+        // [WHY] GenericList cannot have Literal or Expression default values (they are reference types and trigger DPG0004). Only None is valid.
+        (_, _, _, prop, _, def, _) => 
+            !(prop == PropType.GenericList && def != DefaultMode.None),
+
+        // [WHY] Value types like int use constant literals, not expressions.
+        (_, _, _, prop, _, def, _) => 
+            !(prop == PropType.Int && def == DefaultMode.Expression)
+    };
+
     private static bool IsValidCombination(
         Framework framework,
         AttrType attr,
@@ -115,22 +141,15 @@ public class CombinatorialMatrixTests : SnapshotTestBase
         PropType prop,
         ReadOnlyMode ro,
         DefaultMode def,
-        DirectMode dir) =>
-        // [WHY] DirectProperty is only valid for normal properties on Avalonia.
-        (dir, framework) is not (DirectMode.True, not Framework.Avalonia)
-        && (dir, attr) is not (DirectMode.True, not AttrType.Normal)
-
-        // [WHY] Records cannot inherit from UserControl, so normal DPs are not supported.
-        && (cls, attr) is not (ClassMode.PublicRecord, AttrType.Normal)
-
-        // [WHY] Static class can only be used with Attached properties.
-        && (cls, attr) is not (ClassMode.StaticClass, not AttrType.Attached)
-
-        // [WHY] GenericList cannot have Literal or Expression default values (they are reference types and trigger DPG0004). Only None is valid.
-        && (prop, def) is not (PropType.GenericList, not DefaultMode.None)
-
-        // [WHY] Value types like int use constant literals, not expressions.
-        && (prop, def) is not (PropType.Int, DefaultMode.Expression);
+        DirectMode dir)
+    {
+        foreach (var rule in ValidationRules)
+        {
+            if (!rule(framework, attr, cls, prop, ro, def, dir))
+                return false;
+        }
+        return true;
+    }
 
     private static void GenerateClass(
         SourceWriter writer,

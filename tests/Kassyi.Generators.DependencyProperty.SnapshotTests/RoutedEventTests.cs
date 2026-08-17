@@ -1,4 +1,5 @@
 using Kassyi.Generators.DependencyProperty.Generators;
+using Kassyi.Generators.Tests.Extensions;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
 [TestClass]
@@ -103,7 +104,7 @@ public class RoutedEventTests : SnapshotTestBase
             .WithLanguageVersion(Microsoft.CodeAnalysis.CSharp.LanguageVersion.Preview);
         var references = (await Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.NetFramework.Net48.Wpf.ResolveAsync(null, CancellationToken.None))
             .ToArray();
-        var projectA = CreateCompilation(
+        using var projectAAssembly = CreateAndEmitCompilation(
             assemblyName: "ProjectA",
             source: """
                     using System.Runtime.CompilerServices;
@@ -122,11 +123,7 @@ public class RoutedEventTests : SnapshotTestBase
                     """,
             references,
             parseOptions);
-        projectA = RunRoutedEventGenerator(projectA, parseOptions);
-        using var projectAAssembly = new MemoryStream();
-        var projectAEmitResult = projectA.Emit(projectAAssembly);
-        Assert.IsTrue(projectAEmitResult.Success, string.Join(Environment.NewLine, projectAEmitResult.Diagnostics));
-        projectAAssembly.Position = 0;
+
         var projectB = CreateCompilation(
             assemblyName: "ProjectB",
             source: """
@@ -185,6 +182,24 @@ public class RoutedEventTests : SnapshotTestBase
             references: references,
             options: new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary));
     }
+
+    private static MemoryStream CreateAndEmitCompilation(
+        string assemblyName,
+        string source,
+        Microsoft.CodeAnalysis.MetadataReference[] references,
+        Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
+    {
+        var compilation = CreateCompilation(assemblyName, source, references, parseOptions);
+        compilation = RunRoutedEventGenerator(compilation, parseOptions);
+        
+        var assemblyStream = new MemoryStream();
+        var emitResult = compilation.Emit(assemblyStream);
+        Assert.IsTrue(emitResult.Success, string.Join(Environment.NewLine, emitResult.Diagnostics));
+        assemblyStream.Position = 0;
+        
+        return assemblyStream;
+    }
+
     private static Microsoft.CodeAnalysis.Compilation RunRoutedEventGenerator(
         Microsoft.CodeAnalysis.Compilation compilation,
         Microsoft.CodeAnalysis.CSharp.CSharpParseOptions parseOptions)
@@ -193,7 +208,7 @@ public class RoutedEventTests : SnapshotTestBase
             generators: [Microsoft.CodeAnalysis.GeneratorExtensions.AsSourceGenerator(new RoutedEventGenerator())],
             parseOptions: parseOptions);
         driver = driver
-            .WithUpdatedAnalyzerConfigOptions(new global::Kassyi.Generators.Tests.Extensions.DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(Framework.Wpf)))
+            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(global::Kassyi.Generators.Tests.Extensions.GlobalOptionsHelper.GetGlobalOptions(Framework.Wpf)))
             .RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out _);
         return updatedCompilation;
     }
