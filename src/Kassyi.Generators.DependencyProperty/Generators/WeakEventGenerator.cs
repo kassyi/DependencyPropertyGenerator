@@ -23,13 +23,10 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
             source: Resources.WeakEventAttribute_cs.AsString());
     }
 
+    protected override IReadOnlyList<Framework> SupportedFrameworks => [Framework.Maui, Framework.Wpf];
+
     protected override (ClassData Class, EventData Event)? PrepareData(GeneratorAttributeContext context)
     {
-        if (context.Framework is not (Framework.Maui or Framework.Wpf))
-        {
-            return null;
-        }
-
         var eventData = context.Attribute.GetEventData(isStaticClass: context.ClassData.IsStatic);
 
         return (context.ClassData, eventData);

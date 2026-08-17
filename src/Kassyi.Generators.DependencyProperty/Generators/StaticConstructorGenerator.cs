@@ -51,7 +51,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         var providers = attributes
             .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
 
-        providers.CombineAll()
+        providers.CombineAll(context)
             .SelectMany(TransformToStaticConstructorData)
             .WithComparer(EqualityComparer<StaticConstructorData>.Default)
             .SelectAndReportExceptions(GetSourceCode, context, Id)
@@ -124,31 +124,14 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         IncrementalValueProvider<string> version,
         bool isAttached)
     {
-        return context.SyntaxProvider
-            .ForAttributeWithMetadataNameOfClassesAndRecords(attributeName)
-            .SelectManyAllAttributesOfCurrentClassSyntax()
-            .Combine(framework)
-            .Combine(version)
-            .SelectAndCatchExceptions(x =>
-            {
-                var (((semanticModel, attributes, classSyntax, classSymbol), frameworkVal), versionVal) = x;
-                if (attributes.IsEmpty)
-                {
-                    return default((ClassData, DependencyPropertyData)?);
-                }
-
-                var classData = classSymbol.GetClassData(frameworkVal, versionVal);
-                var ctx = new GeneratorAttributeContext(
-                    semanticModel,
-                    attributes[0],
-                    classSyntax,
-                    classSymbol,
-                    frameworkVal,
-                    versionVal,
-                    classData);
-                return PrepareData(ctx, isAttached: isAttached);
-            })
-            .WhereNotNull()
+        return context.ExtractData(
+                framework,
+                version,
+                attributeName,
+                ctx => PrepareData(ctx.ForFirstAttribute(), isAttached),
+                Id,
+                selectMany: true,
+                reportExceptions: false)
             .CollectAsEquatableArray();
     }
     #endregion

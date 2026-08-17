@@ -19,6 +19,8 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
 
     protected abstract string GetHintName(TData data);
 
+    protected virtual IReadOnlyList<Framework> SupportedFrameworks => [];
+
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -26,12 +28,20 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
 
         var framework = context.DetectFramework();
         var version = context.DetectVersion();
+        var supported = SupportedFrameworks;
 
         context.RegisterAttributeGenerator(
             framework,
             version,
             AttributeNames,
-            multiCtx => PrepareData(multiCtx.ForFirstAttribute()),
+            multiCtx =>
+            {
+                if (supported.Count > 0 && !supported.Contains(multiCtx.Framework))
+                {
+                    return null;
+                }
+                return PrepareData(multiCtx.ForFirstAttribute());
+            },
             GetSourceCode,
             Id);
     }
