@@ -14,7 +14,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     protected abstract IReadOnlyList<string> AttributeNames { get; }
 
     protected abstract void PostInitialize(IncrementalGeneratorPostInitializationContext context);
-    protected abstract TData? PrepareData(in GeneratorAttributeContext context);
+    protected abstract TData? PrepareData(GeneratorAttributeContext context);
     
     // [WHY] AST-based generator pipeline replaces legacy text templates for zero allocations.
     protected abstract string GenerateSource(TData data);

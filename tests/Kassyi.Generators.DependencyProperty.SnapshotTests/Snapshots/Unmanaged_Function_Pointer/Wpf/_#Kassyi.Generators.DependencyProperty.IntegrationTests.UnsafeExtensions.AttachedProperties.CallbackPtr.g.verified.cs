@@ -30,9 +30,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: default(delegate* unmanaged&lt;int, void&gt;)
         /// </summary>
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
         public static delegate* unmanaged<int, void> GetCallbackPtr(global::System.Windows.DependencyObject element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));

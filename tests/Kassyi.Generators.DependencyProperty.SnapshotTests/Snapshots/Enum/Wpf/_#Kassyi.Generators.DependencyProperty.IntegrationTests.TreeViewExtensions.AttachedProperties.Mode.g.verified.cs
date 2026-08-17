@@ -30,9 +30,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: Mode2
         /// </summary>
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.TreeView))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.TreeView))]
         public static global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode GetMode(global::System.Windows.Controls.TreeView element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));

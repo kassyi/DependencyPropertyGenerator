@@ -27,9 +27,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: default(Test)
         /// </summary>
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.Grid))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.Grid))]
         public static global::Kassyi.Generators.DependencyProperty.IntegrationTests.Test? GetTestProp(global::System.Windows.Controls.Grid element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));

@@ -38,9 +38,9 @@ Can be used to identify the web view as belonging to a certain app/version on th
         /// </summary>
         [global::System.ComponentModel.Description(@"A suffix that is added to the default user agent, surrounded by square brackets.
 Can be used to identify the web view as belonging to a certain app/version on the server side.")]
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.Grid))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.Controls.Grid))]
         public static string? GetUserAgentSuffix(global::System.Windows.Controls.Grid element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));
