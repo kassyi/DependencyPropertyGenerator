@@ -632,6 +632,21 @@ public class LanguageFeatureTests : SnapshotTestBase
             }
             """, framework);
     }
+
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-034")]
+    [DataRow(Framework.Wpf)]
+    public Task SemanticType_NullableGenerics_ShouldNotBeReplaced(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            using System.Collections.Generic;
+
+            [DependencyProperty<List<int?>>("MyProperty")]
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
+            {
+                partial void OnMyPropertyChanged(List<int?>? newValue) { }
+            }
+            """, framework);
+    }
 }
-
-
