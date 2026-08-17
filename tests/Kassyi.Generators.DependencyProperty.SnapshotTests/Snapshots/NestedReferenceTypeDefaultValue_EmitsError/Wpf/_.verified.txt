@@ -1,4 +1,4 @@
-{
+﻿{
   Diagnostics: [
     {
       Location: /*
@@ -103,12 +103,12 @@
 [DependencyProperty<List<int>>("MyProperty7", DefaultValueExpression = "invalid expression %%%")]
 */
  : (18,1)-(18,88),
-      Message: The DefaultValueExpression 'new List<int>(' contains invalid syntax and could not be parsed,
+      Message: Default value 'new List<int>(' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
       Severity: Error,
       Descriptor: {
-        Id: DPG0008,
-        Title: Invalid Default Value Expression,
-        MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed,
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
         Category: Usage,
         DefaultSeverity: Error,
         IsEnabledByDefault: true
@@ -122,12 +122,12 @@
 [DependencyProperty<List<int>>("MyProperty8", DefaultValueExpression = "MyControl.s_items")]
 */
  : (19,1)-(19,96),
-      Message: The DefaultValueExpression 'invalid expression %%%' contains invalid syntax and could not be parsed,
+      Message: Default value 'invalid expression %%%' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
       Severity: Error,
       Descriptor: {
-        Id: DPG0008,
-        Title: Invalid Default Value Expression,
-        MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed,
+        Id: DPG0004,
+        Title: Reference Type Default Value Sharing,
+        MessageFormat: Default value '{0}' is a reference type and will be shared across all instances. Use CreateDefaultValueCallback = true instead.,
         Category: Usage,
         DefaultSeverity: Error,
         IsEnabledByDefault: true

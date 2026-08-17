@@ -1,15 +1,15 @@
-﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyGridHelper.AttachedProperties.AttachedNotNullStringProperty.g.cs
+﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControlHelper.AttachedProperties.AttachedNotNullStringProperty.g.cs
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public static partial class MyGridHelper
+    public static partial class MyControlHelper
     {
         /// <summary>
         /// Identifies the AttachedNotNullStringProperty dependency property.<br/>
         /// Default value: ""
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttachedNotNullStringPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "AttachedNotNullStringProperty", returnType: typeof(string), declaringType: typeof(MyGridHelper), defaultValue: (string)"", defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: static (sender, value) => IsAttachedNotNullStringPropertyValid((global::Microsoft.Maui.Controls.Grid)sender, (string? )value), propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty AttachedNotNullStringPropertyProperty = global::Microsoft.Maui.Controls.BindableProperty.CreateAttached(propertyName: "AttachedNotNullStringProperty", returnType: typeof(string), declaringType: typeof(MyControlHelper), defaultValue: (string)"", defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: static (sender, value) => IsAttachedNotNullStringPropertyValid((global::Microsoft.Maui.Controls.Grid)sender, (string? )value), propertyChanged: static (sender, oldValue, newValue) =>
         {
             OnAttachedNotNullStringPropertyChanged();
             OnAttachedNotNullStringPropertyChanged((global::Microsoft.Maui.Controls.Grid)sender);

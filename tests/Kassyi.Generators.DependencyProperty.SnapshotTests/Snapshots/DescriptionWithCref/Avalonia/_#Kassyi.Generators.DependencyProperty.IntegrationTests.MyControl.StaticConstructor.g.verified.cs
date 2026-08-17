@@ -6,14 +6,14 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
     {
         static MyControl()
         {
-#pragma warning disable CS8600, CS8604
             IsSpinningProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<bool>>(static x =>
             {
+#pragma warning disable CS8600, CS8604
                 ((MyControl)x.Sender).OnIsSpinningChanged();
                 ((MyControl)x.Sender).OnIsSpinningChanged((bool)x.NewValue.GetValueOrDefault());
                 ((MyControl)x.Sender).OnIsSpinningChanged((bool)x.OldValue.GetValueOrDefault(), (bool)x.NewValue.GetValueOrDefault());
-            }));
 #pragma warning restore CS8600, CS8604
+            }));
         }
     }
 }
