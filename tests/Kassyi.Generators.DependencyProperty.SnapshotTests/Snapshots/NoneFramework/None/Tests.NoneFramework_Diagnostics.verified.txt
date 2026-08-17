@@ -1,6 +1,6 @@
-﻿[
+[
   {
-    Id: TRF001,
+    Id: DPG0000,
     Severity: Error,
     MessageFormat:
 Framework is not recognized.

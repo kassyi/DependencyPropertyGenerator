@@ -1,4 +1,4 @@
-﻿{
+{
   Diagnostics: [
     {
       Message:
@@ -7,7 +7,7 @@ You can explicitly specify the framework by setting one of the following constan
 HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI,
       Severity: Error,
       Descriptor: {
-        Id: TRF001,
+        Id: DPG0000,
         Title: Framework is not recognized,
         MessageFormat:
 Framework is not recognized.
