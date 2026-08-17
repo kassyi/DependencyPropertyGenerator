@@ -160,9 +160,10 @@ internal sealed class DependencyPropertyDataBuilder
 
         if (parseFailed)
         {
+            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
             throw new DiagnosticException(Diagnostic.Create(
                 DiagnosticDescriptors.InvalidDefaultValueExpression,
-                attributeSyntax?.GetLocation() ?? Location.None,
+                location,
                 defaultValueExpression));
         }
 

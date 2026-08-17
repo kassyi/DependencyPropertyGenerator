@@ -53,8 +53,8 @@ internal static partial class SourceGenerationHelper
         }
 
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCommonPropertyAttributes(ref writer, property, @class);
         GenerateBrowsableForTypeAttribute(ref writer, property);
+        GenerateCommonPropertyAttributes(ref writer, property, @class);
 
         using (writer.Scope($"public static {type} Get{property.Name}({browsableForType} element)"))
         {
