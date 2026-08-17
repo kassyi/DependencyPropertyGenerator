@@ -1,5 +1,5 @@
-using Microsoft.CodeAnalysis;
 using Kassyi.Generators.DependencyProperty.Models;
+using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules.Signatures;
 

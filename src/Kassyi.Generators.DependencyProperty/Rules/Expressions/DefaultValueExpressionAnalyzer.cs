@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -193,14 +192,16 @@ internal static class DefaultValueExpressionAnalyzer
             _ => null
         };
 
-        if (memberName != null && containingClassSymbol != null)
+        if (memberName == null || containingClassSymbol == null)
         {
-            foreach (var member in containingClassSymbol.GetMembers(memberName))
+            return false;
+        }
+
+        foreach (var member in containingClassSymbol.GetMembers(memberName))
+        {
+            if (IsReferenceTypeSymbol(member))
             {
-                if (IsReferenceTypeSymbol(member))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -209,9 +210,9 @@ internal static class DefaultValueExpressionAnalyzer
 
     private static bool IsReferenceTypeSymbol(ISymbol symbol)
     {
-        ITypeSymbol? memberType = symbol switch
+        var memberType = symbol switch
         {
-            IFieldSymbol field when !field.HasConstantValue => field.Type,
+            IFieldSymbol { HasConstantValue: false } field => field.Type,
             IPropertySymbol prop => prop.Type,
             _ => null
         };
