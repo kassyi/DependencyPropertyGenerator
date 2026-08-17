@@ -82,7 +82,7 @@ public static class IncrementalValuesProviderExtensions
         this IncrementalValueProvider<TSource> source,
         Func<TSource, CancellationToken, TResult> selector,
         IncrementalGeneratorInitializationContext initializationContext,
-        string id = "SRE001")
+        string id)
     {
         var outputWithErrors = source
             .Select<TSource, (TResult? Value, Exception? Exception)>((value, cancellationToken) =>
@@ -146,7 +146,7 @@ public static class IncrementalValuesProviderExtensions
         this IncrementalValuesProvider<TSource> source,
         Func<TSource, CancellationToken, TResult> selector,
         IncrementalGeneratorInitializationContext initializationContext,
-        string id = "SRE001")
+        string id)
     {
         var outputWithErrors = source
             .Select<TSource, (TResult? Value, Exception? Exception)>((value, cancellationToken) =>
@@ -199,7 +199,7 @@ public static class IncrementalValuesProviderExtensions
         this IncrementalValuesProvider<TSource> source,
         Func<TSource, TResult> selector,
         IncrementalGeneratorInitializationContext initializationContext,
-        string id = "SRE001")
+        string id)
     {
         return source
             .SelectAndReportExceptions((x, _) => selector(x), initializationContext, id);
@@ -210,7 +210,7 @@ public static class IncrementalValuesProviderExtensions
         this IncrementalValueProvider<TSource> source,
         Func<TSource, TResult> selector,
         IncrementalGeneratorInitializationContext initializationContext,
-        string id = "SRE001")
+        string id)
     {
         return source
             .SelectAndReportExceptions((x, _) => selector(x), initializationContext, id);
@@ -221,7 +221,7 @@ public static class IncrementalValuesProviderExtensions
         this IncrementalValuesProvider<(TLeft Left, Framework Right)> source,
         Func<Framework, TLeft, TResult> selector,
         IncrementalGeneratorInitializationContext context,
-        string id = "SRE001")
+        string id)
     {
         return source
             .SelectAndReportExceptions(x => selector(x.Right, x.Left), context, id);
@@ -239,23 +239,16 @@ public static class IncrementalValuesProviderExtensions
 
     /// <summary>Detects the target UI framework from compilation configuration and reports an error diagnostic if unrecognized.</summary>
     public static IncrementalValueProvider<Framework> DetectFramework(
-        this IncrementalGeneratorInitializationContext context)
+        this IncrementalGeneratorInitializationContext context,
+        DiagnosticDescriptor? frameworkNotRecognizedDescriptor = null)
     {
         var frameworkWithDiagnostic = context.AnalyzerConfigOptionsProvider
             .Select<AnalyzerConfigOptionsProvider, (Framework Framework, Diagnostic? Diagnostic)>((options, _) =>
             {
                 var framework = options.TryRecognizeFramework();
 
-                var diagnostic = framework == Framework.None
-                    ? Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            id: "TRF001",
-                            title: "Framework is not recognized",
-                            messageFormat: AnalyzerConfigOptionsProviderExtensions.FrameworkIsNotRecognized,
-                            "Usage",
-                            DiagnosticSeverity.Error,
-                            true),
-                        Location.None)
+                var diagnostic = framework == Framework.None && frameworkNotRecognizedDescriptor != null
+                    ? Diagnostic.Create(frameworkNotRecognizedDescriptor, Location.None)
                     : null;
 
                 return (Framework: framework, Diagnostic: diagnostic);

@@ -8,7 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {
-    protected override string Id => "REG";
 
     protected override IReadOnlyList<string> AttributeNames { get; } =
     [

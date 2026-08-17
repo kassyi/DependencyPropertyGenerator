@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
@@ -16,7 +17,7 @@ internal static class GeneratorHelper
         IncrementalValueProvider<string> version,
         string attributeName,
         Func<GeneratorMultiAttributeContext, TData?> prepareData,
-        string id,
+        string id = DiagnosticDescriptors.UnhandledExceptionId,
         bool selectMany = true,
         bool reportExceptions = true)
         where TData : struct
@@ -87,7 +88,7 @@ internal static class GeneratorHelper
         IReadOnlyList<string> attributeNames,
         Func<GeneratorMultiAttributeContext, TData?> prepareData,
         Func<TData, FileWithName> getSourceCode,
-        string id,
+        string id = DiagnosticDescriptors.UnhandledExceptionId,
         bool selectMany = true)
         where TData : struct
     {

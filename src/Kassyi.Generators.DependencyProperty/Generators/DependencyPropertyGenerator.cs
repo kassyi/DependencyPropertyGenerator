@@ -8,8 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Class, DependencyPropertyData DependencyProperty)>
 {
-    protected override string Id => "DPG";
-
     protected override IReadOnlyList<string> AttributeNames { get; } =
     [
         KnownAttributes.DependencyProperty,

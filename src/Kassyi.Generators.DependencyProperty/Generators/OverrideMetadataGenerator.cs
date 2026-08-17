@@ -8,7 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class OverrideMetadataGenerator : MultiAttributeGeneratorBase<(ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetadata)>
 {
-    protected override string Id => "OMG";
 
     protected override IReadOnlyList<string> AttributeNames { get; } =
     [

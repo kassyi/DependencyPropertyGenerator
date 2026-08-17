@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
@@ -10,12 +11,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class StaticConstructorGenerator : IIncrementalGenerator
 {
-    #region Constants
-
-    private const string Id = "SCG";
-
-    #endregion
-
     #region Methods
 
     /// <inheritdoc />
@@ -34,10 +29,8 @@ public class StaticConstructorGenerator : IIncrementalGenerator
                 source: Resources.SourceTrigger_cs.AsString());
         });
 
-        var framework = context.DetectFramework();
+        var framework = context.DetectFramework(DiagnosticDescriptors.FrameworkNotRecognized);
         var version = context.DetectVersion();
-
-
 
         IncrementalValueProvider<EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)>>[] providers =
         [
@@ -51,7 +44,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
         providers.CombineAll(context)
             .SelectMany(TransformToStaticConstructorData)
             .WithComparer(EqualityComparer<StaticConstructorData>.Default)
-            .SelectAndReportExceptions(GetSourceCode, context, Id)
+            .SelectAndReportExceptions(GetSourceCode, context, DiagnosticDescriptors.UnhandledExceptionId)
             .AddSource(context);
     }
 
@@ -123,7 +116,6 @@ public class StaticConstructorGenerator : IIncrementalGenerator
                 version,
                 attributeName,
                 ctx => PrepareData(ctx.ForFirstAttribute(), isAttached),
-                Id,
                 selectMany: true,
                 reportExceptions: false)
             .CollectAsEquatableArray();

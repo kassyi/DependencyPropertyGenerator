@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);IDE0190;CA1031;CA1307</NoWarn>
+    <NoWarn>$(NoWarn);IDE0190;CA1031;CA1307;RS2008;RS1032</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
