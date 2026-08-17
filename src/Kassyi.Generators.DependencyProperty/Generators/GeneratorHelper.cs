@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
@@ -100,22 +101,39 @@ internal static class GeneratorHelper
 
     /// <summary>Combines multiple incremental value providers into a single unified array provider.</summary>
     public static IncrementalValueProvider<EquatableArray<T>> CombineAll<T>(
-        this IEnumerable<IncrementalValueProvider<EquatableArray<T>>> providers,
+        this IReadOnlyList<IncrementalValueProvider<EquatableArray<T>>> providers,
         IncrementalGeneratorInitializationContext context)
         where T : IEquatable<T>
     {
-        var list = providers.ToList();
-        if (list.Count == 0)
+        if (providers.Count == 0)
         {
-            return context.AnalyzerConfigOptionsProvider.Select((_, _) => EquatableArray<T>.Empty);
+            return context.AnalyzerConfigOptionsProvider.Select(static (_, _) => EquatableArray.Empty<T>());
         }
 
-        var combined = list[0];
-        for (var i = 1; i < list.Count; i++)
+        var combined = providers[0];
+        for (var i = 1; i < providers.Count; i++)
         {
             combined = combined
-                .Combine(list[i])
-                .Select(static (x, _) => x.Left.AsImmutableArray().AddRange(x.Right.AsImmutableArray()).AsEquatableArray());
+                .Combine(providers[i])
+                .Select(static (x, _) =>
+                {
+                    if (x.Left.IsEmpty)
+                    {
+                        return x.Right;
+                    }
+
+                    if (x.Right.IsEmpty)
+                    {
+                        return x.Left;
+                    }
+
+                    var left = x.Left.AsImmutableArray();
+                    var right = x.Right.AsImmutableArray();
+                    var builder = ImmutableArray.CreateBuilder<T>(left.Length + right.Length);
+                    builder.AddRange(left);
+                    builder.AddRange(right);
+                    return builder.MoveToImmutable().AsEquatableArray();
+                });
         }
 
         return combined;

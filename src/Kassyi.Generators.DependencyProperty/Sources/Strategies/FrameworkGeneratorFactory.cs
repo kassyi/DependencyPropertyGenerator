@@ -5,17 +5,22 @@ namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 /// <summary>Instantiates the appropriate source generation strategy based on the target UI framework.</summary>
 internal static class FrameworkGeneratorFactory
 {
+    private static readonly WpfFrameworkGenerator s_wpf = new();
+    private static readonly AvaloniaFrameworkGenerator s_avalonia = new();
+    private static readonly MauiFrameworkGenerator s_maui = new();
+    private static readonly UwpFrameworkGenerator s_uwp = new();
+
     public static FrameworkGenerator Create(Framework framework)
     {
         return framework switch
         {
-            Framework.Wpf => new WpfFrameworkGenerator(),
-            Framework.Avalonia => new AvaloniaFrameworkGenerator(),
-            Framework.Maui => new MauiFrameworkGenerator(),
-            Framework.Uwp => new UwpFrameworkGenerator(),
-            Framework.WinUi => new UwpFrameworkGenerator(),
-            Framework.Uno => new UwpFrameworkGenerator(),
-            Framework.UnoWinUi => new UwpFrameworkGenerator(),
+            Framework.Wpf => s_wpf,
+            Framework.Avalonia => s_avalonia,
+            Framework.Maui => s_maui,
+            Framework.Uwp => s_uwp,
+            Framework.WinUi => s_uwp,
+            Framework.Uno => s_uwp,
+            Framework.UnoWinUi => s_uwp,
             _ => throw new ArgumentOutOfRangeException(nameof(framework))
         };
     }

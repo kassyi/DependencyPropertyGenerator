@@ -39,17 +39,14 @@ public class StaticConstructorGenerator : IIncrementalGenerator
 
 
 
-        (string Name, bool IsAttached)[] attributes =
+        IncrementalValueProvider<EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)>>[] providers =
         [
-            (KnownAttributes.DependencyProperty, false),
-            ($"{KnownAttributes.DependencyProperty}`1", false),
-            (KnownAttributes.AttachedDependencyProperty, true),
-            ($"{KnownAttributes.AttachedDependencyProperty}`1", true),
-            ($"{KnownAttributes.AttachedDependencyProperty}`2", true)
+            GetClassData(context, KnownAttributes.DependencyProperty, framework, version, isAttached: false),
+            GetClassData(context, $"{KnownAttributes.DependencyProperty}`1", framework, version, isAttached: false),
+            GetClassData(context, KnownAttributes.AttachedDependencyProperty, framework, version, isAttached: true),
+            GetClassData(context, $"{KnownAttributes.AttachedDependencyProperty}`1", framework, version, isAttached: true),
+            GetClassData(context, $"{KnownAttributes.AttachedDependencyProperty}`2", framework, version, isAttached: true),
         ];
-
-        var providers = attributes
-            .Select(attr => GetClassData(context, attr.Name, framework, version, attr.IsAttached));
 
         providers.CombineAll(context)
             .SelectMany(TransformToStaticConstructorData)

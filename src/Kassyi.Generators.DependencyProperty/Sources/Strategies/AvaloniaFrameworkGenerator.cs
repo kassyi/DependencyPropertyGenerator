@@ -143,9 +143,19 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             {
                 GenerateAvaloniaStaticConstructorAffects(ref tempWriter, @class, property);
             }
-            foreach (var property in properties.OrderBy(static p => p.Modifiers.IsAttached))
+            foreach (var property in properties)
             {
-                GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
+                if (!property.Modifiers.IsAttached)
+                {
+                    GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
+                }
+            }
+            foreach (var property in properties)
+            {
+                if (property.Modifiers.IsAttached)
+                {
+                    GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
+                }
             }
 
             if (tempWriter.Length == 0)
