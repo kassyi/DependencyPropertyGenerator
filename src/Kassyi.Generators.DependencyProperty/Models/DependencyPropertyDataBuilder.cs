@@ -208,7 +208,7 @@ internal sealed class DependencyPropertyDataBuilder
         var onChangedName = isCustomOnChanged ? _validationAndCallbacks.OnChanged : $"On{_name}Changed";
         var targetType = _typeSymbol != null
             ? SignatureRuleHelper.GetNormalizedTypeName(_typeSymbol)
-            : _type.Replace("global::", string.Empty).Replace("?", string.Empty);
+            : SignatureRuleHelper.NormalizeTypeName(_type);
         var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _modifiers.IsAttached, _componentModel.BrowsableForType, _framework);
 
         var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);

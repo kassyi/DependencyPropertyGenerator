@@ -12,7 +12,12 @@ internal static class SignatureRuleHelper
     public static string GetNormalizedTypeName(ITypeSymbol typeSymbol)
     {
         var str = typeSymbol.ToDisplayString(TypeFormat);
-        return str.EndsWith("?", StringComparison.Ordinal) ? str.Substring(0, str.Length - 1) : str;
+        var span = str.AsSpan();
+        if (span.EndsWith("?".AsSpan(), StringComparison.Ordinal))
+        {
+            span = span.Slice(0, span.Length - 1);
+        }
+        return span.Length == str.Length ? str : span.ToString();
     }
 
     /// <summary>Trims global:: and trailing nullable markers from a type name string.</summary>
