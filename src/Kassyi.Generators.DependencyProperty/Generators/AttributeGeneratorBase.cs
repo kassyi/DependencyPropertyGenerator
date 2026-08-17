@@ -2,8 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Abstract base class for attribute-driven incremental source generators.</summary>
