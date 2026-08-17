@@ -40,16 +40,7 @@ internal static partial class SourceGenerationHelper
         strategy.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.SetterXmlDocumentation, property, isProperty: true);
-        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
-        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
-        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
-        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
-        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
-        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
-        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
-        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
-        GenerateExcludeFromCodeCoverageAttribute(ref writer);
+        GenerateCommonPropertyAttributes(ref writer, property, @class.Version);
 
         var setterVisibility = property.IsReadOnly ? "internal" : "public";
         var browsableForType = GenerateBrowsableForType(property);
@@ -62,17 +53,8 @@ internal static partial class SourceGenerationHelper
         }
 
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
-        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
-        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
-        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
-        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
-        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
+        GenerateCommonPropertyAttributes(ref writer, property, @class.Version);
         GenerateBrowsableForTypeAttribute(ref writer, property);
-        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
-        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
-        GenerateExcludeFromCodeCoverageAttribute(ref writer);
 
         using (writer.Scope($"public static {type} Get{property.Name}({browsableForType} element)"))
         {
