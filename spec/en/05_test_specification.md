@@ -107,14 +107,15 @@ The suite verifies zero interference between C# language features (C# 8.0 throug
 | **Language-021** | Metadata Propagation | `[Category]`, `[Description]`, `[TypeConverter]` | Copies ComponentModel attributes cleanly to the property proxy. |
 | **Language-022** | Inheritance Edge | Shadowing base property with `new` modifier | Generates safe `new` property registrations. |
 | **Language-023** | Callbacks | `Validate = true`, `Coerce = true` coexistence | Generates validation and coercion methods properly. |
-| **Language-024** | Avalonia Flags | `AffectsRender`, `AffectsMeasure`, `AffectsArrange` | Registers static constructor invalidation hooks. |
-| **Language-025** | Event Binding | `BindEvents` with static handler wiring | Wires UI events and property callbacks automatically. |
-| **Language-026** | Multidimensional | `int[,,]` multidimensional array property | Preserves multidimensional array signatures. |
-| **Language-027** | Nullable Context | Nullable-enabled record classes | Preserves nullable annotations correctly. |
-| **Language-028** | Static Class | Attached properties on static classes | Preserves static class modifiers without duplicates. |
-| **Language-029** | Namespaces | Same-name classes in different namespaces | Isolates generation to prevent collisions across namespaces. |
-| **Language-030** | Partial Property | `required partial` property with `init` | Integrates directly with C# 13 partial property implementations. |
-| **Language-031** | Function Pointer | Function pointer (`delegate* unmanaged<int, void>`) | Generates unmanaged function pointer types correctly as property types. |
+| **Language-024** | Attached Callbacks | `Validate = true`, `Coerce = true` on attached properties | Generates validation and coercion signatures for attached properties properly. |
+| **Language-025** | Avalonia Flags | `AffectsRender`, `AffectsMeasure`, `AffectsArrange` | Registers static constructor invalidation hooks. |
+| **Language-026** | Event Binding | `BindEvents` with static handler wiring | Wires UI events and property callbacks automatically. |
+| **Language-027** | Multidimensional | `int[,,]` multidimensional array property | Preserves multidimensional array signatures. |
+| **Language-028** | Nullable Context | Nullable-enabled record classes | Preserves nullable annotations correctly. |
+| **Language-029** | Static Class | Attached properties on static classes | Preserves static class modifiers without duplicates. |
+| **Language-030** | Namespaces | Same-name classes in different namespaces | Isolates generation to prevent collisions across namespaces. |
+| **Language-031** | Partial Property | `required partial` property with `init` | Integrates directly with C# 13 partial property implementations. |
+| **Language-032** | Function Pointer | Function pointer (`delegate* unmanaged<int, void>`) | Generates unmanaged function pointer types correctly as property types. |
 
 ---
 
@@ -128,10 +129,10 @@ Tests validate attached property generation including type constraints and callb
 * **Attached-004**: Generates UI event subscriptions and handler wiring when `BindEvent` is specified.
 * **Attached-005**: Defaults the target to `DependencyObject` when the second type parameter is omitted.
 * **Attached-006**: Emits multiline XML documentation and descriptions without string literal syntax errors.
-* **Attached-008**: Generates custom `OnChanged` method wiring and static constructors.
-* **Attached-009**: Avoids circular references when passing the same class as a type parameter.
-* **Attached-010**: Generates attached properties correctly on inherited classes.
-* **Attached-011**: Wires event argument callbacks using `DependencyPropertyChangedEventArgs`.
+* **Attached-007**: Generates custom `OnChanged` method wiring and static constructors.
+* **Attached-008**: Avoids circular references when passing the same class as a type parameter.
+* **Attached-009**: Generates attached properties correctly on inherited classes.
+* **Attached-010**: Wires event argument callbacks using `DependencyPropertyChangedEventArgs`.
 
 ### 6.2 Routed Events (`Routed`)
 Tests validate event generation based on routing infrastructure such as WPF.
@@ -139,7 +140,7 @@ Tests validate event generation based on routing infrastructure such as WPF.
 * **Routed-002**: Generates attached routed events (`IsAttached = true`) with static `Add/RemoveHandler` methods.
 * **Routed-003**: Prevents duplicate `public static partial class` modifiers on static classes.
 * **Routed-004**: Prevents duplicate `global::` namespace prefixes on custom generic delegate handlers.
-* **Routed-005**: Selectively suppresses `CS0436` conflicts for generated attributes.
+* **Routed-006**: Selectively suppresses `CS0436` conflicts for generated attributes.
 
 ### 6.3 Weak Events (`Weak`)
 Tests validate weak event manager code generation to prevent memory leaks.
@@ -152,9 +153,9 @@ Tests validate weak event manager code generation to prevent memory leaks.
 ### 6.4 Metadata Overrides and Property Sharing (`Metadata`)
 Tests validate metadata rewriting and shared property behavior across the inheritance tree.
 * **Metadata-001**: Generates default value overrides (`OverrideMetadata` on WPF, `RegisterPropertyChangedCallback` elsewhere).
-* **Metadata-001B**: Generates metadata overrides for read-only properties.
-* **Metadata-002**: Registers property sharing via `AddOwner` calls.
-* **Metadata-002B**: Shares properties across different types using `AddOwner`.
+* **Metadata-002**: Generates metadata overrides for read-only properties.
+* **Metadata-003**: Registers property sharing via `AddOwner` calls.
+* **Metadata-004**: Shares properties across different types using `AddOwner`.
 
 ### 6.5 Documentation Consistency (`Doc`)
 Tests ensure that code snippets provided in user-facing documentation work correctly.
@@ -170,14 +171,14 @@ The generator must ensure that invalid user input triggers clean compile-time di
 | Test ID | Diagnostic ID | Severity | Trigger Condition | Expected Diagnostic Message Format |
 | :--- | :--- | :--- | :--- | :--- |
 | **Error-001** | `DPG0001` | Error | Non-existent or invalid signature for `OnChanged` callback | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.` |
-| **Error-001B** | `DPG0001` | Error | Non-existent callback method in attached property | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.` |
-| **Error-002** | `DPG0002` | Error | Applying attributes to a `file`-scoped local class | `The file-local class '{0}' cannot be used for source generation.` |
-| **Error-003** | `DPG0003` | Error | Using `ref struct` type as a property type | `The type '{0}' is a ref struct and cannot be used as a DependencyProperty type.` |
-| **Error-004** | `DPG0004` | Error | Reference type default value without callback or expression | `Reference type '{0}' cannot have a DefaultValue without CreateDefaultValueCallback = true or DefaultValueExpression.` |
-| **Error-005** | `DPG0005` | Error | Unsupported `OldAndNewValue` callback in non-WPF/Avalonia frameworks | `OverrideMetadata with OldAndNewValue callback is only supported on WPF and Avalonia.` |
-| **Error-006** | `DPG0006` | Error | Invalid expression syntax in `DefaultValueExpression` | Handles syntax errors gracefully. |
-| **Error-007** | - | Info | Fallback behavior when `Framework.None` is specified | Generates proper fallback code. |
-| **Error-008** | `DPG0007` | Error | Invalid signature for callback methods (e.g. `OnChanged`) | `The partial method '{0}' has an unsupported signature...` |
+| **Error-002** | `DPG0001` | Error | Non-existent callback method in attached property | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.` |
+| **Error-003** | `DPG0002` | Error | Applying attributes to a `file`-scoped local class | `The file-local class '{0}' cannot be used for source generation.` |
+| **Error-004** | `DPG0003` | Error | Using `ref struct` type as a property type | `The type '{0}' is a ref struct and cannot be used as a DependencyProperty type.` |
+| **Error-005** | `DPG0004` | Error | Reference type default value without callback or expression | `Reference type '{0}' cannot have a DefaultValue without CreateDefaultValueCallback = true or DefaultValueExpression.` |
+| **Error-007** | `DPG0005` | Error | Unsupported `OldAndNewValue` callback in non-WPF/Avalonia frameworks | `OverrideMetadata with OldAndNewValue callback is only supported on WPF and Avalonia.` |
+| **Error-008** | `DPG0006` | Error | Invalid expression syntax in `DefaultValueExpression` | Handles syntax errors gracefully. |
+| **Error-009** | - | Info | Fallback behavior when `Framework.None` is specified | Generates proper fallback code. |
+| **Error-010** | `DPG0007` | Error | Invalid signature for callback methods (e.g. `OnChanged`) | `The partial method '{0}' has an unsupported signature...` |
 
 ---
 
