@@ -22,7 +22,8 @@ public static class CompilationCache
         {
             ReferenceAssemblies referenceAssemblies = framework switch
             {
-                Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
+                Framework.None => ReferenceAssemblies.Net.Net80,
+                Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
                 _ => ReferenceAssembliesFactory.Get(framework, netVersion)
             };
             

@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
@@ -35,6 +36,20 @@ public static class FrameworkExtensions
     public static string GetBaseObjectTypeFullName(this Framework framework) =>
         $"{framework.GetNamespace()}.{framework.GetBaseObjectTypeName()}";
 
+    /// <summary>Attempts to recognize the target UI framework by inspecting referenced type symbols in the compilation.</summary>
+    public static Framework TryRecognizeFramework(this Compilation compilation)
+    {
+        compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
+
+        return ResolveFramework(
+            isMaui: () => compilation.GetTypeByMetadataName("Microsoft.Maui.Controls.BindableObject") != null,
+            isAvalonia: () => compilation.GetTypeByMetadataName("Avalonia.AvaloniaObject") != null,
+            hasUno: () => compilation.GetTypeByMetadataName("Uno.UI.FeatureConfiguration") != null,
+            hasWinUi: () => compilation.GetTypeByMetadataName("Microsoft.UI.Xaml.DependencyObject") != null,
+            isUwp: () => compilation.GetTypeByMetadataName("Windows.UI.Xaml.DependencyObject") != null,
+            isWpf: () => compilation.GetTypeByMetadataName("System.Windows.DependencyObject") != null);
+    }
+
     /// <summary>Attempts to recognize the target UI framework from MSBuild properties and compilation constants.</summary>
     public static Framework TryRecognizeFramework(this AnalyzerConfigOptionsProvider provider)
     {
@@ -42,41 +57,90 @@ public static class FrameworkExtensions
 
         var constants = provider.GetGlobalOption("DefineConstants", prefix: "RecognizeFramework") ?? string.Empty;
 
-        if (has("UseMaui", "HAS_MAUI"))
+        return ResolveFramework(
+            isMaui: () => has("UseMaui", "HAS_MAUI"),
+            isAvalonia: () => has(null, "HAS_AVALONIA"),
+            hasUno: () => has(null, "HAS_UNO") || hasConstant("HAS_UNO_WINUI"),
+            hasWinUi: () => has("UseWinUI", "HAS_WINUI") || hasConstant("HAS_UNO_WINUI"),
+            isUwp: () => hasConstant("WINDOWS_UWP") || hasConstant("HAS_UWP"),
+            isWpf: () => has("UseWPF", "HAS_WPF"));
+
+        bool has(string? property, string constant) =>
+            (property != null && bool.TryParse(provider.GetGlobalOption(property), out var enabled) && enabled) ||
+            hasConstant(constant);
+
+        bool hasConstant(string constant)
+        {
+            foreach (var part in constants.Split(';'))
+            {
+                if (string.Equals(part.Trim(), constant, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private static Framework ResolveFramework(
+        Func<bool> isMaui,
+        Func<bool> isAvalonia,
+        Func<bool> hasUno,
+        Func<bool> hasWinUi,
+        Func<bool> isUwp,
+        Func<bool> isWpf)
+    {
+        if (isMaui())
         {
             return Framework.Maui;
         }
 
-        if (has(null, "HAS_AVALONIA"))
+        if (isAvalonia())
         {
             return Framework.Avalonia;
         }
 
-        if (constants.Contains("HAS_UNO_WINUI") || (constants.Contains("HAS_UNO") && constants.Contains("HAS_WINUI")))
+        var uno = hasUno();
+        var winUi = hasWinUi();
+
+        if (uno && winUi)
         {
             return Framework.UnoWinUi;
         }
 
-        if (has(null, "HAS_UNO"))
+        if (uno)
         {
             return Framework.Uno;
         }
 
-        if (has("UseWinUI", "HAS_WINUI"))
+        if (winUi)
         {
             return Framework.WinUi;
         }
 
-        if (constants.Contains("WINDOWS_UWP") || constants.Contains("HAS_UWP"))
+        if (isUwp())
         {
             return Framework.Uwp;
         }
 
-        return has("UseWPF", "HAS_WPF") ? Framework.Wpf : Framework.None;
+        if (isWpf())
+        {
+            return Framework.Wpf;
+        }
 
-        bool has(string? property, string constant) =>
-            (property != null && bool.Parse(provider.GetGlobalOption(property) ?? bool.FalseString)) ||
-            constants.Contains(constant);
+        return Framework.None;
+    }
+
+    /// <summary>Attempts to recognize the target UI framework from compilation symbols, falling back to build configuration options.</summary>
+    public static Framework TryRecognizeFramework(this Compilation compilation, AnalyzerConfigOptionsProvider? options)
+    {
+        var framework = compilation.TryRecognizeFramework();
+        if (framework != Framework.None)
+        {
+            return framework;
+        }
+
+        return options?.TryRecognizeFramework() ?? Framework.None;
     }
 
     /// <summary>Recognizes the target UI framework or throws <see cref="InvalidOperationException"/> if unrecognized.</summary>

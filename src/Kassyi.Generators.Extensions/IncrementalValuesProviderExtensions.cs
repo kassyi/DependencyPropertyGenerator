@@ -237,15 +237,17 @@ public static class IncrementalValuesProviderExtensions
             .Select(static (x, _) => x!.Value);
     }
 
-    /// <summary>Detects the target UI framework from compilation configuration and reports an error diagnostic if unrecognized.</summary>
+    /// <summary>Detects the target UI framework from compilation symbols and configuration, reporting an error diagnostic if unrecognized.</summary>
     public static IncrementalValueProvider<Framework> DetectFramework(
         this IncrementalGeneratorInitializationContext context,
         DiagnosticDescriptor? frameworkNotRecognizedDescriptor = null)
     {
-        var frameworkWithDiagnostic = context.AnalyzerConfigOptionsProvider
-            .Select<AnalyzerConfigOptionsProvider, (Framework Framework, Diagnostic? Diagnostic)>((options, _) =>
+        var frameworkWithDiagnostic = context.CompilationProvider
+            .Combine(context.AnalyzerConfigOptionsProvider)
+            .Select((tuple, _) =>
             {
-                var framework = options.TryRecognizeFramework();
+                var (compilation, options) = tuple;
+                var framework = compilation.TryRecognizeFramework(options);
 
                 var diagnostic = framework == Framework.None && frameworkNotRecognizedDescriptor != null
                     ? Diagnostic.Create(frameworkNotRecognizedDescriptor, Location.None)
