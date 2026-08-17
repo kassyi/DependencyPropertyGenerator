@@ -15,7 +15,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor CustomOnChangedMethodNotFoundOrUnsupported = new(
         id: "DPG0001",
         title: "OnChanged Method Not Found or Unsupported",
-        messageFormat: "The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.",
+        messageFormat: "The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'",
         category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -76,7 +76,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor UnsupportedCallbackSignature = new(
         id: "DPG0007",
         title: "Unsupported Callback Signature",
-        messageFormat: "Method '{0}' matches the naming convention but has an unsupported signature.",
+        messageFormat: "Method '{0}' matches the naming convention but has an unsupported signature",
         category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -87,7 +87,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor InvalidDefaultValueExpression = new(
         id: "DPG0008",
         title: "Invalid Default Value Expression",
-        messageFormat: "The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.",
+        messageFormat: "The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed",
         category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
