@@ -32,21 +32,11 @@ internal static partial class SourceGenerationHelper
 
     internal static string GenerateDependencyPropertyName(DependencyPropertyData property) => property is { Modifiers.IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui } ? $"{property.Name}PropertyKey" : $"{property.Name}Property";
 
-    internal static string GenerateTypeByPlatform(Framework framework, string name)
-    {
-        return (framework switch
-        {
-            Framework.Wpf => $"System.Windows.{name}",
-            Framework.Uwp or Framework.Uno => $"Windows.UI.Xaml.{name}",
-            Framework.WinUi or Framework.UnoWinUi => $"Microsoft.UI.Xaml.{name}",
-            Framework.Avalonia => $"Avalonia.{name}",
-            Framework.Maui => $"Microsoft.Maui.Controls.{name}",
-            _ => throw new InvalidOperationException("Platform is not supported."),
-        }).WithGlobalPrefix();
-    }
+    internal static string GenerateTypeByPlatform(Framework framework, string name) =>
+        $"{framework.GetNamespace()}.{name}".WithGlobalPrefix();
 
-    internal static string GenerateDependencyObjectType(Framework framework) => 
-        framework == Framework.Maui ? GenerateTypeByPlatform(framework, "BindableObject") : GenerateTypeByPlatform(framework, framework == Framework.Avalonia ? "AvaloniaObject" : "DependencyObject");
+    internal static string GenerateDependencyObjectType(Framework framework) =>
+        framework.GetBaseObjectTypeFullName().WithGlobalPrefix();
 
     internal static string GenerateDefaultValue(DependencyPropertyData property)
     {
