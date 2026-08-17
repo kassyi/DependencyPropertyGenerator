@@ -110,6 +110,41 @@ internal sealed class DependencyPropertyDataBuilder
         var defaultValue = defaultValueExpression ?? GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
         var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
+        var (directExpressionSyntax, defaultValueDocSyntax, parseFailed) = ParseDefaultValueExpressions(defaultValueExpression, attributeSyntax);
+
+        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
+        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
+
+        var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+
+        if (parseFailed)
+        {
+            throw new DiagnosticException(Diagnostic.Create(
+                DiagnosticDescriptors.InvalidDefaultValueExpression,
+                location,
+                defaultValueExpression));
+        }
+
+        var isReferenceType = false;
+        if (directExpressionSyntax != null)
+        {
+            var position = attributeSyntax?.GetLocation().SourceSpan.Start;
+            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
+        }
+
+        if (!isReferenceType)
+        {
+            return this;
+        }
+
+        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static (ExpressionSyntax? DirectExpr, ExpressionSyntax? DocExpr, bool ParseFailed) ParseDefaultValueExpressions(
+        string? defaultValueExpression,
+        AttributeSyntax? attributeSyntax)
+    {
         ExpressionSyntax? directExpressionSyntax = null;
         var parseFailed = false;
 
@@ -125,6 +160,7 @@ internal sealed class DependencyPropertyDataBuilder
             } 
             catch 
             { 
+                // [INTENTIONAL FALLBACK] If SyntaxFactory throws, we assume parse failure.
                 parseFailed = true;
             }
         }
@@ -137,32 +173,7 @@ internal sealed class DependencyPropertyDataBuilder
             ? directExpressionSyntax 
             : attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
-        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
-
-        if (parseFailed)
-        {
-            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-            throw new DiagnosticException(Diagnostic.Create(
-                DiagnosticDescriptors.InvalidDefaultValueExpression,
-                location,
-                defaultValueExpression));
-        }
-
-        var isReferenceType = false;
-        if (directExpressionSyntax != null)
-        {
-            var position = attributeSyntax?.GetLocation().SourceSpan.Start;
-            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
-        }
-            
-        if (isReferenceType)
-        {
-            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-            throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
-        }
-
-        return this;
+        return (directExpressionSyntax, defaultValueDocSyntax, parseFailed);
     }
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
@@ -210,18 +221,29 @@ internal sealed class DependencyPropertyDataBuilder
             throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.UnsupportedCallbackSignature, methodLocation, onChangedName));
         }
 
+        ValidateOverrideMetadataCallback(attribute, classSymbol, matchChanged);
+
+        return this;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ValidateOverrideMetadataCallback(
+        AttributeData attribute,
+        INamedTypeSymbol classSymbol,
+        MethodSignatureMatch matchChanged)
+    {
         var isOverrideMetadata = attribute.AttributeClass?.Name is nameof(OverrideMetadataAttribute) or "OverrideMetadata";
 
         if (_framework is not (Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi or Framework.Maui) ||
             !isOverrideMetadata)
         {
-            return this;
+            return;
         }
 
         if (!matchChanged.Signatures.HasFlag(CallbackSignature.OldAndNewValue) &&
             !(_isAttached && matchChanged.Signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue)))
         {
-            return this;
+            return;
         }
 
         var location = classSymbol.Locations.FirstOrDefault() ?? Location.None;

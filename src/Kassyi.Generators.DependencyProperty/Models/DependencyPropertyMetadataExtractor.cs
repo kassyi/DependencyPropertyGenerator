@@ -111,24 +111,8 @@ internal static class DependencyPropertyMetadataExtractor
             TryGetPropertyModifiers(classSymbol, propertyName, ref isPartialProperty, ref isRequired, ref isInitOnly);
         }
 
-        var matchChanged = classSymbol != null
-            ? PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType)
-            : new MethodSignatureMatch();
-
-        if (!isCustomOnChanged)
-        {
-            matchChanged.Signatures = isAttached
-                ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
-                : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
-        }
-
-        var matchChanging = classSymbol != null
-            ? PrepareData.CheckMethodsDirectly(classSymbol, onChangingName, targetType, targetSenderType)
-            : new MethodSignatureMatch();
-
-        matchChanging.Signatures = isAttached
-            ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
-            : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
+        var matchChanged = EvaluateSignature(classSymbol, onChangedName, targetType, targetSenderType, isCustomOnChanged, isAttached);
+        var matchChanging = EvaluateSignature(classSymbol, onChangingName, targetType, targetSenderType, false, isAttached);
 
         var bindEventsArray = GetBindEventsArray(bindEvent, bindEvents);
 
@@ -141,6 +125,29 @@ internal static class DependencyPropertyMetadataExtractor
                 ChangingSignatures: matchChanging.Signatures
             )
         };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static MethodSignatureMatch EvaluateSignature(
+        INamedTypeSymbol? classSymbol,
+        string methodName,
+        string targetType,
+        string targetSenderType,
+        bool isCustom,
+        bool isAttached)
+    {
+        var match = classSymbol != null
+            ? PrepareData.CheckMethodsDirectly(classSymbol, methodName, targetType, targetSenderType)
+            : new MethodSignatureMatch();
+
+        if (!isCustom)
+        {
+            match.Signatures = isAttached
+                ? CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue | CallbackSignature.SenderAndOldAndNewValue
+                : CallbackSignature.NoParameters | CallbackSignature.NewValue | CallbackSignature.OldAndNewValue;
+        }
+
+        return match;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -173,28 +180,38 @@ internal static class DependencyPropertyMetadataExtractor
                     continue;
                 }
 
-                var hasPartial = false;
-                foreach (var modifier in p.Modifiers)
+                var (hasPartial, hasRequired) = CheckModifiers(p);
+                if (hasRequired)
                 {
-                    if (modifier.IsKind(SyntaxKind.PartialKeyword) || modifier.Text == "partial")
-                    {
-                        hasPartial = true;
-                    }
-                    else if (modifier.IsKind(SyntaxKind.RequiredKeyword) || modifier.Text == "required")
-                    {
-                        isRequired = true;
-                    }
+                    isRequired = true;
                 }
 
-                if (!hasPartial)
+                if (hasPartial)
                 {
-                    continue;
+                    isPartialProperty = true;
+                    return;
                 }
-
-                isPartialProperty = true;
-                return;
             }
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static (bool HasPartial, bool IsRequired) CheckModifiers(PropertyDeclarationSyntax p)
+    {
+        var hasPartial = false;
+        var hasRequired = false;
+        foreach (var modifier in p.Modifiers)
+        {
+            if (modifier.IsKind(SyntaxKind.PartialKeyword) || modifier.Text == "partial")
+            {
+                hasPartial = true;
+            }
+            else if (modifier.IsKind(SyntaxKind.RequiredKeyword) || modifier.Text == "required")
+            {
+                hasRequired = true;
+            }
+        }
+        return (hasPartial, hasRequired);
     }
 
     private static CallbackSignature GetChangedSignatureFlags(
