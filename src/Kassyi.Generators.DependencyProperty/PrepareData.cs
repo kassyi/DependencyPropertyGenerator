@@ -275,7 +275,7 @@ public static class PrepareData
         if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
         {
             var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            return $"new {typeString}{implicitNew.ArgumentList?.ToFullString() ?? ""}{implicitNew.Initializer?.ToFullString() ?? ""}";
+            return $"{implicitNew.GetLeadingTrivia().ToFullString()}new {typeString}{implicitNew.ArgumentList?.ToFullString() ?? ""}{implicitNew.Initializer?.ToFullString() ?? ""}{implicitNew.GetTrailingTrivia().ToFullString()}";
         }
 
         return defaultValue;

@@ -111,6 +111,7 @@ internal sealed class DependencyPropertyDataBuilder
         var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
         ExpressionSyntax? directExpressionSyntax = null;
+        bool parseFailed = false;
 
         if (defaultValueExpression != null)
         {
@@ -119,22 +120,12 @@ internal sealed class DependencyPropertyDataBuilder
                 directExpressionSyntax = SyntaxFactory.ParseExpression(defaultValueExpression); 
                 if (directExpressionSyntax.ContainsDiagnostics)
                 {
-                    throw new DiagnosticException(Diagnostic.Create(
-                        DiagnosticDescriptors.InvalidDefaultValueExpression,
-                        attributeSyntax?.GetLocation() ?? Location.None,
-                        defaultValueExpression));
+                    parseFailed = true;
                 }
             } 
-            catch (DiagnosticException)
-            {
-                throw;
-            }
             catch 
             { 
-                throw new DiagnosticException(Diagnostic.Create(
-                    DiagnosticDescriptors.InvalidDefaultValueExpression,
-                    attributeSyntax?.GetLocation() ?? Location.None,
-                    defaultValueExpression));
+                parseFailed = true;
             }
         }
         else
@@ -142,19 +133,37 @@ internal sealed class DependencyPropertyDataBuilder
             directExpressionSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
         }
 
-        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
-        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, directExpressionSyntax, _typeSymbol);
+        var defaultValueDocSyntax = defaultValueExpression != null 
+            ? directExpressionSyntax 
+            : attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        if (directExpressionSyntax != null)
+        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
+        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
+
+        bool isReferenceType = false;
+        if (directExpressionSyntax != null && !parseFailed)
         {
             int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
-            bool isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
+            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
+        }
+        else if (defaultValueExpression != null && parseFailed)
+        {
+            // Conservative fallback for invalid string expressions
+            isReferenceType = _typeSymbol is { IsValueType: false } && _typeSymbol.SpecialType != SpecialType.System_String;
+        }
             
-            if (isReferenceType)
-            {
-                var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-                throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
-            }
+        if (isReferenceType)
+        {
+            var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+            throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
+        }
+
+        if (parseFailed)
+        {
+            throw new DiagnosticException(Diagnostic.Create(
+                DiagnosticDescriptors.InvalidDefaultValueExpression,
+                attributeSyntax?.GetLocation() ?? Location.None,
+                defaultValueExpression));
         }
 
         return this;

@@ -152,13 +152,10 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
                 return;
             }
 
-            // [WHY] Optional<T>.GetValueOrDefault() returns null when value is unset (e.g. initial change), causing CS8600/CS8604 in #nullable enable context.
             using var _ = writer.ClassScope(@class);
             using (writer.Scope($"static {@class.Name}()"))
             {
-                writer.AppendLine("#pragma warning disable CS8600, CS8604");
                 writer.Append(tempWriter.ToString());
-                writer.AppendLine("#pragma warning restore CS8600, CS8604");
             }
         }
         finally
@@ -191,6 +188,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         var observerType = $"global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{propertyType}>>";
         using (writer.Scope($"{property.Name}Property.Changed.Subscribe(new {observerType}(static x =>", "}));"))
         {
+            writer.AppendLine("#pragma warning disable CS8600, CS8604");
             var senderType = property.IsAttached
                 ? SourceGenerationHelper.GenerateBrowsableForType(property)
                 : @class.Type;
@@ -220,6 +218,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
                     writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
                 }
             }
+            writer.AppendLine("#pragma warning restore CS8600, CS8604");
         }
     }
 }

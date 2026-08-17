@@ -127,7 +127,7 @@ internal static partial class SourceGenerationHelper
             $"typeof({GenerateBrowsableForType(property)})");
     }
 
-    internal static void GenerateCommonPropertyAttributes(ref SourceWriter writer, DependencyPropertyData property, string version, bool isGetter = false)
+    internal static void GenerateCommonPropertyAttributes(ref SourceWriter writer, DependencyPropertyData property, ClassData @class)
     {
         GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
         GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
@@ -136,14 +136,9 @@ internal static partial class SourceGenerationHelper
         GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
         GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
         
-        if (isGetter && property.IsAttached)
-        {
-            GenerateBrowsableForTypeAttribute(ref writer, property);
-        }
-
         GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
-        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, property.Framework);
-        GenerateGeneratedCodeAttribute(ref writer, version);
+        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
         GenerateExcludeFromCodeCoverageAttribute(ref writer);
     }
 }

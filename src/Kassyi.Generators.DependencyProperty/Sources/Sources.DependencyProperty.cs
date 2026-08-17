@@ -46,7 +46,7 @@ internal static partial class SourceGenerationHelper
         strategy.GenerateAdditionalFieldForDirectProperties(ref writer, property);
         strategy.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCommonPropertyAttributes(ref writer, property, @class.Version);
+        GenerateCommonPropertyAttributes(ref writer, property, @class);
 
         var partialModifier = property.IsPartialProperty ? "partial " : string.Empty;
         var requiredModifier = property.IsRequired ? "required " : string.Empty;

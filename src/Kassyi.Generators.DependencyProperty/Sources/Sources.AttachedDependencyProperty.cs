@@ -40,7 +40,7 @@ internal static partial class SourceGenerationHelper
         strategy.GenerateAdditionalPropertyForReadOnlyProperties(ref writer, property);
         
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.SetterXmlDocumentation, property, isProperty: true);
-        GenerateCommonPropertyAttributes(ref writer, property, @class.Version);
+        GenerateCommonPropertyAttributes(ref writer, property, @class);
 
         var setterVisibility = property.IsReadOnly ? "internal" : "public";
         var browsableForType = GenerateBrowsableForType(property);
@@ -53,7 +53,7 @@ internal static partial class SourceGenerationHelper
         }
 
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
-        GenerateCommonPropertyAttributes(ref writer, property, @class.Version);
+        GenerateCommonPropertyAttributes(ref writer, property, @class);
         GenerateBrowsableForTypeAttribute(ref writer, property);
 
         using (writer.Scope($"public static {type} Get{property.Name}({browsableForType} element)"))
