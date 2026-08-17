@@ -1,10 +1,10 @@
-﻿//HintName: DependencyPropertyAttribute.g.cs
+//HintName: DependencyPropertyAttribute.g.cs
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty;
-/// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
+/// <summary>Generates dependency property using DependencyProperty.Register.</summary>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
 [global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
 internal sealed class DependencyPropertyAttribute : global::System.Attribute
@@ -89,7 +89,7 @@ internal sealed class DependencyPropertyAttribute : global::System.Attribute
     }
 }
 
-/// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
+/// <summary>Generates dependency property using DependencyProperty.Register.</summary>
 /// <typeparam name = "T">Type of this dependency property.</typeparam>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
 [global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
