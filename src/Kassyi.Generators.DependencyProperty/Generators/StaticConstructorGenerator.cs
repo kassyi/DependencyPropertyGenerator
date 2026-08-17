@@ -58,6 +58,7 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .AddSource(context);
     }
 
+    /// <summary>Groups flat dependency property data by declaring class for static constructor generation.</summary>
     internal static IEnumerable<StaticConstructorData> TransformToStaticConstructorData(
         EquatableArray<(ClassData Class, DependencyPropertyData DependencyProperty)> array,
         CancellationToken _)

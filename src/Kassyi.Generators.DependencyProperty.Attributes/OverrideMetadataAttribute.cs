@@ -87,7 +87,7 @@ public OverrideMetadataAttribute(
     }
 }
 
-/// <summary>Will override dependency property metadata using DependencyProperty.OverrideMetadata. Metadata override behavior: <seealso href="https://docs.microsoft.com/en-us/dotnet/desktop/wpf/properties/framework-property-metadata?view=netdesktop-6.0#metadata-override-behavior"/></summary>
+/// <summary>Overrides dependency property metadata using DependencyProperty.OverrideMetadata. Metadata override behavior: <seealso href="https://docs.microsoft.com/en-us/dotnet/desktop/wpf/properties/framework-property-metadata?view=netdesktop-6.0#metadata-override-behavior"/></summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
 [global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]

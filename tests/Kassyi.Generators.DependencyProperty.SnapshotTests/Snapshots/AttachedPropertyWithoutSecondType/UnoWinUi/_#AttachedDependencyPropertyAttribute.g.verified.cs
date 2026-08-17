@@ -127,7 +127,7 @@ public AttachedDependencyPropertyAttribute(
     }
 }
 
-/// <summary>Will generates attached dependency property using DependencyProperty.RegisterAttached.</summary>
+/// <summary>Generates attached dependency property using DependencyProperty.RegisterAttached.</summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
 [global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
@@ -248,7 +248,7 @@ public AttachedDependencyPropertyAttribute(
     }
 }
 
-/// <summary>Will generates attached dependency property using DependencyProperty.RegisterAttached.</summary>
+/// <summary>Generates attached dependency property using DependencyProperty.RegisterAttached.</summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
 /// <typeparam name="TBrowsableForType">The type for which the extension is intended.</typeparam>
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]

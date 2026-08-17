@@ -45,6 +45,7 @@ public static class PrepareData
         new TripleParameterRule()
     ];
 
+    /// <summary>Iterates over all methods matching the specified name to evaluate their signatures against expected callback patterns.</summary>
     internal static MethodSignatureMatch CheckMethodsDirectly(
         INamedTypeSymbol classSymbol, string methodName, string targetType, string senderType)
     {
@@ -65,6 +66,7 @@ public static class PrepareData
         return match;
     }
 
+    /// <summary>Resolves the fully qualified name of the DependencyObject base class for the target UI framework.</summary>
     internal static string GenerateDependencyObjectType(Framework framework) =>
         framework == Framework.Maui ? "Microsoft.Maui.Controls.BindableObject" :
         framework == Framework.Avalonia ? "Avalonia.AvaloniaObject" :
@@ -185,6 +187,7 @@ public static class PrepareData
         return parentClassesBuilder.ToImmutable().AsEquatableArray();
     }
 
+    /// <summary>Determines if a symbol is a built-in C# special type or an array of special types.</summary>
     internal static bool? IsSpecialType(this ITypeSymbol? symbol)
     {
         return symbol switch
@@ -198,6 +201,7 @@ public static class PrepareData
         };
     }
 
+    /// <summary>Extracts the syntax node for a specific named argument from an attribute syntax tree.</summary>
     internal static ExpressionSyntax? GetNamedArgumentExpressionSyntax(this AttributeSyntax attributeSyntax, string name)
     {
         attributeSyntax = attributeSyntax ?? throw new ArgumentNullException(nameof(attributeSyntax));
@@ -219,8 +223,10 @@ public static class PrepareData
         return null;
     }
 
+    /// <summary>Extracts the full text string of a specific named argument expression from an attribute syntax tree.</summary>
     internal static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name) => attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
 
+    /// <summary>Expands implicit object creation expressions (e.g., 'new()') into explicit type instantiations.</summary>
     internal static string? ExpandDefaultValueExpression(string? defaultValue, ExpressionSyntax? expression, ITypeSymbol? typeSymbol)
     {
         if (typeSymbol == null || string.IsNullOrWhiteSpace(defaultValue))
@@ -240,7 +246,7 @@ public static class PrepareData
             }
             catch
             {
-                // [INTENTIONAL FALLBACK] If Roslyn syntax parsing fails (e.g. for plain string or constant literals),
+                // [WHY] If Roslyn syntax parsing fails (e.g. for plain string or constant literals),
                 // we safely fall back to using the raw defaultValue string representation without throwing.
             }
         }

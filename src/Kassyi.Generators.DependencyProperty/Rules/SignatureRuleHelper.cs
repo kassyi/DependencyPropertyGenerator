@@ -2,17 +2,20 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules;
 
+/// <summary>Provides utility methods for resolving and comparing type signatures in callback methods.</summary>
 internal static class SignatureRuleHelper
 {
     internal static readonly SymbolDisplayFormat TypeFormat = SymbolDisplayFormat.FullyQualifiedFormat
         .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
+    /// <summary>Returns the fully qualified type name without the global namespace prefix and trailing question marks.</summary>
     public static string GetNormalizedTypeName(ITypeSymbol typeSymbol)
     {
         var str = typeSymbol.ToDisplayString(TypeFormat);
         return str.EndsWith("?", StringComparison.Ordinal) ? str.Substring(0, str.Length - 1) : str;
     }
 
+    /// <summary>Trims global:: and trailing nullable markers from a type name string.</summary>
     internal static string NormalizeTypeName(string typeName)
     {
         if (string.IsNullOrEmpty(typeName))
@@ -33,6 +36,7 @@ internal static class SignatureRuleHelper
         return span.Length == typeName.Length ? typeName : span.ToString();
     }
 
+    /// <summary>Determines if a given type symbol represents an EventArgs derivative used in event callbacks.</summary>
     public static bool IsEventArgsType(ITypeSymbol typeSymbol)
     {
         var current = typeSymbol;

@@ -2,6 +2,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Instantiates the appropriate source generation strategy based on the target UI framework.</summary>
 internal static class FrameworkGeneratorFactory
 {
     public static FrameworkGenerator Create(Framework framework)

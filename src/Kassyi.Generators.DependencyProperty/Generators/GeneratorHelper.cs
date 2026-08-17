@@ -5,8 +5,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Core assembly-internal helper for extracting syntax data and registering attribute-based generators.</summary>
 internal static class GeneratorHelper
 {
+    /// <summary>Extracts framework-specific metadata from attributes and prepares it for incremental generation.</summary>
     public static IncrementalValuesProvider<TData> ExtractData<TData>(
         this IncrementalGeneratorInitializationContext context,
         IncrementalValueProvider<Framework> framework,
@@ -21,6 +23,7 @@ internal static class GeneratorHelper
         var provider = context.SyntaxProvider
             .ForAttributeWithMetadataNameOfClassesAndRecords(attributeName);
 
+        // [WHY] SelectMany flattens multiple attributes applied to the same class or partial declarations into individual elements.
         var combinedProvider = selectMany
             ? provider.SelectManyAllAttributesOfCurrentClassSyntax()
             : provider.SelectAllAttributes();
@@ -75,6 +78,7 @@ internal static class GeneratorHelper
         }
     }
 
+    /// <summary>Registers source generation pipelines for multiple attribute names sharing the same extraction logic.</summary>
     public static void RegisterAttributeGenerator<TData>(
         this IncrementalGeneratorInitializationContext context,
         IncrementalValueProvider<Framework> framework,
@@ -94,6 +98,7 @@ internal static class GeneratorHelper
         }
     }
 
+    /// <summary>Combines multiple incremental value providers into a single unified array provider.</summary>
     public static IncrementalValueProvider<EquatableArray<T>> CombineAll<T>(
         this IEnumerable<IncrementalValueProvider<EquatableArray<T>>> providers,
         IncrementalGeneratorInitializationContext context)

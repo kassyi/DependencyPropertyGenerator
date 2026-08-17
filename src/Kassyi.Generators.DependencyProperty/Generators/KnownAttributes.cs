@@ -1,5 +1,6 @@
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
+/// <summary>Contains short names of generator attributes to quickly match syntax nodes before semantic analysis.</summary>
 internal static class KnownAttributeShortNames
 {
     public const string DependencyProperty = "DependencyProperty";
@@ -10,6 +11,7 @@ internal static class KnownAttributeShortNames
     public const string OverrideMetadata = "OverrideMetadata";
 }
 
+/// <summary>Contains fully qualified names of generator attributes for exact semantic matching.</summary>
 internal static class KnownAttributes
 {
     public const string Namespace = "Kassyi.Generators.DependencyProperty.";
@@ -29,6 +31,7 @@ internal static class KnownAttributes
     public const string OverrideMetadata = Namespace + OverrideMetadataAttribute;
 }
 
+/// <summary>Contains names of dependency property types used across various UI frameworks.</summary>
 internal static class KnownPropertyTypes
 {
     public const string DependencyProperty = "DependencyProperty";
@@ -40,6 +43,7 @@ internal static class KnownPropertyTypes
     public const string BindablePropertyKey = "BindablePropertyKey";
 }
 
+/// <summary>Contains framework-specific method names used during source generation (e.g., Register, GetValue).</summary>
 internal static class KnownMethodNames
 {
     public const string Register = "Register";

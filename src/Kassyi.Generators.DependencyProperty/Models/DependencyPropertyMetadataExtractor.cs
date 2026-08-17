@@ -9,8 +9,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Extracts framework-agnostic and UI framework-specific metadata from attribute arguments for dependency property generation.</summary>
 internal static class DependencyPropertyMetadataExtractor
 {
+    /// <summary>Extracts core component model metadata such as BrowsableForType, Category, and TypeConverter.</summary>
     public static ComponentModelData ExtractComponentModel(
         AttributeData attribute,
         Dictionary<string, TypedConstant> namedArgs,
@@ -34,6 +36,7 @@ internal static class DependencyPropertyMetadataExtractor
             Localizability: GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.Localizability)).ToEnum<Localizability>()?.ToString("G"));
     }
 
+    /// <summary>Extracts WPF/WinUI specific framework metadata flags like AffectsMeasure and Inherits.</summary>
     public static FrameworkMetadataData ExtractFrameworkMetadata(Dictionary<string, TypedConstant> namedArgs)
     {
         return new FrameworkMetadataData(
@@ -53,6 +56,7 @@ internal static class DependencyPropertyMetadataExtractor
         );
     }
 
+    /// <summary>Extracts XML documentation strings for property, getter, and setter from attribute arguments.</summary>
     public static XmlDocumentationData ExtractXmlDocumentation(Dictionary<string, TypedConstant> namedArgs)
     {
         var propertyXmlDoc = GetNamedArgument(namedArgs, nameof(DependencyPropertyAttribute.PropertyXmlDocumentation)).Value as string;
@@ -65,6 +69,7 @@ internal static class DependencyPropertyMetadataExtractor
         );
     }
 
+    /// <summary>Extracts data validation flags for dependency property callbacks.</summary>
     public static ValidationAndCallbackData ExtractValidationFlags(
         Dictionary<string, TypedConstant> namedArgs,
         ValidationAndCallbackData initial = default)
@@ -78,6 +83,7 @@ internal static class DependencyPropertyMetadataExtractor
         };
     }
 
+    /// <summary>Analyzes user-defined class members to resolve property changed/changing callback signatures.</summary>
     public static ValidationAndCallbackData ExtractCallbacks(
         Dictionary<string, TypedConstant> namedArgs,
         string propertyName,
@@ -111,6 +117,7 @@ internal static class DependencyPropertyMetadataExtractor
             TryGetPropertyModifiers(classSymbol, propertyName, ref isPartialProperty, ref isRequired, ref isInitOnly);
         }
 
+        // [WHY] Validates if the user-defined class implements the expected callback signatures to prevent invalid code generation.
         var matchChanged = EvaluateSignature(classSymbol, onChangedName, targetType, targetSenderType, isCustomOnChanged, isAttached);
         var matchChanging = EvaluateSignature(classSymbol, onChangingName, targetType, targetSenderType, false, isAttached);
 
@@ -186,11 +193,13 @@ internal static class DependencyPropertyMetadataExtractor
                     isRequired = true;
                 }
 
-                if (hasPartial)
+                if (!hasPartial)
                 {
-                    isPartialProperty = true;
-                    return;
+                    continue;
                 }
+
+                isPartialProperty = true;
+                return;
             }
         }
     }
@@ -232,6 +241,7 @@ internal static class DependencyPropertyMetadataExtractor
 
 
 
+    /// <summary>Resolves the target sender type for callback methods, handling attached property specifics.</summary>
     internal static string GetTargetSenderType(
         INamedTypeSymbol? classSymbol,
         bool isAttached,
