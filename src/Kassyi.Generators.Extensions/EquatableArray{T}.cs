@@ -22,6 +22,9 @@ public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnume
 {
     private readonly T[]? _array;
 
+    /// <summary>Gets an empty <see cref="EquatableArray{T}"/>.</summary>
+    public static EquatableArray<T> Empty => default;
+
     /// <summary>Creates a new <see cref="EquatableArray{T}"/> instance.</summary>
     public EquatableArray(ImmutableArray<T> array)
     {

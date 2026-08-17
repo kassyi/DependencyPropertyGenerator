@@ -8,7 +8,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)
     {
         var defaultBindingMode = property.FrameworkMetadata.DefaultBindingMode is null or "Default"
-            ? property.IsReadOnly
+            ? property.Modifiers.IsReadOnly
                 ? "OneWayToSource"
                 : "OneWay"
             : property.FrameworkMetadata.DefaultBindingMode;
@@ -37,8 +37,8 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
 
     public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)
     {
-        return property.IsAttached ? property.IsReadOnly ? "CreateAttachedReadOnly" : "CreateAttached" :
-            property.IsReadOnly ? "CreateReadOnly" : "Create";
+        return property.Modifiers.IsAttached ? property.Modifiers.IsReadOnly ? "CreateAttachedReadOnly" : "CreateAttached" :
+            property.Modifiers.IsReadOnly ? "CreateReadOnly" : "Create";
     }
 
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
@@ -55,7 +55,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
 
     protected override string GenerateValidateValueCallbackInternal(ClassData @class, DependencyPropertyData property)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
 
@@ -66,7 +66,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
     {
         return SourceGenerationHelper.GenerateTypeByPlatform(
             property.Framework,
-            property.IsReadOnly
+            property.Modifiers.IsReadOnly
                 ? "BindablePropertyKey"
                 : "BindableProperty");
     }
@@ -75,7 +75,7 @@ internal sealed class MauiFrameworkGenerator : FrameworkGenerator
         ref SourceWriter writer,
         DependencyPropertyData property)
     {
-        if (!property.IsReadOnly)
+        if (!property.Modifiers.IsReadOnly)
         {
             return;
         }

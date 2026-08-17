@@ -9,7 +9,7 @@ internal static partial class SourceGenerationHelper
     {
         var value = property.Type;
         if ((canBeNull ||
-             property is { IsValueType: false, DefaultValue: null }) &&
+             property is { Modifiers.IsValueType: false, DefaultValue: null }) &&
             !value.EndsWith("?", StringComparison.Ordinal))
         {
             value += "?";
@@ -31,7 +31,7 @@ internal static partial class SourceGenerationHelper
 
     internal static string GenerateDependencyPropertyName(DependencyPropertyData property)
     {
-        if (property is { IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui })
+        if (property is { Modifiers.IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui })
         {
             return $"{property.Name}PropertyKey";
         }
@@ -58,7 +58,7 @@ internal static partial class SourceGenerationHelper
     internal static string GenerateDefaultValue(DependencyPropertyData property)
     {
         var type = property.Type;
-        if (property is { IsSpecialType: true, DefaultValueDocumentation: { } })
+        if (property is { Modifiers.IsSpecialType: true, DefaultValueDocumentation: { } })
         {
             return $"({type}){property.DefaultValueDocumentation}";
         }
@@ -77,6 +77,12 @@ internal static partial class SourceGenerationHelper
     internal static string GenerateBrowsableForType(DependencyPropertyData property) =>
         property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
 
+    /// <summary>
+    /// Generates a valid C# parameter name from a type name.
+    /// Ex: "global::System.Windows.Controls.Control" -> "control"
+    /// Ex: "global::System.Collections.Generic.List&lt;string&gt;" -> "list"
+    /// Ex: "Class" -> "@class"
+    /// </summary>
     private static string GenerateBrowsableForTypeParameterName(DependencyPropertyData property)
     {
         var typeName = property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
@@ -86,9 +92,11 @@ internal static partial class SourceGenerationHelper
             return "sender";
         }
         
+        // Remove generic type arguments (e.g. "List<string>" -> "List")
         var genericIndex = typeName.IndexOf('<');
         var nameToProcess = genericIndex >= 0 ? typeName.Substring(0, genericIndex) : typeName;
         
+        // Remove namespace (e.g. "System.Windows.Controls.Control" -> "Control")
         var lastDot = nameToProcess.LastIndexOf('.');
         var startIndex = lastDot >= 0 ? lastDot + 1 : 0;
         var length = nameToProcess.Length - startIndex;
@@ -98,6 +106,7 @@ internal static partial class SourceGenerationHelper
             return "sender";
         }
 
+        // Convert the first character to lowercase (e.g. "Control" -> "control")
         Span<char> span = stackalloc char[length];
         nameToProcess.AsSpan(startIndex).CopyTo(span);
         
@@ -108,6 +117,7 @@ internal static partial class SourceGenerationHelper
         
         var name = span.ToString();
         
+        // Escape C# keywords if necessary (e.g. "class" -> "@class")
         if (Array.IndexOf(s_cSharpKeywords, name) >= 0)
         {
             return "@" + name;
@@ -160,16 +170,16 @@ internal static partial class SourceGenerationHelper
 
     private static string GenerateAdditionalSetterModifier(DependencyPropertyData property)
     {
-        return property is { IsDirect: true, Framework: Framework.Avalonia }
+        return property is { Modifiers.IsDirect: true, Framework: Framework.Avalonia }
             ? "private "
-            : property.IsReadOnly
+            : property.Modifiers.IsReadOnly
                 ? "protected "
                 : string.Empty;
     }
 
     private static string GeneratePropertyModifier(DependencyPropertyData property)
     {
-        if (property is { IsReadOnly: true, Framework: Framework.Wpf })
+        if (property is { Modifiers.IsReadOnly: true, Framework: Framework.Wpf })
         {
             return "internal";
         }
@@ -186,7 +196,7 @@ internal static partial class SourceGenerationHelper
 
         if (property.Framework == Framework.Maui)
         {
-            var senderType = property.IsAttached
+            var senderType = property.Modifiers.IsAttached
                 ? GenerateBrowsableForType(property)
                 : @class.Type;
 
@@ -209,8 +219,8 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateOnChangedMethodDeclaration(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
-        var modifiers = property.IsAttached ? "static " : string.Empty;
-        var targetParameter = property.IsAttached
+        var modifiers = property.Modifiers.IsAttached ? "static " : string.Empty;
+        var targetParameter = property.Modifiers.IsAttached
             ? $"{GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, "
             : string.Empty;
         var propertyType = GenerateType(property);
@@ -220,7 +230,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateOnChangedMethodCall(ref SourceWriter writer, string name, DependencyPropertyData property)
     {
-        var targetArgument = property.IsAttached
+        var targetArgument = property.Modifiers.IsAttached
             ? $"{GenerateBrowsableForTypeParameterName(property)}, "
             : string.Empty;
 
@@ -235,7 +245,7 @@ internal static partial class SourceGenerationHelper
         }
 
         var type = property.Type;
-        var sender = property.IsAttached ? GenerateBrowsableForTypeParameterName(property) : "this";
+        var sender = property.Modifiers.IsAttached ? GenerateBrowsableForTypeParameterName(property) : "this";
 
         writer.AppendLine();
         GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed_BeforeBind", property);
@@ -270,8 +280,24 @@ internal static partial class SourceGenerationHelper
         }
     }
 
+    internal static Strategies.IDependencyPropertyGeneratorStrategy GeneratePropertyHeader(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
 
-    
+        return Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
+    }
+
+    internal static void GeneratePropertyFooter(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        GenerateOnChangedMethods(ref writer, @class, property);
+        GenerateOnChangingMethods(ref writer, @class, property);
+        GenerateCoercePartialMethod(ref writer, property);
+        GenerateValidatePartialMethod(ref writer, @class, property);
+        GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
+        GenerateBindEventMethod(ref writer, property);
+    }
+
     internal static SourceWriterClassScope ClassScope(ref this SourceWriter writer, ClassData @class)
     {
         writer.AppendLine();

@@ -10,7 +10,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             ? "OneWay"
             : property.FrameworkMetadata.DefaultBindingMode;
 
-        if (!property.IsDirect)
+        if (!property.Modifiers.IsDirect)
         {
             return $"""
                 name: "{property.Name}",
@@ -21,10 +21,10 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
                 coerce: {GenerateCoerceValueCallback(@class, property)}
                 """;
         }
-        var nameArgument = property.IsAddOwner ? "" : $"name: \"{property.Name}\", ";
+        var nameArgument = property.Modifiers.IsAddOwner ? "" : $"name: \"{property.Name}\", ";
         return $"""
             {nameArgument}getter: static sender => sender.{property.Name},
-            setter: {(property.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
+            setter: {(property.Modifiers.IsReadOnly ? "null" : $"static (sender, value) => sender.{property.Name} = value")},
             unsetValue: {SourceGenerationHelper.GenerateDefaultValue(property)},
             defaultBindingMode: global::Avalonia.Data.BindingMode.{defaultBindingMode},
             enableDataValidation: {(property.ValidationAndCallbacks.EnableDataValidation ? "true" : "false")}
@@ -33,7 +33,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
 
     public override string GenerateAddOwnerCreateCall(ClassData @class, DependencyPropertyData property)
     {
-        var arguments = property.IsDirect
+        var arguments = property.Modifiers.IsDirect
             ? GenerateRegisterMethodArguments(@class, property)
             : GeneratePropertyMetadata(@class, property);
 
@@ -45,8 +45,8 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         var type = SourceGenerationHelper.GenerateType(property);
         return property switch
         {
-            { IsDirect: true } => $"RegisterDirect<{@class.Type}, {type}>",
-            { IsAttached: true } => $"RegisterAttached<{@class.Type}, {SourceGenerationHelper.GenerateBrowsableForType(property)}, {type}>",
+            { Modifiers.IsDirect: true } => $"RegisterDirect<{@class.Type}, {type}>",
+            { Modifiers.IsAttached: true } => $"RegisterAttached<{@class.Type}, {SourceGenerationHelper.GenerateBrowsableForType(property)}, {type}>",
             _ => $"Register<{@class.Type}, {type}>",
         };
     }
@@ -58,7 +58,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             ? "OneWay"
             : property.FrameworkMetadata.DefaultBindingMode;
 
-        if (property.IsDirect)
+        if (property.Modifiers.IsDirect)
         {
             writer.Append($"""
                 {parameterName}new global::Avalonia.Data.Core.TargetNullValuePropertyMetadata<{SourceGenerationHelper.GenerateType(property)}>(
@@ -83,8 +83,8 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         var type = SourceGenerationHelper.GenerateType(property);
         var propertyKind = property switch
         {
-            { IsDirect: true } => $"DirectProperty<{@class.Type}, {type}>",
-            { IsAttached: true } => $"AttachedProperty<{type}>",
+            { Modifiers.IsDirect: true } => $"DirectProperty<{@class.Type}, {type}>",
+            { Modifiers.IsAttached: true } => $"AttachedProperty<{type}>",
             _ => $"StyledProperty<{type}>",
         };
 
@@ -98,7 +98,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         ref SourceWriter writer,
         DependencyPropertyData property)
     {
-        if (!property.IsDirect)
+        if (!property.Modifiers.IsDirect)
         {
             return;
         }
@@ -142,7 +142,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             {
                 GenerateAvaloniaStaticConstructorAffects(ref tempWriter, @class, property);
             }
-            foreach (var property in properties.OrderBy(static p => p.IsAttached))
+            foreach (var property in properties.OrderBy(static p => p.Modifiers.IsAttached))
             {
                 GenerateAvaloniaStaticConstructorPropertyChanged(ref tempWriter, @class, property);
             }
@@ -189,35 +189,19 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         using (writer.Scope($"{property.Name}Property.Changed.Subscribe(new {observerType}(static x =>", "}));"))
         {
             writer.AppendLine("#pragma warning disable CS8600, CS8604");
-            var senderType = property.IsAttached
+            var senderType = property.Modifiers.IsAttached
                 ? SourceGenerationHelper.GenerateBrowsableForType(property)
                 : @class.Type;
                 
             var senderCast = $"({senderType})x.Sender";
             var instanceCast = $"(({@class.Type})x.Sender)";
             var typeCast = $"({propertyType})";
-            var isAttached = property.IsAttached;
+            var isAttached = property.Modifiers.IsAttached;
             
             var oldVal = $"{typeCast}x.OldValue.GetValueOrDefault()";
             var newVal = $"{typeCast}x.NewValue.GetValueOrDefault()";
 
-            (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
-            [
-                (CallbackSignature.NoParameters, isAttached, []),
-                (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
-                (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
-                (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
-                (CallbackSignature.EventArgs, isAttached, ["x"]),
-                (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, "x"]),
-            ];
-
-            foreach (var (flag, isStatic, args) in mappings)
-            {
-                if (signatures.HasFlag(flag))
-                {
-                    writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
-                }
-            }
+            GenerateCallbackCalls(writer, signatures, name, isAttached, senderCast, instanceCast, oldVal, newVal, "x");
             writer.AppendLine("#pragma warning restore CS8600, CS8604");
         }
     }

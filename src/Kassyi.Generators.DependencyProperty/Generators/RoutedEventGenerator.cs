@@ -26,12 +26,20 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
             source: Resources.RoutedEventStrategy_cs.AsString());
     }
 
+    protected override IReadOnlyList<Framework> SupportedFrameworks => [
+        Framework.Wpf,
+        Framework.Uwp,
+        Framework.WinUi,
+        Framework.Uno,
+        Framework.UnoWinUi,
+        Framework.Avalonia
+    ];
+
     protected override (ClassData Class, EventData Event)? PrepareData(
         GeneratorAttributeContext context)
     {
         var eventData = context.Attribute.GetEventData(isStaticClass: false);
-        if (context.Framework is Framework.Maui ||
-            context.Framework is not Framework.Wpf && eventData.IsAttached)
+        if (context.Framework is not Framework.Wpf && eventData.IsAttached)
         {
             return null;
         }

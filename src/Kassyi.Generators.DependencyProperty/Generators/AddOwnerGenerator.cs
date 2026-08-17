@@ -23,14 +23,11 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
             source: Resources.AddOwnerAttribute_cs.AsString());
     }
 
+    protected override IReadOnlyList<Framework> SupportedFrameworks => [Framework.Avalonia, Framework.Wpf];
+
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
         GeneratorAttributeContext context)
     {
-        if (context.Framework is not (Framework.Avalonia or Framework.Wpf))
-        {
-            return null;
-        }
-
         return (context.ClassData, context.GetDependencyPropertyData(isAddOwner: true));
     }
 

@@ -14,12 +14,12 @@ internal abstract class FrameworkGenerator :
     
     public virtual string GeneratePropertyMetadata(ClassData @class, DependencyPropertyData property)
     {
-        if (property is { IsAddOwner: true, DefaultValue: null })
+        if (property is { Modifiers.IsAddOwner: true, DefaultValue: null })
         {
             return "null";
         }
 
-        var parameterName = (@class.Framework, property.IsAttached) switch
+        var parameterName = (@class.Framework, property.Modifiers.IsAttached) switch
         {
             (Framework.Wpf, true) or (Framework.Uwp, true) or (Framework.WinUi, true) => "defaultMetadata: ",
             (Framework.Avalonia, _) => "metadata: ",
@@ -65,14 +65,14 @@ internal abstract class FrameworkGenerator :
         CallbackSignature signatures,
         string callbackSignature)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
 
         var senderCast = $"({senderType})sender";
         var instanceCast = $"(({senderType})sender)";
         var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
-        var isAttached = property.IsAttached;
+        var isAttached = property.Modifiers.IsAttached;
 
         var oldVal = $"{typeCast}{OldValueExpression}";
         var newVal = $"{typeCast}{NewValueExpression}";
@@ -82,32 +82,45 @@ internal abstract class FrameworkGenerator :
         writer.AppendLine(callbackSignature);
         writer.AppendLine("{");
 
-        (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
-        [
-            (CallbackSignature.NoParameters, isAttached, []),
-            (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
-            (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
-            (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
-            (CallbackSignature.EventArgs, isAttached, [argsExpr]),
-            (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, argsExpr]),
-        ];
-
-        foreach (var (flag, isStatic, args) in mappings)
-        {
-            if (signatures.HasFlag(flag))
-            {
-                writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
-            }
-        }
+        GenerateCallbackCalls(writer, signatures, name, isAttached, senderCast, instanceCast, oldVal, newVal, argsExpr);
 
         writer.Append("}");
         return writer.ToString();
     }
 
-    protected static string GenerateCall(string methodName, bool isStatic, string senderExpression, params string[] args)
+    protected static void GenerateCallbackCalls(
+        SourceWriter writer,
+        CallbackSignature signatures,
+        string name,
+        bool isAttached,
+        string senderCast,
+        string instanceCast,
+        string oldVal,
+        string newVal,
+        string argsExpr)
     {
-        var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
-        return $"{target}({string.Join(", ", args)});";
+        WriteCallIfFlag(writer, signatures, CallbackSignature.NoParameters, name, isAttached, instanceCast, "");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.NewValue, name, isAttached, instanceCast, isAttached ? senderCast : newVal);
+        WriteCallIfFlag(writer, signatures, CallbackSignature.OldAndNewValue, name, isAttached, instanceCast, isAttached ? $"{senderCast}, {newVal}" : $"{oldVal}, {newVal}");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.SenderAndOldAndNewValue, name, isAttached, instanceCast, $"{senderCast}, {oldVal}, {newVal}");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.EventArgs, name, isAttached, instanceCast, argsExpr);
+        WriteCallIfFlag(writer, signatures, CallbackSignature.SenderAndEventArgs, name, true, instanceCast, $"{(isAttached ? senderCast : instanceCast)}, {argsExpr}");
+    }
+
+    private static void WriteCallIfFlag(
+        SourceWriter writer,
+        CallbackSignature currentSignatures,
+        CallbackSignature targetFlag,
+        string methodName,
+        bool isStatic,
+        string senderExpression,
+        string args)
+    {
+        if ((currentSignatures & targetFlag) != 0)
+        {
+            var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
+            writer.AppendLine($"{target}({args});");
+        }
     }
     
 
@@ -126,12 +139,12 @@ internal abstract class FrameworkGenerator :
 
     protected virtual string GenerateCoerceValueCallbackInternal(ClassData @class, DependencyPropertyData property)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
         var propertyType = SourceGenerationHelper.GenerateType(property, canBeNull: true);
 
-        return property.IsAttached
+        return property.Modifiers.IsAttached
             ? $"{CoerceAttachedCallbackSignature} Coerce{property.Name}(({senderType})sender, ({propertyType}){CoerceAttachedValueExpression})"
             : $"static (sender, value) => (({senderType})sender).Coerce{property.Name}(({propertyType})value)";
     }

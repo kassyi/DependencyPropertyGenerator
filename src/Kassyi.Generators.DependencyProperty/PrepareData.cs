@@ -145,9 +145,7 @@ public static class PrepareData
             : classSymbol.ContainingNamespace.ToDisplayString();
         var className = classSymbol.Name;
 
-        var keyword = classSymbol.IsRecord 
-            ? (classSymbol.IsValueType ? "record struct" : "record") 
-            : (classSymbol.IsValueType ? "struct" : "class");
+        var keyword = classSymbol.GetKeyword();
         var nameWithTypeParameters = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
         var parentClasses = GetParentClasses(classSymbol);
@@ -175,9 +173,7 @@ public static class PrepareData
         var currentParent = classSymbol.ContainingType;
         while (currentParent != null)
         {
-            var parentKeyword = currentParent.IsRecord 
-                ? (currentParent.IsValueType ? "record struct" : "record") 
-                : (currentParent.IsValueType ? "struct" : "class");
+            var parentKeyword = currentParent.GetKeyword();
             var parentName = currentParent.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
             var parentModifiers = GetModifiers(currentParent);
@@ -244,7 +240,8 @@ public static class PrepareData
             }
             catch
             {
-                // Fallback to raw string if Roslyn syntax parsing fails.
+                // [INTENTIONAL FALLBACK] If Roslyn syntax parsing fails (e.g. for plain string or constant literals),
+                // we safely fall back to using the raw defaultValue string representation without throwing.
             }
         }
 
@@ -256,6 +253,14 @@ public static class PrepareData
         var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         return $"{implicitNew.GetLeadingTrivia().ToFullString()}new {typeString}{implicitNew.ArgumentList.ToFullString()}{implicitNew.Initializer?.ToFullString() ?? ""}{implicitNew.GetTrailingTrivia().ToFullString()}";
 
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string GetKeyword(this INamedTypeSymbol classSymbol)
+    {
+        return classSymbol.IsRecord 
+            ? (classSymbol.IsValueType ? "record struct" : "record") 
+            : (classSymbol.IsValueType ? "struct" : "class");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

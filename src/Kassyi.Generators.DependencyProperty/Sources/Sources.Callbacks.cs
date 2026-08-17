@@ -40,7 +40,7 @@ internal static partial class SourceGenerationHelper
         var name = property.Name;
 
         writer.AppendLine();
-        if (property.IsAttached)
+        if (property.Modifiers.IsAttached)
         {
             GenerateGeneratedCodeAttribute(ref writer, property.Version);
             writer.AppendLine($"static partial void On{name}{suffix}();");
