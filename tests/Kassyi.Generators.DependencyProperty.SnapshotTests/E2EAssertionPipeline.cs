@@ -13,7 +13,7 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 public static class E2EAssertionPipeline
 {
     public static void Verify(
-        string inputSource,
+        SyntaxTree inputTree,
         SyntaxTree[] generatedSyntaxTrees,
         Framework framework,
         Compilation compilation,
@@ -27,7 +27,7 @@ public static class E2EAssertionPipeline
             return;
         }
 
-        var inputRoot = CSharpSyntaxTree.ParseText(inputSource).GetCompilationUnitRoot();
+        var inputRoot = inputTree.GetCompilationUnitRoot();
         var outputRoots = generatedSyntaxTrees.Select(st => st.GetRoot()).ToArray();
 
         // Level 1: Ensure generator produced expected elements

@@ -15,10 +15,10 @@ public class ReadmeTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task ReadmeExample(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [DependencyProperty<bool>("IsSpinning", DefaultValue = true, Category = "Category", Description = "Description")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
                 // Optional
                 partial void OnIsSpinningChanged(bool oldValue, bool newValue)
@@ -26,11 +26,11 @@ public class ReadmeTests : SnapshotTestBase
                 }
             }
 
-            [AttachedDependencyProperty<object, TreeView>("SelectedItem", DefaultBindingMode = DefaultBindingMode.TwoWay)]
+            [AttachedDependencyProperty<object, {{FrameworkTestData.GetTreeView(framework)}}>("SelectedItem", DefaultBindingMode = DefaultBindingMode.TwoWay)]
             public static partial class TreeViewExtensions
             {
                 // Optional
-                static partial void OnSelectedItemChanged(TreeView sender, object? oldValue, object? newValue)
+                static partial void OnSelectedItemChanged({{FrameworkTestData.GetTreeView(framework)}} sender, object? oldValue, object? newValue)
                 {
                 }
             }
@@ -46,10 +46,10 @@ public class ReadmeTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task DescriptionWithCref(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [DependencyProperty<bool>("IsSpinning", Description = "<see cref=\"Style.TargetType\"/> must be Label.")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
 

@@ -15,9 +15,9 @@ public class RoutedEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task RoutedEvent(Framework framework)
     {
-        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + $$"""
             [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, WinRtEvents = true)]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -32,9 +32,9 @@ public class RoutedEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task AttachedRoutedEvent(Framework framework)
     {
-        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<RoutedEventGenerator>(GetHeader(framework, "Controls") + $$"""
             [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, IsAttached = true)]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -45,7 +45,7 @@ public class RoutedEventTests : SnapshotTestBase
     public async Task AttachedRoutedEvent_StaticClass_DoesNotDuplicatePublicModifier()
     {
         const Framework framework = Framework.Wpf;
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls") + $$"""
                                                         [RoutedEvent("MouseDoubleClickEvent", RoutedEventStrategy.Bubble, IsAttached = true)]
                                                         public static partial class ImageRoutedEvents
                                                         {
@@ -64,7 +64,7 @@ public class RoutedEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public async Task RoutedEvent_WithGenericHandlerType_DoesNotProduceDuplicateGlobalPrefix(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls") + $$"""
                                                         public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
                                                         [RoutedEvent<MyRoutedEventHandler>("TrayLeftMouseDown", RoutedEventStrategy.Bubble, WinRtEvents = true)]
                                                         public partial class MyControl : UserControl
@@ -84,7 +84,7 @@ public class RoutedEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public async Task RoutedEvent_WithTypeNamedArgument_DoesNotProduceDuplicateGlobalPrefix(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls") + $$"""
                                                         public delegate void MyRoutedEventHandler(object sender, global::System.EventArgs e);
                                                         [RoutedEvent("TrayLeftMouseDown", RoutedEventStrategy.Bubble, Type = typeof(MyRoutedEventHandler), WinRtEvents = true)]
                                                         public partial class MyControl : UserControl

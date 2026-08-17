@@ -14,7 +14,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task Enum(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             public enum Mode
             {
@@ -22,10 +22,10 @@ public class AttachedPropertyTests : SnapshotTestBase
                 Mode2,
             }
 
-            [AttachedDependencyProperty<Mode, TreeView>("Mode", DefaultValue = Mode.Mode2)]
+            [AttachedDependencyProperty<Mode, {{FrameworkTestData.GetTreeView(framework)}}>("Mode", DefaultValue = Mode.Mode2)]
             public static partial class TreeViewExtensions
             {
-                static partial void OnModeChanged(TreeView sender, Mode oldValue, Mode newValue)
+                static partial void OnModeChanged({{FrameworkTestData.GetTreeView(framework)}} sender, Mode oldValue, Mode newValue)
                 {
                 }
             }
@@ -41,7 +41,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task AttachedReadOnlyProperty(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [AttachedDependencyProperty<object, Grid>("AttachedReadOnlyProperty", IsReadOnly = true)]
             public static partial class GridExtensions
@@ -54,7 +54,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [TestCategory($"{TestCategoryNames.Attached}-003")]
     public async Task AttachedPropertyAccessors_UseBrowsableForType()
     {
-        var source = GetHeader(Framework.Wpf, "Controls") + """
+        var source = GetHeader(Framework.Wpf, "Controls") + $$"""
 
                                                             [AttachedDependencyProperty<bool, Grid>("GeneratedTest")]
                                                             public static partial class TestProps
@@ -76,12 +76,12 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task BindEvent(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Input") + $$"""
 
-            [AttachedDependencyProperty<object, UIElement>("BindEventProperty", BindEvent = nameof(UIElement.KeyUp))]
+            [AttachedDependencyProperty<object, {{FrameworkTestData.GetUIElement(framework)}}>("BindEventProperty", BindEvent = nameof({{FrameworkTestData.GetUIElement(framework)}}.{{FrameworkTestData.GetBindEventPropertyName(framework)}}))]
             public static partial class UIElementExtensions
             {
-                private static void OnBindEventPropertyChanged_KeyUp(object? sender, KeyEventArgs args)
+                private static void OnBindEventPropertyChanged_{{FrameworkTestData.GetBindEventPropertyName(framework)}}(object? sender, {{FrameworkTestData.GetKeyEventArgsType(framework)}} args)
                 {
                 }
             }
@@ -97,7 +97,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task AttachedPropertyWithoutSecondType(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework) + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework) + $$"""
 
             [AttachedDependencyProperty<object>("SomeProperty")]
             public static partial class GridExtensions
@@ -115,7 +115,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task MultilineDescription(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [AttachedDependencyProperty<string, Grid>("UserAgentSuffix",
             	Description = @"A suffix that is added to the default user agent, surrounded by square brackets.
@@ -136,7 +136,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task CustomOnChangedAttached(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [AttachedDependencyProperty<int, Grid>("RowCount", OnChanged = nameof(OnRowCountChanged), DefaultValue = -1)]
             public static partial class GridHelpers
@@ -157,7 +157,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task SameClassAsTypeParameter(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [AttachedDependencyProperty<Test, Grid>("TestProp", OnChanged = nameof(TestChanged))]
             public partial class Test
@@ -178,9 +178,9 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task InheritClass(Framework framework)
     {
-        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Controls") + """
+        return CheckSourceAsync<AttachedDependencyPropertyGenerator>(GetHeader(framework, string.Empty, "Controls") + $$"""
 
-            [AttachedDependencyProperty<int, FrameworkElement>("MyColumn")]
+            [AttachedDependencyProperty<int, {{FrameworkTestData.GetFrameworkElement(framework)}}>("MyColumn")]
             public partial class MyGird : Grid
             {
             }
@@ -192,7 +192,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public async Task AttachedOnChangedWithEventArgs(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls") + $$"""
 
                                                         [AttachedDependencyProperty<string>("Test", OnChanged = nameof(OnTestChanged))]
                                                         public static partial class TestHelper

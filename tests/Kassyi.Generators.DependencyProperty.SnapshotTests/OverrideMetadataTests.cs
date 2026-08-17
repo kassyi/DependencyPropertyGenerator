@@ -14,10 +14,10 @@ public class OverrideMetadataTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task OverrideMetadata(Framework framework)
     {
-        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + $$"""
 
             [DependencyProperty<int>("AquariumSize", AffectsRender = true, DefaultValue = 10)]
-            public partial class Aquarium : UIElement
+            public partial class Aquarium : {{FrameworkTestData.GetUIElement(framework)}}
             {
             }
 
@@ -40,10 +40,10 @@ public class OverrideMetadataTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task OverrideMetadataForReadOnlyProperty(Framework framework)
     {
-        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + $$"""
 
             [DependencyProperty<int>("AquariumSize", IsReadOnly = true, DefaultValue = 10)]
-            public partial class Aquarium : UIElement
+            public partial class Aquarium : {{FrameworkTestData.GetUIElement(framework)}}
             {
             }
 

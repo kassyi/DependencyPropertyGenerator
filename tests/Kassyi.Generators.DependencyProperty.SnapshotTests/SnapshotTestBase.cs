@@ -51,19 +51,11 @@ public abstract partial class SnapshotTestBase : VerifyBase
         GetHeader(framework, nullable: true, @namespace: true, values);
 
 
-    protected static ReferenceAssemblies GetReferenceAssemblies(Framework framework) => framework switch
-    {
-        Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-        Framework.Avalonia => ReferenceAssembliesFactory.Get(framework, "net6.0"),
-        Framework.Maui => ReferenceAssembliesFactory.Get(framework, "net7.0"),
-        _ => ReferenceAssembliesFactory.Get(framework, "net8.0")
-    };
+
 
     private static string ApplyFrameworkReplacements(string source, Framework framework)
     {
-        var tree = CSharpSyntaxTree.ParseText(source);
-        var rewriter = new FrameworkSyntaxRewriter(framework);
-        var newSource = rewriter.Visit(tree.GetRoot()).ToFullString();
+        var newSource = source;
 
         if (framework == Framework.Avalonia)
         {
@@ -81,6 +73,8 @@ public abstract partial class SnapshotTestBase : VerifyBase
         return newSource;
     }
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, GeneratorDriver> _driverCache = new();
+
     protected static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
         string source,
         Framework framework,
@@ -89,16 +83,10 @@ public abstract partial class SnapshotTestBase : VerifyBase
         where T : IIncrementalGenerator, new()
     {
         var processedSource = ApplyFrameworkReplacements(source, framework);
-        var references = await GetReferenceAssemblies(framework).ResolveAsync(null, cancellationToken);
+        var baseCompilation = await CompilationCache.GetBaseCompilationAsync(framework, cancellationToken).ConfigureAwait(false);
 
-        var compilation = (Compilation)CSharpCompilation.Create(
-            assemblyName: "Tests",
-            syntaxTrees: [
-                CSharpSyntaxTree.ParseText(processedSource, options: new CSharpParseOptions(LanguageVersion.Preview),
-                    cancellationToken: cancellationToken),
-            ],
-            references: references,
-            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+        var syntaxTree = CSharpSyntaxTree.ParseText(processedSource, options: new CSharpParseOptions(LanguageVersion.Preview), cancellationToken: cancellationToken);
+        var compilation = baseCompilation.AddSyntaxTrees(syntaxTree);
 
         var generator = new T();
         IIncrementalGenerator[] allGenerators = generator switch
@@ -108,10 +96,11 @@ public abstract partial class SnapshotTestBase : VerifyBase
             _ => [generator, .. additionalGenerators]
         };
 
-        var driver = CSharpGeneratorDriver.Create(
+        var cacheKey = $"{typeof(T).Name}_{framework}_{string.Join(",", allGenerators.Select(g => g.GetType().Name))}";
+        var driver = _driverCache.GetOrAdd(cacheKey, _ => CSharpGeneratorDriver.Create(
                 generators: allGenerators.Select(GeneratorExtensions.AsSourceGenerator).ToArray(),
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview))
-            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GlobalOptionsHelper.GetGlobalOptions(framework)));
+            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GlobalOptionsHelper.GetGlobalOptions(framework))));
 
         return (compilation, driver);
     }
@@ -135,7 +124,8 @@ public abstract partial class SnapshotTestBase : VerifyBase
             .Select(static generatedSource => generatedSource.SyntaxTree)
             .ToArray();
 
-        E2EAssertionPipeline.Verify(source, generatedSyntaxTrees, framework, compilation, diagnosticsArray, callerName ?? string.Empty, skipE2EValidation);
+        var inputTree = compilation.SyntaxTrees.First(t => t != null);
+        E2EAssertionPipeline.Verify(inputTree, generatedSyntaxTrees, framework, compilation, diagnosticsArray, callerName ?? string.Empty, skipE2EValidation);
 
         await Task.WhenAll(
             Verify(diagnosticsArray.ToSnapshotModels())

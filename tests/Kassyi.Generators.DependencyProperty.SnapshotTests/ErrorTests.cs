@@ -10,13 +10,13 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task AttachedCustomOnChangedUnsupportedSignature(Framework framework)
     {
-        var source = GetHeader(framework, "Controls", "System.Windows") + """
+        var source = GetHeader(framework, "Controls", "System.Windows") + $$"""
 
             [AttachedDependencyProperty<string>("Test", OnChanged = nameof(OnTestChanged))]
             public static partial class TestHelper
             {
                 // Unsupported signature (3 parameters, not conforming to any known pattern)
-                private static void OnTestChanged(DependencyObject d, DependencyPropertyChangedEventArgs e, int extra)
+                private static void OnTestChanged({{FrameworkTestData.GetDependencyObject(framework)}} d, DependencyPropertyChangedEventArgs e, int extra)
                 {
                 }
             }
@@ -29,7 +29,7 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task AttachedCustomOnChangedNotFound(Framework framework)
     {
-        var source = GetHeader(framework, "Controls") + """
+        var source = GetHeader(framework, "Controls") + $$"""
 
             [AttachedDependencyProperty<string>("Test", OnChanged = "NonExistentMethod")]
             public static partial class TestHelper
@@ -44,10 +44,10 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task FileLocalType_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [DependencyProperty("MyProperty", typeof(int))]
-            file partial class MyControl : UserControl
+            file partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework, skipE2EValidation: true);
@@ -58,7 +58,7 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task RefStructPropertyType_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + $$"""
 
             public ref struct MyRefStruct { }
 
@@ -74,10 +74,10 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task ReferenceTypeDefaultValue_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + $$"""
 
             [DependencyProperty("MyProperty", typeof(List<int>), DefaultValueExpression = "new List<int>()")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework, skipE2EValidation: true);
@@ -91,10 +91,10 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task OverrideMetadataWithOldAndNewValue_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + """
+        return CheckSourceAsync<OverrideMetadataGenerator>(GetHeader(framework, string.Empty, "System") + $$"""
 
             [DependencyProperty<int>("AquariumSize", IsReadOnly = true, DefaultValue = 10)]
-            public partial class Aquarium : UIElement
+            public partial class Aquarium : {{FrameworkTestData.GetUIElement(framework)}}
             {
             }
 
@@ -113,13 +113,13 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task InvalidDefaultValueExpression_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
             public record struct MyProfile(double A, double B);
 
             [DependencyProperty<MyProfile>("BrokenProfile1", DefaultValueExpression = "new(1.5, 48.0")]
             [DependencyProperty<MyProfile>("BrokenProfile2", DefaultValueExpression = "new(???")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework, skipE2EValidation: true);
@@ -131,10 +131,10 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.None)]
     public Task NoneFramework(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent<string>("UrlChanged", IsStatic = true)]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework, skipE2EValidation: true);
@@ -147,13 +147,13 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task UnsupportedCallbackSignature_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, string.Empty) + $$"""
 
             [DependencyProperty<string>("MyProperty")]
-            public partial class MyControl : FrameworkElement
+            public partial class MyControl : {{FrameworkTestData.GetFrameworkElement(framework)}}
             {
                 // Unsupported signature (matches name, but missing or wrong parameter types)
-                partial void OnMyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+                partial void OnMyPropertyChanged({{FrameworkTestData.GetDependencyObject(framework)}} d, DependencyPropertyChangedEventArgs e)
                 {
                 }
             }
@@ -165,7 +165,7 @@ public class ErrorTests : SnapshotTestBase
     [DataRow(Framework.Wpf)]
     public Task NestedReferenceTypeDefaultValue_EmitsError(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + """
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Collections.Generic") + $$"""
 
             public static class ExternalConfig
             {
