@@ -18,12 +18,13 @@ public abstract partial class SnapshotTestBase : VerifyBase
         bool @namespace,
         params string[] values)
     {
-        var prefix = framework switch
+        string? prefix = framework switch
         {
             Framework.WinUi or Framework.UnoWinUi => "Microsoft.UI.Xaml",
             Framework.Uwp or Framework.Uno => "Windows.UI.Xaml",
             Framework.Avalonia => "Avalonia",
             Framework.Maui => "Microsoft.Maui",
+            Framework.None => null,
             _ => "System.Windows",
         };
 
@@ -31,10 +32,10 @@ public abstract partial class SnapshotTestBase : VerifyBase
             Environment.NewLine,
             values.Select(v => v switch
             {
-                { Length: 0 } or null => $"using {prefix};",
+                { Length: 0 } or null => prefix != null ? $"using {prefix};" : string.Empty,
                 _ when v.StartsWith("System") => $"using {v};",
-                _ => $"using {prefix}.{v};"
-            }));
+                _ => prefix != null ? $"using {prefix}.{v};" : $"using {v};"
+            }).Where(u => !string.IsNullOrEmpty(u)));
 
         return $"""
                 {usings}
