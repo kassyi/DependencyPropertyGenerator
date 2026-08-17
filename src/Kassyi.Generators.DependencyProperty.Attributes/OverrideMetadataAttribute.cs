@@ -1,20 +1,24 @@
-// ReSharper disable RedundantNameQualifier
+﻿// ReSharper disable RedundantNameQualifier
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Overrides dependency property metadata using DependencyProperty.OverrideMetadata. Metadata override behavior: <seealso href="https://docs.microsoft.com/en-us/dotnet/desktop/wpf/properties/framework-property-metadata?view=netdesktop-6.0#metadata-override-behavior"/></summary>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class OverrideMetadataAttribute : global::System.Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class OverrideMetadataAttribute : Attribute
 {
     /// <summary>Name of this dependency property.</summary>
 	public string Name { get; }
 
     /// <summary>Type of this dependency property.</summary>
-    public global::System.Type Type { get; }
+    public Type Type { get; }
 
     /// <summary>Default value of this dependency property. If you need to pass a new() expression, use <see cref="DefaultValueExpression"/>. Default - <see langword="default(type)"/>.</summary>
     public object? DefaultValue { get; set; }
@@ -80,24 +84,24 @@ internal sealed class OverrideMetadataAttribute : global::System.Attribute
     public bool Validate { get; set; }
 public OverrideMetadataAttribute(
         string name,
-        global::System.Type type)
+        Type type)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
-        Type = type ?? throw new global::System.ArgumentNullException(nameof(type));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 }
 
 /// <summary>Overrides dependency property metadata using DependencyProperty.OverrideMetadata. Metadata override behavior: <seealso href="https://docs.microsoft.com/en-us/dotnet/desktop/wpf/properties/framework-property-metadata?view=netdesktop-6.0#metadata-override-behavior"/></summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class OverrideMetadataAttribute<T> : global::System.Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class OverrideMetadataAttribute<T> : Attribute
 {
     /// <summary>Name of this dependency property.</summary>
 	public string Name { get; }
 
     /// <summary>Type of this dependency property.</summary>
-    public global::System.Type Type { get; }
+    public Type Type { get; }
 
     /// <summary>Default value of this dependency property. If you need to pass a new() expression, use <see cref="DefaultValueExpression"/>. Default - <see langword="default(type)"/>.</summary>
     public object? DefaultValue { get; set; }
@@ -164,7 +168,7 @@ internal sealed class OverrideMetadataAttribute<T> : global::System.Attribute
 public OverrideMetadataAttribute(
         string name)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
         Type = typeof(T);
     }
 }
