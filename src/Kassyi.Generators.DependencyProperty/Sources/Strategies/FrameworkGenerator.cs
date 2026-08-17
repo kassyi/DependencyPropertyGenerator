@@ -117,23 +117,18 @@ internal abstract class FrameworkGenerator :
         string senderExpression,
         string args)
     {
-        if ((currentSignatures & targetFlag) != 0)
+        if ((currentSignatures & targetFlag) == 0)
         {
-            var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
-            writer.AppendLine($"{target}({args});");
+            return;
         }
+
+        var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
+        writer.AppendLine($"{target}({args});");
     }
     
 
     public string GenerateCoerceValueCallback(ClassData @class, DependencyPropertyData property)
-    {
-        if (!property.ValidationAndCallbacks.Coerce)
-        {
-            return "null";
-        }
-        
-        return GenerateCoerceValueCallbackInternal(@class, property);
-    }
+        => !property.ValidationAndCallbacks.Coerce ? "null" : GenerateCoerceValueCallbackInternal(@class, property);
 
     protected virtual string CoerceAttachedCallbackSignature => "static (sender, value) =>";
     protected virtual string CoerceAttachedValueExpression => "value";
@@ -340,40 +335,36 @@ internal abstract class FrameworkGenerator :
         writer.AppendLine($"public static readonly {routedEventType} {@event.Name}Event = {eventManagerType}.{registerMethod}({registerArgs});");
         writer.AppendLine();
 
-        writeMethodSignature(ref writer, "Add");
-        using (writer.Scope())
+        using (writer.Scope(writeMethodSignature(ref writer, "Add")))
         {
             writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
             GenerateAddHandler(ref writer, @class, @event, uiElementType, contentElementType);
         }
         writer.AppendLine();
 
-        writeMethodSignature(ref writer, "Remove");
-        using (writer.Scope())
+        using (writer.Scope(writeMethodSignature(ref writer, "Remove")))
         {
             writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
             GenerateRemoveHandler(ref writer, @class, @event, uiElementType, contentElementType);
         }
         return;
 
-        void writeMethodSignature(ref SourceWriter w, string prefix)
+        string writeMethodSignature(ref SourceWriter w, string prefix)
         {
             SourceGenerationHelper.GenerateXmlDocumentationFrom(ref w, @event.EventXmlDocumentation, @event);
             SourceGenerationHelper.GenerateCategoryAttribute(ref w, @event.Category);
             SourceGenerationHelper.GenerateDescriptionAttribute(ref w, @event.Description);
-            w.AppendLine($"public static void {prefix}{@event.Name}Handler({dependencyObjectType} element, {routedEventHandlerType} handler)");
+            return $"public static void {prefix}{@event.Name}Handler({dependencyObjectType} element, {routedEventHandlerType} handler)";
         }
     }
 
     protected virtual void GenerateHandlerAction(ref SourceWriter writer, EventData @event, string uiElementType, string contentElementType, string action)
     {
-        writer.AppendLine($"if (element is {uiElementType} uiElement)");
-        using (writer.Scope())
+        using (writer.Scope($"if (element is {uiElementType} uiElement)"))
         {
             writer.AppendLine($"uiElement.{action}({@event.Name}Event, handler);");
         }
-        writer.AppendLine($"else if (element is {contentElementType} contentElement)");
-        using (writer.Scope())
+        using (writer.Scope($"else if (element is {contentElementType} contentElement)"))
         {
             writer.AppendLine($"contentElement.{action}({@event.Name}Event, handler);");
         }

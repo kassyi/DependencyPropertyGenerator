@@ -205,7 +205,7 @@ internal static partial class SourceGenerationHelper
         writer.AppendLine($"private static partial {GenerateType(property)} Get{property.Name}DefaultValue();");
     }
 
-    private static void GenerateOnChangedMethodDeclaration(ref SourceWriter writer, string name, DependencyPropertyData property)
+    private static string GenerateOnChangedMethodDeclaration(string name, DependencyPropertyData property)
     {
         var modifiers = property.Modifiers.IsAttached ? "static " : string.Empty;
         var targetParameter = property.Modifiers.IsAttached
@@ -213,7 +213,7 @@ internal static partial class SourceGenerationHelper
             : string.Empty;
         var propertyType = GenerateType(property);
 
-        writer.Append($"{modifiers}partial void {name}({targetParameter}{propertyType} oldValue, {propertyType} newValue)");
+        return $"{modifiers}partial void {name}({targetParameter}{propertyType} oldValue, {propertyType} newValue)";
     }
 
     private static void GenerateOnChangedMethodCall(ref SourceWriter writer, string name, DependencyPropertyData property)
@@ -236,14 +236,12 @@ internal static partial class SourceGenerationHelper
         var sender = property.Modifiers.IsAttached ? GenerateBrowsableForTypeParameterName(property) : "this";
 
         writer.AppendLine();
-        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed_BeforeBind", property);
+        writer.Append(GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_BeforeBind", property));
         writer.AppendLine(";");
-        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed_AfterBind", property);
+        writer.Append(GenerateOnChangedMethodDeclaration($"On{property.Name}Changed_AfterBind", property));
         writer.AppendLine(";");
         writer.AppendLine();
-        GenerateOnChangedMethodDeclaration(ref writer, $"On{property.Name}Changed", property);
-        writer.AppendLine();
-        using (writer.Scope())
+        using (writer.Scope(GenerateOnChangedMethodDeclaration($"On{property.Name}Changed", property)))
         {
             GenerateOnChangedMethodCall(ref writer, $"On{property.Name}Changed_BeforeBind", property);
             writer.AppendLine();
