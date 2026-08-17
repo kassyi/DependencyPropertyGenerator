@@ -120,6 +120,10 @@ public partial class MyControl : UserControl
 
 インクリメンタル・ソースジェネレーターのパフォーマンス（特にVisual StudioやRiderなどのIDE上でのタイピング時の応答速度）を極限まで高めるため、以下の最適化プラクティスを厳守します。
 
+### ベンチマーク実証済みの原則
+- **文字列パースよりASTノード直接走査**: 式の解析において、一度抽出した文字列を再度パース (`SyntaxFactory.ParseExpression()`) する手法に比べ、`ExpressionSyntax` ノードを直接AST走査する手法は、再トークナイズや中間構文木の生成アロケーションを完全に回避できるため大幅に高速かつ省メモリです。ジェネレーターのホットパスでの文字列からの再パースは行わないでください。
+- **SyntaxFactoryよりSourceWriterによるコード生成**: ソース生成のホットパスでは、`SyntaxFactory.NormalizeWhitespace().ToFullString()` による構文木構築よりも、[`SourceWriter`](../../src/Kassyi.Generators.Extensions/SourceWriter.cs) (カスタム補間文字列ハンドラー) による直接出力が推奨されます（※ユニットテストや非ホットパスでの構文解析・検証用途では `SyntaxFactory` の使用も許容されます）。
+
 ### Dos (推奨事項)
 - **`ForAttributeWithMetadataName` の使用**: 属性ベースで構文をフィルタリングするRoslyn 4.3以降のAPIを使用し、対象外コードの変更によるジェネレーターの起動を最小化します。
 - **データ抽出の早期実行**: `SyntaxNode` や `ISymbol` を受け取ったら、直ちにプリミティブな型や値レコードに変換してDTOに格納します。
