@@ -3,20 +3,13 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Incremental generator for overriding dependency property metadata.</summary>
 [Generator]
 public class OverrideMetadataGenerator : IIncrementalGenerator
 {
-    #region Constants
-
     private const string Id = "OMG";
-
-    #endregion
-
-    #region Methods
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -49,24 +42,19 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
     }
 
     private static (ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+        GeneratorMultiAttributeContext context)
     {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
+        if (context.Framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
         {
             return null;
         }
 
-        var classData = classSymbol.GetClassData(framework, version);
-        var overrideMetadata = attributes
-            .Select(attribute => attribute.GetDependencyPropertyData(
-                framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), semanticModel: semanticModel))
+        var overrideMetadata = context.Attributes
+            .Select(attribute => context.GetDependencyPropertyData(attribute))
             .ToImmutableArray()
             .AsEquatableArray();
 
-        return (classData, overrideMetadata);
+        return (Class: context.ClassData, OverrideMetada: overrideMetadata);
     }
 
     private static FileWithName GetSourceCode(
@@ -92,6 +80,4 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
             writer.Dispose();
         }
     }
-
-    #endregion
 }

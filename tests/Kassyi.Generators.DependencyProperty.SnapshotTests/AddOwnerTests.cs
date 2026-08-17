@@ -14,10 +14,10 @@ public class AddOwnerTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task AddOwner(Framework framework)
     {
-        return CheckSourceAsync<AddOwnerGenerator>(GetHeader(framework, string.Empty, "Media", "Controls") + """
+        return CheckSourceAsync<AddOwnerGenerator>(GetHeader(framework, string.Empty, "Media", "Controls") + $$"""
 
-            [AddOwner<Brush, Border>(nameof(Border.Background))]
-            public partial class UnrelatedStateControl : UIElement
+            [AddOwner<{{FrameworkTestData.GetBrush(framework)}}, Border>(nameof(Border.Background))]
+            public partial class UnrelatedStateControl : {{FrameworkTestData.GetUIElement(framework)}}
             {
             }
             """, framework);
@@ -32,10 +32,10 @@ public class AddOwnerTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task AddOwner2(Framework framework)
     {
-        return CheckSourceAsync<AddOwnerGenerator>(GetHeader(framework, string.Empty, "Controls") + """
+        return CheckSourceAsync<AddOwnerGenerator>(GetHeader(framework, string.Empty, "Controls") + $$"""
 
-            [AddOwner<string, TextBox>(nameof(TextBox.Text))]
-            public partial class UnrelatedStateControl : UIElement
+            [AddOwner<string, {{FrameworkTestData.GetTextBox(framework)}}>(nameof({{FrameworkTestData.GetTextBox(framework)}}.Text))]
+            public partial class UnrelatedStateControl : {{FrameworkTestData.GetUIElement(framework)}}
             {
             }
             """, framework);

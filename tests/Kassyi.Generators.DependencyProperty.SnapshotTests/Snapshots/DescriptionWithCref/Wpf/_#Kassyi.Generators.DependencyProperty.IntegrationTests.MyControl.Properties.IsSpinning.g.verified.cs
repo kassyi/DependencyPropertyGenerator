@@ -1,34 +1,52 @@
 ﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.IsSpinning.g.cs
+
 #nullable enable
+
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public partial class MyControl
-    {
-        /// <summary>
-        /// Identifies the <see cref = "IsSpinning"/> dependency property.<br/>
-        /// Default value: default(bool)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty IsSpinningProperty = global::System.Windows.DependencyProperty.Register(name: "IsSpinning", propertyType: typeof(bool), ownerType: typeof(MyControl), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(bool), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
-        {
-            ((MyControl)sender).OnIsSpinningChanged();
-            ((MyControl)sender).OnIsSpinningChanged((bool)args.NewValue);
-            ((MyControl)sender).OnIsSpinningChanged((bool)args.OldValue, (bool)args.NewValue);
-        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
-        /// <summary>
-        /// &lt;see cref=&quot;Style.TargetType&quot;/&gt; must be Label.<br/>
-        /// Default value: default(bool)
-        /// </summary>
-        [global::System.ComponentModel.Description("&lt;see cref=&quot;Style.TargetType&quot;/&gt; must be Label.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public bool IsSpinning { get => (bool)GetValue(IsSpinningProperty); set => SetValue(IsSpinningProperty, value); }
+public partial class MyControl
+{
+/// <summary>
+/// Identifies the <see cref="IsSpinning"/> dependency property.<br/>
+/// Default value: default(bool)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+public static readonly global::System.Windows.DependencyProperty IsSpinningProperty =
+global::System.Windows.DependencyProperty.Register(name: "IsSpinning",
+propertyType: typeof(bool),
+ownerType: typeof(MyControl),
+typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(
+    defaultValue: default(bool),
+    flags: global::System.Windows.FrameworkPropertyMetadataOptions.None,
+    propertyChangedCallback: static (sender, args) =>
+{
+((MyControl)sender).OnIsSpinningChanged();
+((MyControl)sender).OnIsSpinningChanged((bool)args.NewValue);
+((MyControl)sender).OnIsSpinningChanged((bool)args.OldValue, (bool)args.NewValue);
+},
+    coerceValueCallback: null,
+    isAnimationProhibited: false),
+validateValueCallback: null);
 
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnIsSpinningChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnIsSpinningChanged(bool newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnIsSpinningChanged(bool oldValue, bool newValue);
-    }
+/// <summary>
+/// &lt;see cref=&quot;Style.TargetType&quot;/&gt; must be Label.<br/>
+/// Default value: default(bool)
+/// </summary>
+[global::System.ComponentModel.Description("&lt;see cref=&quot;Style.TargetType&quot;/&gt; must be Label.")]
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public bool IsSpinning
+{
+get => (bool)GetValue(IsSpinningProperty);
+set => SetValue(IsSpinningProperty, value);
+
+}
+
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnIsSpinningChanged();
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnIsSpinningChanged(bool newValue);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnIsSpinningChanged(bool oldValue, bool newValue);
+}
 }

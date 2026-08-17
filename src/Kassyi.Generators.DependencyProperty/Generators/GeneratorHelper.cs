@@ -1,3 +1,4 @@
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
@@ -11,7 +12,7 @@ internal static class GeneratorHelper
         IncrementalValueProvider<Framework> framework,
         IncrementalValueProvider<string> version,
         IReadOnlyList<string> attributeNames,
-        Func<((ClassWithAttributesContext context, Framework framework) left, string version), TData?> prepareData,
+        Func<GeneratorMultiAttributeContext, TData?> prepareData,
         Func<TData, FileWithName> getSourceCode,
         string id,
         bool selectMany = true)
@@ -29,7 +30,25 @@ internal static class GeneratorHelper
             combinedProvider
                 .Combine(framework)
                 .Combine(version)
-                .SelectAndReportExceptions(prepareData, context, id)
+                .SelectAndReportExceptions(x =>
+                {
+                    var (((semanticModel, attributes, classSyntax, classSymbol), frameworkVal), versionVal) = x;
+                    if (attributes.IsEmpty)
+                    {
+                        return null;
+                    }
+
+                    var classData = classSymbol.GetClassData(frameworkVal, versionVal);
+                    var ctx = new GeneratorMultiAttributeContext(
+                        semanticModel,
+                        attributes,
+                        classSyntax,
+                        classSymbol,
+                        frameworkVal,
+                        versionVal,
+                        classData);
+                    return prepareData(ctx);
+                }, context, id)
                 .WhereNotNull()
                 .SelectAndReportExceptions(getSourceCode, context, id)
                 .AddSource(context);

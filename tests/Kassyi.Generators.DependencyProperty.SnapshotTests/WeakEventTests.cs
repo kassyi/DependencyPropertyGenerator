@@ -14,10 +14,10 @@ public class WeakEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task WeakEvent(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent("Completed")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -32,10 +32,10 @@ public class WeakEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task WeakEventWithType(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent<string>("UrlChanged")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -50,10 +50,10 @@ public class WeakEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task StaticWeakEvent(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent("Completed", IsStatic = true)]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -68,10 +68,10 @@ public class WeakEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task StaticWeakEventWithType(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent<string>("UrlChanged", IsStatic = true)]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
@@ -86,10 +86,10 @@ public class WeakEventTests : SnapshotTestBase
     [DataRow(Framework.Avalonia)]
     public Task WeakEventWithEventArgsType(Framework framework)
     {
-        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + """
+        return CheckSourceAsync<WeakEventGenerator>(GetHeader(framework, "Controls") + $$"""
 
             [WeakEvent<System.EventArgs>("Changed")]
-            public partial class MyControl : UserControl
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);

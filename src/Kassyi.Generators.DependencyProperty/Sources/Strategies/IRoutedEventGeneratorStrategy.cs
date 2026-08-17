@@ -1,5 +1,5 @@
-using Kassyi.Generators.Extensions;
 using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 

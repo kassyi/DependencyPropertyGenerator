@@ -2,7 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Incremental generator for adding dependency property owners.</summary>
@@ -25,21 +24,14 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
+        GeneratorAttributeContext context)
     {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (framework is not (Framework.Avalonia or Framework.Wpf) ||
-            attributes.FirstOrDefault() is not { } attribute)
+        if (context.Framework is not (Framework.Avalonia or Framework.Wpf))
         {
             return null;
         }
 
-        var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData =
-            attribute.GetDependencyPropertyData(
-                framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAddOwner: true, semanticModel: semanticModel);
-
-        return (classData, dependencyPropertyData);
+        return (context.ClassData, context.GetDependencyPropertyData(isAddOwner: true));
     }
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>

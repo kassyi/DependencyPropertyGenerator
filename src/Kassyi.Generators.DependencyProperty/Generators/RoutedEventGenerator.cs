@@ -2,7 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Incremental generator for WPF and WinUI routed events.</summary>
@@ -28,24 +27,16 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
     }
 
     protected override (ClassData Class, EventData Event)? PrepareData(
-        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
+        GeneratorAttributeContext context)
     {
-        var (((_, attributes, _, classSymbol), framework), version) = tuple;
-        if (attributes.FirstOrDefault() is not { } attribute)
+        var eventData = context.Attribute.GetEventData(isStaticClass: false);
+        if (context.Framework is Framework.Maui ||
+            context.Framework is not Framework.Wpf && eventData.IsAttached)
         {
             return null;
         }
 
-        var eventData = attribute.GetEventData(isStaticClass: false);
-        if (framework is Framework.Maui ||
-            framework is not Framework.Wpf && eventData.IsAttached)
-        {
-            return null;
-        }
-
-        var classData = classSymbol.GetClassData(framework, version);
-
-        return (classData, eventData);
+        return (context.ClassData, eventData);
     }
 
     protected override string GenerateSource((ClassData Class, EventData Event) data) =>

@@ -1,51 +1,71 @@
 ﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyUIElement.Properties.BindEventsProperty.g.cs
+
 #nullable enable
+
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public partial class MyUIElement
-    {
-        /// <summary>
-        /// Identifies the <see cref = "BindEventsProperty"/> dependency property.<br/>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::System.Windows.DependencyProperty BindEventsPropertyProperty = global::System.Windows.DependencyProperty.Register(name: "BindEventsProperty", propertyType: typeof(object), ownerType: typeof(MyUIElement), typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(defaultValue: default(object), flags: global::System.Windows.FrameworkPropertyMetadataOptions.None, propertyChangedCallback: static (sender, args) =>
-        {
-            ((MyUIElement)sender).OnBindEventsPropertyChanged();
-            ((MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.NewValue);
-            ((MyUIElement)sender).OnBindEventsPropertyChanged((object? )args.OldValue, (object? )args.NewValue);
-        }, coerceValueCallback: null, isAnimationProhibited: false), validateValueCallback: null);
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public object? BindEventsProperty { get => (object? )GetValue(BindEventsPropertyProperty); set => SetValue(BindEventsPropertyProperty, value); }
+public partial class MyUIElement
+{
+/// <summary>
+/// Identifies the <see cref="BindEventsProperty"/> dependency property.<br/>
+/// Default value: default(object)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+public static readonly global::System.Windows.DependencyProperty BindEventsPropertyProperty =
+global::System.Windows.DependencyProperty.Register(name: "BindEventsProperty",
+propertyType: typeof(object),
+ownerType: typeof(MyUIElement),
+typeMetadata: new global::System.Windows.FrameworkPropertyMetadata(
+    defaultValue: default(object),
+    flags: global::System.Windows.FrameworkPropertyMetadataOptions.None,
+    propertyChangedCallback: static (sender, args) =>
+{
+((MyUIElement)sender).OnBindEventsPropertyChanged();
+((MyUIElement)sender).OnBindEventsPropertyChanged((object?)args.NewValue);
+((MyUIElement)sender).OnBindEventsPropertyChanged((object?)args.OldValue, (object?)args.NewValue);
+},
+    coerceValueCallback: null,
+    isAnimationProhibited: false),
+validateValueCallback: null);
 
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnBindEventsPropertyChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnBindEventsPropertyChanged(object? newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnBindEventsPropertyChanged(object? oldValue, object? newValue);
-        partial void OnBindEventsPropertyChanged_BeforeBind(object? oldValue, object? newValue);
-        partial void OnBindEventsPropertyChanged_AfterBind(object? oldValue, object? newValue);
-        partial void OnBindEventsPropertyChanged(object? oldValue, object? newValue)
-        {
-            OnBindEventsPropertyChanged_BeforeBind(oldValue, newValue);
-            if (oldValue is not default(object))
-            {
-                this.MouseEnter -= OnBindEventsPropertyChanged_MouseEnter;
-                this.MouseLeave -= OnBindEventsPropertyChanged_MouseLeave;
-            }
+/// <summary>
+/// Default value: default(object)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public object? BindEventsProperty
+{
+get => (object?)GetValue(BindEventsPropertyProperty);
+set => SetValue(BindEventsPropertyProperty, value);
 
-            if (newValue is not default(object))
-            {
-                this.MouseEnter += OnBindEventsPropertyChanged_MouseEnter;
-                this.MouseLeave += OnBindEventsPropertyChanged_MouseLeave;
-            }
+}
 
-            OnBindEventsPropertyChanged_AfterBind(oldValue, newValue);
-        }
-    }
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnBindEventsPropertyChanged();
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnBindEventsPropertyChanged(object? newValue);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnBindEventsPropertyChanged(object? oldValue, object? newValue);
+
+partial void OnBindEventsPropertyChanged_BeforeBind(object? oldValue, object? newValue);
+partial void OnBindEventsPropertyChanged_AfterBind(object? oldValue, object? newValue);
+
+partial void OnBindEventsPropertyChanged(object? oldValue, object? newValue)
+{
+OnBindEventsPropertyChanged_BeforeBind(oldValue, newValue);
+
+if (oldValue is not default(object))
+{
+this.MouseEnter -= OnBindEventsPropertyChanged_MouseEnter;
+this.MouseLeave -= OnBindEventsPropertyChanged_MouseLeave;
+}
+if (newValue is not default(object))
+{
+this.MouseEnter += OnBindEventsPropertyChanged_MouseEnter;
+this.MouseLeave += OnBindEventsPropertyChanged_MouseLeave;
+}
+
+OnBindEventsPropertyChanged_AfterBind(oldValue, newValue);
+}
+}
 }

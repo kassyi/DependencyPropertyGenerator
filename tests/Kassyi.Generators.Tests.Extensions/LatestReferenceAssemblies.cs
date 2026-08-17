@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace Kassyi.Generators.Tests.Extensions;
@@ -46,7 +46,7 @@ public static class LatestReferenceAssemblies
     
     private static readonly Lazy<ReferenceAssemblies> _lazyNet90Windows =
         new(() =>
-            Net80.AddPackages(
+            Net90.AddPackages(
                 ImmutableArray.Create(
                     new PackageIdentity("Microsoft.WindowsDesktop.App.Ref", "9.0.0"))));
     

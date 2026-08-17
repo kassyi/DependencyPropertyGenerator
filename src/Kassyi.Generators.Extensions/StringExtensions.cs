@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Text;
 
 namespace Kassyi.Generators.Extensions;
@@ -180,12 +179,7 @@ public static class StringExtensions
     {
         fullTypeName = fullTypeName ?? throw new ArgumentNullException(nameof(fullTypeName));
 
-        if (fullTypeName.StartsWith("global::", StringComparison.Ordinal))
-        {
-            return fullTypeName;
-        }
-
-        return $"global::{fullTypeName}";
+        return fullTypeName.StartsWith("global::", StringComparison.Ordinal) ? fullTypeName : $"global::{fullTypeName}";
     }
 
 #if NET8_0_OR_GREATER

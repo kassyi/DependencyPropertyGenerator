@@ -5,6 +5,7 @@ using Kassyi.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
+using System.Threading.Tasks;
 namespace Kassyi.Generators.DependencyProperty.Benchmarks;
 [MemoryDiagnoser]
 [ShortRunJob]
@@ -16,23 +17,18 @@ public class GeneratorBenchmark
     private Compilation _modifiedCompilation = null!;
     private GeneratorDriver _driver = null!;
     [GlobalSetup]
-    public void Setup()
+    public async Task Setup()
     {
         var source = GetSourceText(Framework);
         var modifiedSource = source + "\n// Minor comment change to trigger incremental step\n";
         var referenceAssemblies = Framework switch
         {
-            Framework.None => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
-            Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
-            Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
-            Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
-            Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
-            Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
-            _ => throw new NotImplementedException(),
+            Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
+            Framework.Avalonia => ReferenceAssembliesFactory.Get(Framework, "net6.0"),
+            Framework.Maui => ReferenceAssembliesFactory.Get(Framework, "net7.0"),
+            _ => ReferenceAssembliesFactory.Get(Framework, "net8.0")
         };
-        var references = referenceAssemblies.ResolveAsync(null, CancellationToken.None).GetAwaiter().GetResult();
+        var references = await referenceAssemblies.ResolveAsync(null, CancellationToken.None);
         _compilation = CSharpCompilation.Create(
             assemblyName: "BenchmarkAssembly",
             syntaxTrees: [
@@ -47,7 +43,7 @@ public class GeneratorBenchmark
             ],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-        var globalOptions = GetGlobalOptions(Framework);
+        var globalOptions = GlobalOptionsHelper.GetGlobalOptions(Framework);
         var generators = new IIncrementalGenerator[]
         {
             new DependencyPropertyGenerator(),
@@ -74,41 +70,7 @@ public class GeneratorBenchmark
         var driver = _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
         return driver.RunGeneratorsAndUpdateCompilation(_modifiedCompilation, out _, out _);
     }
-    private static Dictionary<string, string> GetGlobalOptions(Framework framework)
-    {
-        var globalOptions = new Dictionary<string, string>();
-        if (framework == Framework.Wpf)
-        {
-            globalOptions.Add("build_property.UseWPF", "true");
-        }
-        else if (framework == Framework.WinUi)
-        {
-            globalOptions.Add("build_property.UseWinUI", "true");
-        }
-        else if (framework == Framework.Maui)
-        {
-            globalOptions.Add("build_property.UseMaui", "true");
-        }
-        else if (framework == Framework.Uwp)
-        {
-            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "WINDOWS_UWP");
-        }
-        else if (framework == Framework.Uno)
-        {
-            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO");
-        }
-        else if (framework == Framework.UnoWinUi)
-        {
-            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_UNO;HAS_WINUI");
-        }
-        else if (framework == Framework.Avalonia)
-        {
-            globalOptions.Add("build_property.RecognizeFramework_DefineConstants", "HAS_AVALONIA");
-        }
 
-        globalOptions.Add("build_property.RecognizeFramework_Version", "0.0.0.0");
-        return globalOptions;
-    }
     private static string GetSourceText(Framework framework)
     {
         var usings = framework switch

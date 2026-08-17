@@ -1,4 +1,4 @@
-﻿[
+[
   {
     Id: CS8019,
     Severity: Hidden,
@@ -17,6 +17,6 @@
     Id: DPG0007,
     Severity: Error,
     Span: (7,2)-(7,79),
-    MessageFormat: Method '{0}' matches the naming convention but has an unsupported signature.
+    MessageFormat: Method '{0}' matches the naming convention but has an unsupported signature
   }
 ]

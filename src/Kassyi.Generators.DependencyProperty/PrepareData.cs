@@ -1,12 +1,12 @@
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using Kassyi.Generators.DependencyProperty.Models;
+using Kassyi.Generators.DependencyProperty.Rules.Signatures;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Immutable;
-using Kassyi.Generators.DependencyProperty.Rules.Signatures;
-using System.Runtime.CompilerServices;
 
 
 namespace Kassyi.Generators.DependencyProperty;
@@ -14,27 +14,28 @@ namespace Kassyi.Generators.DependencyProperty;
 /// <summary>Provides data extraction and transformation helpers for Roslyn generator pipeline stages.</summary>
 public static class PrepareData
 {
-    /// <summary>Extracts dependency property model data from attribute and syntax definitions.</summary>
+    /// <summary>Extracts dependency property model data directly from generator attribute context.</summary>
     public static DependencyPropertyData GetDependencyPropertyData(
-        this AttributeData attribute,
-        Framework framework,
-        string version,
-        INamedTypeSymbol? classSymbol = null,
-        AttributeSyntax? attributeSyntax = null,
+        this GeneratorAttributeContext context,
         bool isAddOwner = false,
-        bool isAttached = false,
-        SemanticModel? semanticModel = null)
+        bool isAttached = false)
     {
-        attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
+        var attribute = context.Attribute ?? throw new ArgumentNullException(nameof(context));
 
         return new DependencyPropertyDataBuilder()
-            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached, classSymbol)
+            .WithCoreProperties(attribute, context.Framework, context.Version, isAddOwner, isAttached, context.ClassSymbol)
             .WithMetadata(attribute)
-            .WithDefaultValues(attribute, attributeSyntax, semanticModel)
+            .WithDefaultValues(attribute, context.ClassSyntax.TryFindAttributeSyntax(attribute), context.SemanticModel)
             .WithXmlDocumentation(attribute)
-            .WithCallbacks(attribute, classSymbol)
+            .WithCallbacks(attribute, context.ClassSymbol)
             .Build();
     }
+
+    /// <summary>Extracts dependency property model data directly from multi-attribute generator context.</summary>
+    public static DependencyPropertyData GetDependencyPropertyData(
+        this GeneratorMultiAttributeContext context,
+        AttributeData attribute) =>
+        context.ForAttribute(attribute).GetDependencyPropertyData();
 
     private static readonly ImmutableArray<Rules.IMethodSignatureRule> s_signatureRules =
     [
@@ -179,29 +180,7 @@ public static class PrepareData
                 : (currentParent.IsValueType ? "struct" : "class");
             var parentName = currentParent.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
-            var parentModifiers = string.Empty;
-            if (currentParent.DeclaringSyntaxReferences.Length > 0 && currentParent.DeclaringSyntaxReferences[0].GetSyntax() is TypeDeclarationSyntax parentSyntaxNode)
-            {
-                foreach (var m in parentSyntaxNode.Modifiers)
-                {
-                    if (!m.IsKind(SyntaxKind.PartialKeyword) && !m.IsKind(SyntaxKind.FileKeyword) && m.Text != "file")
-                    {
-                        parentModifiers += m.Text + " ";
-                    }
-                }
-            }
-            else
-            {
-                parentModifiers = currentParent.IsStatic ? "public static " : "public ";
-            }
-            if (string.IsNullOrWhiteSpace(parentModifiers))
-            {
-                parentModifiers = string.Empty;
-            }
-            else if (!parentModifiers.EndsWith(" ", StringComparison.Ordinal))
-            {
-                parentModifiers += " ";
-            }
+            var parentModifiers = GetModifiers(currentParent);
 
             parentClassesBuilder.Add(new ParentClassData(parentKeyword, parentName, parentModifiers));
             currentParent = currentParent.ContainingType;
@@ -232,6 +211,7 @@ public static class PrepareData
             return null;
         }
 
+        // [WHY] Avoid LINQ to eliminate array allocations and enumerator allocations on every keystroke.
         foreach (var argument in attributeSyntax.ArgumentList.Arguments)
         {
             if (argument.NameEquals?.Name.Identifier.ValueText == name)
@@ -243,10 +223,7 @@ public static class PrepareData
         return null;
     }
 
-    internal static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name)
-    {
-        return attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
-    }
+    internal static string? GetNamedArgumentExpression(this AttributeSyntax attributeSyntax, string name) => attributeSyntax.GetNamedArgumentExpressionSyntax(name)?.ToFullString();
 
     internal static string? ExpandDefaultValueExpression(string? defaultValue, ExpressionSyntax? expression, ITypeSymbol? typeSymbol)
     {
@@ -271,20 +248,14 @@ public static class PrepareData
             }
         }
 
-        if (expression is ImplicitObjectCreationExpressionSyntax implicitNew)
+        if (expression is not ImplicitObjectCreationExpressionSyntax implicitNew)
         {
-            var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            return SyntaxFactory.ObjectCreationExpression(
-                SyntaxFactory.Token(SyntaxKind.NewKeyword).WithTrailingTrivia(SyntaxFactory.Space),
-                SyntaxFactory.ParseTypeName(typeString),
-                implicitNew.ArgumentList,
-                implicitNew.Initializer)
-                .WithLeadingTrivia(implicitNew.GetLeadingTrivia())
-                .WithTrailingTrivia(implicitNew.GetTrailingTrivia())
-                .ToFullString();
+            return defaultValue;
         }
 
-        return defaultValue;
+        var typeString = targetSymbol.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        return $"{implicitNew.GetLeadingTrivia().ToFullString()}new {typeString}{implicitNew.ArgumentList.ToFullString()}{implicitNew.Initializer?.ToFullString() ?? ""}{implicitNew.GetTrailingTrivia().ToFullString()}";
+
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -322,18 +293,26 @@ public static class PrepareData
             return classSymbol.IsStatic ? "public static " : "public ";
         }
 
+        return ExtractModifiers(syntaxNode);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string ExtractModifiers(TypeDeclarationSyntax syntaxNode)
+    {
         var modifiers = string.Empty;
         foreach (var m in syntaxNode.Modifiers)
         {
-            if (!m.IsKind(SyntaxKind.PartialKeyword))
+            if (!m.IsKind(SyntaxKind.PartialKeyword) && !m.IsKind(SyntaxKind.FileKeyword) && m.Text != "file")
             {
                 modifiers += m.Text + " ";
             }
         }
+
         if (string.IsNullOrWhiteSpace(modifiers))
         {
             return string.Empty;
         }
+
         return modifiers.EndsWith(" ", StringComparison.Ordinal) ? modifiers : modifiers + " ";
     }
 }

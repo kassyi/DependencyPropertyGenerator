@@ -53,6 +53,8 @@
     <ItemGroup Label="Attributes">
         <EmbeddedResource Include="../Kassyi.Generators.DependencyProperty.Attributes/*.cs" Visible="false" />
         <AdditionalFiles Include="../Kassyi.Generators.DependencyProperty.Attributes/*.cs" Visible="false" HResourcesGenerator_Resource="true" />
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
 
     <ItemGroup>

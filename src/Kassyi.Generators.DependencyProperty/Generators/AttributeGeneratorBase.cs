@@ -1,7 +1,7 @@
+using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Abstract base class for attribute-driven incremental source generators.</summary>
@@ -12,7 +12,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     protected abstract IReadOnlyList<string> AttributeNames { get; }
 
     protected abstract void PostInitialize(IncrementalGeneratorPostInitializationContext context);
-    protected abstract TData? PrepareData(((ClassWithAttributesContext context, Framework framework) left, string version) tuple);
+    protected abstract TData? PrepareData(GeneratorAttributeContext context);
     
     // [WHY] AST-based generator pipeline replaces legacy text templates for zero allocations.
     protected abstract string GenerateSource(TData data);
@@ -31,7 +31,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
             framework,
             version,
             AttributeNames,
-            PrepareData,
+            multiCtx => PrepareData(multiCtx.ForFirstAttribute()),
             GetSourceCode,
             Id);
     }

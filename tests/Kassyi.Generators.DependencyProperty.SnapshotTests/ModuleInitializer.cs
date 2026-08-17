@@ -20,17 +20,8 @@ public static class ModuleInitializer
         if (!string.IsNullOrEmpty(dir))
         {
             var solutionDir = dir.TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
-            VerifierSettings.ScrubLinesWithReplace(line => line.Replace(solutionDir, "{SolutionDirectory}"));
+            VerifierSettings.AddScrubber(builder => builder.Replace(solutionDir, "{SolutionDirectory}"));
         }
-
-        VerifierSettings.AddScrubber("cs", sb =>
-        {
-            var text = sb.ToString();
-            var tree = CSharpSyntaxTree.ParseText(text);
-            var formatted = tree.GetRoot().NormalizeWhitespace().ToFullString();
-            sb.Clear();
-            sb.Append(formatted);
-        });
     }
 }
 

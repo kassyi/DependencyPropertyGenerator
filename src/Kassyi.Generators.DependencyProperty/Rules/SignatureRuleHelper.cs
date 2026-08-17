@@ -1,4 +1,3 @@
-using System;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules;
@@ -39,17 +38,15 @@ internal static class SignatureRuleHelper
         var current = typeSymbol;
         while (current != null)
         {
-            if (current.Name is "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs")
+            switch (current.Name)
             {
-                return true;
+                case "DependencyPropertyChangedEventArgs" or "ValueChangedEventArgs":
+                case nameof(EventArgs) when (current.ContainingNamespace?.ToDisplayString() == "System"):
+                    return true;
+                default:
+                    current = current.BaseType;
+                    break;
             }
-
-            if (current.Name == nameof(EventArgs) && current.ContainingNamespace?.ToDisplayString() == "System")
-            {
-                return true;
-            }
-
-            current = current.BaseType;
         }
 
         return false;

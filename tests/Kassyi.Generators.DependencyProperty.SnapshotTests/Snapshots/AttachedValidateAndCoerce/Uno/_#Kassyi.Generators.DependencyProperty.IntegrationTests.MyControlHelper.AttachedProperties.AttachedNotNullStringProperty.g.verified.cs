@@ -1,63 +1,69 @@
 ﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControlHelper.AttachedProperties.AttachedNotNullStringProperty.g.cs
+
 #nullable enable
+
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public static partial class MyControlHelper
-    {
-        /// <summary>
-        /// Identifies the AttachedNotNullStringProperty dependency property.<br/>
-        /// Default value: ""
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty AttachedNotNullStringPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedNotNullStringProperty", propertyType: typeof(string), ownerType: typeof(MyControlHelper), new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
-        {
-            var coercedValue = CoerceAttachedNotNullStringProperty((global::Windows.UI.Xaml.Controls.UserControl)sender, (string? )args.NewValue);
-            if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
-            {
-                ((global::Windows.UI.Xaml.Controls.UserControl)sender).SetValue(AttachedNotNullStringPropertyProperty, coercedValue);
-                return;
-            }
+public static partial class MyControlHelper
+{
+/// <summary>
+/// Identifies the AttachedNotNullStringProperty dependency property.<br/>
+/// Default value: ""
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+public static readonly global::Windows.UI.Xaml.DependencyProperty AttachedNotNullStringPropertyProperty =global::Windows.UI.Xaml.DependencyProperty.RegisterAttached(name: "AttachedNotNullStringProperty",
+propertyType: typeof(string),
+ownerType: typeof(MyControlHelper),
+new global::Windows.UI.Xaml.PropertyMetadata(
+    defaultValue: (string)"",
+    propertyChangedCallback: static (sender, args) =>
+{
+var coercedValue = CoerceAttachedNotNullStringProperty((global::Windows.UI.Xaml.Controls.UserControl)sender, (string?)args.NewValue);
+if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
+{
+((global::Windows.UI.Xaml.Controls.UserControl)sender).SetValue(AttachedNotNullStringPropertyProperty, coercedValue);
+return;
+}
+var callback = new global::Windows.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
+{
+OnAttachedNotNullStringPropertyChanged();
+OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender);
+OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender, (string)args.NewValue);
+OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender, (string)args.OldValue, (string)args.NewValue);
+});
+callback(sender, args);
+}
+));
+/// <summary>
+/// Default value: ""
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public static void SetAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl element, string value)
+{
+element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+element.SetValue(AttachedNotNullStringPropertyProperty, value);
+}
+/// <summary>
+/// Default value: ""
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public static string GetAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl element)
+{
+element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+return (string)element.GetValue(AttachedNotNullStringPropertyProperty);
+}
 
-            var callback = new global::Windows.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
-            {
-                OnAttachedNotNullStringPropertyChanged();
-                OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender);
-                OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender, (string)args.NewValue);
-                OnAttachedNotNullStringPropertyChanged((global::Windows.UI.Xaml.Controls.UserControl)sender, (string)args.OldValue, (string)args.NewValue);
-            });
-            callback(sender, args);
-        }));
-        /// <summary>
-        /// Default value: ""
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static void SetAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl element, string value)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-            element.SetValue(AttachedNotNullStringPropertyProperty, value);
-        }
-
-        /// <summary>
-        /// Default value: ""
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static string GetAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl element)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-            return (string)element.GetValue(AttachedNotNullStringPropertyProperty);
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnAttachedNotNullStringPropertyChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl, string newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl, string oldValue, string newValue);
-        private static partial string CoerceAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl userControl, string? value);
-        private static partial bool IsAttachedNotNullStringPropertyValid(string? value);
-    }
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnAttachedNotNullStringPropertyChanged();
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl, string newValue);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnAttachedNotNullStringPropertyChanged(global::Windows.UI.Xaml.Controls.UserControl userControl, string oldValue, string newValue);
+private static partial string CoerceAttachedNotNullStringProperty(global::Windows.UI.Xaml.Controls.UserControl userControl, string? value);
+private static partial bool IsAttachedNotNullStringPropertyValid(string? value);
+}
 }

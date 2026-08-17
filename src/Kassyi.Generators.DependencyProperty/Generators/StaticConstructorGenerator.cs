@@ -4,7 +4,6 @@ using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Incremental generator for platform static constructor registrations.</summary>
@@ -92,23 +91,8 @@ public class StaticConstructorGenerator : IIncrementalGenerator
     }
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple,
-        bool isAttached)
-    {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (attributes.FirstOrDefault() is not { } attribute)
-        {
-            return null;
-        }
-
-        var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData = attribute.GetDependencyPropertyData(
-            framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAttached: isAttached, semanticModel: semanticModel);
-
-        return (classData, dependencyPropertyData);
-    }
+        GeneratorAttributeContext context,bool isAttached) =>
+        (context.ClassData, context.GetDependencyPropertyData(isAttached: isAttached));
 
     private static FileWithName GetSourceCode(StaticConstructorData data)
     {
@@ -145,7 +129,25 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .Combine(framework)
             .Combine(version)
-            .SelectAndCatchExceptions(x => PrepareData(x, isAttached: isAttached))
+            .SelectAndCatchExceptions(x =>
+            {
+                var (((semanticModel, attributes, classSyntax, classSymbol), frameworkVal), versionVal) = x;
+                if (attributes.IsEmpty)
+                {
+                    return default((ClassData, DependencyPropertyData)?);
+                }
+
+                var classData = classSymbol.GetClassData(frameworkVal, versionVal);
+                var ctx = new GeneratorAttributeContext(
+                    semanticModel,
+                    attributes[0],
+                    classSyntax,
+                    classSymbol,
+                    frameworkVal,
+                    versionVal,
+                    classData);
+                return PrepareData(ctx, isAttached: isAttached);
+            })
             .WhereNotNull()
             .CollectAsEquatableArray();
     }

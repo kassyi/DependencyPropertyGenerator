@@ -1,61 +1,69 @@
 ﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.UIElementExtensions.AttachedProperties.BindEventProperty.g.cs
+
 #nullable enable
+
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    partial class UIElementExtensions
-    {
-        /// <summary>
-        /// Identifies the BindEventProperty dependency property.<br/>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Avalonia.AttachedProperty<object?> BindEventPropertyProperty = global::Avalonia.AvaloniaProperty.RegisterAttached<UIElementExtensions, global::Avalonia.Input.InputElement, object?>(name: "BindEventProperty", defaultValue: default(object), inherits: false, defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay, validate: null, coerce: null);
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static void SetBindEventProperty(global::Avalonia.Input.InputElement element, object? value)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-            element.SetValue(BindEventPropertyProperty, value);
-        }
+partial class UIElementExtensions
+{
+/// <summary>
+/// Identifies the BindEventProperty dependency property.<br/>
+/// Default value: default(object)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+public static readonly global::Avalonia.AttachedProperty<object?> BindEventPropertyProperty =global::Avalonia.AvaloniaProperty.RegisterAttached<UIElementExtensions, global::Avalonia.Input.InputElement, object?>(name: "BindEventProperty",
+defaultValue: default(object),
+inherits: false,
+defaultBindingMode: global::Avalonia.Data.BindingMode.OneWay,
+validate: null,
+coerce: null);
+/// <summary>
+/// Default value: default(object)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public static void SetBindEventProperty(global::Avalonia.Input.InputElement element, object? value)
+{
+element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+element.SetValue(BindEventPropertyProperty, value);
+}
+/// <summary>
+/// Default value: default(object)
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public static object? GetBindEventProperty(global::Avalonia.Input.InputElement element)
+{
+element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+return (object?)element.GetValue(BindEventPropertyProperty);
+}
 
-        /// <summary>
-        /// Default value: default(object)
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static object? GetBindEventProperty(global::Avalonia.Input.InputElement element)
-        {
-            element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-            return (object? )element.GetValue(BindEventPropertyProperty);
-        }
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnBindEventPropertyChanged();
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? newValue);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
 
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnBindEventPropertyChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
-        static partial void OnBindEventPropertyChanged_BeforeBind(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
-        static partial void OnBindEventPropertyChanged_AfterBind(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
-        static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue)
-        {
-            OnBindEventPropertyChanged_BeforeBind(inputElement, oldValue, newValue);
-            if (oldValue is not default(object))
-            {
-                inputElement.KeyUp -= OnBindEventPropertyChanged_KeyUp;
-            }
+static partial void OnBindEventPropertyChanged_BeforeBind(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
+static partial void OnBindEventPropertyChanged_AfterBind(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue);
 
-            if (newValue is not default(object))
-            {
-                inputElement.KeyUp += OnBindEventPropertyChanged_KeyUp;
-            }
+static partial void OnBindEventPropertyChanged(global::Avalonia.Input.InputElement inputElement, object? oldValue, object? newValue)
+{
+OnBindEventPropertyChanged_BeforeBind(inputElement, oldValue, newValue);
 
-            OnBindEventPropertyChanged_AfterBind(inputElement, oldValue, newValue);
-        }
-    }
+if (oldValue is not default(object))
+{
+inputElement.KeyUp -= OnBindEventPropertyChanged_KeyUp;
+}
+if (newValue is not default(object))
+{
+inputElement.KeyUp += OnBindEventPropertyChanged_KeyUp;
+}
+
+OnBindEventPropertyChanged_AfterBind(inputElement, oldValue, newValue);
+}
+}
 }

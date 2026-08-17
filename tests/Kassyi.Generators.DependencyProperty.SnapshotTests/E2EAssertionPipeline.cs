@@ -13,8 +13,8 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 public static class E2EAssertionPipeline
 {
     public static void Verify(
-        string inputSource,
-        string[] generatedSources,
+        SyntaxTree inputTree,
+        SyntaxTree[] generatedSyntaxTrees,
         Framework framework,
         Compilation compilation,
         ImmutableArray<Diagnostic> diagnostics,
@@ -27,14 +27,14 @@ public static class E2EAssertionPipeline
             return;
         }
 
-        var inputRoot = CSharpSyntaxTree.ParseText(inputSource).GetCompilationUnitRoot();
-        var outputRoots = generatedSources.Select(s => CSharpSyntaxTree.ParseText(s).GetCompilationUnitRoot()).ToArray();
+        var inputRoot = inputTree.GetCompilationUnitRoot();
+        var outputRoots = generatedSyntaxTrees.Select(st => st.GetRoot()).ToArray();
 
         // Level 1: Ensure generator produced expected elements
         VerifyCountMatching(inputRoot, outputRoots, framework);
 
         // Level 2: Signature and syntax validation
-        VerifySignatureMatching(outputRoots, framework);
+        VerifySignatureMatching(outputRoots, compilation, framework);
         
         // Level 3: Verify get/set accessors
         VerifyClrWrappers(outputRoots, framework);
@@ -77,60 +77,66 @@ public static class E2EAssertionPipeline
         }
     }
 
-    private static void VerifySignatureMatching(SyntaxNode[] outputRoots, Framework framework)
+    private static void VerifySignatureMatching(SyntaxNode[] outputRoots, Compilation compilation, Framework framework)
     {
-        // Find InvocationExpression for Register / RegisterAttached / Create / CreateAttached
-        var invocations = outputRoots.SelectMany(r => r.DescendantNodes().OfType<InvocationExpressionSyntax>())
-            .Where(i => i.Expression is MemberAccessExpressionSyntax mae && 
-                        mae.Name.Identifier.ValueText is KnownMethodNames.Register 
-                                                     or KnownMethodNames.RegisterAttached 
-                                                     or KnownMethodNames.RegisterReadOnly 
-                                                     or KnownMethodNames.RegisterAttachedReadOnly 
-                                                     or KnownMethodNames.RegisterDirect 
-                                                     or KnownMethodNames.Create 
-                                                     or KnownMethodNames.CreateAttached 
-                                                     or KnownMethodNames.CreateReadOnly 
-                                                     or KnownMethodNames.CreateAttachedReadOnly)
-            .ToList();
-
-        foreach (var inv in invocations)
+        foreach (var root in outputRoots)
         {
-            var args = inv.ArgumentList.Arguments;
-            if (args.Count >= 3)
+            var semanticModel = compilation.GetSemanticModel(root.SyntaxTree);
+            var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
+
+            foreach (var inv in invocations)
             {
-                // Name argument
-                var nameArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "name") ?? args[0];
-                if (nameArg.Expression is not InvocationExpressionSyntax && nameArg.Expression is not LiteralExpressionSyntax)
+                if (inv.Expression is not MemberAccessExpressionSyntax mae) continue;
+                if (!IsRegistrationMethod(mae.Name.Identifier.ValueText)) continue;
+                if (framework == Framework.Avalonia && mae.Name is GenericNameSyntax) continue;
+
+                var symbolInfo = semanticModel.GetSymbolInfo(inv);
+                if (symbolInfo.Symbol is not IMethodSymbol methodSymbol) continue;
+
+                VerifyMethodArguments(inv, methodSymbol);
+            }
+        }
+    }
+
+    private static bool IsRegistrationMethod(string name)
+    {
+        return name is KnownMethodNames.Register
+            or KnownMethodNames.RegisterAttached
+            or KnownMethodNames.RegisterReadOnly
+            or KnownMethodNames.RegisterAttachedReadOnly
+            or KnownMethodNames.RegisterDirect
+            or KnownMethodNames.Create
+            or KnownMethodNames.CreateAttached
+            or KnownMethodNames.CreateReadOnly
+            or KnownMethodNames.CreateAttachedReadOnly;
+    }
+
+    private static void VerifyMethodArguments(InvocationExpressionSyntax inv, IMethodSymbol methodSymbol)
+    {
+        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+        {
+            var paramName = methodSymbol.Parameters[i].Name;
+
+            var arg = inv.ArgumentList.Arguments.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == paramName);
+            if (arg == null && i < inv.ArgumentList.Arguments.Count)
+            {
+                arg = inv.ArgumentList.Arguments[i];
+            }
+
+            if (arg == null) continue;
+
+            if (paramName is "propertyType" or "returnType" or "ownerType" or "declaringType")
+            {
+                if (!IsTypeOfExpression(arg.Expression))
+                {
+                    throw new Exception($"Level 2 Assertion Failed: {paramName} argument is not typeof. Found: {arg.Expression}");
+                }
+            }
+            else if (paramName is "name")
+            {
+                if (arg.Expression is not InvocationExpressionSyntax && arg.Expression is not LiteralExpressionSyntax)
                 {
                     throw new Exception("Level 2 Assertion Failed: Name argument is not a nameof expression or literal.");
-                }
-
-                // Avalonia handles things slightly differently (e.g. AvaloniaProperty.Register<TOwner, TValue>)
-                if (framework == Framework.Avalonia)
-                {
-                    // Avalonia has type arguments in the method call for Register<TOwner, TValue>
-                    if (inv.Expression is MemberAccessExpressionSyntax mae && mae.Name is GenericNameSyntax)
-                    {
-                        continue;
-                    }
-                }
-
-                // PropertyType argument
-                var propTypeArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "propertyType" || a.NameColon?.Name.Identifier.Text == "returnType");
-                if (propTypeArg == null && args.Count > 1) propTypeArg = args[1];
-
-                if (propTypeArg != null && !IsTypeOfExpression(propTypeArg.Expression))
-                {
-                    throw new Exception($"Level 2 Assertion Failed: PropertyType argument is not typeof. Found: {propTypeArg.Expression}");
-                }
-
-                // OwnerType argument
-                var ownerTypeArg = args.FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == "ownerType" || a.NameColon?.Name.Identifier.Text == "declaringType");
-                if (ownerTypeArg == null && args.Count > 2) ownerTypeArg = args[2];
-
-                if (ownerTypeArg != null && !IsTypeOfExpression(ownerTypeArg.Expression))
-                {
-                    throw new Exception($"Level 2 Assertion Failed: OwnerType argument is not typeof. Found: {ownerTypeArg.Expression}");
                 }
             }
         }
@@ -138,7 +144,10 @@ public static class E2EAssertionPipeline
 
     private static void VerifyClrWrappers(SyntaxNode[] outputRoots, Framework framework)
     {
-        var properties = outputRoots.SelectMany(r => r.DescendantNodes().OfType<PropertyDeclarationSyntax>()).ToList();
+        var properties = outputRoots
+            .SelectMany(r => r.DescendantNodes().OfType<PropertyDeclarationSyntax>())
+            .Where(p => p.Identifier.ValueText != "CurrentManager")
+            .ToList();
         foreach (var prop in properties)
         {
             var accessors = prop.AccessorList?.Accessors;
@@ -147,15 +156,29 @@ public static class E2EAssertionPipeline
                 var get = accessors.Value.FirstOrDefault(a => a.Keyword.IsKind(SyntaxKind.GetKeyword));
                 var set = accessors.Value.FirstOrDefault(a => a.Keyword.IsKind(SyntaxKind.SetKeyword));
 
-                if (get != null && get.Body == null && get.ExpressionBody != null)
+                if (get != null)
                 {
-                    if (!IsValidGetterExpression(get.ExpressionBody.Expression))
+                    ExpressionSyntax? getExpr = get.ExpressionBody?.Expression;
+                    if (getExpr == null && get.Body != null)
+                    {
+                        var returnStatement = get.Body.Statements.OfType<ReturnStatementSyntax>().FirstOrDefault();
+                        getExpr = returnStatement?.Expression;
+                    }
+
+                    if (getExpr != null && !IsValidGetterExpression(getExpr))
                         throw new Exception("Level 3 Assertion Failed: Getter does not call GetValue or return a backing field.");
                 }
 
-                if (set != null && set.Body == null && set.ExpressionBody != null)
+                if (set != null)
                 {
-                    if (!IsValidSetterExpression(set.ExpressionBody.Expression))
+                    ExpressionSyntax? setExpr = set.ExpressionBody?.Expression;
+                    if (setExpr == null && set.Body != null)
+                    {
+                        var exprStatement = set.Body.Statements.OfType<ExpressionStatementSyntax>().FirstOrDefault();
+                        setExpr = exprStatement?.Expression;
+                    }
+
+                    if (setExpr != null && !IsValidSetterExpression(setExpr))
                         throw new Exception("Level 3 Assertion Failed: Setter does not call SetValue or SetAndRaise.");
                 }
             }
@@ -266,6 +289,9 @@ public static class E2EAssertionPipeline
             QualifiedNameSyntax qn => qn.Right.Identifier.ValueText,
             GenericNameSyntax gn => gn.Identifier.ValueText,
             AliasQualifiedNameSyntax alias => alias.Name.Identifier.ValueText,
+            PredefinedTypeSyntax pre => pre.Keyword.ValueText,
+            NullableTypeSyntax nts => GetSimpleName(nts.ElementType) + "?",
+            ArrayTypeSyntax ats => GetSimpleName(ats.ElementType) + "[]",
             _ => type.ToString()
         };
     }

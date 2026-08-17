@@ -56,12 +56,8 @@ public partial class MyControl
         
         var errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         
-        foreach (var error in errors)
-        {
-            Console.WriteLine(error.ToString());
-        }
-        
         // Assert that the compilation fails because 'init' and 'set' conflict in partial properties.
-        Assert.IsTrue(errors.Count > 0, "Expected compilation errors for mismatched partial property accessors, but found none.");
+        Assert.IsTrue(errors.Count > 0, 
+            $"Expected compilation errors for mismatched partial property accessors, but found none. Diagnostics:\n{string.Join(Environment.NewLine, diagnostics)}");
     }
 }

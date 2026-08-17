@@ -120,6 +120,10 @@ To resolve this error, you must change the first argument of your method from `D
 
 To maintain maximum IDE responsiveness during typing, adhere to the following generator performance guidelines.
 
+### Benchmark-Backed Principles
+- **AST Node Traversal over String Parsing**: For expression analysis, direct `ExpressionSyntax` AST traversal completely avoids re-tokenization and intermediate syntax tree allocations, making it significantly faster and lighter on memory compared to re-parsing extracted strings (`SyntaxFactory.ParseExpression()`). Avoid string re-parsing in generator hot paths.
+- **SourceWriter over SyntaxFactory for Code Generation**: In code generation hot paths, emitting code directly via [`SourceWriter`](../../src/Kassyi.Generators.Extensions/SourceWriter.cs) (custom interpolated string handler) is preferred over heavy syntax tree construction and formatting via `SyntaxFactory.NormalizeWhitespace().ToFullString()`. (Note: `SyntaxFactory` remains acceptable in non-hot paths or unit tests).
+
 ### Dos (Best Practices)
 - **Use `ForAttributeWithMetadataName`**: Filter declarations based on attributes to drastically limit generator invocation. Avoid obsolete syntax receivers.
 - **Early Primitive Projection**: Immediately transform `SyntaxNode` or `ISymbol` into primitives or readonly record structs during the extraction phase.

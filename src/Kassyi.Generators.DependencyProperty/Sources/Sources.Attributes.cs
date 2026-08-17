@@ -126,5 +126,20 @@ internal static partial class SourceGenerationHelper
             "System.Windows.AttachedPropertyBrowsableForType",
             $"typeof({GenerateBrowsableForType(property)})");
     }
+
+    internal static void GenerateCommonPropertyAttributes(ref SourceWriter writer, DependencyPropertyData property, ClassData @class)
+    {
+        GenerateCategoryAttribute(ref writer, property.ComponentModel.Category);
+        GenerateDescriptionAttribute(ref writer, property.ComponentModel.Description);
+        GenerateTypeConverterAttribute(ref writer, property.ComponentModel.TypeConverter);
+        GenerateBindableAttribute(ref writer, property.ComponentModel.Bindable);
+        GenerateBrowsableAttribute(ref writer, property.ComponentModel.Browsable);
+        GenerateDesignerSerializationVisibilityAttribute(ref writer, property.ComponentModel.DesignerSerializationVisibility);
+        
+        GenerateClsCompliantAttribute(ref writer, property.ComponentModel.ClsCompliant);
+        GenerateLocalizabilityAttribute(ref writer, property.ComponentModel.Localizability, @class.Framework);
+        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+        GenerateExcludeFromCodeCoverageAttribute(ref writer);
+    }
 }
 

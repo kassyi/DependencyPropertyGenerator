@@ -2,7 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
-
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
 /// <summary>Incremental generator for attached dependency properties.</summary>
@@ -26,20 +25,7 @@ public class AttachedDependencyPropertyGenerator : AttributeGeneratorBase<(Class
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
-    {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (attributes.FirstOrDefault() is not { } attribute)
-        {
-            return null;
-        }
-
-        var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData = attribute.GetDependencyPropertyData(framework, version,
-            classSymbol, classSyntax.TryFindAttributeSyntax(attribute), isAttached: true, semanticModel: semanticModel);
-
-        return (classData, dependencyPropertyData);
-    }
+        GeneratorAttributeContext context) =>(context.ClassData, context.GetDependencyPropertyData(isAttached: true));
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateAttachedDependencyPropertySource(data.Class, data.DependencyProperty);

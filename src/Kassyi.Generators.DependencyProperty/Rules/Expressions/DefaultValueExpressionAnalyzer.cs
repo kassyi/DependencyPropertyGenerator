@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,7 +22,7 @@ internal static class DefaultValueExpressionAnalyzer
     {
         if (expression.ContainsDiagnostics)
         {
-            return IsConservativeReferenceTypeFallback(expression.ToString(), propertyTypeSymbol);
+            return IsConservativeReferenceTypeFallback(expression, propertyTypeSymbol);
         }
 
         // Check top-level node first
@@ -68,7 +67,7 @@ internal static class DefaultValueExpressionAnalyzer
     }
 
 
-    private static bool IsConservativeReferenceTypeFallback(string? rawExpression, ITypeSymbol? propertyTypeSymbol)
+    private static bool IsConservativeReferenceTypeFallback(ExpressionSyntax expression, ITypeSymbol? propertyTypeSymbol)
     {
         // [WHY] Value types and strings are safe regardless of expression syntax errors
         if (propertyTypeSymbol != null && (propertyTypeSymbol.IsValueType || IsSpecialSafeType(propertyTypeSymbol)))
@@ -76,14 +75,10 @@ internal static class DefaultValueExpressionAnalyzer
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(rawExpression))
-        {
-            return false;
-        }
+        var firstTokenText = expression.GetFirstToken().Text;
 
-        var trimmed = rawExpression!.Trim();
         // Literals, typeof, default, null are safe even when parsing fails
-        if (trimmed is "null" || trimmed.StartsWith("typeof(", StringComparison.Ordinal) || trimmed.StartsWith("default", StringComparison.Ordinal))
+        if (firstTokenText is "null" or "typeof" or "default")
         {
             return false;
         }
@@ -197,14 +192,16 @@ internal static class DefaultValueExpressionAnalyzer
             _ => null
         };
 
-        if (memberName != null && containingClassSymbol != null)
+        if (memberName == null || containingClassSymbol == null)
         {
-            foreach (var member in containingClassSymbol.GetMembers(memberName))
+            return false;
+        }
+
+        foreach (var member in containingClassSymbol.GetMembers(memberName))
+        {
+            if (IsReferenceTypeSymbol(member))
             {
-                if (IsReferenceTypeSymbol(member))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -213,9 +210,9 @@ internal static class DefaultValueExpressionAnalyzer
 
     private static bool IsReferenceTypeSymbol(ISymbol symbol)
     {
-        ITypeSymbol? memberType = symbol switch
+        var memberType = symbol switch
         {
-            IFieldSymbol field when !field.HasConstantValue => field.Type,
+            IFieldSymbol { HasConstantValue: false } field => field.Type,
             IPropertySymbol prop => prop.Type,
             _ => null
         };

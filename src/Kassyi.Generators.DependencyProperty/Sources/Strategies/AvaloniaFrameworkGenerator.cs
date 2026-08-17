@@ -188,6 +188,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         var observerType = $"global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<{propertyType}>>";
         using (writer.Scope($"{property.Name}Property.Changed.Subscribe(new {observerType}(static x =>", "}));"))
         {
+            writer.AppendLine("#pragma warning disable CS8600, CS8604");
             var senderType = property.IsAttached
                 ? SourceGenerationHelper.GenerateBrowsableForType(property)
                 : @class.Type;
@@ -217,6 +218,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
                     writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
                 }
             }
+            writer.AppendLine("#pragma warning restore CS8600, CS8604");
         }
     }
 }

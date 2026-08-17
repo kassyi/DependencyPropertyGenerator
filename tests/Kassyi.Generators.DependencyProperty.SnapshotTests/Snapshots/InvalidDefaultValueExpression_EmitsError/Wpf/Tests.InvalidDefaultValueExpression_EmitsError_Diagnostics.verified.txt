@@ -1,4 +1,4 @@
-﻿[
+[
   {
     Id: CS8019,
     Severity: Hidden,
@@ -10,12 +10,12 @@
     Id: DPG0008,
     Severity: Error,
     Span: (8,2)-(8,91),
-    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.
+    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed
   },
   {
     Id: DPG0008,
     Severity: Error,
     Span: (9,2)-(9,85),
-    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed.
+    MessageFormat: The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed
   }
 ]
