@@ -1,28 +1,31 @@
-﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyGrid.Properties.IsSpinning.g.cs
+﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.IsSpinning.g.cs
 #nullable enable
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public partial class MyGrid
+    public partial class MyControl
     {
         /// <summary>
         /// Identifies the <see cref = "IsSpinning"/> dependency property.<br/>
-        /// Default value: default(bool)
+        /// Default value: true
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(MyGrid), defaultValue: default(bool), defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneTime, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
+        public static readonly global::Microsoft.Maui.Controls.BindableProperty IsSpinningProperty = global::Microsoft.Maui.Controls.BindableProperty.Create(propertyName: "IsSpinning", returnType: typeof(bool), declaringType: typeof(MyControl), defaultValue: (bool)true, defaultBindingMode: global::Microsoft.Maui.Controls.BindingMode.OneWay, validateValue: null, propertyChanged: static (sender, oldValue, newValue) =>
         {
-            ((MyGrid)sender).OnIsSpinningChanged();
-            ((MyGrid)sender).OnIsSpinningChanged((bool)newValue);
-            ((MyGrid)sender).OnIsSpinningChanged((bool)oldValue, (bool)newValue);
+            ((MyControl)sender).OnIsSpinningChanged();
+            ((MyControl)sender).OnIsSpinningChanged((bool)newValue);
+            ((MyControl)sender).OnIsSpinningChanged((bool)oldValue, (bool)newValue);
         }, propertyChanging: static (sender, oldValue, newValue) =>
         {
-            ((MyGrid)sender).OnIsSpinningChanging();
-            ((MyGrid)sender).OnIsSpinningChanging((bool)newValue);
-            ((MyGrid)sender).OnIsSpinningChanging((bool)oldValue, (bool)newValue);
+            ((MyControl)sender).OnIsSpinningChanging();
+            ((MyControl)sender).OnIsSpinningChanging((bool)newValue);
+            ((MyControl)sender).OnIsSpinningChanging((bool)oldValue, (bool)newValue);
         }, coerceValue: null, defaultValueCreator: null);
         /// <summary>
-        /// Default value: default(bool)
+        /// Description<br/>
+        /// Default value: true
         /// </summary>
+        [global::System.ComponentModel.Category("Category")]
+        [global::System.ComponentModel.Description("Description")]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public bool IsSpinning { get => (bool)GetValue(IsSpinningProperty); set => SetValue(IsSpinningProperty, value); }

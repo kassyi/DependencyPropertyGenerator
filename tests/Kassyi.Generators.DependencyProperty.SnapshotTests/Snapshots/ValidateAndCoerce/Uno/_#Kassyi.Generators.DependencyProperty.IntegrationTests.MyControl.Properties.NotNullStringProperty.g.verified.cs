@@ -1,45 +1,59 @@
 ﻿//HintName: Kassyi.Generators.DependencyProperty.IntegrationTests.MyControl.Properties.NotNullStringProperty.g.cs
+
 #nullable enable
+
 namespace Kassyi.Generators.DependencyProperty.IntegrationTests
 {
-    public partial class MyControl
-    {
-        /// <summary>
-        /// Identifies the <see cref = "NotNullStringProperty"/> dependency property.<br/>
-        /// Default value: ""
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        public static readonly global::Windows.UI.Xaml.DependencyProperty NotNullStringPropertyProperty = global::Windows.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty", propertyType: typeof(string), ownerType: typeof(MyControl), typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(defaultValue: (string)"", propertyChangedCallback: static (sender, args) =>
-        {
-            var coercedValue = ((MyControl)sender).CoerceNotNullStringProperty((string? )args.NewValue);
-            if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
-            {
-                ((MyControl)sender).SetValue(NotNullStringPropertyProperty, coercedValue);
-                return;
-            }
+public partial class MyControl
+{
+/// <summary>
+/// Identifies the <see cref="NotNullStringProperty"/> dependency property.<br/>
+/// Default value: ""
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+public static readonly global::Windows.UI.Xaml.DependencyProperty NotNullStringPropertyProperty =
+global::Windows.UI.Xaml.DependencyProperty.Register(name: "NotNullStringProperty",
+propertyType: typeof(string),
+ownerType: typeof(MyControl),
+typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(
+    defaultValue: (string)"",
+    propertyChangedCallback: static (sender, args) =>
+{
+var coercedValue = ((MyControl)sender).CoerceNotNullStringProperty((string?)args.NewValue);
+if (!global::System.Collections.Generic.EqualityComparer<string>.Default.Equals((string)args.NewValue, coercedValue))
+{
+((MyControl)sender).SetValue(NotNullStringPropertyProperty, coercedValue);
+return;
+}
+var callback = new global::Windows.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
+{
+((MyControl)sender).OnNotNullStringPropertyChanged();
+((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
+((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
+});
+callback(sender, args);
+}
+));
 
-            var callback = new global::Windows.UI.Xaml.PropertyChangedCallback(static (sender, args) =>
-            {
-                ((MyControl)sender).OnNotNullStringPropertyChanged();
-                ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.NewValue);
-                ((MyControl)sender).OnNotNullStringPropertyChanged((string)args.OldValue, (string)args.NewValue);
-            });
-            callback(sender, args);
-        }));
-        /// <summary>
-        /// Default value: ""
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public string NotNullStringProperty { get => (string)GetValue(NotNullStringPropertyProperty); set => SetValue(NotNullStringPropertyProperty, value); }
+/// <summary>
+/// Default value: ""
+/// </summary>
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public string NotNullStringProperty
+{
+get => (string)GetValue(NotNullStringPropertyProperty);
+set => SetValue(NotNullStringPropertyProperty, value);
 
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnNotNullStringPropertyChanged();
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnNotNullStringPropertyChanged(string newValue);
-        [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
-        partial void OnNotNullStringPropertyChanged(string oldValue, string newValue);
-        private partial string CoerceNotNullStringProperty(string? value);
-        private static partial bool IsNotNullStringPropertyValid(string? value);
-    }
+}
+
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnNotNullStringPropertyChanged();
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnNotNullStringPropertyChanged(string newValue);
+[global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
+partial void OnNotNullStringPropertyChanged(string oldValue, string newValue);
+private partial string CoerceNotNullStringProperty(string? value);
+private static partial bool IsNotNullStringPropertyValid(string? value);
+}
 }
