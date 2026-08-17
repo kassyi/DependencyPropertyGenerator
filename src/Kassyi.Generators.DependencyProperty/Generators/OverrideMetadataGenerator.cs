@@ -42,11 +42,14 @@ public class OverrideMetadataGenerator : MultiAttributeGeneratorBase<(ClassData 
         return (Class: context.ClassData, OverrideMetada: overrideMetadata);
     }
 
+    private static readonly IGenerationStrategy s_wpfStrategy = new WpfGenerationStrategy();
+    private static readonly IGenerationStrategy s_nonWpfStrategy = new NonWpfGenerationStrategy();
+
     protected override string GenerateSource((ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada) data)
     {
-        IGenerationStrategy strategy = data.Class.Framework is Framework.Wpf
-            ? new WpfGenerationStrategy()
-            : new NonWpfGenerationStrategy();
+        var strategy = data.Class.Framework is Framework.Wpf
+            ? s_wpfStrategy
+            : s_nonWpfStrategy;
 
         var writer = new SourceWriter();
         try
@@ -62,9 +65,9 @@ public class OverrideMetadataGenerator : MultiAttributeGeneratorBase<(ClassData 
 
     protected override string GetHintName((ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada) data)
     {
-        IGenerationStrategy strategy = data.Class.Framework is Framework.Wpf
-            ? new WpfGenerationStrategy()
-            : new NonWpfGenerationStrategy();
+        var strategy = data.Class.Framework is Framework.Wpf
+            ? s_wpfStrategy
+            : s_nonWpfStrategy;
         return strategy.GetFileName(data.Class);
     }
 }

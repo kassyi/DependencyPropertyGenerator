@@ -115,13 +115,12 @@ internal sealed class DependencyPropertyDataBuilder
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
         _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
 
-        var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-
         if (parseFailed)
         {
+            var parseErrorLocation = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
             throw new DiagnosticException(Diagnostic.Create(
                 DiagnosticDescriptors.InvalidDefaultValueExpression,
-                location,
+                parseErrorLocation,
                 defaultValueExpression));
         }
 
@@ -137,7 +136,8 @@ internal sealed class DependencyPropertyDataBuilder
             return this;
         }
 
-        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
+        var refTypeErrorLocation = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, refTypeErrorLocation, _defaultValue));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
