@@ -54,84 +54,32 @@ public abstract partial class SnapshotTestBase : VerifyBase
     protected static ReferenceAssemblies GetReferenceAssemblies(Framework framework) => framework switch
     {
         Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-        Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
-        Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
-        Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
-        Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
-        Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
-        Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
-        _ => throw new NotImplementedException($"Framework {framework} is not supported.")
+        Framework.Avalonia => ReferenceAssembliesFactory.Get(framework, "net6.0"),
+        Framework.Maui => ReferenceAssembliesFactory.Get(framework, "net7.0"),
+        _ => ReferenceAssembliesFactory.Get(framework, "net8.0")
     };
 
-    private static string ApplyFrameworkReplacements(string source, Framework framework) => framework switch
+    private static string ApplyFrameworkReplacements(string source, Framework framework)
     {
-        Framework.Wpf => WpfReplacementsRegex().Replace(source, static match => match.Value switch
+        var tree = CSharpSyntaxTree.ParseText(source);
+        var rewriter = new FrameworkSyntaxRewriter(framework);
+        var newSource = rewriter.Visit(tree.GetRoot()).ToFullString();
+
+        if (framework == Framework.Avalonia)
         {
-            "PointerEntered" => "MouseEnter",
-            "PointerExited" => "MouseLeave",
-            "PointerRoutedEventArgs" => "MouseEventArgs",
-            _ => match.Value
-        }),
-
-        Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp => 
-            UnoReplacementsRegex().Replace(source, "KeyRoutedEventArgs"),
-
-        Framework.Avalonia => AvaloniaReplacementsRegex().Replace(source, static match => match.Value switch
+            newSource = newSource.Replace("static partial class", "partial class");
+        }
+        else if (framework == Framework.Maui)
         {
-            "DispatcherObject" or "DependencyObject" => "global::Avalonia.AvaloniaObject",
-            "Visual" => "global::Avalonia.Interactivity.Interactive",
-            "UIElement" => "global::Avalonia.Input.InputElement",
-            "FrameworkElement" => "global::Avalonia.Controls.Control",
-            "PointerRoutedEventArgs" => "PointerEventArgs",
-            "Brush" => "IBrush",
-            "static partial class" => "partial class",
-            _ => match.Value
-        }),
+            newSource = Regex.Replace(newSource, @"\busing Microsoft\.Maui\.(?:Input|Controls|Media);\r?\n?", string.Empty);
+            newSource = $"""
+                         using Microsoft.Maui.Controls;
+                         {newSource}
+                         """;
+        }
 
-        Framework.Maui => $"""
-            using Microsoft.Maui.Controls;
-            {ReplaceMaui(source)}
-            """,
-
-        _ => source
-    };
-
-    private static string ReplaceMaui(string source)
-    {
-        return MauiReplacementsRegex().Replace(source, static match =>
-        {
-            var val = match.Value;
-            if (val.StartsWith("using")) return string.Empty;
-            if (val.Contains("UIElement")) return val.Replace("UIElement", "VisualElement");
-            if (val.Contains("FrameworkElement")) return val.Replace("FrameworkElement", "VisualElement");
-            if (val.Contains("TreeView")) return val.Replace("TreeView", "Grid");
-            
-            return val switch
-            {
-                "TextBox" => "Entry",
-                "UserControl" => "Grid",
-                "MyControl" => "MyGrid",
-                "KeyUp" => "SizeChanged",
-                "KeyEventArgs" => "global::System.EventArgs",
-                "PointerEntered" => "Loaded",
-                "PointerExited" => "Unloaded",
-                "PointerRoutedEventArgs" => "global::System.EventArgs",
-                _ => val
-            };
-        });
+        return newSource;
     }
-
-    [GeneratedRegex(@"(?<=\b|_)(?:PointerEntered|PointerExited|PointerRoutedEventArgs)(?=\b|_)")]
-    private static partial Regex WpfReplacementsRegex();
-
-    [GeneratedRegex(@"(?<=\b|_)KeyEventArgs(?=\b|_)")]
-    private static partial Regex UnoReplacementsRegex();
-
-    [GeneratedRegex(@"\b(?:DispatcherObject|DependencyObject|Visual|UIElement|FrameworkElement|PointerRoutedEventArgs|Brush)\b|static partial class")]
-    private static partial Regex AvaloniaReplacementsRegex();
-
-    [GeneratedRegex(@"\busing Microsoft\.Maui\.(?:Input|Controls|Media);|\b(?:My)?(?:UI|Framework)Element(?:Extensions)?\b|\bTextBox\b|\bUserControl\b|\bTreeView(?:Extensions)?\b|\bMyControl\b|(?<=\b|_)(?:KeyUp|KeyEventArgs|PointerEntered|PointerExited|PointerRoutedEventArgs)(?=\b|_)")]
-    private static partial Regex MauiReplacementsRegex();
 
     protected static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
         string source,
@@ -182,12 +130,12 @@ public abstract partial class SnapshotTestBase : VerifyBase
         var diagnostics = compilation.GetDiagnostics(cancellationToken).Concat(generatorDiagnostics);
         var diagnosticsArray = ImmutableArray.CreateRange(diagnostics);
 
-        var generatedSources = driver.GetRunResult().Results
+        var generatedSyntaxTrees = driver.GetRunResult().Results
             .SelectMany(static result => result.GeneratedSources)
-            .Select(static generatedSource => generatedSource.SourceText.ToString())
+            .Select(static generatedSource => generatedSource.SyntaxTree)
             .ToArray();
 
-        E2EAssertionPipeline.Verify(source, generatedSources, framework, compilation, diagnosticsArray, callerName ?? string.Empty, skipE2EValidation);
+        E2EAssertionPipeline.Verify(source, generatedSyntaxTrees, framework, compilation, diagnosticsArray, callerName ?? string.Empty, skipE2EValidation);
 
         await Task.WhenAll(
             Verify(diagnosticsArray.ToSnapshotModels())
