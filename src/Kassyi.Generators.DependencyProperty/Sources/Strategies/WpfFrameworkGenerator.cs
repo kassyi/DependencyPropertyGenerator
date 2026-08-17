@@ -127,61 +127,56 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
         string eventArgsType, 
         string source)
     {
-        using (writer.Scope($"private class {eventName}WeakEventManager : global::System.Windows.WeakEventManager"))
-        {
-            using (writer.Scope($"private {eventName}WeakEventManager()")) { }
+        var deliverEventArg = eventArgsType == "global::System.EventArgs"
+            ? "args"
+            : "args as object as global::System.EventArgs ?? global::System.EventArgs.Empty";
 
-            using (writer.Scope($"public static void AddHandler(object? source, {eventHandlerType} handler)"))
+        writer.AppendLine($$"""
+            private class {{eventName}}WeakEventManager : global::System.Windows.WeakEventManager
             {
-                writer.AppendLine("if (source == null) throw new global::System.ArgumentNullException(nameof(source));");
-                writer.AppendLine("if (handler == null) throw new global::System.ArgumentNullException(nameof(handler));");
-                writer.AppendLine("CurrentManager.ProtectedAddHandler(source, handler);");
-            }
-
-            using (writer.Scope($"public static void RemoveHandler(object? source, {eventHandlerType} handler)"))
+            private {{eventName}}WeakEventManager()
             {
-                writer.AppendLine("if (source == null) throw new global::System.ArgumentNullException(nameof(source));");
-                writer.AppendLine("if (handler == null) throw new global::System.ArgumentNullException(nameof(handler));");
-                writer.AppendLine("CurrentManager.ProtectedRemoveHandler(source, handler);");
             }
-
-            using (writer.Scope($"internal static {eventName}WeakEventManager CurrentManager"))
+            public static void AddHandler(object? source, {{eventHandlerType}} handler)
             {
-                using (writer.Scope("get"))
-                {
-                    writer.AppendLine($"var managerType = typeof({eventName}WeakEventManager);");
-                    writer.AppendLine($"var manager = ({eventName}WeakEventManager)GetCurrentManager(managerType);");
-                    using (writer.Scope("if (manager == null)"))
-                    {
-                        writer.AppendLine($"manager = new {eventName}WeakEventManager();");
-                        writer.AppendLine("SetCurrentManager(managerType, manager);");
-                    }
-                    writer.AppendLine("return manager;");
-                }
+            if (source == null) throw new global::System.ArgumentNullException(nameof(source));
+            if (handler == null) throw new global::System.ArgumentNullException(nameof(handler));
+            CurrentManager.ProtectedAddHandler(source, handler);
             }
-
-            using (writer.Scope("protected override void StartListening(object? source)"))
+            public static void RemoveHandler(object? source, {{eventHandlerType}} handler)
             {
-                writer.AppendLine($"{source}.{eventName} += On{eventName};");
+            if (source == null) throw new global::System.ArgumentNullException(nameof(source));
+            if (handler == null) throw new global::System.ArgumentNullException(nameof(handler));
+            CurrentManager.ProtectedRemoveHandler(source, handler);
             }
-
-            using (writer.Scope("protected override void StopListening(object? source)"))
+            internal static {{eventName}}WeakEventManager CurrentManager
             {
-                writer.AppendLine($"{source}.{eventName} -= On{eventName};");
-            }
-
-            using (writer.Scope($"internal void On{eventName}(object? sender, {eventArgsType} args)"))
+            get
             {
-                if (eventArgsType == "global::System.EventArgs")
-                {
-                    writer.AppendLine("DeliverEvent(sender, args);");
-                }
-                else
-                {
-                    writer.AppendLine("DeliverEvent(sender, args as object as global::System.EventArgs ?? global::System.EventArgs.Empty);");
-                }
+            var managerType = typeof({{eventName}}WeakEventManager);
+            var manager = ({{eventName}}WeakEventManager)GetCurrentManager(managerType);
+            if (manager == null)
+            {
+            manager = new {{eventName}}WeakEventManager();
+            SetCurrentManager(managerType, manager);
             }
-        }
+            return manager;
+            }
+            }
+            protected override void StartListening(object? source)
+            {
+            {{source}}.{{eventName}} += On{{eventName}};
+            }
+            protected override void StopListening(object? source)
+            {
+            {{source}}.{{eventName}} -= On{{eventName}};
+            }
+            internal void On{{eventName}}(object? sender, {{eventArgsType}} args)
+            {
+            DeliverEvent(sender, {{deliverEventArg}});
+            }
+            }
+            """);
     }
 
     public override void GenerateStaticConstructor(

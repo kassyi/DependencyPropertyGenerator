@@ -82,32 +82,45 @@ internal abstract class FrameworkGenerator :
         writer.AppendLine(callbackSignature);
         writer.AppendLine("{");
 
-        (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
-        [
-            (CallbackSignature.NoParameters, isAttached, []),
-            (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
-            (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
-            (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
-            (CallbackSignature.EventArgs, isAttached, [argsExpr]),
-            (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, argsExpr]),
-        ];
-
-        foreach (var (flag, isStatic, args) in mappings)
-        {
-            if (signatures.HasFlag(flag))
-            {
-                writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
-            }
-        }
+        GenerateCallbackCalls(writer, signatures, name, isAttached, senderCast, instanceCast, oldVal, newVal, argsExpr);
 
         writer.Append("}");
         return writer.ToString();
     }
 
-    protected static string GenerateCall(string methodName, bool isStatic, string senderExpression, params string[] args)
+    protected static void GenerateCallbackCalls(
+        SourceWriter writer,
+        CallbackSignature signatures,
+        string name,
+        bool isAttached,
+        string senderCast,
+        string instanceCast,
+        string oldVal,
+        string newVal,
+        string argsExpr)
     {
-        var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
-        return $"{target}({string.Join(", ", args)});";
+        WriteCallIfFlag(writer, signatures, CallbackSignature.NoParameters, name, isAttached, instanceCast, "");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.NewValue, name, isAttached, instanceCast, isAttached ? senderCast : newVal);
+        WriteCallIfFlag(writer, signatures, CallbackSignature.OldAndNewValue, name, isAttached, instanceCast, isAttached ? $"{senderCast}, {newVal}" : $"{oldVal}, {newVal}");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.SenderAndOldAndNewValue, name, isAttached, instanceCast, $"{senderCast}, {oldVal}, {newVal}");
+        WriteCallIfFlag(writer, signatures, CallbackSignature.EventArgs, name, isAttached, instanceCast, argsExpr);
+        WriteCallIfFlag(writer, signatures, CallbackSignature.SenderAndEventArgs, name, true, instanceCast, $"{(isAttached ? senderCast : instanceCast)}, {argsExpr}");
+    }
+
+    private static void WriteCallIfFlag(
+        SourceWriter writer,
+        CallbackSignature currentSignatures,
+        CallbackSignature targetFlag,
+        string methodName,
+        bool isStatic,
+        string senderExpression,
+        string args)
+    {
+        if ((currentSignatures & targetFlag) != 0)
+        {
+            var target = isStatic ? methodName : $"{senderExpression}.{methodName}";
+            writer.AppendLine($"{target}({args});");
+        }
     }
     
 

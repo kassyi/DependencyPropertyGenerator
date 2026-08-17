@@ -22,10 +22,7 @@ internal static partial class SourceGenerationHelper
     public static void GenerateDependencyProperty(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
     {
         using var _ = writer.ClassScope(@class);
-        var strategy = Strategies.FrameworkGeneratorFactory.CreateDependencyPropertyStrategy(property.Framework);
-
-        GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.XmlDocumentation, property, isProperty: false);
-        GenerateGeneratedCodeAttribute(ref writer, @class.Version);
+        var strategy = GeneratePropertyHeader(ref writer, @class, property);
 
         var propertyModifier = GeneratePropertyModifier(property);
         var propertyType = strategy.GeneratePropertyType(@class, property);
@@ -62,12 +59,7 @@ internal static partial class SourceGenerationHelper
             }
         }
 
-        GenerateOnChangedMethods(ref writer, @class, property);
-        GenerateOnChangingMethods(ref writer, @class, property);
-        GenerateCoercePartialMethod(ref writer, property);
-        GenerateValidatePartialMethod(ref writer, @class, property);
-        GenerateCreateDefaultValueCallbackPartialMethod(ref writer, property);
-        GenerateBindEventMethod(ref writer, property);
+        GeneratePropertyFooter(ref writer, @class, property);
     }
     private static void GenerateGetter(ref SourceWriter writer, DependencyPropertyData property)
     {

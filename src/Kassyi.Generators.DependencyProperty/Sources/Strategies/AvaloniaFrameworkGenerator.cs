@@ -201,23 +201,7 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
             var oldVal = $"{typeCast}x.OldValue.GetValueOrDefault()";
             var newVal = $"{typeCast}x.NewValue.GetValueOrDefault()";
 
-            (CallbackSignature Flag, bool IsStatic, string[] Args)[] mappings =
-            [
-                (CallbackSignature.NoParameters, isAttached, []),
-                (CallbackSignature.NewValue, isAttached, isAttached ? [senderCast] : [newVal]),
-                (CallbackSignature.OldAndNewValue, isAttached, isAttached ? [senderCast, newVal] : [oldVal, newVal]),
-                (CallbackSignature.SenderAndOldAndNewValue, isAttached, [senderCast, oldVal, newVal]),
-                (CallbackSignature.EventArgs, isAttached, ["x"]),
-                (CallbackSignature.SenderAndEventArgs, true, [isAttached ? senderCast : instanceCast, "x"]),
-            ];
-
-            foreach (var (flag, isStatic, args) in mappings)
-            {
-                if (signatures.HasFlag(flag))
-                {
-                    writer.AppendLine(GenerateCall(name, isStatic, instanceCast, args));
-                }
-            }
+            GenerateCallbackCalls(writer, signatures, name, isAttached, senderCast, instanceCast, oldVal, newVal, "x");
             writer.AppendLine("#pragma warning restore CS8600, CS8604");
         }
     }
