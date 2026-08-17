@@ -32,9 +32,9 @@ public partial class Level1
             /// <summary>
             /// Default value: default(string)
             /// </summary>
+            [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
             [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
             [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-            [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
             public static string? GetMyProperty(global::System.Windows.DependencyObject element)
             {
                 element = element ?? throw new global::System.ArgumentNullException(nameof(element));

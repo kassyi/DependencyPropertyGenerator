@@ -30,9 +30,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: default(int)
         /// </summary>
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.FrameworkElement))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.FrameworkElement))]
         public static int GetMyColumn(global::System.Windows.FrameworkElement element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));

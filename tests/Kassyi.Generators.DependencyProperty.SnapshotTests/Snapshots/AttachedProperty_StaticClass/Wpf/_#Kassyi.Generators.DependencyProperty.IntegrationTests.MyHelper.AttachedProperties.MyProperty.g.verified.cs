@@ -30,9 +30,9 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
         /// <summary>
         /// Default value: default(int)
         /// </summary>
+        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
         [global::System.CodeDom.Compiler.GeneratedCode("DependencyPropertyGenerator", "0.0.0.0")]
         [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        [global::System.Windows.AttachedPropertyBrowsableForType(typeof(global::System.Windows.DependencyObject))]
         public static int GetMyProperty(global::System.Windows.DependencyObject element)
         {
             element = element ?? throw new global::System.ArgumentNullException(nameof(element));

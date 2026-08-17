@@ -286,8 +286,7 @@ public static class E2EAssertionPipeline
             PredefinedTypeSyntax pre => pre.Keyword.ValueText,
             NullableTypeSyntax nts => GetSimpleName(nts.ElementType) + "?",
             ArrayTypeSyntax ats => GetSimpleName(ats.ElementType) + "[]",
-            TupleTypeSyntax _ => type.ToString(),
-            _ => throw new NotSupportedException($"Unsupported node type: {type.GetType()} in {type}")
+            _ => type.ToString()
         };
     }
 }
