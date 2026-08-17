@@ -1,11 +1,11 @@
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Kassyi.Generators.DependencyProperty.Rules;
+using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Kassyi.Generators.Extensions;
-using Kassyi.Generators.DependencyProperty.Rules;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -226,13 +226,14 @@ internal static class DependencyPropertyMetadataExtractor
             return string.Empty;
         }
 
-        if (isAttached)
+        if (!isAttached)
         {
-            var typeString = browsableForType ?? PrepareData.GenerateDependencyObjectType(framework);
-            return SignatureRuleHelper.NormalizeTypeName(typeString);
+            return SignatureRuleHelper.GetNormalizedTypeName(classSymbol);
         }
 
-        return SignatureRuleHelper.GetNormalizedTypeName(classSymbol);
+        var typeString = browsableForType ?? PrepareData.GenerateDependencyObjectType(framework);
+        return SignatureRuleHelper.NormalizeTypeName(typeString);
+
     }
 
     private static EquatableArray<string> GetBindEventsArray(string? bindEvent, TypedConstant bindEvents)
@@ -243,21 +244,22 @@ internal static class DependencyPropertyMetadataExtractor
         }
 
         // [WHY] Avoid LINQ Select/Where chains to prevent array and enumerator allocations.
-        if (bindEvents is { Kind: TypedConstantKind.Array, Values.IsDefaultOrEmpty: false })
+        if (bindEvents is not { Kind: TypedConstantKind.Array, Values.IsDefaultOrEmpty: false })
         {
-            var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
-            foreach (var value in bindEvents.Values)
-            {
-                var str = value.Value as string;
-                if (!string.IsNullOrWhiteSpace(str))
-                {
-                    builder.Add(str!);
-                }
-            }
-            return builder.ToImmutable().AsEquatableArray();
+            return Array.Empty<string>().ToImmutableArray().AsEquatableArray();
         }
 
-        return Array.Empty<string>().ToImmutableArray().AsEquatableArray();
+        var builder = ImmutableArray.CreateBuilder<string>(bindEvents.Values.Length);
+        foreach (var value in bindEvents.Values)
+        {
+            var str = value.Value as string;
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                builder.Add(str!);
+            }
+        }
+        return builder.ToImmutable().AsEquatableArray();
+
     }
 
     private static string? GetStringOrTypeString(TypedConstant constant)

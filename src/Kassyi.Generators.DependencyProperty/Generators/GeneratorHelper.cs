@@ -2,7 +2,6 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-using System.Collections.Immutable;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -36,7 +35,7 @@ internal static class GeneratorHelper
                     var (((semanticModel, attributes, classSyntax, classSymbol), frameworkVal), versionVal) = x;
                     if (attributes.IsEmpty)
                     {
-                        return default(TData?);
+                        return null;
                     }
 
                     var classData = classSymbol.GetClassData(frameworkVal, versionVal);

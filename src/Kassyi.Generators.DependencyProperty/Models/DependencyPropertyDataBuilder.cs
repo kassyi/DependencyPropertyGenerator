@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Kassyi.Generators.Extensions;
-using Kassyi.Generators.Extensions.Models;
 using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Rules;
 using Kassyi.Generators.DependencyProperty.Rules.Expressions;
+using Kassyi.Generators.Extensions;
+using Kassyi.Generators.Extensions.Models;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
@@ -111,7 +111,7 @@ internal sealed class DependencyPropertyDataBuilder
         var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
         ExpressionSyntax? directExpressionSyntax = null;
-        bool parseFailed = false;
+        var parseFailed = false;
 
         if (defaultValueExpression != null)
         {
@@ -140,10 +140,10 @@ internal sealed class DependencyPropertyDataBuilder
         _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
         _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
 
-        bool isReferenceType = false;
+        var isReferenceType = false;
         if (directExpressionSyntax != null && !parseFailed)
         {
-            int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
+            var position = attributeSyntax?.GetLocation().SourceSpan.Start;
             isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
         }
         else if (defaultValueExpression != null && parseFailed)
@@ -205,7 +205,7 @@ internal sealed class DependencyPropertyDataBuilder
 
         var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);
         
-        if (matchChanged.HasMethod && matchChanged.Signatures == CallbackSignature.None)
+        if (matchChanged is { HasMethod: true, Signatures: CallbackSignature.None })
         {
             var methodLocation = classSymbol.Locations.FirstOrDefault() ?? Location.None;
             if (attribute.ApplicationSyntaxReference?.GetSyntax() is { } syntaxForLocation)

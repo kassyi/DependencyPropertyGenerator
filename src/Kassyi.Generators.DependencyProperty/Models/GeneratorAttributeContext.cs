@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using Kassyi.Generators.Extensions;
-using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
