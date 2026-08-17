@@ -2,6 +2,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -28,24 +29,16 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
     }
 
     protected override (ClassData Class, EventData Event)? PrepareData(
-        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
+        in GeneratorAttributeContext context)
     {
-        var (((_, attributes, _, classSymbol), framework), version) = tuple;
-        if (attributes.FirstOrDefault() is not { } attribute)
+        var eventData = context.Attribute.GetEventData(isStaticClass: false);
+        if (context.Framework is Framework.Maui ||
+            context.Framework is not Framework.Wpf && eventData.IsAttached)
         {
             return null;
         }
 
-        var eventData = attribute.GetEventData(isStaticClass: false);
-        if (framework is Framework.Maui ||
-            framework is not Framework.Wpf && eventData.IsAttached)
-        {
-            return null;
-        }
-
-        var classData = classSymbol.GetClassData(framework, version);
-
-        return (classData, eventData);
+        return (context.ClassData, eventData);
     }
 
     protected override string GenerateSource((ClassData Class, EventData Event) data) =>

@@ -2,6 +2,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.DependencyProperty.Sources;
 using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -25,20 +26,16 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        ((ClassWithAttributesContext context, Framework framework) left, string version) tuple)
+        in GeneratorAttributeContext context)
     {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (attributes.FirstOrDefault() is not { } attribute)
-        {
-            return null;
-        }
+        var dependencyPropertyData = context.Attribute.GetDependencyPropertyData(
+            context.Framework,
+            context.Version,
+            context.ClassSymbol,
+            context.ClassSyntax.TryFindAttributeSyntax(context.Attribute),
+            semanticModel: context.SemanticModel);
 
-        var classData = classSymbol.GetClassData(framework, version);
-        var dependencyPropertyData =
-            attribute.GetDependencyPropertyData(framework, version, classSymbol,
-                classSyntax.TryFindAttributeSyntax(attribute), semanticModel: semanticModel);
-
-        return (classData, dependencyPropertyData);
+        return (context.ClassData, dependencyPropertyData);
     }
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>

@@ -23,7 +23,7 @@ internal static class DefaultValueExpressionAnalyzer
     {
         if (expression.ContainsDiagnostics)
         {
-            return IsConservativeReferenceTypeFallback(expression.ToString(), propertyTypeSymbol);
+            return IsConservativeReferenceTypeFallback(expression, propertyTypeSymbol);
         }
 
         // Check top-level node first
@@ -68,7 +68,7 @@ internal static class DefaultValueExpressionAnalyzer
     }
 
 
-    private static bool IsConservativeReferenceTypeFallback(string? rawExpression, ITypeSymbol? propertyTypeSymbol)
+    private static bool IsConservativeReferenceTypeFallback(ExpressionSyntax expression, ITypeSymbol? propertyTypeSymbol)
     {
         // [WHY] Value types and strings are safe regardless of expression syntax errors
         if (propertyTypeSymbol != null && (propertyTypeSymbol.IsValueType || IsSpecialSafeType(propertyTypeSymbol)))
@@ -76,14 +76,10 @@ internal static class DefaultValueExpressionAnalyzer
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(rawExpression))
-        {
-            return false;
-        }
+        var firstTokenText = expression.GetFirstToken().Text;
 
-        var trimmed = rawExpression!.Trim();
         // Literals, typeof, default, null are safe even when parsing fails
-        if (trimmed is "null" || trimmed.StartsWith("typeof(", StringComparison.Ordinal) || trimmed.StartsWith("default", StringComparison.Ordinal))
+        if (firstTokenText is "null" or "typeof" or "default")
         {
             return false;
         }

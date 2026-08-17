@@ -106,34 +106,24 @@ internal sealed class DependencyPropertyDataBuilder
         AttributeSyntax? attributeSyntax,
         SemanticModel? semanticModel = null)
     {
-        ExtractDefaultValueStrings(attributeSyntax);
-        ValidateReferenceTypeDefaultValue(attribute, attributeSyntax, semanticModel);
-
-        return this;
-    }
-
-    private void ExtractDefaultValueStrings(AttributeSyntax? attributeSyntax)
-    {
         var defaultValueExpression = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString();
         var defaultValue = defaultValueExpression ?? GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValue)).Value?.ToString();
         var defaultValueDoc = defaultValueExpression ?? attributeSyntax?.GetNamedArgumentExpression(nameof(DependencyPropertyAttribute.DefaultValue));
 
-        ExpressionSyntax? defaultValueSyntax = null;
-        ExpressionSyntax? defaultValueDocSyntax = null;
+        ExpressionSyntax? directExpressionSyntax = null;
 
         if (defaultValueExpression != null)
         {
             try 
             { 
-                defaultValueSyntax = SyntaxFactory.ParseExpression(defaultValueExpression); 
-                if (defaultValueSyntax.ContainsDiagnostics)
+                directExpressionSyntax = SyntaxFactory.ParseExpression(defaultValueExpression); 
+                if (directExpressionSyntax.ContainsDiagnostics)
                 {
                     throw new DiagnosticException(Diagnostic.Create(
                         DiagnosticDescriptors.InvalidDefaultValueExpression,
                         attributeSyntax?.GetLocation() ?? Location.None,
                         defaultValueExpression));
                 }
-                defaultValueDocSyntax = defaultValueSyntax;
             } 
             catch (DiagnosticException)
             {
@@ -149,62 +139,25 @@ internal sealed class DependencyPropertyDataBuilder
         }
         else
         {
-            defaultValueSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
-            defaultValueDocSyntax = defaultValueSyntax;
-        }
-
-        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, defaultValueSyntax, _typeSymbol);
-        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, defaultValueDocSyntax, _typeSymbol);
-    }
-
-    private void ValidateReferenceTypeDefaultValue(
-        AttributeData attribute,
-        AttributeSyntax? attributeSyntax,
-        SemanticModel? semanticModel)
-    {
-        int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
-        var defaultValueExpression = GetNamedArgument(nameof(DependencyPropertyAttribute.DefaultValueExpression)).Value?.ToString();
-        
-        ExpressionSyntax? directExpressionSyntax = null;
-        bool parseFailed = false;
-        if (defaultValueExpression != null)
-        {
-            try 
-            { 
-                directExpressionSyntax = SyntaxFactory.ParseExpression(defaultValueExpression); 
-                if (directExpressionSyntax.ContainsDiagnostics)
-                {
-                    parseFailed = true;
-                }
-            } 
-            catch 
-            { 
-                parseFailed = true; 
-            }
-        }
-        else
-        {
             directExpressionSyntax = attributeSyntax?.GetNamedArgumentExpressionSyntax(nameof(DependencyPropertyAttribute.DefaultValue));
         }
 
-        var isReferenceType = false;
+        _defaultValue = PrepareData.ExpandDefaultValueExpression(defaultValue, directExpressionSyntax, _typeSymbol);
+        _defaultValueDocumentation = PrepareData.ExpandDefaultValueExpression(defaultValueDoc, directExpressionSyntax, _typeSymbol);
+
         if (directExpressionSyntax != null)
         {
-            isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
-        }
-        else if (defaultValueExpression != null && parseFailed)
-        {
-            // Conservative fallback for invalid string expressions
-            isReferenceType = _typeSymbol is { IsValueType: false } && _typeSymbol.SpecialType != SpecialType.System_String;
-        }
-
-        if (!isReferenceType)
-        {
-            return;
+            int? position = attributeSyntax?.GetLocation().SourceSpan.Start;
+            bool isReferenceType = DefaultValueExpressionAnalyzer.IsReferenceTypeExpression(directExpressionSyntax, _typeSymbol, _classSymbol, semanticModel, position);
+            
+            if (isReferenceType)
+            {
+                var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
+                throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
+            }
         }
 
-        var location = attributeSyntax?.GetLocation() ?? attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? Location.None;
-        throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.ReferenceTypeDefaultValueSharing, location, _defaultValue));
+        return this;
     }
 
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)

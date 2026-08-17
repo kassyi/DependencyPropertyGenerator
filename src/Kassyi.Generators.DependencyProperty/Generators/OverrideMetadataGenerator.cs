@@ -3,6 +3,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Generators;
 
@@ -49,24 +50,24 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
     }
 
     private static (ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada)? PrepareData(
-        ((ClassWithAttributesContext context,
-            Framework framework) left,
-            string version) tuple)
+        in GeneratorMultiAttributeContext context)
     {
-        var (((semanticModel, attributes, classSyntax, classSymbol), framework), version) = tuple;
-        if (framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
+        if (context.Framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
         {
             return null;
         }
 
-        var classData = classSymbol.GetClassData(framework, version);
-        var overrideMetadata = attributes
+        var overrideMetadata = context.Attributes
             .Select(attribute => attribute.GetDependencyPropertyData(
-                framework, version, classSymbol, classSyntax.TryFindAttributeSyntax(attribute), semanticModel: semanticModel))
+                context.Framework,
+                context.Version,
+                context.ClassSymbol,
+                context.ClassSyntax.TryFindAttributeSyntax(attribute),
+                semanticModel: context.SemanticModel))
             .ToImmutableArray()
             .AsEquatableArray();
 
-        return (classData, overrideMetadata);
+        return (context.ClassData, overrideMetadata);
     }
 
     private static FileWithName GetSourceCode(
