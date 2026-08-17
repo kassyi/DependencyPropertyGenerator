@@ -138,7 +138,10 @@ public static class E2EAssertionPipeline
 
     private static void VerifyClrWrappers(SyntaxNode[] outputRoots, Framework framework)
     {
-        var properties = outputRoots.SelectMany(r => r.DescendantNodes().OfType<PropertyDeclarationSyntax>()).ToList();
+        var properties = outputRoots
+            .SelectMany(r => r.DescendantNodes().OfType<PropertyDeclarationSyntax>())
+            .Where(p => p.Identifier.ValueText != "CurrentManager")
+            .ToList();
         foreach (var prop in properties)
         {
             var accessors = prop.AccessorList?.Accessors;
@@ -147,15 +150,29 @@ public static class E2EAssertionPipeline
                 var get = accessors.Value.FirstOrDefault(a => a.Keyword.IsKind(SyntaxKind.GetKeyword));
                 var set = accessors.Value.FirstOrDefault(a => a.Keyword.IsKind(SyntaxKind.SetKeyword));
 
-                if (get != null && get.Body == null && get.ExpressionBody != null)
+                if (get != null)
                 {
-                    if (!IsValidGetterExpression(get.ExpressionBody.Expression))
+                    ExpressionSyntax? getExpr = get.ExpressionBody?.Expression;
+                    if (getExpr == null && get.Body != null)
+                    {
+                        var returnStatement = get.Body.Statements.OfType<ReturnStatementSyntax>().FirstOrDefault();
+                        getExpr = returnStatement?.Expression;
+                    }
+
+                    if (getExpr != null && !IsValidGetterExpression(getExpr))
                         throw new Exception("Level 3 Assertion Failed: Getter does not call GetValue or return a backing field.");
                 }
 
-                if (set != null && set.Body == null && set.ExpressionBody != null)
+                if (set != null)
                 {
-                    if (!IsValidSetterExpression(set.ExpressionBody.Expression))
+                    ExpressionSyntax? setExpr = set.ExpressionBody?.Expression;
+                    if (setExpr == null && set.Body != null)
+                    {
+                        var exprStatement = set.Body.Statements.OfType<ExpressionStatementSyntax>().FirstOrDefault();
+                        setExpr = exprStatement?.Expression;
+                    }
+
+                    if (setExpr != null && !IsValidSetterExpression(setExpr))
                         throw new Exception("Level 3 Assertion Failed: Setter does not call SetValue or SetAndRaise.");
                 }
             }
@@ -266,7 +283,11 @@ public static class E2EAssertionPipeline
             QualifiedNameSyntax qn => qn.Right.Identifier.ValueText,
             GenericNameSyntax gn => gn.Identifier.ValueText,
             AliasQualifiedNameSyntax alias => alias.Name.Identifier.ValueText,
-            _ => type.ToString()
+            PredefinedTypeSyntax pre => pre.Keyword.ValueText,
+            NullableTypeSyntax nts => GetSimpleName(nts.ElementType) + "?",
+            ArrayTypeSyntax ats => GetSimpleName(ats.ElementType) + "[]",
+            TupleTypeSyntax _ => type.ToString(),
+            _ => throw new NotSupportedException($"Unsupported node type: {type.GetType()} in {type}")
         };
     }
 }

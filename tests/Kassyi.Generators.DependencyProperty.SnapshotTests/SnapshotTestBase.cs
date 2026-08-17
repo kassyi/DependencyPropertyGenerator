@@ -2,6 +2,7 @@
 
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using Kassyi.Generators.DependencyProperty.Generators;
 using Kassyi.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis;
@@ -9,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 
-public abstract class SnapshotTestBase : VerifyBase
+public abstract partial class SnapshotTestBase : VerifyBase
 {
     protected static string GetHeader(
         Framework framework,
@@ -28,11 +29,11 @@ public abstract class SnapshotTestBase : VerifyBase
 
         var usings = string.Join(
             Environment.NewLine,
-            values.Select(value => value switch
+            values.Select(v => v switch
             {
                 { Length: 0 } or null => $"using {prefix};",
-                ['S', 'y', 's', 't', 'e', 'm', ..] => $"using {value};",
-                _ => $"using {prefix}.{value};"
+                _ when v.StartsWith("System") => $"using {v};",
+                _ => $"using {prefix}.{v};"
             }));
 
         return $"""
@@ -49,26 +50,6 @@ public abstract class SnapshotTestBase : VerifyBase
         params string[] values) =>
         GetHeader(framework, nullable: true, @namespace: true, values);
 
-    protected static Dictionary<string, string> GetGlobalOptions(Framework framework)
-    {
-        var options = new Dictionary<string, string>
-        {
-            ["build_property.RecognizeFramework_Version"] = "0.0.0.0"
-        };
-
-        switch (framework)
-        {
-            case Framework.Wpf: options["build_property.UseWPF"] = "true"; break;
-            case Framework.WinUi: options["build_property.UseWinUI"] = "true"; break;
-            case Framework.Maui: options["build_property.UseMaui"] = "true"; break;
-            case Framework.Uwp: options["build_property.RecognizeFramework_DefineConstants"] = "WINDOWS_UWP"; break;
-            case Framework.Uno: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_UNO"; break;
-            case Framework.UnoWinUi: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_UNO;HAS_WINUI"; break;
-            case Framework.Avalonia: options["build_property.RecognizeFramework_DefineConstants"] = "HAS_AVALONIA"; break;
-        }
-
-        return options;
-    }
 
     protected static ReferenceAssemblies GetReferenceAssemblies(Framework framework) => framework switch
     {
@@ -84,45 +65,73 @@ public abstract class SnapshotTestBase : VerifyBase
 
     private static string ApplyFrameworkReplacements(string source, Framework framework) => framework switch
     {
-        Framework.Wpf => source
-            .Replace("PointerEntered", "MouseEnter")
-            .Replace("PointerExited", "MouseLeave")
-            .Replace("PointerRoutedEventArgs", "MouseEventArgs"),
+        Framework.Wpf => WpfReplacementsRegex().Replace(source, static match => match.Value switch
+        {
+            "PointerEntered" => "MouseEnter",
+            "PointerExited" => "MouseLeave",
+            "PointerRoutedEventArgs" => "MouseEventArgs",
+            _ => match.Value
+        }),
 
-        Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp => source
-            .Replace("KeyEventArgs", "KeyRoutedEventArgs"),
+        Framework.Uno or Framework.UnoWinUi or Framework.WinUi or Framework.Uwp => 
+            UnoReplacementsRegex().Replace(source, "KeyRoutedEventArgs"),
 
-        Framework.Avalonia => source
-            .ReplaceType("DispatcherObject", "Avalonia.AvaloniaObject")
-            .ReplaceType("DependencyObject", "Avalonia.AvaloniaObject")
-            .ReplaceType("Visual", "Avalonia.Interactivity.Interactive")
-            .ReplaceType("UIElement", "Avalonia.Input.InputElement")
-            .ReplaceType("FrameworkElement", "Avalonia.Controls.Control")
-            .Replace("static partial class", "partial class")
-            .Replace("Brush", "IBrush")
-            .Replace("PointerRoutedEventArgs", "PointerEventArgs"),
+        Framework.Avalonia => AvaloniaReplacementsRegex().Replace(source, static match => match.Value switch
+        {
+            "DispatcherObject" or "DependencyObject" => "global::Avalonia.AvaloniaObject",
+            "Visual" => "global::Avalonia.Interactivity.Interactive",
+            "UIElement" => "global::Avalonia.Input.InputElement",
+            "FrameworkElement" => "global::Avalonia.Controls.Control",
+            "PointerRoutedEventArgs" => "PointerEventArgs",
+            "Brush" => "IBrush",
+            "static partial class" => "partial class",
+            _ => match.Value
+        }),
 
         Framework.Maui => $"""
             using Microsoft.Maui.Controls;
-            {source
-                .Replace("using Microsoft.Maui.Input;", string.Empty)
-                .Replace("using Microsoft.Maui.Controls;", string.Empty)
-                .Replace("using Microsoft.Maui.Media;", string.Empty)
-                .Replace("UIElement", "VisualElement")
-                .Replace("FrameworkElement", "VisualElement")
-                .Replace("TextBox", "Entry")
-                .Replace("UserControl", "Grid")
-                .Replace("TreeView", "Grid")
-                .Replace("MyControl", "MyGrid")
-                .Replace("KeyUp", "SizeChanged")
-                .Replace("KeyEventArgs", "global::System.EventArgs")
-                .Replace("PointerEntered", "Loaded")
-                .Replace("PointerExited", "Unloaded")
-                .Replace("PointerRoutedEventArgs", "global::System.EventArgs")}
+            {ReplaceMaui(source)}
             """,
 
         _ => source
     };
+
+    private static string ReplaceMaui(string source)
+    {
+        return MauiReplacementsRegex().Replace(source, static match =>
+        {
+            var val = match.Value;
+            if (val.StartsWith("using")) return string.Empty;
+            if (val.Contains("UIElement")) return val.Replace("UIElement", "VisualElement");
+            if (val.Contains("FrameworkElement")) return val.Replace("FrameworkElement", "VisualElement");
+            if (val.Contains("TreeView")) return val.Replace("TreeView", "Grid");
+            
+            return val switch
+            {
+                "TextBox" => "Entry",
+                "UserControl" => "Grid",
+                "MyControl" => "MyGrid",
+                "KeyUp" => "SizeChanged",
+                "KeyEventArgs" => "global::System.EventArgs",
+                "PointerEntered" => "Loaded",
+                "PointerExited" => "Unloaded",
+                "PointerRoutedEventArgs" => "global::System.EventArgs",
+                _ => val
+            };
+        });
+    }
+
+    [GeneratedRegex(@"(?<=\b|_)(?:PointerEntered|PointerExited|PointerRoutedEventArgs)(?=\b|_)")]
+    private static partial Regex WpfReplacementsRegex();
+
+    [GeneratedRegex(@"(?<=\b|_)KeyEventArgs(?=\b|_)")]
+    private static partial Regex UnoReplacementsRegex();
+
+    [GeneratedRegex(@"\b(?:DispatcherObject|DependencyObject|Visual|UIElement|FrameworkElement|PointerRoutedEventArgs|Brush)\b|static partial class")]
+    private static partial Regex AvaloniaReplacementsRegex();
+
+    [GeneratedRegex(@"\busing Microsoft\.Maui\.(?:Input|Controls|Media);|\b(?:My)?(?:UI|Framework)Element(?:Extensions)?\b|\bTextBox\b|\bUserControl\b|\bTreeView(?:Extensions)?\b|\bMyControl\b|(?<=\b|_)(?:KeyUp|KeyEventArgs|PointerEntered|PointerExited|PointerRoutedEventArgs)(?=\b|_)")]
+    private static partial Regex MauiReplacementsRegex();
 
     protected static async Task<(Compilation Compilation, GeneratorDriver Driver)> CreateCompilationAndDriverAsync<T>(
         string source,
@@ -154,7 +163,7 @@ public abstract class SnapshotTestBase : VerifyBase
         var driver = CSharpGeneratorDriver.Create(
                 generators: allGenerators.Select(GeneratorExtensions.AsSourceGenerator).ToArray(),
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview))
-            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GetGlobalOptions(framework)));
+            .WithUpdatedAnalyzerConfigOptions(new DictionaryAnalyzerConfigOptionsProvider(GlobalOptionsHelper.GetGlobalOptions(framework)));
 
         return (compilation, driver);
     }
@@ -250,14 +259,11 @@ internal static class StringExtensions
 {
     internal static string ReplaceType(this string source, string from, string to)
     {
-        return source
-            .Replace($": {from}", $": global::{to}")
-            .Replace($"{from}.", $"global::{to}.")
-            .Replace($", {from}", $", global::{to}")
-            .Replace($"<{from}", $"<global::{to}")
-            .Replace($"{from}>", $"global::{to}>")
-            .Replace($"({from}", $"(global::{to}")
-            .Replace($"{from})", $"global::{to})");
+        // Require word boundaries so we don't accidentally match substrings.
+        // Also avoid adding global:: if it's just 'IBrush' or similar simple replacement,
+        // but for framework types, global:: ensures there's no namespace conflict.
+        var replacement = to.Contains(".") ? $"global::{to}" : to;
+        return Regex.Replace(source, $@"\b{from}\b", replacement);
     }
 }
 
