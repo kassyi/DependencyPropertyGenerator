@@ -26,17 +26,7 @@ public class DependencyPropertyGenerator : AttributeGeneratorBase<(ClassData Cla
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        in GeneratorAttributeContext context)
-    {
-        var dependencyPropertyData = context.Attribute.GetDependencyPropertyData(
-            context.Framework,
-            context.Version,
-            context.ClassSymbol,
-            context.ClassSyntax.TryFindAttributeSyntax(context.Attribute),
-            semanticModel: context.SemanticModel);
-
-        return (context.ClassData, dependencyPropertyData);
-    }
+        GeneratorAttributeContext context) =>(context.ClassData, context.GetDependencyPropertyData());
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateDependencyPropertySource(data.Class, data.DependencyProperty);

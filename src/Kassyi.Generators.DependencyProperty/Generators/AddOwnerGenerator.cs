@@ -26,23 +26,14 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        in GeneratorAttributeContext context)
+        GeneratorAttributeContext context)
     {
         if (context.Framework is not (Framework.Avalonia or Framework.Wpf))
         {
             return null;
         }
 
-        var dependencyPropertyData =
-            context.Attribute.GetDependencyPropertyData(
-                context.Framework,
-                context.Version,
-                context.ClassSymbol,
-                context.ClassSyntax.TryFindAttributeSyntax(context.Attribute),
-                isAddOwner: true,
-                semanticModel: context.SemanticModel);
-
-        return (context.ClassData, dependencyPropertyData);
+        return (context.ClassData, context.GetDependencyPropertyData(isAddOwner: true));
     }
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>

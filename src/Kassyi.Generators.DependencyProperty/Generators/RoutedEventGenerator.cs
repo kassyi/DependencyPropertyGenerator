@@ -29,7 +29,7 @@ public class RoutedEventGenerator : AttributeGeneratorBase<(ClassData Class, Eve
     }
 
     protected override (ClassData Class, EventData Event)? PrepareData(
-        in GeneratorAttributeContext context)
+        GeneratorAttributeContext context)
     {
         var eventData = context.Attribute.GetEventData(isStaticClass: false);
         if (context.Framework is Framework.Maui ||

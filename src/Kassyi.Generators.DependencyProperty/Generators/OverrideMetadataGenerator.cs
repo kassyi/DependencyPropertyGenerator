@@ -11,13 +11,7 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class OverrideMetadataGenerator : IIncrementalGenerator
 {
-    #region Constants
-
     private const string Id = "OMG";
-
-    #endregion
-
-    #region Methods
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -50,7 +44,7 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
     }
 
     private static (ClassData Class, EquatableArray<DependencyPropertyData> OverrideMetada)? PrepareData(
-        in GeneratorMultiAttributeContext context)
+        GeneratorMultiAttributeContext context)
     {
         if (context.Framework is not (Framework.Wpf or Framework.Uwp or Framework.WinUi or Framework.Uno or Framework.UnoWinUi))
         {
@@ -58,16 +52,11 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
         }
 
         var overrideMetadata = context.Attributes
-            .Select(attribute => attribute.GetDependencyPropertyData(
-                context.Framework,
-                context.Version,
-                context.ClassSymbol,
-                context.ClassSyntax.TryFindAttributeSyntax(attribute),
-                semanticModel: context.SemanticModel))
+            .Select(attribute => context.GetDependencyPropertyData(attribute))
             .ToImmutableArray()
             .AsEquatableArray();
 
-        return (context.ClassData, overrideMetadata);
+        return (Class: context.ClassData, OverrideMetada: overrideMetadata);
     }
 
     private static FileWithName GetSourceCode(
@@ -93,6 +82,4 @@ public class OverrideMetadataGenerator : IIncrementalGenerator
             writer.Dispose();
         }
     }
-
-    #endregion
 }

@@ -24,4 +24,13 @@ public readonly record struct GeneratorMultiAttributeContext(
     INamedTypeSymbol ClassSymbol,
     Framework Framework,
     string Version,
-    ClassData ClassData);
+    ClassData ClassData)
+{
+    /// <summary>Creates a single-attribute context for the specified attribute.</summary>
+    public GeneratorAttributeContext ForAttribute(AttributeData attribute) =>
+        new(SemanticModel, attribute, ClassSyntax, ClassSymbol, Framework, Version, ClassData);
+
+    /// <summary>Creates a single-attribute context for the first attribute.</summary>
+    public GeneratorAttributeContext ForFirstAttribute() =>
+        new(SemanticModel, Attributes[0], ClassSyntax, ClassSymbol, Framework, Version, ClassData);
+}

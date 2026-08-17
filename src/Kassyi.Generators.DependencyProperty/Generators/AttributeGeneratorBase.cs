@@ -33,14 +33,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
             framework,
             version,
             AttributeNames,
-            multiCtx => PrepareData(new GeneratorAttributeContext(
-                multiCtx.SemanticModel,
-                multiCtx.Attributes[0],
-                multiCtx.ClassSyntax,
-                multiCtx.ClassSymbol,
-                multiCtx.Framework,
-                multiCtx.Version,
-                multiCtx.ClassData)),
+            multiCtx => PrepareData(multiCtx.ForFirstAttribute()),
             GetSourceCode,
             Id);
     }

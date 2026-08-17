@@ -25,8 +25,7 @@ public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, Event
             source: Resources.WeakEventAttribute_cs.AsString());
     }
 
-    protected override (ClassData Class, EventData Event)? PrepareData(
-        in GeneratorAttributeContext context)
+    protected override (ClassData Class, EventData Event)? PrepareData(GeneratorAttributeContext context)
     {
         if (context.Framework is not (Framework.Maui or Framework.Wpf))
         {

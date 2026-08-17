@@ -14,27 +14,28 @@ namespace Kassyi.Generators.DependencyProperty;
 /// <summary>Provides data extraction and transformation helpers for Roslyn generator pipeline stages.</summary>
 public static class PrepareData
 {
-    /// <summary>Extracts dependency property model data from attribute and syntax definitions.</summary>
+    /// <summary>Extracts dependency property model data directly from generator attribute context.</summary>
     public static DependencyPropertyData GetDependencyPropertyData(
-        this AttributeData attribute,
-        Framework framework,
-        string version,
-        INamedTypeSymbol? classSymbol = null,
-        AttributeSyntax? attributeSyntax = null,
+        this GeneratorAttributeContext context,
         bool isAddOwner = false,
-        bool isAttached = false,
-        SemanticModel? semanticModel = null)
+        bool isAttached = false)
     {
-        attribute = attribute ?? throw new ArgumentNullException(nameof(attribute));
+        var attribute = context.Attribute ?? throw new ArgumentNullException(nameof(context));
 
         return new DependencyPropertyDataBuilder()
-            .WithCoreProperties(attribute, framework, version, isAddOwner, isAttached, classSymbol)
+            .WithCoreProperties(attribute, context.Framework, context.Version, isAddOwner, isAttached, context.ClassSymbol)
             .WithMetadata(attribute)
-            .WithDefaultValues(attribute, attributeSyntax, semanticModel)
+            .WithDefaultValues(attribute, context.ClassSyntax.TryFindAttributeSyntax(attribute), context.SemanticModel)
             .WithXmlDocumentation(attribute)
-            .WithCallbacks(attribute, classSymbol)
+            .WithCallbacks(attribute, context.ClassSymbol)
             .Build();
     }
+
+    /// <summary>Extracts dependency property model data directly from multi-attribute generator context.</summary>
+    public static DependencyPropertyData GetDependencyPropertyData(
+        this GeneratorMultiAttributeContext context,
+        AttributeData attribute) =>
+        context.ForAttribute(attribute).GetDependencyPropertyData();
 
     private static readonly ImmutableArray<Rules.IMethodSignatureRule> s_signatureRules =
     [

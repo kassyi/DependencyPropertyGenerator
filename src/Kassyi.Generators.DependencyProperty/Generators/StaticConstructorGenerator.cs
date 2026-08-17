@@ -93,19 +93,8 @@ public class StaticConstructorGenerator : IIncrementalGenerator
     }
 
     private static (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        in GeneratorAttributeContext context,
-        bool isAttached)
-    {
-        var dependencyPropertyData = context.Attribute.GetDependencyPropertyData(
-            context.Framework,
-            context.Version,
-            context.ClassSymbol,
-            context.ClassSyntax.TryFindAttributeSyntax(context.Attribute),
-            isAttached: isAttached,
-            semanticModel: context.SemanticModel);
-
-        return (context.ClassData, dependencyPropertyData);
-    }
+        GeneratorAttributeContext context,bool isAttached) =>
+        (context.ClassData, context.GetDependencyPropertyData(isAttached: isAttached));
 
     private static FileWithName GetSourceCode(StaticConstructorData data)
     {

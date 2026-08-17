@@ -27,18 +27,7 @@ public class AttachedDependencyPropertyGenerator : AttributeGeneratorBase<(Class
     }
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        in GeneratorAttributeContext context)
-    {
-        var dependencyPropertyData = context.Attribute.GetDependencyPropertyData(
-            context.Framework,
-            context.Version,
-            context.ClassSymbol,
-            context.ClassSyntax.TryFindAttributeSyntax(context.Attribute),
-            isAttached: true,
-            semanticModel: context.SemanticModel);
-
-        return (context.ClassData, dependencyPropertyData);
-    }
+        GeneratorAttributeContext context) =>(context.ClassData, context.GetDependencyPropertyData(isAttached: true));
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateAttachedDependencyPropertySource(data.Class, data.DependencyProperty);
