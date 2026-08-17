@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Kassyi.Generators.DependencyProperty;
 
-/// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
+/// <summary>Generates dependency property using DependencyProperty.Register.</summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 [Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
 internal sealed class DependencyPropertyAttribute : Attribute
@@ -130,7 +130,7 @@ public DependencyPropertyAttribute(
     }
 }
 
-/// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
+/// <summary>Generates dependency property using DependencyProperty.Register.</summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 [Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
