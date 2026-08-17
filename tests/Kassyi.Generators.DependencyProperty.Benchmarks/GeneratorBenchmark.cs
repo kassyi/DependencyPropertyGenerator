@@ -23,15 +23,10 @@ public class GeneratorBenchmark
         var modifiedSource = source + "\n// Minor comment change to trigger incremental step\n";
         var referenceAssemblies = Framework switch
         {
-            Framework.None => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
-            Framework.Uwp => FrameworkReferenceAssemblies.Net80Uwp,
-            Framework.WinUi => FrameworkReferenceAssemblies.Net80WinUi,
-            Framework.Uno => FrameworkReferenceAssemblies.Net80Uno,
-            Framework.UnoWinUi => FrameworkReferenceAssemblies.Net80UnoWinUi,
-            Framework.Avalonia => FrameworkReferenceAssemblies.Net60Avalonia,
-            Framework.Maui => FrameworkReferenceAssemblies.Net70Maui,
-            _ => throw new NotImplementedException(),
+            Framework.None or Framework.Wpf => ReferenceAssemblies.NetFramework.Net48.Wpf,
+            Framework.Avalonia => ReferenceAssembliesFactory.Get(Framework, "net6.0"),
+            Framework.Maui => ReferenceAssembliesFactory.Get(Framework, "net7.0"),
+            _ => ReferenceAssembliesFactory.Get(Framework, "net8.0")
         };
         var references = await referenceAssemblies.ResolveAsync(null, CancellationToken.None);
         _compilation = CSharpCompilation.Create(
