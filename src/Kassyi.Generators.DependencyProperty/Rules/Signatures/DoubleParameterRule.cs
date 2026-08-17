@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules.Signatures;
 
+/// <summary>Evaluates callback methods that take exactly two parameters (e.g., OldValue and NewValue).</summary>
 internal sealed class DoubleParameterRule : IMethodSignatureRule
 {
     public void Evaluate(IMethodSymbol method, string targetType, string senderType, MethodSignatureMatch match)

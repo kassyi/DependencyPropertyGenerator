@@ -3,6 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources;
 
+/// <summary>Provides generic and framework-agnostic helper methods for building source code strings.</summary>
 internal static partial class SourceGenerationHelper
 {
     internal static string GenerateType(DependencyPropertyData property, bool canBeNull = false)
@@ -29,15 +30,7 @@ internal static partial class SourceGenerationHelper
         return value;
     }
 
-    internal static string GenerateDependencyPropertyName(DependencyPropertyData property)
-    {
-        if (property is { Modifiers.IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui })
-        {
-            return $"{property.Name}PropertyKey";
-        }
-
-        return $"{property.Name}Property";
-    }
+    internal static string GenerateDependencyPropertyName(DependencyPropertyData property) => property is { Modifiers.IsReadOnly: true, Framework: Framework.Wpf or Framework.Maui } ? $"{property.Name}PropertyKey" : $"{property.Name}Property";
 
     internal static string GenerateTypeByPlatform(Framework framework, string name)
     {
@@ -77,12 +70,7 @@ internal static partial class SourceGenerationHelper
     internal static string GenerateBrowsableForType(DependencyPropertyData property) =>
         property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
 
-    /// <summary>
-    /// Generates a valid C# parameter name from a type name.
-    /// Ex: "global::System.Windows.Controls.Control" -> "control"
-    /// Ex: "global::System.Collections.Generic.List&lt;string&gt;" -> "list"
-    /// Ex: "Class" -> "@class"
-    /// </summary>
+    /// <summary>Generates a valid C# parameter name from a type name, escaping keywords if necessary.</summary>
     private static string GenerateBrowsableForTypeParameterName(DependencyPropertyData property)
     {
         var typeName = property.ComponentModel.BrowsableForType ?? GenerateDependencyObjectType(property.Framework);
@@ -298,6 +286,7 @@ internal static partial class SourceGenerationHelper
         GenerateBindEventMethod(ref writer, property);
     }
 
+    /// <summary>Opens the outer envelope (namespace and class declarations) and returns a zero-allocation disposable scope to close them.</summary>
     internal static SourceWriterClassScope ClassScope(ref this SourceWriter writer, ClassData @class)
     {
         writer.AppendLine();
@@ -334,6 +323,7 @@ internal static partial class SourceGenerationHelper
         string.IsNullOrWhiteSpace(@event.Type) ? "global::System.EventArgs" : GenerateType(@event);
 }
 
+/// <summary>Provides a zero-allocation disposable scope for closing class and namespace brackets.</summary>
 internal readonly ref struct SourceWriterClassScope(SourceWriter writer, bool hasNamespace, int parentCount) : IDisposable
 {
     public void Dispose()

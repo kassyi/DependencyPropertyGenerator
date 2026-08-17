@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules.Signatures;
 
+/// <summary>Evaluates callback methods that take exactly one parameter (e.g., NewValue).</summary>
 internal sealed class SingleParameterRule : IMethodSignatureRule
 {
     public void Evaluate(IMethodSymbol method, string targetType, string senderType, MethodSignatureMatch match)

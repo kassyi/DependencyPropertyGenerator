@@ -1,6 +1,10 @@
 ﻿//HintName: DefaultBindingMode.g.cs
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Describes the direction of the data flow in a binding.</summary>

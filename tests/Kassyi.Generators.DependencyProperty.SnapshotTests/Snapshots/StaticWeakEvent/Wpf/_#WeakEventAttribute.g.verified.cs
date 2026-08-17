@@ -4,29 +4,33 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
-/// <summary>Generates routed event using EventManager.RegisterRoutedEvent.</summary>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class WeakEventAttribute : global::System.Attribute
+/// <summary>Generates weak event manager and event accessors.</summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class WeakEventAttribute : Attribute
 {
     /// <summary>Name of this routed event.</summary>
 	public string Name { get; }
 
     /// <summary>Type of this routed event. Default - typeof(RoutedEventHandler).</summary>
-    public global::System.Type? Type { get; set; }
+    public Type? Type { get; set; }
 
-    /// <summary>Will generates static event. Default - <see langword="false"/>.</summary>
+    /// <summary>Generates static event. Default - <see langword="false"/>.</summary>
     public bool IsStatic { get; set; }
 
-    /// <summary>Description of this routed event. The event will contain a <see cref="global::System.ComponentModel.DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
+    /// <summary>Description of this weak event. The event will contain a <see cref="DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
     public string? Description { get; set; }
 
-    /// <summary>Category of this routed event. The event will contain a <see cref="global::System.ComponentModel.CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>Category of this weak event. The event will contain a <see cref="CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public string? Category { get; set; }
 
-    /// <summary>The routed event xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
+    /// <summary>The weak event xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
     public string XmlDocumentation { get; set; } = string.Empty;
 
     /// <summary>The event add/remove xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
@@ -34,32 +38,32 @@ internal sealed class WeakEventAttribute : global::System.Attribute
 public WeakEventAttribute(
         string name)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 }
 
-/// <summary>Will generates routed event using EventManager.RegisterRoutedEvent.</summary>
+/// <summary>Generates weak event manager and event accessors.</summary>
 /// <typeparam name="T">Type of this routed event.</typeparam>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class WeakEventAttribute<T> : global::System.Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class WeakEventAttribute<T> : Attribute
 {
     /// <summary>Name of this routed event.</summary>
 	public string Name { get; }
 
     /// <summary>Type of this routed event. Default - typeof(RoutedEventHandler).</summary>
-    public global::System.Type? Type { get; set; }
+    public Type? Type { get; set; }
 
-    /// <summary>Will generates static event. Default - <see langword="false"/>.</summary>
+    /// <summary>Generates static event. Default - <see langword="false"/>.</summary>
     public bool IsStatic { get; set; }
 
-    /// <summary>Description of this routed event. The event will contain a <see cref="global::System.ComponentModel.DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
+    /// <summary>Description of this weak event. The event will contain a <see cref="DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
     public string? Description { get; set; }
 
-    /// <summary>Category of this routed event. The event will contain a <see cref="global::System.ComponentModel.CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>Category of this weak event. The event will contain a <see cref="CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public string? Category { get; set; }
 
-    /// <summary>The routed event xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
+    /// <summary>The weak event xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
     public string XmlDocumentation { get; set; } = string.Empty;
 
     /// <summary>The event add/remove xml documentation. Default - "&lt;summary&gt;&lt;/summary&gt;".</summary>
@@ -67,7 +71,7 @@ internal sealed class WeakEventAttribute<T> : global::System.Attribute
 public WeakEventAttribute(
         string name)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
         Type = typeof(T);
     }
 }

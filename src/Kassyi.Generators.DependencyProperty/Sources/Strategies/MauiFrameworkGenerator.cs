@@ -3,6 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Implements bindable property and event source generation for the .NET MAUI framework.</summary>
 internal sealed class MauiFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)

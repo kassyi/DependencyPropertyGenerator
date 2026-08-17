@@ -1,4 +1,8 @@
-#nullable enable
+﻿#nullable enable
+
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Kassyi.Generators.DependencyProperty;
 

@@ -2,16 +2,12 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Diagnostics;
 
-/// <summary>
-/// Centralized diagnostic descriptors and error definitions for DependencyPropertyGenerator.
-/// </summary>
+/// <summary>Centralized diagnostic descriptors and error definitions for DependencyPropertyGenerator.</summary>
 internal static class DiagnosticDescriptors
 {
     private const string UsageCategory = "Usage";
 
-    /// <summary>
-    /// DPG0001: The specified OnChanged method was not found or has an unsupported signature.
-    /// </summary>
+    /// <summary>DPG0001: The specified OnChanged method was not found or has an unsupported signature.</summary>
     public static readonly DiagnosticDescriptor CustomOnChangedMethodNotFoundOrUnsupported = new(
         id: "DPG0001",
         title: "OnChanged Method Not Found or Unsupported",
@@ -20,15 +16,11 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// Formats the C# #error preprocessor directive string for DPG0001.
-    /// </summary>
+    /// <summary>Formats the C# #error preprocessor directive string for DPG0001.</summary>
     public static string FormatDpg0001Error(string onChangedMethodName, string fullClassName) =>
         $"#error DPG0001: The specified OnChanged method '{onChangedMethodName}' was not found or has an unsupported signature on '{fullClassName}'.";
 
-    /// <summary>
-    /// DPG0002: File scoped types are not supported.
-    /// </summary>
+    /// <summary>DPG0002: File scoped types are not supported.</summary>
     public static readonly DiagnosticDescriptor FileScopedTypeNotSupported = new(
         id: "DPG0002",
         title: "Invalid Type Modifier",
@@ -37,9 +29,7 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// DPG0003: Ref struct property types are not supported.
-    /// </summary>
+    /// <summary>DPG0003: Ref struct property types are not supported.</summary>
     public static readonly DiagnosticDescriptor RefStructPropertyTypeNotSupported = new(
         id: "DPG0003",
         title: "Invalid Property Type",
@@ -48,9 +38,7 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// DPG0004: Reference type default value sharing across instances.
-    /// </summary>
+    /// <summary>DPG0004: Reference type default value sharing across instances.</summary>
     public static readonly DiagnosticDescriptor ReferenceTypeDefaultValueSharing = new(
         id: "DPG0004",
         title: "Reference Type Default Value Sharing",
@@ -59,9 +47,7 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// DPG0005: OldAndNewValue signature is not supported for OverrideMetadata on platforms without old value support.
-    /// </summary>
+    /// <summary>DPG0005: OldAndNewValue signature is not supported for OverrideMetadata on platforms without old value support.</summary>
     public static readonly DiagnosticDescriptor OverrideMetadataOldAndNewValueNotSupported = new(
         id: "DPG0005",
         title: "Invalid Callback Signature",
@@ -70,9 +56,7 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// DPG0007: Callback method has unsupported signature.
-    /// </summary>
+    /// <summary>DPG0007: Callback method has unsupported signature.</summary>
     public static readonly DiagnosticDescriptor UnsupportedCallbackSignature = new(
         id: "DPG0007",
         title: "Unsupported Callback Signature",
@@ -81,9 +65,7 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    /// <summary>
-    /// DPG0008: DefaultValueExpression contains invalid syntax.
-    /// </summary>
+    /// <summary>DPG0008: DefaultValueExpression contains invalid syntax.</summary>
     public static readonly DiagnosticDescriptor InvalidDefaultValueExpression = new(
         id: "DPG0008",
         title: "Invalid Default Value Expression",

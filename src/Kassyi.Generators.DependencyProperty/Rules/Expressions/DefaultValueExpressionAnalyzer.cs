@@ -5,14 +5,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Rules.Expressions;
 
-/// <summary>
-/// Analyzes default value expressions to detect reference type instantiations or shared mutable reference members.
-/// </summary>
+/// <summary>Analyzes default value expressions to detect reference type instantiations or shared mutable reference members.</summary>
 internal static class DefaultValueExpressionAnalyzer
 {
-    /// <summary>
-    /// Evaluates whether the given AST expression or any of its sub-expressions is a reference type instantiation or shared reference member.
-    /// </summary>
+    /// <summary>Evaluates whether the given AST expression or any of its sub-expressions is a reference type instantiation or shared reference member.</summary>
     public static bool IsReferenceTypeExpression(
         ExpressionSyntax expression,
         ITypeSymbol? propertyTypeSymbol,

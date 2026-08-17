@@ -3,6 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Implements dependency property and routed event source generation for the WPF framework.</summary>
 internal sealed class WpfFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property) => $"""

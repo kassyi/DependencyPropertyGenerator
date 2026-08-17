@@ -8,17 +8,26 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     where TData : struct
 {
+    /// <summary>Gets the unique identifier for the generator used in diagnostic reporting.</summary>
     protected abstract string Id { get; }
+    
+    /// <summary>Gets the metadata names of the attributes that trigger this generator.</summary>
     protected abstract IReadOnlyList<string> AttributeNames { get; }
 
+    /// <summary>Registers static source files during post-initialization.</summary>
     protected abstract void PostInitialize(IncrementalGeneratorPostInitializationContext context);
+    
+    /// <summary>Prepares the data model required for source generation from the matched attribute contexts.</summary>
     protected abstract TData? PrepareData(GeneratorAttributeContext context);
     
+    /// <summary>Generates the C# source code text based on the prepared data.</summary>
     // [WHY] AST-based generator pipeline replaces legacy text templates for zero allocations.
     protected abstract string GenerateSource(TData data);
 
+    /// <summary>Gets the hint name for the generated source file.</summary>
     protected abstract string GetHintName(TData data);
 
+    /// <summary>Gets the UI frameworks supported by this generator.</summary>
     protected virtual IReadOnlyList<Framework> SupportedFrameworks => [];
 
     /// <inheritdoc />
@@ -49,8 +58,6 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     private FileWithName GetSourceCode(TData data)
     {
         var text = GenerateSource(data);
-        return new FileWithName(
-            Name: GetHintName(data),
-            Text: text);
+        return new FileWithName(Name: GetHintName(data), Text: text);
     }
 }

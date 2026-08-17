@@ -2,6 +2,7 @@ using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Implements dependency property and routed event source generation for the Avalonia framework.</summary>
 internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
 {
     public override string GenerateRegisterMethodArguments(ClassData @class, DependencyPropertyData property)

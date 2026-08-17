@@ -3,6 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Implements dependency property and routed event source generation for UWP, WinUI, and Uno frameworks.</summary>
 internal sealed class UwpFrameworkGenerator : FrameworkGenerator
 {
     public override string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)

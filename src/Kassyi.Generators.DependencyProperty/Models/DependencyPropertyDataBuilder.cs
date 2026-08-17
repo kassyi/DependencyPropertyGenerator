@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Kassyi.Generators.DependencyProperty.Models;
 
+/// <summary>Builder class for constructing dependency property metadata across multiple passes to minimize allocations.</summary>
 internal sealed class DependencyPropertyDataBuilder
 {
     private readonly Dictionary<string, TypedConstant> _namedArguments = new(StringComparer.Ordinal);
@@ -33,6 +34,7 @@ internal sealed class DependencyPropertyDataBuilder
     private TypedConstant GetNamedArgument(string name) 
         => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
+    /// <summary>Initializes core property state, evaluating type symbols and initial modifiers.</summary>
     public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached, INamedTypeSymbol? classSymbol = null)
     {
         // [WHY] Pre-cache named arguments in a dictionary to achieve O(1) lookups instead of repeated linear O(N) searches across multiple With* methods.
@@ -81,6 +83,7 @@ internal sealed class DependencyPropertyDataBuilder
         return this;
     }
 
+    /// <summary>Extracts framework metadata and validation flags from the provided attribute.</summary>
     public DependencyPropertyDataBuilder WithMetadata(AttributeData attribute)
     {
         _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
@@ -90,6 +93,7 @@ internal sealed class DependencyPropertyDataBuilder
         return this;
     }
 
+    /// <summary>Parses default value expressions, resolving AST strings safely without runtime evaluation overhead.</summary>
     public DependencyPropertyDataBuilder WithDefaultValues(
         AttributeData attribute,
         AttributeSyntax? attributeSyntax,
@@ -149,7 +153,7 @@ internal sealed class DependencyPropertyDataBuilder
             } 
             catch 
             { 
-                // [INTENTIONAL FALLBACK] If SyntaxFactory throws, we assume parse failure.
+                // [WHY] If SyntaxFactory throws during parsing, we assume it's a parse failure and fall back to attribute syntax.
                 parseFailed = true;
             }
         }
@@ -165,12 +169,14 @@ internal sealed class DependencyPropertyDataBuilder
         return (directExpressionSyntax, defaultValueDocSyntax, parseFailed);
     }
 
+    /// <summary>Extracts XML documentation overrides from attribute arguments.</summary>
     public DependencyPropertyDataBuilder WithXmlDocumentation(AttributeData attribute)
     {
         _xmlDocumentation = DependencyPropertyMetadataExtractor.ExtractXmlDocumentation(_namedArguments);
         return this;
     }
 
+    /// <summary>Analyzes the declaring class to validate and extract callback method signatures.</summary>
     public DependencyPropertyDataBuilder WithCallbacks(AttributeData attribute, INamedTypeSymbol? classSymbol)
     {
         _validationAndCallbacks = DependencyPropertyMetadataExtractor.ExtractCallbacks(
@@ -250,6 +256,7 @@ internal sealed class DependencyPropertyDataBuilder
         throw new DiagnosticException(Diagnostic.Create(DiagnosticDescriptors.OverrideMetadataOldAndNewValueNotSupported, location, _framework.ToString()));
     }
 
+    /// <summary>Constructs the immutable dependency property data record.</summary>
     public DependencyPropertyData Build()
     {
         return new DependencyPropertyData(

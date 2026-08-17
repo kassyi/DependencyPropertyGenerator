@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Rules.Signatures;
 
+/// <summary>Evaluates callback methods that take no parameters.</summary>
 internal sealed class NoParametersRule : IMethodSignatureRule
 {
     public void Evaluate(IMethodSymbol method, string targetType, string senderType, MethodSignatureMatch match)

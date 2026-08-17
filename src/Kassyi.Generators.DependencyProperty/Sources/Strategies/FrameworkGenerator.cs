@@ -3,6 +3,7 @@ using Kassyi.Generators.Extensions;
 
 namespace Kassyi.Generators.DependencyProperty.Sources.Strategies;
 
+/// <summary>Base class providing common source generation logic and bridging UI framework differences.</summary>
 internal abstract class FrameworkGenerator : 
     IDependencyPropertyGeneratorStrategy,
     IRoutedEventGeneratorStrategy,

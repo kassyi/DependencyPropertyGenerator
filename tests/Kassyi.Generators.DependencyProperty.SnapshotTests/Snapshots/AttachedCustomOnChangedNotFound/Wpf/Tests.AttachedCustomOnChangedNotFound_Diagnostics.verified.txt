@@ -19,5 +19,77 @@
     Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.AttachedDependencyPropertyGenerator\Kassyi.Generators.DependencyProperty.IntegrationTests.TestHelper.AttachedProperties.Test.g.cs,
     Span: (44,8)-(44,184),
     MessageFormat: #error: '{0}'
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\DefaultBindingMode.g.cs,
+    Span: (3,1)-(3,14),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\DefaultBindingMode.g.cs,
+    Span: (4,1)-(4,29),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\DefaultBindingMode.g.cs,
+    Span: (5,1)-(5,26),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Localizability.g.cs,
+    Span: (3,1)-(3,14),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Localizability.g.cs,
+    Span: (4,1)-(4,29),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\Localizability.g.cs,
+    Span: (5,1)-(5,26),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\SourceTrigger.g.cs,
+    Span: (3,1)-(3,14),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\SourceTrigger.g.cs,
+    Span: (4,1)-(4,29),
+    MessageFormat: Unnecessary using directive.
+  },
+  {
+    Id: CS8019,
+    Severity: Hidden,
+    WarningLevel: 1,
+    Location: Kassyi.Generators.DependencyProperty\Kassyi.Generators.DependencyProperty.Generators.StaticConstructorGenerator\SourceTrigger.g.cs,
+    Span: (5,1)-(5,26),
+    MessageFormat: Unnecessary using directive.
   }
 ]

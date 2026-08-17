@@ -1,6 +1,10 @@
 ﻿//HintName: Localizability.g.cs
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Specifies the category value of a System.Windows.LocalizabilityAttribute for a binary XAML (BAML) class or class member.</summary>
