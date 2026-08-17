@@ -14,12 +14,12 @@ internal abstract class FrameworkGenerator :
     
     public virtual string GeneratePropertyMetadata(ClassData @class, DependencyPropertyData property)
     {
-        if (property is { IsAddOwner: true, DefaultValue: null })
+        if (property is { Modifiers.IsAddOwner: true, DefaultValue: null })
         {
             return "null";
         }
 
-        var parameterName = (@class.Framework, property.IsAttached) switch
+        var parameterName = (@class.Framework, property.Modifiers.IsAttached) switch
         {
             (Framework.Wpf, true) or (Framework.Uwp, true) or (Framework.WinUi, true) => "defaultMetadata: ",
             (Framework.Avalonia, _) => "metadata: ",
@@ -65,14 +65,14 @@ internal abstract class FrameworkGenerator :
         CallbackSignature signatures,
         string callbackSignature)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
 
         var senderCast = $"({senderType})sender";
         var instanceCast = $"(({senderType})sender)";
         var typeCast = $"({SourceGenerationHelper.GenerateType(property)})";
-        var isAttached = property.IsAttached;
+        var isAttached = property.Modifiers.IsAttached;
 
         var oldVal = $"{typeCast}{OldValueExpression}";
         var newVal = $"{typeCast}{NewValueExpression}";
@@ -139,12 +139,12 @@ internal abstract class FrameworkGenerator :
 
     protected virtual string GenerateCoerceValueCallbackInternal(ClassData @class, DependencyPropertyData property)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
         var propertyType = SourceGenerationHelper.GenerateType(property, canBeNull: true);
 
-        return property.IsAttached
+        return property.Modifiers.IsAttached
             ? $"{CoerceAttachedCallbackSignature} Coerce{property.Name}(({senderType})sender, ({propertyType}){CoerceAttachedValueExpression})"
             : $"static (sender, value) => (({senderType})sender).Coerce{property.Name}(({propertyType})value)";
     }

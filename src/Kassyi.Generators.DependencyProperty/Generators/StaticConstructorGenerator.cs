@@ -102,14 +102,10 @@ public class StaticConstructorGenerator : IIncrementalGenerator
             SourceGenerationHelper.GenerateStaticConstructor(
                 ref writer,
                 data.Class,
-                [.. data.Properties.Where(static property => !property.IsDirect)]);
+                [.. data.Properties.Where(static property => !property.Modifiers.IsDirect)]);
             var text = writer.ToString();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return FileWithName.Empty;
-            }
-
-            return new FileWithName(Name: $"{data.Class.FullName}.StaticConstructor.g.cs", Text: text);
+            return string.IsNullOrWhiteSpace(text) ? FileWithName.Empty 
+                : new FileWithName(Name: $"{data.Class.FullName}.StaticConstructor.g.cs", Text: text);
         }
         finally
         {

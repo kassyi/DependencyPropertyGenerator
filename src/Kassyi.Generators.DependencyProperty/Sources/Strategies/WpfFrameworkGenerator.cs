@@ -15,11 +15,11 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
 
     public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property)
     {
-        return property is { IsReadOnly: true }
-            ? property.IsAttached
+        return property is { Modifiers.IsReadOnly: true }
+            ? property.Modifiers.IsAttached
                 ? "RegisterAttachedReadOnly"
                 : "RegisterReadOnly"
-            : property.IsAttached ? "RegisterAttached" : "Register";
+            : property.Modifiers.IsAttached ? "RegisterAttached" : "Register";
     }
 
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
@@ -48,7 +48,7 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
     {
         return SourceGenerationHelper.GenerateTypeByPlatform(
             property.Framework,
-            property.IsReadOnly
+            property.Modifiers.IsReadOnly
                 ? "DependencyPropertyKey"
                 : "DependencyProperty");
     }
@@ -60,7 +60,7 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
         ref SourceWriter writer,
         DependencyPropertyData property)
     {
-        if (!property.IsReadOnly)
+        if (!property.Modifiers.IsReadOnly)
         {
             return;
         }
@@ -189,7 +189,7 @@ internal sealed class WpfFrameworkGenerator : FrameworkGenerator
         {
             foreach (var property in properties)
             {
-                if (property.IsReadOnly)
+                if (property.Modifiers.IsReadOnly)
                 {
                     writer.AppendLine($"{property.Name}Property.OverrideMetadata(forType: typeof({@class.Type}), {GeneratePropertyMetadata(@class, property)}, key: {property.Name}PropertyKey);");
                 }

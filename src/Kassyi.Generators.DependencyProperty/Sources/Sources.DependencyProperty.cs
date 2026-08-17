@@ -29,7 +29,7 @@ internal static partial class SourceGenerationHelper
         var dependencyPropertyName = GenerateDependencyPropertyName(property);
 
         writer.Append($"{propertyModifier} static readonly {propertyType} {dependencyPropertyName} =");
-        if (property.IsAddOwner)
+        if (property.Modifiers.IsAddOwner)
         {
             GenerateAddOwnerCreateCall(ref writer, @class, property);
         }
@@ -45,14 +45,14 @@ internal static partial class SourceGenerationHelper
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
         GenerateCommonPropertyAttributes(ref writer, property, @class);
 
-        var partialModifier = property.IsPartialProperty ? "partial " : string.Empty;
-        var requiredModifier = property.IsRequired ? "required " : string.Empty;
-        var newModifier = property.HidesBaseProperty ? "new " : string.Empty;
+        var partialModifier = property.Modifiers.IsPartialProperty ? "partial " : string.Empty;
+        var requiredModifier = property.Modifiers.IsRequired ? "required " : string.Empty;
+        var newModifier = property.Modifiers.HidesBaseProperty ? "new " : string.Empty;
         using (writer.Scope($"public {newModifier}{requiredModifier}{partialModifier}{GenerateType(property)} {property.Name.EscapeKeyword()}"))
         {
             GenerateGetter(ref writer, property);
             writer.AppendLine();
-            if (!property.IsReadOnly)
+            if (!property.Modifiers.IsReadOnly)
             {
                 GenerateSetter(ref writer, property);
                 writer.AppendLine();
@@ -63,7 +63,7 @@ internal static partial class SourceGenerationHelper
     }
     private static void GenerateGetter(ref SourceWriter writer, DependencyPropertyData property)
     {
-        if (property is { IsDirect: true, Framework: Framework.Avalonia })
+        if (property is { Modifiers.IsDirect: true, Framework: Framework.Avalonia })
         {
             writer.Append($"get => _{property.Name.ToParameterName()};");
         }
@@ -75,7 +75,7 @@ internal static partial class SourceGenerationHelper
 
     private static void GenerateSetter(ref SourceWriter writer, DependencyPropertyData property)
     {
-        if (property is { IsDirect: true, Framework: Framework.Avalonia })
+        if (property is { Modifiers.IsDirect: true, Framework: Framework.Avalonia })
         {
             using (writer.Scope("private set"))
             {
@@ -89,7 +89,7 @@ internal static partial class SourceGenerationHelper
         }
         else
         {
-            var setOrInit = property.IsInitOnly ? "init" : "set";
+            var setOrInit = property.Modifiers.IsInitOnly ? "init" : "set";
             writer.AppendLine($"{GenerateAdditionalSetterModifier(property)}{setOrInit} => SetValue({GenerateDependencyPropertyName(property)}, value);");
         }
     }
@@ -102,7 +102,7 @@ internal static partial class SourceGenerationHelper
             return;
         }
 
-        if (property.IsAttached)
+        if (property.Modifiers.IsAttached)
         {
             writer.AppendLine($"private static partial {GenerateType(property)} Coerce{property.Name}({GenerateBrowsableForType(property)} {GenerateBrowsableForTypeParameterName(property)}, {GenerateType(property, canBeNull: true)} value);");
         }

@@ -21,7 +21,7 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
         DependencyPropertyData property,
         string baseCallback)
     {
-        var senderType = property.IsAttached
+        var senderType = property.Modifiers.IsAttached
             ? SourceGenerationHelper.GenerateBrowsableForType(property)
             : @class.Type;
         var propertyType = SourceGenerationHelper.GenerateType(property);
@@ -32,7 +32,7 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
         var rawNewValue = $"({SourceGenerationHelper.GenerateType(property, canBeNull: true)})args.NewValue";
         var typedNewValue = $"({propertyType})args.NewValue";
 
-        var coerceCall = property.IsAttached
+        var coerceCall = property.Modifiers.IsAttached
             ? $"Coerce{property.Name}({senderCast}, {rawNewValue})"
             : $"{senderInstance}.Coerce{property.Name}({rawNewValue})";
 
@@ -66,7 +66,7 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
         """;
 
     public override string GenerateRegisterMethod(ClassData @class, DependencyPropertyData property) =>
-        property.IsAttached ? "RegisterAttached" : "Register";
+        property.Modifiers.IsAttached ? "RegisterAttached" : "Register";
 
     public override void GeneratePropertyMetadata(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string parameterName)
     {
@@ -74,7 +74,7 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
         var propertyChanged = GeneratePropertyChangedCallback(@class, property);
         var type = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "PropertyMetadata");
 
-        if (property.IsAttached)
+        if (property.Modifiers.IsAttached)
         {
             writer.Append($"""
                 {parameterName}new {type}(

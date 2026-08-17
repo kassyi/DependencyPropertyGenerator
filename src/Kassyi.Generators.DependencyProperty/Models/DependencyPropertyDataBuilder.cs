@@ -17,29 +17,21 @@ internal sealed class DependencyPropertyDataBuilder
     private string _version = string.Empty;
     private string _type = string.Empty;
     private string _shortType = string.Empty;
-    private bool _isValueType = true;
-    private bool _isSpecialType;
     private string? _defaultValue;
     private string? _defaultValueDocumentation;
-    private bool _isReadOnly;
-    private bool _isDirect;
-    private bool _isAttached;
-    private bool _isAddOwner;
     private Framework _framework;
     
     private ComponentModelData _componentModel;
     private FrameworkMetadataData _frameworkMetadata;
     private XmlDocumentationData _xmlDocumentation;
     private ValidationAndCallbackData _validationAndCallbacks;
-    private bool _isPartialProperty;
-    private bool _hidesBaseProperty;
-    private bool _isRequired;
-    private bool _isInitOnly;
+    private PropertyModifiersData _modifiers = new(IsValueType: true);
 
     private INamedTypeSymbol? _classSymbol;
     private ITypeSymbol? _typeSymbol;
 
-    private TypedConstant GetNamedArgument(string name) => _namedArguments.TryGetValue(name, out var value) ? value : default;
+    private TypedConstant GetNamedArgument(string name) 
+        => _namedArguments.TryGetValue(name, out var value) ? value : default;
 
     public DependencyPropertyDataBuilder WithCoreProperties(AttributeData attribute, Framework framework, string version, bool isAddOwner, bool isAttached, INamedTypeSymbol? classSymbol = null)
     {
@@ -52,8 +44,6 @@ internal sealed class DependencyPropertyDataBuilder
 
         _framework = framework;
         _version = version;
-        _isAddOwner = isAddOwner;
-        _isAttached = isAttached;
         _classSymbol = classSymbol;
 
         _name = attribute.ConstructorArguments is { Length: > 0 } ctorArgs
@@ -73,21 +63,20 @@ internal sealed class DependencyPropertyDataBuilder
 
         _type = typeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty;
         _shortType = typeSymbol?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? string.Empty;
-        _isValueType = typeSymbol?.IsValueType ?? true;
-        _isSpecialType = typeSymbol.IsSpecialType() ?? false;
-        
-        _isReadOnly = GetNamedArgument(nameof(DependencyPropertyAttribute.IsReadOnly)).ToBoolean();
-        _isDirect = GetNamedArgument(nameof(DependencyPropertyAttribute.IsDirect)).ToBoolean();
-
-        _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
-
-        if (_isAttached || classSymbol == null)
-        {
-            return this;
-        }
 
         // [WHY] Avoid LINQ Any() to eliminate delegate and enumerator allocations during metadata extraction.
-        _hidesBaseProperty = CheckHidesBaseProperty(classSymbol, _name);
+        var hidesBaseProperty = !isAttached && classSymbol != null && CheckHidesBaseProperty(classSymbol, _name);
+
+        _modifiers = new PropertyModifiersData(
+            IsValueType: typeSymbol?.IsValueType ?? true,
+            IsSpecialType: typeSymbol.IsSpecialType() ?? false,
+            IsReadOnly: GetNamedArgument(nameof(DependencyPropertyAttribute.IsReadOnly)).ToBoolean(),
+            IsDirect: GetNamedArgument(nameof(DependencyPropertyAttribute.IsDirect)).ToBoolean(),
+            IsAttached: isAttached,
+            IsAddOwner: isAddOwner,
+            HidesBaseProperty: hidesBaseProperty);
+
+        _componentModel = DependencyPropertyMetadataExtractor.ExtractComponentModel(attribute, _namedArguments, _componentModel);
 
         return this;
     }
@@ -188,14 +177,21 @@ internal sealed class DependencyPropertyDataBuilder
             _namedArguments,
             _name,
             _type,
-            _isAttached,
+            _modifiers.IsAttached,
             _framework,
             classSymbol,
             _componentModel.BrowsableForType,
             _validationAndCallbacks,
-            out _isPartialProperty,
-            out _isRequired,
-            out _isInitOnly);
+            out var isPartialProperty,
+            out var isRequired,
+            out var isInitOnly);
+
+        _modifiers = _modifiers with
+        {
+            IsPartialProperty = isPartialProperty,
+            IsRequired = isRequired,
+            IsInitOnly = isInitOnly
+        };
 
         if (classSymbol == null)
         {
@@ -207,7 +203,7 @@ internal sealed class DependencyPropertyDataBuilder
         var targetType = _typeSymbol != null
             ? SignatureRuleHelper.GetNormalizedTypeName(_typeSymbol)
             : _type.Replace("global::", string.Empty).Replace("?", string.Empty);
-        var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _isAttached, _componentModel.BrowsableForType, _framework);
+        var targetSenderType = DependencyPropertyMetadataExtractor.GetTargetSenderType(classSymbol, _modifiers.IsAttached, _componentModel.BrowsableForType, _framework);
 
         var matchChanged = PrepareData.CheckMethodsDirectly(classSymbol, onChangedName, targetType, targetSenderType);
         
@@ -241,7 +237,7 @@ internal sealed class DependencyPropertyDataBuilder
         }
 
         if (!matchChanged.Signatures.HasFlag(CallbackSignature.OldAndNewValue) &&
-            !(_isAttached && matchChanged.Signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue)))
+            !(_modifiers.IsAttached && matchChanged.Signatures.HasFlag(CallbackSignature.SenderAndOldAndNewValue)))
         {
             return;
         }
@@ -261,23 +257,14 @@ internal sealed class DependencyPropertyDataBuilder
             Version: _version,
             Type: _type,
             ShortType: _shortType,
-            IsValueType: _isValueType,
-            IsSpecialType: _isSpecialType,
             DefaultValue: _defaultValue,
             DefaultValueDocumentation: _defaultValueDocumentation,
-            IsReadOnly: _isReadOnly,
-            IsDirect: _isDirect,
-            IsAttached: _isAttached,
-            IsAddOwner: _isAddOwner,
             Framework: _framework,
             ComponentModel: _componentModel,
             FrameworkMetadata: _frameworkMetadata,
             XmlDocumentation: _xmlDocumentation,
             ValidationAndCallbacks: _validationAndCallbacks,
-            IsPartialProperty: _isPartialProperty,
-            HidesBaseProperty: _hidesBaseProperty,
-            IsRequired: _isRequired,
-            IsInitOnly: _isInitOnly
+            Modifiers: _modifiers
         );
     }
 

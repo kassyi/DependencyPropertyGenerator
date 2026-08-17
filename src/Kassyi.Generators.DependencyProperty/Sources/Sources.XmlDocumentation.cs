@@ -25,7 +25,7 @@ internal static partial class SourceGenerationHelper
         DependencyPropertyData property,
         bool isProperty)
     {
-        var name = property.IsAttached
+        var name = property.Modifiers.IsAttached
             ? property.Name
             : $"<see cref=\"{property.Name}\"/>";
         var body = isProperty

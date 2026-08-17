@@ -17,7 +17,7 @@ internal static partial class SourceGenerationHelper
         {
             foreach (var property in overrideMetadata)
             {
-                var senderType = property.IsAttached
+                var senderType = property.Modifiers.IsAttached
                     ? GenerateBrowsableForType(property)
                     : @class.Type;
 

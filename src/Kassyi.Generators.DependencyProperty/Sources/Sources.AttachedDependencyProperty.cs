@@ -39,7 +39,7 @@ internal static partial class SourceGenerationHelper
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.SetterXmlDocumentation, property, isProperty: true);
         GenerateCommonPropertyAttributes(ref writer, property, @class);
 
-        var setterVisibility = property.IsReadOnly ? "internal" : "public";
+        var setterVisibility = property.Modifiers.IsReadOnly ? "internal" : "public";
         var browsableForType = GenerateBrowsableForType(property);
         var type = GenerateType(property);
 
