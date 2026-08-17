@@ -4,18 +4,22 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class DependencyPropertyAttribute : global::System.Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class DependencyPropertyAttribute : Attribute
 {
     /// <summary>Name of this dependency property.</summary>
 	public string Name { get; }
 
     /// <summary>Type of this dependency property.</summary>
-    public global::System.Type Type { get; }
+    public Type Type { get; }
 
     /// <summary>Default value of this dependency property. If you need to pass a new() expression, use <see cref="DefaultValueExpression"/>. Default - <see langword="default(type)"/>.</summary>
     public object? DefaultValue { get; set; }
@@ -29,25 +33,25 @@ internal sealed class DependencyPropertyAttribute : global::System.Attribute
     /// <summary>Avalonia: Direct properties are a lightweight version of styled properties. Default - <see langword="false"/>.</summary>
     public bool IsDirect { get; set; }
 
-    /// <summary>Description of this dependency property. The property will contain a <see cref="global::System.ComponentModel.DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
+    /// <summary>Description of this dependency property. The property will contain a <see cref="DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
     public string? Description { get; set; }
 
-    /// <summary>Category of this dependency property. The property will contain a <see cref="global::System.ComponentModel.CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>Category of this dependency property. The property will contain a <see cref="CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public string? Category { get; set; }
 
-    /// <summary>Type converter of this dependency property. The property will contain a <see cref="global::System.ComponentModel.TypeConverterAttribute"/> with this value. Default - <see langword="null"/>.</summary>
-    public global::System.Type? TypeConverter { get; set; }
+    /// <summary>Type converter of this dependency property. The property will contain a <see cref="TypeConverterAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    public Type? TypeConverter { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.BindableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="BindableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool Bindable { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.BrowsableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="BrowsableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool Browsable { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.DesignerSerializationVisibilityAttribute"/> with this value. Default - <see langword="null"/>.</summary>
-    public global::System.ComponentModel.DesignerSerializationVisibility DesignerSerializationVisibility { get; set; }
+    /// <summary>The property will contain a <see cref="DesignerSerializationVisibilityAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    public DesignerSerializationVisibility DesignerSerializationVisibility { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.CLSCompliantAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="CLSCompliantAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool ClsCompliant { get; set; }
 
     /// <summary>The property will contain a System.Windows.LocalizabilityAttribute with this value. Default - <see langword="null"/>.</summary>
@@ -120,24 +124,24 @@ internal sealed class DependencyPropertyAttribute : global::System.Attribute
     public bool CreateDefaultValueCallback { get; set; }
 public DependencyPropertyAttribute(
         string name,
-        global::System.Type type)
+        Type type)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
-        Type = type ?? throw new global::System.ArgumentNullException(nameof(type));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 }
 
 /// <summary>Generates attached dependency property using DependencyProperty.Register.</summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-[global::System.Diagnostics.Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
-internal sealed class DependencyPropertyAttribute<T> : global::System.Attribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
+internal sealed class DependencyPropertyAttribute<T> : Attribute
 {
     /// <summary>Name of this dependency property.</summary>
     public string Name { get; }
 
     /// <summary>Type of this dependency property.</summary>
-    public global::System.Type Type { get; }
+    public Type Type { get; }
 
     /// <summary>Default value of this dependency property. If you need to pass a new() expression, use <see cref="DefaultValueExpression"/>. Default - <see langword="default(type)"/>.</summary>
     public T? DefaultValue { get; set; }
@@ -151,25 +155,25 @@ internal sealed class DependencyPropertyAttribute<T> : global::System.Attribute
     /// <summary>Avalonia: Direct properties are a lightweight version of styled properties. Default - <see langword="false"/>.</summary>
     public bool IsDirect { get; set; }
 
-    /// <summary>Description of this dependency property. The property will contain a <see cref="global::System.ComponentModel.DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
+    /// <summary>Description of this dependency property. The property will contain a <see cref="DescriptionAttribute"/> with this value. This will also be used in the xml documentation if not explicitly specified. Default - <see langword="null"/>.</summary>
     public string? Description { get; set; }
 
-    /// <summary>Category of this dependency property. The property will contain a <see cref="global::System.ComponentModel.CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>Category of this dependency property. The property will contain a <see cref="CategoryAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public string? Category { get; set; }
 
-    /// <summary>Type converter of this dependency property. The property will contain a <see cref="global::System.ComponentModel.TypeConverterAttribute"/> with this value. Default - <see langword="null"/>.</summary>
-    public global::System.Type? TypeConverter { get; set; }
+    /// <summary>Type converter of this dependency property. The property will contain a <see cref="TypeConverterAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    public Type? TypeConverter { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.BindableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="BindableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool Bindable { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.BrowsableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="BrowsableAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool Browsable { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.ComponentModel.DesignerSerializationVisibilityAttribute"/> with this value. Default - <see langword="null"/>.</summary>
-    public global::System.ComponentModel.DesignerSerializationVisibility DesignerSerializationVisibility { get; set; }
+    /// <summary>The property will contain a <see cref="DesignerSerializationVisibilityAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    public DesignerSerializationVisibility DesignerSerializationVisibility { get; set; }
 
-    /// <summary>The property will contain a <see cref="global::System.CLSCompliantAttribute"/> with this value. Default - <see langword="null"/>.</summary>
+    /// <summary>The property will contain a <see cref="CLSCompliantAttribute"/> with this value. Default - <see langword="null"/>.</summary>
     public bool ClsCompliant { get; set; }
 
     /// <summary>The property will contain a System.Windows.LocalizabilityAttribute with this value. Default - <see langword="null"/>.</summary>
@@ -243,7 +247,7 @@ internal sealed class DependencyPropertyAttribute<T> : global::System.Attribute
 public DependencyPropertyAttribute(
         string name)
     {
-        Name = name ?? throw new global::System.ArgumentNullException(nameof(name));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
         Type = typeof(T);
     }
 }

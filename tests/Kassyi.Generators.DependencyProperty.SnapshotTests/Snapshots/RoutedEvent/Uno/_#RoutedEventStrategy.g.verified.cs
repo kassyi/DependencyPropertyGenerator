@@ -1,6 +1,10 @@
 ﻿//HintName: RoutedEventStrategy.g.cs
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Indicates the routing strategy of a routed event.</summary>

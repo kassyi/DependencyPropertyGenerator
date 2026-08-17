@@ -1,6 +1,10 @@
 ﻿//HintName: SourceTrigger.g.cs
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Kassyi.Generators.DependencyProperty;
 
 /// <summary>Describes the timing of binding source updates.</summary>
