@@ -152,10 +152,13 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
                 return;
             }
 
+            // [WHY] Optional<T>.GetValueOrDefault() returns null when value is unset (e.g. initial change), causing CS8600/CS8604 in #nullable enable context.
             using var _ = writer.ClassScope(@class);
             using (writer.Scope($"static {@class.Name}()"))
             {
+                writer.AppendLine("#pragma warning disable CS8600, CS8604");
                 writer.Append(tempWriter.ToString());
+                writer.AppendLine("#pragma warning restore CS8600, CS8604");
             }
         }
         finally

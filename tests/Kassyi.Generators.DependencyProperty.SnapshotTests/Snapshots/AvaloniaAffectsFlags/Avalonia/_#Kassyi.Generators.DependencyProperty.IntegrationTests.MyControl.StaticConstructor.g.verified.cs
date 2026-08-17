@@ -6,6 +6,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
     {
         static MyControl()
         {
+#pragma warning disable CS8600, CS8604
             AffectsRender<MyControl>(FillProperty);
             AffectsMeasure<MyControl>(FillProperty);
             AffectsArrange<MyControl>(FillProperty);
@@ -15,6 +16,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
                 ((MyControl)x.Sender).OnFillChanged((global::Avalonia.Media.IBrush? )x.NewValue.GetValueOrDefault());
                 ((MyControl)x.Sender).OnFillChanged((global::Avalonia.Media.IBrush? )x.OldValue.GetValueOrDefault(), (global::Avalonia.Media.IBrush? )x.NewValue.GetValueOrDefault());
             }));
+#pragma warning restore CS8600, CS8604
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
     {
         static TreeViewExtensions()
         {
+#pragma warning disable CS8600, CS8604
             ModeProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode>>(static x =>
             {
                 OnModeChanged();
@@ -13,6 +14,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
                 OnModeChanged((global::Avalonia.Controls.TreeView)x.Sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.NewValue.GetValueOrDefault());
                 OnModeChanged((global::Avalonia.Controls.TreeView)x.Sender, (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.OldValue.GetValueOrDefault(), (global::Kassyi.Generators.DependencyProperty.IntegrationTests.Mode)x.NewValue.GetValueOrDefault());
             }));
+#pragma warning restore CS8600, CS8604
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
     {
         static GridExtensions()
         {
+#pragma warning disable CS8600, CS8604
             SomePropertyProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<object?>>(static x =>
             {
                 OnSomePropertyChanged();
@@ -13,6 +14,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
                 OnSomePropertyChanged((global::Avalonia.AvaloniaObject)x.Sender, (object? )x.NewValue.GetValueOrDefault());
                 OnSomePropertyChanged((global::Avalonia.AvaloniaObject)x.Sender, (object? )x.OldValue.GetValueOrDefault(), (object? )x.NewValue.GetValueOrDefault());
             }));
+#pragma warning restore CS8600, CS8604
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
     {
         static TreeViewExtensions()
         {
+#pragma warning disable CS8600, CS8604
             SelectedItemProperty.Changed.Subscribe(new global::Avalonia.Reactive.AnonymousObserver<global::Avalonia.AvaloniaPropertyChangedEventArgs<object?>>(static x =>
             {
                 OnSelectedItemChanged();
@@ -13,6 +14,7 @@ namespace Kassyi.Generators.DependencyProperty.IntegrationTests
                 OnSelectedItemChanged((global::Avalonia.Controls.TreeView)x.Sender, (object? )x.NewValue.GetValueOrDefault());
                 OnSelectedItemChanged((global::Avalonia.Controls.TreeView)x.Sender, (object? )x.OldValue.GetValueOrDefault(), (object? )x.NewValue.GetValueOrDefault());
             }));
+#pragma warning restore CS8600, CS8604
         }
     }
 }
