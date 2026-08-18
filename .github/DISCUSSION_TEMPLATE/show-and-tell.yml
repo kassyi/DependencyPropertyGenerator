@@ -1,0 +1,48 @@
+name: "🙌 Show and Tell"
+description: "Show off what you built, share control libraries, or post benchmark results using DependencyPropertyGenerator!"
+title: "[Show & Tell]: "
+labels: ["show-and-tell"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Did you build an awesome custom control library or achieve massive build-time speedups with **DependencyPropertyGenerator**? Share it with the community!
+
+  - type: textarea
+    id: project-description
+    attributes:
+      label: "Project / Control Overview"
+      description: "Tell us about what you created or where you are using the generator."
+      placeholder: "e.g., A modern docking control library for Avalonia and WPF using DependencyPropertyGenerator to manage 100+ attached properties..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ui-framework
+    attributes:
+      label: "Target UI Framework(s)"
+      description: "Which framework(s) does your project target?"
+      multiple: true
+      options:
+        - "WPF"
+        - "Avalonia UI"
+        - ".NET MAUI"
+        - "Uno Platform (WinUI / UWP)"
+        - "WinUI 3 / Windows App SDK"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: highlights
+    attributes:
+      label: "Highlights & Experience"
+      description: "What did you like the most? (e.g., Zero-allocation performance, generic attributes, callback type safety, clean code)"
+      placeholder: "e.g., Reduced boilerplate code by 80% while keeping typing latency under 0.5 ms in Rider..."
+
+  - type: textarea
+    id: links-and-screenshots
+    attributes:
+      label: "Links, Code Examples, or Screenshots"
+      description: "Share repository links, package links, code snippets, or screenshots."
+      placeholder: "e.g., https://github.com/..."

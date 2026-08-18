@@ -1,0 +1,74 @@
+name: "🙏 Q&A & Usage Help"
+description: "Ask questions or get help with property generation, callbacks, compilation errors, or platform setup."
+title: "[Q&A]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help with **DependencyPropertyGenerator**? Ask your question here!
+        Before posting, please check the [Specifications & Documentation](./spec/en/intro.md) and [Diagnostics Reference](./spec/en/07_diagnostics_reference.md).
+
+  - type: textarea
+    id: question-summary
+    attributes:
+      label: "Question / What are you trying to accomplish?"
+      description: "Provide a clear and concise summary of what you are trying to do."
+      placeholder: "e.g., How do I correctly hook into a PropertyChanged callback with sender and old/new values in Avalonia?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ui-framework
+    attributes:
+      label: "UI Framework"
+      description: "Which platform are you targeting?"
+      options:
+        - "WPF"
+        - "Avalonia UI"
+        - ".NET MAUI"
+        - "Uno Platform (WinUI / UWP)"
+        - "WinUI 3 / Windows App SDK"
+        - "Multi-targeting / Custom"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: "Environment & Language"
+      description: "Select your development environment details."
+      multiple: true
+      options:
+        - ".NET 9.0 SDK"
+        - ".NET 8.0 SDK"
+        - "C# 13 / preview"
+        - "C# 12"
+        - "C# 11"
+        - "C# 8.0 - 10.0"
+        - "Visual Studio 2022"
+        - "JetBrains Rider"
+        - "VS Code (C# Dev Kit)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-snippet
+    attributes:
+      label: "Your Code Snippet"
+      description: "Paste the C# class and attribute definition related to your question."
+      render: csharp
+      placeholder: |
+        [DependencyProperty<string>("Title", OnChanged = nameof(OnTitleChanged))]
+        public partial class MyControl : UserControl
+        {
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: errors-or-behavior
+    attributes:
+      label: "Observed Behavior / Diagnostic Messages"
+      description: "Are you seeing a compiler error (e.g., `DPG0001`, `CS1503`) or is a callback not firing as expected?"
+      placeholder: "e.g., The build fails with DPG0001: OnChanged method not found..."
