@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Kassyi.Generators.Extensions.Models;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Kassyi.Generators.Extensions;
 

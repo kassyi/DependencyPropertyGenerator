@@ -7,21 +7,18 @@ namespace Kassyi.Generators.Extensions;
 public static class FrameworkExtensions
 {
     /// <summary>Error message template displayed when the UI framework cannot be recognized.</summary>
-    public const string FrameworkIsNotRecognized = """
-        Framework is not recognized.
-        You can explicitly specify the framework by setting one of the following constants in your project:
-        HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI
-        """;
+    public const string FrameworkIsNotRecognized = "Framework is not recognized. You can explicitly specify the framework by setting one of the following constants in your project: HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI.";
 
     /// <summary>Gets the primary UI root namespace for the target framework.</summary>
     public static string GetNamespace(this Framework framework) => framework switch
     {
+        Framework.None => string.Empty,
         Framework.Wpf => "System.Windows",
         Framework.Uwp or Framework.Uno => "Windows.UI.Xaml",
         Framework.WinUi or Framework.UnoWinUi => "Microsoft.UI.Xaml",
         Framework.Avalonia => "Avalonia",
         Framework.Maui => "Microsoft.Maui.Controls",
-        _ => throw new InvalidOperationException($"Platform '{framework}' is not supported."),
+        _ => throw new InvalidOperationException(FrameworkIsNotRecognized),
     };
 
     /// <summary>Gets the base object type name (e.g. DependencyObject, BindableObject, AvaloniaObject) for the framework.</summary>
@@ -134,13 +131,13 @@ public static class FrameworkExtensions
     /// <summary>Attempts to recognize the target UI framework from compilation symbols, falling back to build configuration options.</summary>
     public static Framework TryRecognizeFramework(this Compilation compilation, AnalyzerConfigOptionsProvider? options)
     {
-        var framework = compilation.TryRecognizeFramework();
+        var framework = options?.TryRecognizeFramework() ?? Framework.None;
         if (framework != Framework.None)
         {
             return framework;
         }
 
-        return options?.TryRecognizeFramework() ?? Framework.None;
+        return compilation.TryRecognizeFramework();
     }
 
     /// <summary>Recognizes the target UI framework or throws <see cref="InvalidOperationException"/> if unrecognized.</summary>

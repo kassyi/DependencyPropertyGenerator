@@ -1,11 +1,8 @@
-[
+﻿[
   {
     Id: DPG0000,
     Severity: Error,
-    MessageFormat:
-Framework is not recognized.
-You can explicitly specify the framework by setting one of the following constants in your project:
-HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI
+    MessageFormat: Framework is not recognized. You can explicitly specify the framework by setting one of the following constants in your project: HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI.
   },
   {
     Id: CS8019,
