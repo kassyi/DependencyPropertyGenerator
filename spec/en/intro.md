@@ -14,8 +14,8 @@ The following documents explain the internal workings of the system.
   Defines the project's purpose, modular design, and target platforms. It also covers the ubiquitous language and structured DTO models used throughout the codebase.
 - **[02. Pipeline and Architecture](./02_pipeline_architecture.md)**
   Explains the Incremental Generator pipeline and dataflow. It details extraction optimization techniques and model equality strategies necessary for efficient caching.
-- **[03. Generation and Optimization](./03_generation_and_optimization.md)**
-  Covers zero-allocation code generation techniques using `SourceWriter` (`ClassScope`) and callback matching rules. It also provides implementation Dos & Don'ts alongside profiling methods.
+- **[03. Code Synthesis and Performance Optimization](./03_synthesis_and_performance.md)**
+  Details the zero-allocation code synthesis engine (`SourceWriter` / `ClassScope`), extreme performance optimization guidelines (AST direct traversal, LINQ elimination), and profiling methodologies.
 - **[04. Complexity Model of Incremental Generator](./04_mathematical_model.md)**
   Analyzes worst-case time and memory complexities. It explains pipeline cache scaling limits and the architectural mitigations required to overcome them.
 - **[05. Test Specification](./05_test_specification.md)**

@@ -2,44 +2,90 @@
 
 [English](./06_framework_strategies.md) | [日本語](../ja/06_framework_strategies.md) | [Index (Intro)](./intro.md)
 
-DependencyPropertyGenerator dynamically generates the appropriate boilerplate code for the target UI framework—such as WPF, UWP, WinUI, Uno, Avalonia, or MAUI—based on a single `[DependencyProperty]` attribute.
-This document serves as an API mapping dictionary (Ground Truth) for developers and autonomous agents to perform framework-specific bug fixes or feature extensions.
+DependencyPropertyGenerator dynamically generates optimal boilerplate code for target UI frameworks—WPF, UWP, WinUI, Uno, Avalonia, or MAUI—based on a single `[DependencyProperty]` attribute.
 
-The architectural differences between each platform are entirely abstracted away through the `IFrameworkGeneratorStrategy` implementation classes located in the `Sources/Strategies/` directory.
+This document serves as the authoritative API mapping dictionary (Ground Truth) for executing framework-specific bug fixes or feature extensions. All architectural differences between platforms are abstracted away through the `IFrameworkGeneratorStrategy` implementation classes located in the `Sources/Strategies/` directory.
 
 ---
 
 ## I. Property Registration API Mapping
 
-### WPF (WpfFrameworkGenerator)
-WPF uses `System.Windows.DependencyProperty` and `DependencyPropertyKey` as the foundation for its property system.
-To register a property, the generator invokes `DependencyProperty.Register`, or `RegisterAttached` for attached properties. When generating read-only properties, it uses `RegisterReadOnly` and `RegisterAttachedReadOnly`.
-Metadata is managed through `System.Windows.FrameworkPropertyMetadata` or `PropertyMetadata`, and callbacks are wired up using dedicated delegate types such as `PropertyChangedCallback`, `CoerceValueCallback`, and `ValidateValueCallback`.
-The most notable implementation detail for WPF is that its metadata (`FrameworkPropertyMetadata`) contains an extensive set of flags tailored for layout and data binding, such as `AffectsMeasure` and `BindsTwoWayByDefault`. Consequently, the generator utilizes the fields in `FrameworkMetadataData` most heavily for WPF code generation.
+### WPF (`WpfFrameworkGenerator`)
 
-### Avalonia (AvaloniaFrameworkGenerator)
+WPF utilizes `System.Windows.DependencyProperty` and `DependencyPropertyKey` as the foundation for its property system.
+
+- **Registration**: Invokes `DependencyProperty.Register` or `RegisterAttached`.
+- **Read-Only**: Utilizes `RegisterReadOnly` and `RegisterAttachedReadOnly`.
+- **Metadata**: Managed via `System.Windows.FrameworkPropertyMetadata` or `PropertyMetadata`.
+- **Callbacks**: Wired using dedicated delegate types (`PropertyChangedCallback`, `CoerceValueCallback`, `ValidateValueCallback`).
+
+> [!NOTE]
+> The WPF `FrameworkPropertyMetadata` contains an extensive set of layout and data binding flags (e.g., `AffectsMeasure`, `BindsTwoWayByDefault`). The generator heavily relies on the fields in `FrameworkMetadataData` to emit these WPF-specific flags securely.
+
+### Avalonia (`AvaloniaFrameworkGenerator`)
+
 Avalonia builds upon `Avalonia.AvaloniaProperty`, typically defining properties as `StyledProperty<T>`, `AttachedProperty<T>`, or `DirectProperty<T>`.
-The generator calls `AvaloniaProperty.Register` or `RegisterAttached` for standard registrations. However, Avalonia introduces the concept of `DirectProperty`, which is a fast, field-backed property. When the `IsDirect` flag is enabled, the generator emits a specialized generic method named `RegisterDirect`.
-Metadata is either passed directly as arguments to the registration method or managed using Avalonia's native metadata features. Change notifications are handled through Observables or event-based subscription models like `AvaloniaPropertyChanged`.
 
-### MAUI (MauiFrameworkGenerator)
-MAUI employs a unique type system, utilizing `Microsoft.Maui.Controls.BindableProperty` and `BindablePropertyKey` instead of the traditional DependencyProperty.
-Property registration is performed using `BindableProperty.Create` or `CreateAttached`, while read-only properties use `CreateReadOnly` or `CreateAttachedReadOnly`. Unlike WPF, metadata is not encapsulated in a dedicated class but is instead passed as flat arguments to the API.
-Callbacks are mapped to specific delegate types, namely `BindingPropertyChangedDelegate`, `CoerceValueDelegate`, and `ValidateValueDelegate`.
+- **Registration**: Invokes `AvaloniaProperty.Register` or `RegisterAttached`.
+- **Direct Properties**: When the `IsDirect` flag is enabled, the generator emits the specialized generic method `RegisterDirect` for fast, field-backed access.
+- **Metadata**: Passed directly as arguments or managed via Avalonia's native metadata classes.
+- **Callbacks**: Routed through Observables or event-based subscription models like `AvaloniaPropertyChanged`.
 
-### UWP, WinUI, and Uno (UwpFrameworkGenerator)
-For these platforms, UWP and Uno rely on `Windows.UI.Xaml.DependencyProperty`, whereas WinUI 3 uses `Microsoft.UI.Xaml.DependencyProperty`.
-The registration API is strictly limited to `DependencyProperty.Register` and `RegisterAttached`, and metadata is handled using `PropertyMetadata`. The only callback natively provided is the `PropertyChangedCallback`.
-An important caveat is that these platforms lack native APIs for coercion and validation. To compensate, the generator emits fallback implementations that manually clamp or correct values inside the property's getter and setter, or within the PropertyChanged event itself, mimicking the missing behavior.
+### MAUI (`MauiFrameworkGenerator`)
+
+MAUI employs a distinct type system utilizing `Microsoft.Maui.Controls.BindableProperty` and `BindablePropertyKey`.
+
+- **Registration**: Performed via `BindableProperty.Create` or `CreateAttached`.
+- **Read-Only**: Utilizes `CreateReadOnly` or `CreateAttachedReadOnly`.
+- **Metadata**: Passed as flat arguments to the API rather than encapsulated in a dedicated class.
+- **Callbacks**: Mapped to specific delegates (`BindingPropertyChangedDelegate`, `CoerceValueDelegate`, `ValidateValueDelegate`).
+
+### UWP, WinUI, and Uno (`UwpFrameworkGenerator`)
+
+UWP and Uno rely on `Windows.UI.Xaml.DependencyProperty`, whereas WinUI 3 relies on `Microsoft.UI.Xaml.DependencyProperty`.
+
+- **Registration**: Strictly limited to `DependencyProperty.Register` and `RegisterAttached`.
+- **Metadata**: Handled using `PropertyMetadata`.
+- **Callbacks**: Natively provides only `PropertyChangedCallback`.
+
+> [!WARNING]
+> These platforms lack native API support for coercion and validation. The generator must emit specialized fallback implementations that manually clamp or correct values inside the property's getter/setter or within the PropertyChanged event itself.
 
 ---
 
 ## II. Strategy Extension Guidelines
 
-When adding support for a new UI framework—or addressing breaking API changes like those in Avalonia v12—you must follow these core principles to extend the implementation safely.
+When adding support for new UI frameworks or addressing breaking API changes (e.g., Avalonia v12), you must strictly follow these architectural principles:
 
-The first rule is to never modify the shared DTO models, such as `DependencyPropertyData`. All platform-specific differences must be isolated and absorbed by overriding the methods in the appropriate generator class (e.g., `XxxFrameworkGenerator.cs`) under the `Sources/Strategies/` directory.
+> [!IMPORTANT]
+> **1. Preserve the DTOs**
+> Never mutate the shared DTO models (e.g., `DependencyPropertyData`). All platform-specific differences must be aggressively isolated and absorbed by overriding the methods in the corresponding generator class (e.g., `XxxFrameworkGenerator.cs`) under the `Sources/Strategies/` directory.
 
-Next, leverage method extraction to resolve differences in API signatures across frameworks. For example, the `GenerateRegisterMethodArguments` method is responsible for constructing the exact string of arguments passed to the `Register` method, allowing you to easily accommodate varying argument orders or types.
+> [!TIP]
+> **2. Method Extraction for Signature Variances**
+> Leverage method extraction to resolve API signature differences. For example, use the `GenerateRegisterMethodArguments` method to construct the exact string of arguments passed to the `Register` method, gracefully accommodating varying argument configurations.
 
-Finally, to preserve benchmark scores and maintain zero-allocation characteristics, you must avoid using LINQ or unnecessary `string.Join` calls within the string generation paths (`SourceWriter`).
+> [!CAUTION]
+> **3. Strictly Zero-Allocation**
+> To preserve benchmark scores, strictly prohibit the use of LINQ or unnecessary `string.Join` calls within the string generation paths (`SourceWriter`).
+
+---
+
+## III. Automatic Framework Detection and Fallback
+
+During Roslyn pipeline initialization, the generator automatically resolves the target UI framework utilizing the following strict priority cascade:
+
+1. **High-Precision Symbol Inspection (`Compilation.TryRecognizeFramework`)**
+   Inspects core framework type symbols present in the compilation context:
+    - `Microsoft.Maui.Controls.BindableObject` $\rightarrow$ `Framework.Maui`
+    - `Avalonia.AvaloniaObject` $\rightarrow$ `Framework.Avalonia`
+    - `Uno.UI.FeatureConfiguration` $\rightarrow$ `Framework.Uno` / `Framework.UnoWinUi`
+    - `Microsoft.UI.Xaml.DependencyObject` $\rightarrow$ `Framework.WinUi`
+    - `Windows.UI.Xaml.DependencyObject` $\rightarrow$ `Framework.Uwp`
+    - `System.Windows.DependencyObject` $\rightarrow$ `Framework.Wpf`
+
+2. **MSBuild Property / Compilation Constant Fallback (`AnalyzerConfigOptionsProvider`)**
+   If symbols cannot be resolved, inspects `DefineConstants` (`HAS_WPF`, `HAS_WINUI`, `HAS_UWP`, `HAS_UNO`, `HAS_UNO_WINUI`, `HAS_AVALONIA`, `HAS_MAUI`) or the `UseMaui` property in project files.
+
+3. **Unrecognized Framework Fallback (`Framework.None`)**
+   If no framework successfully matches, the generator safely assigns `Framework.None`. In this state, it emits diagnostic `DPG0000` (Framework is not recognized) while selectively skipping platform-specific `using` imports and registrations. It securely emits only the raw attribute definitions to completely prevent compilation failure.

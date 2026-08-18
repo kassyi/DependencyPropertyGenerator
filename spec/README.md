@@ -18,7 +18,7 @@ Please select your preferred language:
 | **Intro** | [Introduction](./en/intro.md) | [概要](./ja/intro.md) | Overview and high-level structure |
 | **01** | [Foundation & Domain](./en/01_foundation_and_domain.md) | [基盤とドメイン](./ja/01_foundation_and_domain.md) | Modular structure, ubiquitous language & DTO models |
 | **02** | [Pipeline & Architecture](./en/02_pipeline_architecture.md) | [パイプライン構造](./ja/02_pipeline_architecture.md) | Incremental generator pipeline & caching strategy |
-| **03** | [Generation & Optimization](./en/03_generation_and_optimization.md) | [生成戦略と最適化](./ja/03_generation_and_optimization.md) | `SourceWriter` (`ClassScope`), callbacks & best practices |
+| **03** | [Code Synthesis & Performance](./en/03_synthesis_and_performance.md) | [コード生成とパフォーマンス最適化](./ja/03_synthesis_and_performance.md) | `SourceWriter` (`ClassScope`), zero-allocation synthesis & profiling |
 | **04** | [Complexity Model](./en/04_mathematical_model.md) | [計算量モデル](./ja/04_mathematical_model.md) | Worst-case complexity analysis & pipeline scaling limits |
 | **05** | [Test Specification](./en/05_test_specification.md) | [テスト仕様書](./ja/05_test_specification.md) | Test architecture, combinatorial matrix, language features & diagnostics |
 | **06** | [Framework Strategies](./en/06_framework_strategies.md) | [フレームワーク別生成マッピング仕様](./ja/06_framework_strategies.md) | Platform API mapping & generator extension guidelines |

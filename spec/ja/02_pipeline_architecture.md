@@ -4,11 +4,12 @@
 
 ## Ⅰ. インクリメンタルパイプライン構造
 
-Roslyn Incremental Source Generator (ISG) は、入力である構文ツリーから最終的なソースコード出力までを、LINQのようなパイプラインで処理します。本プロジェクトでは `Kassyi.Generators.Extensions` のヘルパーを利用してパイプラインを簡潔かつ超低アロケーションに構築しています。
+Roslyn Incremental Source Generator (ISG) は、コンパイラからのイベントを入力として受け取り、LINQ のようなパイプラインを介してソースコードを出力へと変換する。本アーキテクチャは `Kassyi.Generators.Extensions` のパイプラインヘルパーを利用し、スリムかつゼロアロケーションの変換を強制する。
 
 ### パイプラインの全体フロー
 
-以下の図は、システム全体のパイプライン概念図です。Roslynが提供する `IncrementalValuesProvider<T>` などのAPIを、LINQのように連鎖させていく様子を示しています。なお、生成器の内部で具体的にどのクラスがデータを処理していくのかについては、後述の「第3章 2. 詳細データフロー」で解説します。
+以下のシーケンス図は、システム全体のパイプライン構成を示す。Roslyn が提供する `IncrementalValuesProvider<T>` API の連鎖を図示している。クラス間の具体的な相互作用の詳細については、本章の「Ⅲ. クラス関係と詳細データフロー」を参照のこと。
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -27,84 +28,114 @@ sequenceDiagram
     SP->>SP: WhereNotNull()
     Note over SP: 前回のコンパイル時と等価(Equals)なら<br/>ここで処理を打ち切りキャッシュを使う
     SP->>Source: Select(Generate)
-    Source-->>SP: 生成したC#ソース文字列
+    Source-->>SP: 生成したC#35;ソースコード文字列
     SP->>Compiler: AddSource()
 ```
 
 ### パイプラインの各フェーズ
 
-パイプラインは以下のフェーズで進行します。
+パイプラインの実行は、以下のフェーズに厳密に従って進行する。
 
-1. **構文のフィルタリング (`ForAttributeWithMetadataName`)**
-   Roslyn 4.3.0 以降の機能を活用し、特定の属性 (`[DependencyProperty]`, `[AttachedDependencyProperty]`, `[RoutedEvent]`, `[WeakEvent]` など) を付与したクラスやレコードの構文のみを抽出します。
-2. **データの抽出 (`PrepareData` / `DependencyPropertyDataBuilder`)**
-   抽出した `AttributeData` や `INamedTypeSymbol` から、生成に必要なすべてのメタデータ（型名、デフォルト値、フラグ類）を抽出し、構造化します。この抽出プロセスは `PrepareData.cs` および `DependencyPropertyDataBuilder` が集約して担当します。属性の NamedArguments 解決では辞書のキャッシュ化や重複構文ルックアップの排除を行い、抽出パフォーマンスを最大化しています。
-3. **等価性の評価とキャッシュ**
-   RoslynのISG基盤は、`Select` の出力が前回と同一（`Equals` が `true`）である場合、後続のパイプライン処理をスキップしてキャッシュを利用します。
-4. **ソースコードの生成 (`Sources.*`)**
-   キャッシュミスが発生した場合にのみ呼び出され、DTOをもとに最終的な `.g.cs` コード文字列を生成します。`SourceWriter` のスコープ管理機構により、ゼロアロケーションかつ安全に出力します。
+1. **構文のフィルタリング:** パイプラインは Roslyn 4.3.0 以降の API (`ForAttributeWithMetadataName`) を活用し、特定の属性が付与されたクラスおよびレコード宣言のみを厳密にフィルタリングする。
+2. **データの抽出:** `PrepareData.cs` および `DependencyPropertyDataBuilder` コンポーネントが、生の `AttributeData` や `INamedTypeSymbol` インスタンスを構造化された DTO へと投影する。このフェーズでは、辞書ルックアップによる `NamedArguments` のキャッシュ化や構文検索の重複排除を行い、抽出速度を最大化する。
+3. **等価性の評価とキャッシュ:** Roslyn ISG ドライバーは `Select` フェーズの出力を評価する。出力が前回のコンパイルステップと厳密に一致する場合（`Equals` が `true` を返す場合）、後続のソース生成処理をバイパスし、インクリメンタルキャッシュを利用する。
+4. **ソースコードの生成:** ジェネレーターはキャッシュミスが発生した場合にのみこのフェーズを呼び出す。DTO を `.g.cs` のソース文字列へと変換する際、`SourceWriter` のスコープ管理を利用してゼロアロケーションのフォーマットを強制する。
 
 ---
 
 ## Ⅱ. モデルの等価性キャッシュ戦略
 
-インクリメンタルジェネレーターにおいて最も重要なパフォーマンス指標はキャッシュヒット率です。
-本プロジェクトでは、ジェネレーター内のデータモデル (`DependencyPropertyData`, `ClassData`, `EventData`, および各種サブモデル) において、以下の設計を徹底しています。
+インクリメンタルジェネレーターにおける最重要パフォーマンス指標は、インクリメンタルキャッシュのヒット率である。このヒット率を最適化するため、データモデル（`DependencyPropertyData`, `ClassData`, `EventData` およびサブレコード）には厳格な値の等価性セマンティクスが強制される。
 
-### `readonly record struct` による値の比較
+> [!IMPORTANT]
+> **`readonly record struct` によるディープバリュー比較**
+> すべてのモデルは `readonly record struct` として宣言される。これにより、C# コンパイラは基礎となるすべてのフィールドを比較する値ベースの `Equals()` および `GetHashCode()` 実装を自動生成し、厳密な値の等価性が保証される。
 
-すべてのモデルを `readonly record struct` として定義しています。これにより、C#コンパイラがすべてのプロパティに対する `Equals()` メソッドと `GetHashCode()` を自動生成し、プロパティの「値」に基づく厳密な等価性比較を行います。
+> [!WARNING]
+> **`EquatableArray<T>` によるコレクションの構造的等価性**
+> Roslyn パイプラインにおいて、標準の配列（`T[]`）や `ImmutableArray<T>` は参照による等価性評価を行う。同一のアイテムを持つ新しい配列インスタンスを生成すると、参照等価性チェックが失敗し、コンパイラキャッシュが無効化される。
 
-### コレクションの等価性担保 (`EquatableArray<T>`)
-
-Roslynパイプラインにおいて、標準の配列 `T[]` や `ImmutableArray<T>` は「参照」で比較されます。そのため、中身が同じであっても参照が異なれば `Equals` が `false` になり、キャッシュが無効化されてしまいます。
-
-これを防ぐため、コレクションデータ（`BindEvents` など）は必ず `EquatableArray<T>` でラップします。
+キャッシュの無効化を回避するため、コレクションは必ず `EquatableArray<T>` でラップされなければならない。
 
 - **実装箇所**: `BindEvents: bindEvents.AsEquatableArray()`
-- **効果**: 配列の要素同士を深く比較 (SequenceEqual) します。要素が同じであれば等価とみなすことで、余計なコード再生成を抑制します。
+- **効果**: このラッパーは要素ごとのディープな等価性（`SequenceEqual`）を強制する。基盤となるデータが意味的に同一である場合、不要なソース再生成を完全に抑制する。
 
 ---
 
 ## Ⅲ. クラス関係と詳細データフロー
 
-このセクションでは、ジェネレーターにおける**具体的なクラス群の役割・関係性**と、Roslyn パイプライン上を**どのようにデータが流れていくか**を解説します。
+このセクションでは、ジェネレーターの内部クラスの具体的な責務を規定し、Roslyn パイプラインを通るデータフローの制約を定義する。
 
 ### 1. 全体アーキテクチャとクラス関係
 
-ジェネレーターの主要な構成要素は大きく分けて以下の4つの層に分類されます。
+ジェネレーターの内部アーキテクチャは、以下の4つの主要なレイヤーに分割される。
 
-1. **Generators (ジェネレーター層)**: Roslynのパイプラインに登録され、全体のフローを制御する。
-2. **Data Extraction (データ抽出層)**: 構文(Syntax)と意味モデル(Symbol)から必要なメタデータのみを抽出する。
-3. **Models (モデル・DTO層)**: 抽出されたデータを保持する。比較（Equatable）可能な値型レコード。
-4. **Sources (ソース生成層)**: DTOを受け取り、実際のC#ソースコード文字列を出力する。
+1. **Generators (ジェネレーター層):** 実行フローを調整するため Roslyn パイプラインに登録される。
+2. **Data Extraction (データ抽出層):** Syntax および Semantic モデルから必要不可欠なメタデータのみを抽出する責務を負う。
+3. **Models (モデル・DTO層):** 抽出されたデータを永続化する、等価性を持つ値型レコード。
+4. **Sources (ソース生成層):** DTO を受け取り、合成された C# ソースコード文字列を出力する。
+
+#### 1. 単一属性ジェネレーター基底と具象実装 (`AttributeGeneratorBase`)
 
 ```mermaid
 classDiagram
     %% Generators
-    class AttributeGeneratorBase~T~ {
+    class AttributeGeneratorBase~TData~ {
         <<abstract>>
         +Initialize(IncrementalGeneratorInitializationContext)
-        #PrepareData(tuple) T
-        #GenerateSource(T) string
+        #PrepareData(GeneratorAttributeContext) TData?
+        #GenerateSource(TData) string
+        #GetHintName(TData) string
+        #SupportedFrameworks IReadOnlyList~Framework~
     }
 
     class DependencyPropertyGenerator {
         #PrepareData() Tuple~ClassData, DPData~
         #GenerateSource() string
     }
-
     class RoutedEventGenerator {
         #PrepareData() Tuple~ClassData, EventData~
     }
-
     AttributeGeneratorBase <|-- DependencyPropertyGenerator
     AttributeGeneratorBase <|-- RoutedEventGenerator
+```
+
+#### 2. 複数属性ジェネレーター基底と具象実装 (`MultiAttributeGeneratorBase`)
+
+```mermaid
+classDiagram
+    class MultiAttributeGeneratorBase~TData~ {
+        <<abstract>>
+        +Initialize(IncrementalGeneratorInitializationContext)
+        #PrepareData(GeneratorMultiAttributeContext) TData?
+        #GenerateSource(TData) string
+        #GetHintName(TData) string
+        #SupportedFrameworks IReadOnlyList~Framework~
+        #SelectMany bool
+    }
+
+    class AttachedDependencyPropertyGenerator {
+        #PrepareData() Tuple~ClassData, DPData~
+    }
+
+    class WeakEventGenerator {
+        #PrepareData() Tuple~ClassData, EventData~
+    }
+
+
+    MultiAttributeGeneratorBase <|-- AttachedDependencyPropertyGenerator
+    MultiAttributeGeneratorBase <|-- WeakEventGenerator
+```
+
+#### 3. データ抽出・モデル (DTO)・ソース生成ヘルパー連携
+
+```mermaid
+classDiagram
 
     %% Data Extraction
     class PrepareData {
         <<static>>
-        +GetDependencyPropertyData(AttributeData, ...) DependencyPropertyData
+        +GetDependencyPropertyData(GeneratorAttributeContext) DependencyPropertyData
         +GetClassData(INamedTypeSymbol, ...) ClassData
     }
 
@@ -148,50 +179,61 @@ classDiagram
     SourceGenerationHelper ..> DependencyPropertyData : 読み取り
 ```
 
-#### 各層の主要クラスの役割
+### 各層の主要クラスの役割
 
-- **`AttributeGeneratorBase<T>`**: インクリメンタルジェネレーターの基盤。パイプラインの `ForAttributeWithMetadataName` によるフィルタリングから、キャッシュ処理、ソース出力までの共通ロジックをカプセル化しています。
-- **`PrepareData`**: ジェネレーター層から呼ばれる抽出処理のエントリーポイント。Roslynの `INamedTypeSymbol` や `AttributeData` といった複雑なオブジェクトから、純粋なデータを取り出す拡張メソッド群を提供します。
-- **`DependencyPropertyDataBuilder`**: 依存関係プロパティ特有の複雑な抽出（コールバックのシグネチャ照合、デフォルト値の解析、XMLドキュメント抽出など）を段階的に行うビルダー。
-- **`ClassData` / `DependencyPropertyData`**: 抽出結果を格納するモデル。インクリメンタルジェネレーターのパフォーマンス（キャッシュヒット率）を最大化するため、すべて `readonly record struct` で実装され、値の等価性が担保されています。
-- **`SourceGenerationHelper`**: データモデルを入力として受け取り、`SourceWriter` を利用して `partial class` や `DependencyProperty.Register(...)` のC#ソースコードを組み立てる静的ヘルパー群です。
+- **`AttributeGeneratorBase<TData>` / `MultiAttributeGeneratorBase<TData>`:** インクリメンタルジェネレーターのコア基盤。構文フィルタリング、ターゲットフレームワークの事前検証（`SupportedFrameworks`）、コンテキストのカプセル化（`GeneratorAttributeContext`）、およびソース出力を含む標準ロジックをカプセル化する。
+- **`PrepareData`:** 抽出プロセスのエントリーポイント。`INamedTypeSymbol` などの複雑な Roslyn オブジェクトから純粋なデータを分離するための拡張メソッドを公開する。
+- **`DependencyPropertyDataBuilder`:** 依存関係プロパティ特有の抽出（コールバックシグネチャの照合や XML ドキュメントの抽出など）を段階的に実行する内部ビルダー。
+- **`ClassData` / `DependencyPropertyData`:** 抽出されたメタデータを永続化するデータモデル。キャッシュパフォーマンスを最大化するため、構造的に `readonly record struct` として実装される。
+- **`SourceGenerationHelper`:** データモデルを消費し、`SourceWriter` を利用して最終的な C# ソースコードを組み立てる静的ヘルパー。
 
 ---
 
 ### 2. 詳細なデータフローと内部メソッドの呼び出し
 
-第1章の概念図ではRoslyn APIの連鎖に注目しましたが、こちらの図では視点を変えて、ジェネレーター内部の具体的な実装に着目します。あるクラスに `[DependencyProperty]` 属性が付与されていることを検知してから最終的なC#コードが生成されるまでに、どのクラスがインスタンス化され、どのメソッドが呼ばれるのかという詳細なシーケンスを追っていきます。
+以下のシーケンス図は、内部の具体的な実行フローをトレースする。`[DependencyProperty]` 属性を検知してから最終的な C# コードが生成されるまでの順序を示し、インスタンス化されるクラスと呼び出されるメソッドを明示的に詳述する。
+
+#### 1. データ抽出フェーズ (Extraction)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Roslyn as Roslyn ISG Pipeline
-    participant DPG as DependencyPropertyGenerator
+    participant Roslyn as ISG Pipeline
+    participant DPG as Generator
     participant PD as PrepareData
     participant Builder as DPDataBuilder
-    participant Models as DTO (ClassData, DPData)
-    participant Helper as SourceGenerationHelper
+    participant Models as DTOs
 
     %% 構文解析フェーズ
-    Roslyn->>DPG: 構文変更の通知<br/>(属性付きクラスを検知)
+    Roslyn->>DPG: 構文変更通知<br/>(属性付きクラス検知)
 
     %% データ抽出フェーズ
     DPG->>PD: GetClassData(classSymbol)
-    Note over PD: 修飾子、名前空間、クラス名等の取得
+    Note over PD: 修飾子、名前空間等取得
     PD-->>Models: ClassData 生成
 
     DPG->>PD: GetDependencyPropertyData(attribute)
-    PD->>Builder: new DependencyPropertyDataBuilder()
+    PD->>Builder: new Builder()
 
-    Note over Builder: 属性引数や構文ツリーから段階的に抽出
-    Builder->>Builder: WithCoreProperties() (型や名前)
-    Builder->>Builder: WithMetadata() (Extrator利用)
-    Builder->>Builder: WithDefaultValues() (デフォルト値構文)
-    Builder->>Builder: WithCallbacks() (OnChanged等の照合)
+    Note over Builder: 属性引数や構文ツリーから<br/>段階的にメタデータを抽出
+    Builder->>Builder: WithCoreProperties()
+    Builder->>Builder: WithMetadata()
+    Builder->>Builder: WithDefaultValues()
+    Builder->>Builder: WithCallbacks()
 
-    Builder-->>Models: DependencyPropertyData 生成
+    Builder-->>Models: DPData 生成
 
-    DPG-->>Roslyn: タプル (ClassData, DependencyPropertyData) を返却
+    DPG-->>Roslyn: タプル (ClassData, DPData) 返却
+```
+
+#### 2. キャッシュ判定とコード生成フェーズ (Generation)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Roslyn as ISG Pipeline
+    participant DPG as Generator
+    participant Helper as SourceGenerationHelper
 
     %% キャッシュ判定フェーズ
     Note over Roslyn: 【重要】モデルの Equals() で等価性判定。<br/>前回コンパイル時から変化がなければ<br/>ここで処理を打ち切り、キャッシュを使う。
@@ -199,17 +241,20 @@ sequenceDiagram
     %% コード生成フェーズ
     Roslyn->>DPG: キャッシュミス時、生成処理要求
     DPG->>Helper: GenerateDependencyPropertySource(Class, DP)
-    Note over Helper: SourceWriterを使用して<br/>C#コードを文字列結合(ゼロアロケ)
+    Note over Helper: SourceWriterを使用して<br/>C#35;コードを文字列結合(ゼロアロケ)
     Helper-->>DPG: 生成されたソースコード (string)
     DPG-->>Roslyn: AddSource() でコンパイラへ登録
-
 ```
 
-### 3. この設計の意図 (なぜこのようなデータフローなのか)
+### 3. アーキテクチャの設計意図
 
-1. **Roslyn型（Symbol/Syntax）の早期切り離し**
-   Roslynの構文ツリー(`SyntaxNode`)や意味モデル(`ISymbol`)は巨大なオブジェクトであり、メモリリークの原因になるだけでなく、コンパイラの等価性比較（キャッシュ判定）を阻害します。そのため、`PrepareData` と `Builder` の層で**素早く純粋なC#のプリミティブ型（string, bool 等の DTO）に変換**して切り離しています。
-2. **ゼロ・アロケーションへの配慮**
-   `SourceGenerationHelper` へデータが渡された後は、Roslynの解析処理は一切行わず、与えられたDTOのデータを元に `StringBuilder` (SourceWriter) で高速にテキストを出力するだけの純粋な関数として動くよう分離されています。
-3. **拡張性と単一責任の分離**
-   WPF, UWP, Avalonia など複数フレームワークへの対応ロジック（`DependencyPropertyDataBuilder`内）と、ソース生成のロジック（`SourceGenerationHelper`）を分けることで、どちらかが複雑化しても影響を与えないアーキテクチャになっています。
+> [!CAUTION]
+> **Roslyn 型（Symbol/Syntax）の早期切り離し**
+> Roslyn の構文ツリー (`SyntaxNode`) と意味モデル (`ISymbol`) は巨大なオブジェクトである。これらを保持すると深刻なメモリリークが発生し、コンパイラのインクリメンタルキャッシュが根本的に破壊される。`PrepareData` レイヤーはこれらを強制的に C# プリミティブ型 (DTO) に変換し、直ちに切り離さなければならない。
+
+> [!TIP]
+> **ゼロアロケーション生成フェーズ**
+> 抽出フェーズがデータを `SourceGenerationHelper` に渡した後、すべての Roslyn 解析処理は停止しなければならない。生成フェーズは、提供された DTO のみに基づいて `SourceWriter` を介してテキストを高速に合成する純粋な関数として機能する。
+
+**拡張性と関心事の分離**
+フレームワーク固有のマッピングロジック（`DependencyPropertyDataBuilder` 内）をソース生成ロジック（`SourceGenerationHelper`）から隔離することで、パースロジックの変更がゼロアロケーションの生成レイヤーを汚染しないアーキテクチャが保証される。
