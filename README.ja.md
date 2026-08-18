@@ -51,9 +51,23 @@ Incremental Source Generator は、開発者がコードを入力するたびに
 - **モジュラーアーキテクチャ**: モノリシックなロジックをフレームワークごとのストラテジー（WPF、WinUI、Avalonia 等）に分割し、保守性とテスト容易性を大幅に向上。
 - **パッケージ名称の刷新**: 名前空間の衝突を防ぎクリーンに利用できるよう `Kassyi.Generators.DependencyProperty` として公開。
 
+## インストール
+
+.NET CLI または NuGet パッケージ マネージャーを使用してインストールします：
+
+```bash
+dotnet add package Kassyi.Generators.DependencyProperty
+```
+
+または、`.csproj` に直接パッケージ参照を追加します：
+
+```xml
+<PackageReference Include="Kassyi.Generators.DependencyProperty" Version="0.1.0" PrivateAssets="all" />
+```
+
 ## クイックスタート
 
-ジェネリック属性を使用してプロパティを宣言するだけで、ボイラープレートコードが自動的に合成されます。
+ジェネリック属性を使用してプロパティを宣言するだけで、ボイラープレートコードが自動的に生成されます。
 
 ```csharp
 using DependencyPropertyGenerator;
@@ -66,7 +80,7 @@ namespace MyApp.Controls;
 [DependencyProperty<bool>("IsSpinning", DefaultValue = true, Category = "Category", Description = "Description")]
 public partial class MyControl : UserControl
 {
-    // ジェネレーターによって自動結線されるコールバック（任意）
+    // ジェネレーターによって自動呼出されるコールバック（任意）
     partial void OnIsSpinningChanged(bool oldValue, bool newValue)
     {
     }
@@ -75,7 +89,7 @@ public partial class MyControl : UserControl
 [AttachedDependencyProperty<object, TreeView>("SelectedItem", DefaultBindingMode = DefaultBindingMode.TwoWay)]
 public static partial class TreeViewExtensions
 {
-    // ジェネレーターによって自動結線されるコールバック（任意）
+    // ジェネレーターによって自動呼出されるコールバック（任意）
     static partial void OnSelectedItemChanged(TreeView sender, object? oldValue, object? newValue)
     {
     }
@@ -170,6 +184,31 @@ XML ドキュメントを生成する最も簡単な方法は `Description` プ�
 
 これにより `[Description]` 属性が付与されると同時に、生成される XML ドキュメントコメントにもテキストが直接埋め込まれます。未加工の XML を指定したい場合は `XmlDocumentation` や `PropertyXmlDocumentation` を使用します。
 
+<details>
+<summary><b>生成される XML ドキュメントコードを確認</b></summary>
+
+```csharp
+/// <summary>
+/// Identifies the <see cref="IsSpinning"/> dependency property.<br/>
+/// Default value: default(bool)
+/// </summary>
+public static readonly global::System.Windows.DependencyProperty IsSpinningProperty =
+    global::System.Windows.DependencyProperty.Register(...);
+
+/// <summary>
+/// 要素が回転中であるかを示します。<br/>
+/// Default value: default(bool)
+/// </summary>
+[global::System.ComponentModel.Description("要素が回転中であるかを示します。")]
+public bool IsSpinning
+{
+    get => (bool)GetValue(IsSpinningProperty);
+    set => SetValue(IsSpinningProperty, value);
+}
+```
+
+</details>
+
 ### プラットフォームの手動設定
 
 自動検出がうまく機能しない環境（マルチプラットフォーム構成や特殊なビルド時）では、`.csproj` 内で明示的にターゲットフレームワークを指定できます：
@@ -212,6 +251,7 @@ UWP、WinUI、Uno では、ジェネレーターが `RegisterPropertyChangedCall
     - **[04. 計算量モデル](./spec/ja/04_mathematical_model.md)**: 最悪時間・メモリ計算量の数理分析
     - **[05. テスト仕様書](./spec/ja/05_test_specification.md)**: 直交表マトリクスと品質保証基準
     - **[06. フレームワーク別生成仕様](./spec/ja/06_framework_strategies.md)**: プラットフォーム固有APIマッピング
+    - **[07. 診断エラーコード一覧](./spec/ja/07_diagnostics_reference.md)**: `DPG0000`〜`DPG9999` の原因と解決策
 
 ## サポートとフィードバック
 
