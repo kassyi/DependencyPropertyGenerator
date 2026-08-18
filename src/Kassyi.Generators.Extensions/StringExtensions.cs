@@ -97,6 +97,7 @@ public static class StringExtensions
 
         var builder = new StringBuilder(text.Length);
         var start = 0;
+        var hasCr = false;
 
         while (start < text.Length)
         {
@@ -124,15 +125,19 @@ public static class StringExtensions
             }
 
             // Skip past \r\n, \r, or \n
-            if (end < text.Length && text[end] == '\r' && end + 1 < text.Length && text[end + 1] == '\n')
+            if (end < text.Length && text[end] == '\r')
             {
-                end++;
+                hasCr = true;
+                if (end + 1 < text.Length && text[end + 1] == '\n')
+                {
+                    end++;
+                }
             }
 
             start = end + 1;
         }
 
-        return builder.Length == text.Length ? text : builder.ToString();
+        return builder.Length == text.Length && !hasCr ? text : builder.ToString();
     }
 
     /// <summary>Normalizes line endings to the specified newline sequence (defaulting to '\n').</summary>

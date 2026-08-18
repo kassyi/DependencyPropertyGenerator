@@ -40,6 +40,7 @@ public class StringExtensionsTests
     [TestMethod]
     [DataRow("Line1\n   \nLine3", "Line1\nLine3")]
     [DataRow("Line1\r\n\t\r\nLine3", "Line1\nLine3")]
+    [DataRow("Line1\rLine2\r\nLine3", "Line1\nLine2\nLine3")] // Tests lone CR normalizations (Qodo identified bug)
     [DataRow("\n\nLine1", "\n\nLine1")] // Keeps pure empty lines (length 0) but removes lines with only spaces
     public void RemoveBlankLinesWhereOnlyWhitespaces_ShouldRemoveSpacesOnlyLines(string input, string expected)
     {
