@@ -55,7 +55,7 @@ public class ArchitectureTests
 
     private static string? GetSolutionRoot()
     {
-        var dir = AppContext.BaseDirectory;
+        var dir = Directory.GetCurrentDirectory();
         while (!string.IsNullOrEmpty(dir))
         {
             if (File.Exists(Path.Combine(dir, "DependencyPropertyGenerator.sln")) ||
