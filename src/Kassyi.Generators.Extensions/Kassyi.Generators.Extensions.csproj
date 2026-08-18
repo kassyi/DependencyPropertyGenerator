@@ -3,7 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);IDE0190;CA1031;CA1307</NoWarn>
+    <!-- IDE0190: Target-typed new expressions are an optional style preference. -->
+    <!-- CA1031: Catching general Exceptions is required in generators to report diagnostics instead of crashing the compiler. -->
+    <!-- CA1307: StringComparison.Ordinal is not strictly needed for source code string manipulations. -->
+    <!-- RS2008: Analyzer release tracking overhead is unnecessary for this generator project. -->
+    <NoWarn>$(NoWarn);IDE0190;CA1031;CA1307;RS2008</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">

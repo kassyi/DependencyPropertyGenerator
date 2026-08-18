@@ -116,14 +116,15 @@ C# 言語仕様（C# 8.0 〜 C# 13.0）の構文的なコンテキストが、�
 | **Language-021** | メタデータ属性     | `[Category]`, `[Description]`, `[TypeConverter]`          | メタデータ属性を生成プロパティプロキシへ欠落なくコピーします。                |
 | **Language-022** | 継承エッジケース   | 親クラスプロパティの `new` 修飾子による隠蔽               | `new` キーワードを付与したプロパティの安全な上書き登録を行います。            |
 | **Language-023** | コールバック       | `Validate = true`, `Coerce = true` の共存                 | バリデーション及び値補正シグネチャを正常に生成します。                        |
-| **Language-024** | Avalonia 固有      | `AffectsRender`, `AffectsMeasure`, `AffectsArrange`       | 静的コンストラクタによる描画・配置無効化フックを登録します。                  |
-| **Language-025** | イベント購読       | `BindEvents` 指定時の静的イベントハンドラ結線             | コントロールイベントとプロパティ変更通知を自動で結線します。                  |
-| **Language-026** | 多次元配列         | `int[,,]` 多次元配列型プロパティ                          | 複雑な多次元配列型シグネチャを完全に復元します。                              |
-| **Language-027** | Nullable           | Nullable 有効コンテキストでの Record 型                   | Nullable アノテーションを欠落なく保持します。                                 |
-| **Language-028** | 静的クラス         | 静的クラスへの添付プロパティ付与                          | 静的クラスの修飾子を重複させずに生成します。                                  |
-| **Language-029** | 名前空間分離       | 異なる名前空間における同名クラス定義                      | 名前空間ごとにプロパティ生成を分離し、衝突を回避します。                      |
-| **Language-030** | partial プロパティ | `required` かつ `init` の partial プロパティ              | C# 13 partial property 実装と完全に結合します。                               |
-| **Language-031** | 関数ポインタ       | 関数ポインタ (`delegate* unmanaged<int, void>`)           | アンマネージ関数ポインタ型をプロパティの型として正しく生成します。            |
+| **Language-024** | 添付コールバック   | 添付プロパティでの `Validate = true`, `Coerce = true`     | 添付プロパティ用のバリデーション及び値補正シグネチャを正常に生成します。      |
+| **Language-025** | Avalonia 固有      | `AffectsRender`, `AffectsMeasure`, `AffectsArrange`       | 静的コンストラクタによる描画・配置無効化フックを登録します。                  |
+| **Language-026** | イベント購読       | `BindEvents` 指定時の静的イベントハンドラ結線             | コントロールイベントとプロパティ変更通知を自動で結線します。                  |
+| **Language-027** | 多次元配列         | `int[,,]` 多次元配列型プロパティ                          | 複雑な多次元配列型シグネチャを完全に復元します。                              |
+| **Language-028** | Nullable           | Nullable 有効コンテキストでの Record 型                   | Nullable アノテーションを欠落なく保持します。                                 |
+| **Language-029** | 静的クラス         | 静的クラスへの添付プロパティ付与                          | 静的クラスの修飾子を重複させずに生成します。                                  |
+| **Language-030** | 名前空間分離       | 異なる名前空間における同名クラス定義                      | 名前空間ごとにプロパティ生成を分離し、衝突を回避します。                      |
+| **Language-031** | partial プロパティ | `required` かつ `init` の partial プロパティ              | C# 13 partial property 実装と完全に結合します。                               |
+| **Language-032** | 関数ポインタ       | 関数ポインタ (`delegate* unmanaged<int, void>`)           | アンマネージ関数ポインタ型をプロパティの型として正しく生成します。            |
 
 ---
 
@@ -139,10 +140,10 @@ C# 言語仕様（C# 8.0 〜 C# 13.0）の構文的なコンテキストが、�
 - **Attached-004**: `BindEvent` を指定した際、UI イベント購読コードとハンドラ結線を生成します。
 - **Attached-005**: 第2型引数を省略した際、基底の `DependencyObject` を対象とした汎用的な添付プロパティを生成します。
 - **Attached-006**: 改行を含む複数行 XML ドキュメントや Description を構文エラーなく出力します。
-- **Attached-008**: カスタム `OnChanged` メソッド結線と静的コンストラクタを生成します。
-- **Attached-009**: 同一クラスを型引数として渡した際に発生する循環参照を回避します。
-- **Attached-010**: 継承先クラスに添付プロパティを正しく付与します。
-- **Attached-011**: `DependencyPropertyChangedEventArgs` を受け取るコールバック結線を検証します。
+- **Attached-007**: カスタム `OnChanged` メソッド結線と静的コンストラクタを生成します。
+- **Attached-008**: 同一クラスを型引数として渡した際に発生する循環参照を回避します。
+- **Attached-009**: 継承先クラスに添付プロパティを正しく付与します。
+- **Attached-010**: `DependencyPropertyChangedEventArgs` を受け取るコールバック結線を検証します。
 
 ### 6.2 ルーティングイベント仕様 (`Routed`)
 
@@ -152,7 +153,7 @@ WPF などのルーティングイベントインフラストラクチャに基�
 - **Routed-002**: `IsAttached = true` の添付ルーティングイベント（静的 `Add/RemoveHandler`）を生成します。
 - **Routed-003**: 静的クラスへ付与する際、`public static partial class` 修飾子が重複するのを防ぎます。
 - **Routed-004**: カスタムジェネリックデリゲートを指定した際、`global::` プレフィックスの二重付与を防ぎます。
-- **Routed-005**: 同名型が衝突した際、`CS0436` 診断サプレッサーが選択的に抑制動作を行うことを確認します。
+- **Routed-006**: 同名型が衝突した際、`CS0436` 診断サプレッサーが選択的に抑制動作を行うことを確認します。
 
 ### 6.3 ウィークイベント仕様 (`Weak`)
 
@@ -169,9 +170,9 @@ WPF などのルーティングイベントインフラストラクチャに基�
 継承ツリー内でのメタデータの書き換えと共有プロパティ動作を検証します。
 
 - **Metadata-001**: デフォルト値のオーバーライドを生成します（WPF では `OverrideMetadata`、他では `RegisterPropertyChangedCallback` を使用します）。
-- **Metadata-001B**: 読み取り専用プロパティのメタデータオーバーライドを検証します。
-- **Metadata-002**: 既存プロパティの `AddOwner` メソッド呼び出しを通じてプロパティ共有登録を行います。
-- **Metadata-002B**: `AddOwner` を使用して異なる型間でプロパティを共有します。
+- **Metadata-002**: 読み取り専用プロパティのメタデータオーバーライドを検証します。
+- **Metadata-003**: 既存プロパティの `AddOwner` メソッド呼び出しを通じてプロパティ共有登録を行います。
+- **Metadata-004**: `AddOwner` を使用して異なる型間でプロパティを共有します。
 
 ### 6.5 ドキュメント整合性 (`Doc`)
 
@@ -189,14 +190,14 @@ WPF などのルーティングイベントインフラストラクチャに基�
 | テストID       | 診断ID    | 重大度 | トリガー条件 (無効コード)                                      | 期待される診断メッセージフォーマット                                                                                   |
 | :------------- | :-------- | :----- | :------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
 | **Error-001**  | `DPG0001` | Error  | 存在しない、または不正シグネチャの `OnChanged` メソッド        | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.`                         |
-| **Error-001B** | `DPG0001` | Error  | 添付プロパティで存在しない `OnChanged` メソッド名を指定        | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.`                         |
-| **Error-002**  | `DPG0002` | Error  | `file` スコープ修飾子を持つローカルクラスへの属性付与          | `The file-local class '{0}' cannot be used for source generation.`                                                     |
-| **Error-003**  | `DPG0003` | Error  | `ref struct` 型をプロパティ型に指定                            | `The type '{0}' is a ref struct and cannot be used as a DependencyProperty type.`                                      |
-| **Error-004**  | `DPG0004` | Error  | 参照型にファクトリコールバックなしで `DefaultValue` を指定     | `Reference type '{0}' cannot have a DefaultValue without CreateDefaultValueCallback = true or DefaultValueExpression.` |
-| **Error-005**  | `DPG0005` | Error  | 非 WPF/Avalonia で `OldAndNewValue` の `OverrideMetadata` 指定 | `OverrideMetadata with OldAndNewValue callback is only supported on WPF and Avalonia.`                                 |
-| **Error-006**  | `DPG0006` | Error  | 不正な `DefaultValueExpression` 構文の指定                     | 構文解析エラーを適切にハンドリングします。                                                                             |
-| **Error-007**  | -         | Info   | `Framework.None` 指定時のフォールバック動作                    | 適切なフォールバックコードを生成します。                                                                               |
-| **Error-008**  | `DPG0007` | Error  | 不正なシグネチャのコールバックメソッド（`OnChanged` 等）指定   | `The partial method '{0}' has an unsupported signature...`                                                             |
+| **Error-002** | `DPG0001` | Error  | 添付プロパティで存在しない `OnChanged` メソッド名を指定        | `The specified OnChanged method '{0}' was not found or has an unsupported signature on '{1}'.`                         |
+| **Error-003**  | `DPG0002` | Error  | `file` スコープ修飾子を持つローカルクラスへの属性付与          | `The file-local class '{0}' cannot be used for source generation.`                                                     |
+| **Error-004**  | `DPG0003` | Error  | `ref struct` 型をプロパティ型に指定                            | `The type '{0}' is a ref struct and cannot be used as a DependencyProperty type.`                                      |
+| **Error-005**  | `DPG0004` | Error  | 参照型にファクトリコールバックなしで `DefaultValue` を指定     | `Reference type '{0}' cannot have a DefaultValue without CreateDefaultValueCallback = true or DefaultValueExpression.` |
+| **Error-007**  | `DPG0005` | Error  | 非 WPF/Avalonia で `OldAndNewValue` の `OverrideMetadata` 指定 | `OverrideMetadata with OldAndNewValue callback is only supported on WPF and Avalonia.`                                 |
+| **Error-008**  | `DPG0006` | Error  | 不正な `DefaultValueExpression` 構文の指定                     | 構文解析エラーを適切にハンドリングします。                                                                             |
+| **Error-009**  | -         | Info   | `Framework.None` 指定時のフォールバック動作                    | 適切なフォールバックコードを生成します。                                                                               |
+| **Error-010**  | `DPG0007` | Error  | 不正なシグネチャのコールバックメソッド（`OnChanged` 等）指定   | `The partial method '{0}' has an unsupported signature...`                                                             |
 
 ---
 

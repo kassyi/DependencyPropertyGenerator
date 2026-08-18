@@ -2,6 +2,10 @@
 
     <PropertyGroup><HResourcesGenerator_Namespace>Kassyi.Generators.DependencyProperty</HResourcesGenerator_Namespace><EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles><RootNamespace>Kassyi.Generators.DependencyProperty</RootNamespace>
         <TargetFrameworks>netstandard2.0</TargetFrameworks><!-- ;net6.0;net7.0;net8.0 -->
+        <!-- CA1014: CLSCompliantAttribute is not required. -->
+        <!-- CA1308: ToLower() is intentionally used for metadata generation. -->
+        <!-- CA1031: Catching general Exceptions is required in generators to report diagnostics instead of crashing the compiler. -->
+        <!-- CA1307: StringComparison.Ordinal is not strictly needed for source code string manipulations. -->
         <NoWarn>$(NoWarn);CA1014;CA1308;CA1031;CA1307</NoWarn>
         <IsRoslynComponent>true</IsRoslynComponent>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>

@@ -32,7 +32,7 @@ public class OverrideMetadataTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Metadata}-001B")]
+    [TestCategory($"{TestCategoryNames.Metadata}-002")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]

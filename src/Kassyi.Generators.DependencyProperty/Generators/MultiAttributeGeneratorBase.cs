@@ -1,3 +1,4 @@
+using Kassyi.Generators.DependencyProperty.Diagnostics;
 using Kassyi.Generators.DependencyProperty.Models;
 using Kassyi.Generators.Extensions;
 using Kassyi.Generators.Extensions.Models;
@@ -9,9 +10,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 public abstract class MultiAttributeGeneratorBase<TData> : IIncrementalGenerator
     where TData : struct
 {
-    /// <summary>Gets the unique identifier for the generator used in diagnostic reporting.</summary>
-    protected abstract string Id { get; }
-
     /// <summary>Gets the metadata names of the attributes that trigger this generator.</summary>
     protected abstract IReadOnlyList<string> AttributeNames { get; }
     
@@ -38,7 +36,7 @@ public abstract class MultiAttributeGeneratorBase<TData> : IIncrementalGenerator
     {
         context.RegisterPostInitializationOutput(PostInitialize);
 
-        var framework = context.DetectFramework();
+        var framework = context.DetectFramework(DiagnosticDescriptors.FrameworkNotRecognized);
         var version = context.DetectVersion();
         var supported = SupportedFrameworks;
 
@@ -55,7 +53,6 @@ public abstract class MultiAttributeGeneratorBase<TData> : IIncrementalGenerator
                 return PrepareData(multiCtx);
             },
             GetSourceCode,
-            Id,
             selectMany: SelectMany);
     }
 

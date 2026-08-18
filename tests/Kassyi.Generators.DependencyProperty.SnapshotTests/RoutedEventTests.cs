@@ -77,7 +77,7 @@ public class RoutedEventTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Routed}-004B")]
+    [TestCategory($"{TestCategoryNames.Routed}-005")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -97,7 +97,7 @@ public class RoutedEventTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Routed}-005")]
+    [TestCategory($"{TestCategoryNames.Routed}-006")]
     public async Task Cs0436Suppressor_SuppressesOnlyGeneratedAttributeConflicts()
     {
         var parseOptions = Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default

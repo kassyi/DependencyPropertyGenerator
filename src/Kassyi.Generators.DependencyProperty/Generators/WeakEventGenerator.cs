@@ -8,7 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class WeakEventGenerator : AttributeGeneratorBase<(ClassData Class, EventData Event)>
 {
-    protected override string Id => "WEG";
 
     protected override IReadOnlyList<string> AttributeNames { get; } =
     [

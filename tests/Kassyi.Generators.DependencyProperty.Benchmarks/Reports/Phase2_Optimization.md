@@ -1,6 +1,7 @@
 # Phase 2: StaticConstructor パイプライン最適化 (Phase 2 Report)
 
 - **計測日時**: 2026-07-26
+- **Commit ID**: `3dd2035` (最適化過程)
 - **環境**: AMD Ryzen 9 7900X 4.70GHz / .NET 9.0.18 (X64) / Windows 11
 - **測定対象**: `GeneratorBenchmark` (Wpf, WinUi, Avalonia, Maui)
 
@@ -31,7 +32,17 @@
 
 ---
 
-## 3. 総評
+## 3. 総合スコア推移 (Performance Score)
+
+| 指標 | Baseline (Phase 0) | Phase 1 | Phase 2 (今回) | 変化 (P0比) |
+|---|---|---|---|---|
+| **スループット合計** | 1,288 ops/s | 1,293 ops/s | **1,273 ops/s** | -15 ops/s |
+| **メモリ合計** | 25.87 MB | 25.72 MB | **25.68 MB** | -0.19 MB |
+| **総合スコア (Baseline=1000)** | 1,000 pts | 1,010 pts | **996 pts** | **-4 pts (-0.4%)** |
+
+---
+
+## 4. 総評
 
 - **メモリ消費量の継続的な低減**:
   - すべてのフレームワークにおいて、アロケーションメモリ（Allocated）が着実に減少（MAUI: 2.90MB -> 2.86MB、Avalonia: 2.86MB -> 2.84MB 等）しました。

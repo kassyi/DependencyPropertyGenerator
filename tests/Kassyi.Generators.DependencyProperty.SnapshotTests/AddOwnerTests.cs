@@ -6,7 +6,7 @@ namespace Kassyi.Generators.DependencyProperty.SnapshotTests;
 public class AddOwnerTests : SnapshotTestBase
 {
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Metadata}-002")]
+    [TestCategory($"{TestCategoryNames.Metadata}-003")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -24,7 +24,7 @@ public class AddOwnerTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Metadata}-002B")]
+    [TestCategory($"{TestCategoryNames.Metadata}-004")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]

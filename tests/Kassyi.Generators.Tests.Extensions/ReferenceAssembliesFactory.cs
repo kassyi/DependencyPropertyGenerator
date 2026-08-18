@@ -30,7 +30,8 @@ public static class ReferenceAssembliesFactory
     {
         return framework switch
         {
-            Framework.Wpf or Framework.None => GetBaseWindows(netVersion),
+            Framework.Wpf => GetBaseWindows(netVersion),
+            Framework.None => GetBase(netVersion),
             Framework.Uwp => GetBaseWindows(netVersion).AddPackages(ImmutableArray.Create(
                 new PackageIdentity("Microsoft.NETCore.UniversalWindowsPlatform", "6.2.14"),
                 new PackageIdentity("Microsoft.UI.Xaml", "2.8.6"),

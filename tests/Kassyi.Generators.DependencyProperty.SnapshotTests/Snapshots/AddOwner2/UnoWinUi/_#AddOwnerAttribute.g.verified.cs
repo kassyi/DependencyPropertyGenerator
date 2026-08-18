@@ -1,4 +1,4 @@
-﻿//HintName: AddOwnerAttribute.g.cs
+//HintName: AddOwnerAttribute.g.cs
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Kassyi.Generators.DependencyProperty;
 
-/// <summary>https://docs.microsoft.com/en-us/dotnet/desktop/wpf/advanced/how-to-add-an-owner-type-for-a-dependency-property?view=netframeworkdesktop-4.8</summary>
+/// <summary>Adds an owner type to an existing dependency property using DependencyProperty.AddOwner.</summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 [Conditional("DEPENDENCY_PROPERTY_GENERATOR_ATTRIBUTES")]
 internal sealed class AddOwnerAttribute : Attribute
@@ -136,7 +136,7 @@ public AddOwnerAttribute(
     }
 }
 
-/// <summary>https://docs.microsoft.com/en-us/dotnet/desktop/wpf/advanced/how-to-add-an-owner-type-for-a-dependency-property?view=netframeworkdesktop-4.8</summary>
+/// <summary>Adds an owner type to an existing dependency property using DependencyProperty.AddOwner.</summary>
 /// <typeparam name="T">Type of this dependency property.</typeparam>
 /// <typeparam name="TFromType">The type for which the extension is intended.</typeparam>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

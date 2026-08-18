@@ -8,7 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 [Generator]
 public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, DependencyPropertyData DependencyProperty)>
 {
-    protected override string Id => "AOG";
 
     protected override IReadOnlyList<string> AttributeNames { get; } =
     [
@@ -26,10 +25,8 @@ public class AddOwnerGenerator : AttributeGeneratorBase<(ClassData Class, Depend
     protected override IReadOnlyList<Framework> SupportedFrameworks => [Framework.Avalonia, Framework.Wpf];
 
     protected override (ClassData Class, DependencyPropertyData DependencyProperty)? PrepareData(
-        GeneratorAttributeContext context)
-    {
-        return (context.ClassData, context.GetDependencyPropertyData(isAddOwner: true));
-    }
+        GeneratorAttributeContext context) =>
+        (context.ClassData, context.GetDependencyPropertyData(isAddOwner: true));
 
     protected override string GenerateSource((ClassData Class, DependencyPropertyData DependencyProperty) data) =>
         SourceGenerationHelper.GenerateDependencyPropertySource(data.Class, data.DependencyProperty);

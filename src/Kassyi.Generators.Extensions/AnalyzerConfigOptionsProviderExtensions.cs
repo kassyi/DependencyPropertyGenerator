@@ -87,49 +87,5 @@ public static class AnalyzerConfigOptionsProviderExtensions
         return string.Equals(isBuildingProjectValue, "false", StringComparison.OrdinalIgnoreCase)
             || string.Equals(isDesignTimeBuildValue, "true", StringComparison.OrdinalIgnoreCase);
     }
-
-    /// <summary>Attempts to recognize the target UI framework from MSBuild properties and compilation constants.</summary>
-    public static Framework TryRecognizeFramework(this AnalyzerConfigOptionsProvider provider)
-    {
-        provider = provider ?? throw new ArgumentNullException(nameof(provider));
-
-        var constants = provider.GetGlobalOption("DefineConstants", prefix: "RecognizeFramework") ?? string.Empty;
-        var useWpf = bool.Parse(provider.GetGlobalOption("UseWPF") ?? bool.FalseString) || constants.Contains("HAS_WPF");
-        var useWinUi = bool.Parse(provider.GetGlobalOption("UseWinUI") ?? bool.FalseString) || constants.Contains("HAS_WINUI");
-        var useMaui = bool.Parse(provider.GetGlobalOption("UseMaui") ?? bool.FalseString) || constants.Contains("HAS_MAUI");
-        var useUwp = constants.Contains("WINDOWS_UWP") || constants.Contains("HAS_UWP");
-        var useUno = constants.Contains("HAS_UNO");
-        var useUnoWinUi = constants.Contains("HAS_UNO_WINUI") || (constants.Contains("HAS_UNO") && constants.Contains("HAS_WINUI"));
-        var useAvalonia = constants.Contains("HAS_AVALONIA");
-
-        return (useWpf, useUwp, useWinUi, useUno, useUnoWinUi, useAvalonia, useMaui) switch
-        {
-            (_, _, _, _, _, _, true) => Framework.Maui,
-            (_, _, _, _, _, true, _) => Framework.Avalonia,
-            (_, _, _, _, true, _, _) => Framework.UnoWinUi,
-            (_, _, _, true, _, _, _) => Framework.Uno,
-            (_, _, true, _, _, _, _) => Framework.WinUi,
-            (_, true, _, _, _, _, _) => Framework.Uwp,
-            (true, _, _, _, _, _, _) => Framework.Wpf,
-            _ => Framework.None,
-        };
-    }
-
-    /// <summary>Error message template displayed when the UI framework cannot be recognized.</summary>
-    public const string FrameworkIsNotRecognized = @"Framework is not recognized.
-You can explicitly specify the framework by setting one of the following constants in your project:
-HAS_WPF, HAS_WINUI, HAS_UWP, HAS_UNO, HAS_UNO_WINUI, HAS_AVALONIA, HAS_MAUI";
-
-    /// <summary>Recognizes the target UI framework or throws <see cref="InvalidOperationException"/> if unrecognized.</summary>
-    public static Framework RecognizeFramework(this AnalyzerConfigOptionsProvider provider)
-    {
-        var framework = provider.TryRecognizeFramework();
-        if (framework != Framework.None)
-        {
-            return framework;
-        }
-
-        throw new InvalidOperationException(FrameworkIsNotRecognized);
-    }
 }
 

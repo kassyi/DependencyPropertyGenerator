@@ -62,16 +62,14 @@ public static class SyntaxValueProviderExtensions
         {
             var innerExpr = invocation.ArgumentList.Arguments[0].Expression;
 
-            // nameof(MyProperty)
-            if (innerExpr is IdentifierNameSyntax innerId)
+            switch (innerExpr)
             {
-                return innerId.Identifier.ValueText;
-            }
-            
-            // nameof(MyClass.MyProperty)
-            if (innerExpr is MemberAccessExpressionSyntax memberAccess)
-            {
-                return memberAccess.Name.Identifier.ValueText;
+                // nameof(MyProperty)
+                case IdentifierNameSyntax innerId:
+                    return innerId.Identifier.ValueText;
+                // nameof(MyClass.MyProperty)
+                case MemberAccessExpressionSyntax memberAccess:
+                    return memberAccess.Name.Identifier.ValueText;
             }
         }
 

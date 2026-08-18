@@ -8,9 +8,6 @@ namespace Kassyi.Generators.DependencyProperty.Generators;
 public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     where TData : struct
 {
-    /// <summary>Gets the unique identifier for the generator used in diagnostic reporting.</summary>
-    protected abstract string Id { get; }
-    
     /// <summary>Gets the metadata names of the attributes that trigger this generator.</summary>
     protected abstract IReadOnlyList<string> AttributeNames { get; }
 
@@ -35,7 +32,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
     {
         context.RegisterPostInitializationOutput(PostInitialize);
 
-        var framework = context.DetectFramework();
+        var framework = context.DetectFramework(Diagnostics.DiagnosticDescriptors.FrameworkNotRecognized);
         var version = context.DetectVersion();
         var supported = SupportedFrameworks;
 
@@ -51,8 +48,7 @@ public abstract class AttributeGeneratorBase<TData> : IIncrementalGenerator
                 }
                 return PrepareData(multiCtx.ForFirstAttribute());
             },
-            GetSourceCode,
-            Id);
+            GetSourceCode);
     }
 
     private FileWithName GetSourceCode(TData data)

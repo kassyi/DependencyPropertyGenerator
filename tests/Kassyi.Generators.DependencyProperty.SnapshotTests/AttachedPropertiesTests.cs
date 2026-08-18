@@ -128,7 +128,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Attached}-008")]
+    [TestCategory($"{TestCategoryNames.Attached}-007")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -149,7 +149,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Attached}-009")]
+    [TestCategory($"{TestCategoryNames.Attached}-008")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -170,7 +170,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Attached}-010")]
+    [TestCategory($"{TestCategoryNames.Attached}-009")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -188,7 +188,7 @@ public class AttachedPropertyTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Attached}-011")]
+    [TestCategory($"{TestCategoryNames.Attached}-010")]
     [DataRow(Framework.Wpf)]
     public async Task AttachedOnChangedWithEventArgs(Framework framework)
     {

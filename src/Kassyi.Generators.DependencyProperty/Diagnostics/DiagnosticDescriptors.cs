@@ -1,3 +1,4 @@
+using Kassyi.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Kassyi.Generators.DependencyProperty.Diagnostics;
@@ -6,6 +7,15 @@ namespace Kassyi.Generators.DependencyProperty.Diagnostics;
 internal static class DiagnosticDescriptors
 {
     private const string UsageCategory = "Usage";
+
+    /// <summary>DPG0000: The UI framework could not be recognized.</summary>
+    public static readonly DiagnosticDescriptor FrameworkNotRecognized = new(
+        id: "DPG0000",
+        title: "Framework is not recognized",
+        messageFormat: FrameworkExtensions.FrameworkIsNotRecognized,
+        category: UsageCategory,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 
     /// <summary>DPG0001: The specified OnChanged method was not found or has an unsupported signature.</summary>
     public static readonly DiagnosticDescriptor CustomOnChangedMethodNotFoundOrUnsupported = new(
@@ -70,6 +80,24 @@ internal static class DiagnosticDescriptors
         id: "DPG0008",
         title: "Invalid Default Value Expression",
         messageFormat: "The DefaultValueExpression '{0}' contains invalid syntax and could not be parsed",
+        category: UsageCategory,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    /// <summary>DPG0009: Suppresses CS0436 warnings caused by duplicate internal attribute helper types across friend assemblies.</summary>
+    public static readonly SuppressionDescriptor Cs0436DuplicateInternalAttributeHelper = new(
+        id: "DPG0009",
+        suppressedDiagnosticId: "CS0436",
+        justification: "DependencyPropertyGenerator emits internal attribute helper types into each compilation; duplicate friend-assembly copies are expected.");
+
+    /// <summary>Unique diagnostic identifier for unhandled generator exceptions.</summary>
+    public const string UnhandledExceptionId = "DPG9999";
+
+    /// <summary>DPG9999: An unhandled exception occurred during source generation.</summary>
+    public static readonly DiagnosticDescriptor UnhandledException = new(
+        id: UnhandledExceptionId,
+        title: "Unhandled Generator Exception",
+        messageFormat: "An unhandled exception occurred during source generation: {0}",
         category: UsageCategory,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);

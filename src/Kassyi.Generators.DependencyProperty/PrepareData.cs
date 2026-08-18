@@ -68,11 +68,7 @@ public static class PrepareData
 
     /// <summary>Resolves the fully qualified name of the DependencyObject base class for the target UI framework.</summary>
     internal static string GenerateDependencyObjectType(Framework framework) =>
-        framework == Framework.Maui ? "Microsoft.Maui.Controls.BindableObject" :
-        framework == Framework.Avalonia ? "Avalonia.AvaloniaObject" :
-        framework == Framework.Wpf ? "System.Windows.DependencyObject" :
-        framework is Framework.Uwp or Framework.Uno ? "Windows.UI.Xaml.DependencyObject" :
-        "Microsoft.UI.Xaml.DependencyObject";
+        framework.GetBaseObjectTypeFullName();
 
     /// <summary>Extracts routed or weak event model data from attribute definitions.</summary>
     public static EventData GetEventData(this AttributeData attribute, bool isStaticClass)

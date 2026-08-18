@@ -58,6 +58,21 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 4. Generic type constraints with file-scoped namespace
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-004")]
+    [DataRow(Framework.Wpf)]
+    public Task GlobalNamespace_MultipleGenerics(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
+
+            [DependencyProperty("MyProperty", typeof(object))]
+            internal partial class MyControl<T1, T2> : {{FrameworkTestData.GetUserControl(framework)}}
+            {
+            }
+            """, framework);
+    }
+
+    // 6. Nested class (asymmetric: non-generic outer, generic inner)
+    [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-005")]
     [DataRow(Framework.Wpf)]
     public Task Generic_Class_WithConstraints(Framework framework)
@@ -75,20 +90,36 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 5. Global namespace x multiple generic type parameters
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-004")]
+    [TestCategory($"{TestCategoryNames.Language}-006")]
     [DataRow(Framework.Wpf)]
-    public Task GlobalNamespace_MultipleGenerics(Framework framework)
+    public Task Generic_AllowsRefStruct(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + $$"""
 
             [DependencyProperty("MyProperty", typeof(object))]
-            internal partial class MyControl<T1, T2> : {{FrameworkTestData.GetUserControl(framework)}}
+            public partial class MyControl<T> : {{FrameworkTestData.GetUserControl(framework)}} where T : allows ref struct
             {
             }
+            """, framework, skipE2EValidation: true);
+    }
+
+    // 21. 'new' modifier for shadowing inherited properties
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-007")]
+    [DataRow(Framework.Wpf)]
+    public Task SameNameClass_DifferentGenerics(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            [DependencyProperty("MyProperty1", typeof(int))]
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}} { }
+
+            [DependencyProperty("MyProperty2", typeof(string))]
+            public partial class MyControl<T> : UserControl { }
             """, framework);
     }
 
-    // 6. Nested class (asymmetric: non-generic outer, generic inner)
+    // 12. Conflict avoidance for identically named types across different namespaces
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-008")]
     [DataRow(Framework.Wpf)]
@@ -167,89 +198,20 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 11. Type arity distinction for identically named types in the same namespace
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-007")]
+    [TestCategory($"{TestCategoryNames.Language}-012")]
     [DataRow(Framework.Wpf)]
-    public Task SameNameClass_DifferentGenerics(Framework framework)
+    public Task Primary_Constructor(Framework framework)
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
-            [DependencyProperty("MyProperty1", typeof(int))]
-            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}} { }
-
-            [DependencyProperty("MyProperty2", typeof(string))]
-            public partial class MyControl<T> : UserControl { }
-            """, framework);
-    }
-
-    // 12. Conflict avoidance for identically named types across different namespaces
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-029")]
-    [DataRow(Framework.Wpf)]
-    public Task SameNameClass_DifferentNamespace(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
-
-            namespace NamespaceA
+            [DependencyProperty("MyProperty", typeof(int))]
+            public partial class MyControl(int myParam) : {{FrameworkTestData.GetUserControl(framework)}}
             {
-                [DependencyProperty("MyPropertyA", typeof(int))]
-                public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}} { }
-            }
-
-            namespace NamespaceB
-            {
-                [DependencyProperty("MyPropertyB", typeof(string))]
-                public partial class MyControl : UserControl { }
             }
             """, framework);
     }
 
-    // 13. Nullable context with record class
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-027")]
-    [DataRow(Framework.Wpf)]
-    public Task Nullable_Context_Record(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>("#nullable enable\n" + GetHeader(framework, "Controls") + $$"""
-
-            [AttachedDependencyProperty("MyProperty", typeof(string))]
-            public partial record MyControl
-            {
-            }
-            """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
-    }
-
-    // 14. Attached property on static class (non-instantiable)
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-028")]
-    [DataRow(Framework.Wpf)]
-    public Task AttachedProperty_StaticClass(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
-
-            [AttachedDependencyProperty("MyProperty", typeof(int), BrowsableForType = typeof(global::System.Windows.{{FrameworkTestData.GetDependencyObject(framework)}}))]
-            public static partial class MyHelper
-            {
-            }
-            """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
-    }
-
-    // 15. Modifier order normalization invariance
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-020")]
-    [DataRow(Framework.Wpf)]
-    public Task Modifiers_Order_Normalization(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
-
-            [DependencyProperty("MyProperty1", typeof(int))]
-            sealed public partial class ControlA : {{FrameworkTestData.GetUserControl(framework)}} { }
-
-            [DependencyProperty("MyProperty2", typeof(int))]
-            public sealed partial class ControlB : UserControl { }
-            """, framework);
-    }
-
-    // 16. C# 13 partial property conflict
+    // 19. Keyword escaping
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-013")]
     [DataRow(Framework.Wpf)]
@@ -267,71 +229,21 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 18. Primary constructor support
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-012")]
-    [DataRow(Framework.Wpf)]
-    public Task Primary_Constructor(Framework framework)
+    [TestCategory($"{TestCategoryNames.Language}-014")]
+    [DataRow(Framework.Maui)]
+    public Task RequiredInit_Properties(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Runtime.CompilerServices") + $$"""
 
             [DependencyProperty("MyProperty", typeof(int))]
-            public partial class MyControl(int myParam) : {{FrameworkTestData.GetUserControl(framework)}}
-            {
-            }
-            """, framework);
-    }
-
-    // 19. Keyword escaping
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-019")]
-    [DataRow(Framework.Wpf)]
-    public Task Keyword_Escaping(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
-
-            [DependencyProperty("@event", typeof(string))]
-            [DependencyProperty("class", typeof(int))]
             public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
-            }
-            """, framework);
-    }
-
-    // 20. Generic constraint with 'allows ref struct' (anti-constraint)
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-006")]
-    [DataRow(Framework.Wpf)]
-    public Task Generic_AllowsRefStruct(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System") + $$"""
-
-            [DependencyProperty("MyProperty", typeof(object))]
-            public partial class MyControl<T> : {{FrameworkTestData.GetUserControl(framework)}} where T : allows ref struct
-            {
+                public required partial int MyProperty { get; init; }
             }
             """, framework, skipE2EValidation: true);
     }
 
-    // 21. 'new' modifier for shadowing inherited properties
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-022")]
-    [DataRow(Framework.Wpf)]
-    public Task Inheritance_NewModifier(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
-
-            public partial class ParentControl : {{FrameworkTestData.GetUserControl(framework)}}
-            {
-                public string MyProperty { get; set; } = string.Empty;
-            }
-
-            [DependencyProperty("MyProperty", typeof(int))]
-            public partial class MyControl : ParentControl
-            {
-            }
-            """, framework);
-    }
-
-    // 22. Collection expression default value
+    // 24. Tuple property type
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-015")]
     [DataRow(Framework.Wpf)]
@@ -348,21 +260,23 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 23. Properties with 'required' and 'init' accessors
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-014")]
-    [DataRow(Framework.Maui)]
-    public Task RequiredInit_Properties(Framework framework)
+    [TestCategory($"{TestCategoryNames.Language}-016")]
+    [DataRow(Framework.Wpf)]
+    public Task TargetTypedNewDefaultValueExpression(Framework framework)
     {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls", "System.Runtime.CompilerServices") + $$"""
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
-            [DependencyProperty("MyProperty", typeof(int))]
+            public record struct MyProfile(double A, double B);
+
+            [DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]
+            [DependencyProperty<MyProfile?>("NullableProfile", DefaultValueExpression = "new      (1.5, 48.0)")]
             public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
-                public required partial int MyProperty { get; init; }
             }
-            """, framework, skipE2EValidation: true);
+            """, framework);
     }
 
-    // 24. Tuple property type
+    // 29. ComponentModel attributes propagation
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-017")]
     [DataRow(Framework.Wpf)]
@@ -394,49 +308,37 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 27. required partial property with init
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-030")]
+    [TestCategory($"{TestCategoryNames.Language}-019")]
     [DataRow(Framework.Wpf)]
-    public Task Partial_Property_Required_Init(Framework framework)
-    {
-        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
-
-            namespace System.Runtime.CompilerServices
-            {
-                internal static class IsExternalInit {}
-                public class RequiredMemberAttribute : Attribute {}
-                public class CompilerFeatureRequiredAttribute : Attribute { public CompilerFeatureRequiredAttribute(string name) {} }
-            }
-
-            namespace Kassyi.Generators.DependencyProperty.IntegrationTests
-            {
-                [DependencyProperty("MyProperty", typeof(int))]
-                public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
-                {
-                    public required partial int MyProperty { get; init; }
-                }
-            }
-            """, framework);
-    }
-
-    // 28. Target-typed new default value expression
-    [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-016")]
-    [DataRow(Framework.Wpf)]
-    public Task TargetTypedNewDefaultValueExpression(Framework framework)
+    public Task Keyword_Escaping(Framework framework)
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
-            public record struct MyProfile(double A, double B);
-
-            [DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]
-            [DependencyProperty<MyProfile?>("NullableProfile", DefaultValueExpression = "new      (1.5, 48.0)")]
+            [DependencyProperty("@event", typeof(string))]
+            [DependencyProperty("class", typeof(int))]
             public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
             }
             """, framework);
     }
 
-    // 29. ComponentModel attributes propagation
+    // 20. Generic constraint with 'allows ref struct' (anti-constraint)
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-020")]
+    [DataRow(Framework.Wpf)]
+    public Task Modifiers_Order_Normalization(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            [DependencyProperty("MyProperty1", typeof(int))]
+            sealed public partial class ControlA : {{FrameworkTestData.GetUserControl(framework)}} { }
+
+            [DependencyProperty("MyProperty2", typeof(int))]
+            public sealed partial class ControlB : UserControl { }
+            """, framework);
+    }
+
+    // 16. C# 13 partial property conflict
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-021")]
     [DataRow(Framework.Wpf)]
@@ -465,6 +367,26 @@ public class LanguageFeatureTests : SnapshotTestBase
     }
 
     // 30. Validate and Coerce callbacks
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-022")]
+    [DataRow(Framework.Wpf)]
+    public Task Inheritance_NewModifier(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            public partial class ParentControl : {{FrameworkTestData.GetUserControl(framework)}}
+            {
+                public string MyProperty { get; set; } = string.Empty;
+            }
+
+            [DependencyProperty("MyProperty", typeof(int))]
+            public partial class MyControl : ParentControl
+            {
+            }
+            """, framework);
+    }
+
+    // 22. Collection expression default value
     [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-023")]
     [DataRow(Framework.Wpf)]
@@ -506,7 +428,7 @@ public class LanguageFeatureTests : SnapshotTestBase
     }
 
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-023B")]
+    [TestCategory($"{TestCategoryNames.Language}-024")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -547,7 +469,7 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 31. Avalonia specific affects flags
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-024")]
+    [TestCategory($"{TestCategoryNames.Language}-025")]
     public Task AvaloniaAffectsFlags()
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(Framework.Avalonia, "Controls", "Media") + $$"""
@@ -561,7 +483,7 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 32. BindEvents static constructor generation
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-025")]
+    [TestCategory($"{TestCategoryNames.Language}-026")]
     [DataRow(Framework.Wpf)]
     [DataRow(Framework.Uno)]
     [DataRow(Framework.UnoWinUi)]
@@ -588,7 +510,7 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 33. Multidimensional array property type
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-026")]
+    [TestCategory($"{TestCategoryNames.Language}-027")]
     [DataRow(Framework.Wpf)]
     public Task MultidimensionalArray(Framework framework)
     {
@@ -603,7 +525,85 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 34. Unmanaged function pointer
     [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-028")]
+    [DataRow(Framework.Wpf)]
+    public Task Nullable_Context_Record(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>("#nullable enable\n" + GetHeader(framework, "Controls") + $$"""
+
+            [AttachedDependencyProperty("MyProperty", typeof(string))]
+            public partial record MyControl
+            {
+            }
+            """, framework, additionalGenerators: new AttachedDependencyPropertyGenerator());
+    }
+
+    // 14. Attached property on static class (non-instantiable)
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-029")]
+    [DataRow(Framework.Wpf)]
+    public Task AttachedProperty_StaticClass(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            [AttachedDependencyProperty("MyProperty", typeof(int), BrowsableForType = typeof(global::System.Windows.{{FrameworkTestData.GetDependencyObject(framework)}}))]
+            public static partial class MyHelper
+            {
+            }
+            """, framework, skipE2EValidation: true, additionalGenerators: new AttachedDependencyPropertyGenerator());
+    }
+
+    // 15. Modifier order normalization invariance
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-030")]
+    [DataRow(Framework.Wpf)]
+    public Task SameNameClass_DifferentNamespace(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
+
+            namespace NamespaceA
+            {
+                [DependencyProperty("MyPropertyA", typeof(int))]
+                public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}} { }
+            }
+
+            namespace NamespaceB
+            {
+                [DependencyProperty("MyPropertyB", typeof(string))]
+                public partial class MyControl : UserControl { }
+            }
+            """, framework);
+    }
+
+    // 13. Nullable context with record class
+    [TestMethod]
     [TestCategory($"{TestCategoryNames.Language}-031")]
+    [DataRow(Framework.Wpf)]
+    public Task Partial_Property_Required_Init(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, nullable: true, @namespace: false, "Controls") + $$"""
+
+            namespace System.Runtime.CompilerServices
+            {
+                internal static class IsExternalInit {}
+                public class RequiredMemberAttribute : Attribute {}
+                public class CompilerFeatureRequiredAttribute : Attribute { public CompilerFeatureRequiredAttribute(string name) {} }
+            }
+
+            namespace Kassyi.Generators.DependencyProperty.IntegrationTests
+            {
+                [DependencyProperty("MyProperty", typeof(int))]
+                public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
+                {
+                    public required partial int MyProperty { get; init; }
+                }
+            }
+            """, framework);
+    }
+
+    // 28. Target-typed new default value expression
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-032")]
     [DataRow(Framework.Wpf)]
     public Task Unmanaged_Function_Pointer(Framework framework)
     {
@@ -618,7 +618,7 @@ public class LanguageFeatureTests : SnapshotTestBase
 
     // 35. String default value with expressions (nameof, string.Concat) should not emit DPG0004
     [TestMethod]
-    [TestCategory($"{TestCategoryNames.Language}-032")]
+    [TestCategory($"{TestCategoryNames.Language}-033")]
     [DataRow(Framework.Wpf)]
     public Task String_DefaultValue_Expressions(Framework framework)
     {
@@ -632,6 +632,21 @@ public class LanguageFeatureTests : SnapshotTestBase
             }
             """, framework);
     }
+
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-034")]
+    [DataRow(Framework.Wpf)]
+    public Task SemanticType_NullableGenerics_ShouldNotBeReplaced(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            using System.Collections.Generic;
+
+            [DependencyProperty<List<int?>>("MyProperty")]
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
+            {
+                partial void OnMyPropertyChanged(List<int?>? newValue) { }
+            }
+            """, framework);
+    }
 }
-
-
