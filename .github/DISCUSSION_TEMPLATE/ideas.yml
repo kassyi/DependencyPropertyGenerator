@@ -1,0 +1,68 @@
+name: "💡 Ideas & Feature Requests"
+description: "Share and discuss architectural ideas, syntax suggestions, or new UI framework support."
+title: "[Idea]: "
+labels: ["enhancement", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an idea to make **DependencyPropertyGenerator** even better!
+        Please describe your proposal, its motivation, and expected syntax design.
+
+  - type: textarea
+    id: problem-or-motivation
+    attributes:
+      label: "Problem or Motivation"
+      description: "Is your feature request related to a problem or a missing capability in your UI workflow?"
+      placeholder: "e.g., When writing custom controls in Avalonia v12, writing direct properties requires repetitive boilerplate..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target-framework
+    attributes:
+      label: "Target UI Framework"
+      description: "Which UI framework(s) would benefit from this idea?"
+      multiple: true
+      options:
+        - "All / Framework-Agnostic"
+        - "WPF"
+        - "Avalonia UI"
+        - ".NET MAUI"
+        - "Uno Platform (WinUI / UWP)"
+        - "WinUI 3 / Windows App SDK"
+        - "New Framework Support"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-syntax
+    attributes:
+      label: "Proposed Syntax / Usage (User Code)"
+      description: "What would the C# code and attributes look like?"
+      render: csharp
+      placeholder: |
+        [DependencyProperty<int>("CustomProperty", SomeNewOption = true)]
+        public partial class MyControl : UserControl
+        {
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-generated-code
+    attributes:
+      label: "Expected Generated Output"
+      description: "What C# code should the source generator emit into the `.g.cs` file?"
+      render: csharp
+      placeholder: |
+        // Emitted code structure
+    validations:
+      required: false
+
+  - type: textarea
+    id: performance-considerations
+    attributes:
+      label: "Performance & Zero-Allocation Considerations (Optional)"
+      description: "Any specific notes regarding incremental caching, Roslyn extraction efficiency, or zero-allocation code synthesis?"
+      placeholder: "e.g., Can be represented as a pure primitive flag in DependencyPropertyData DTO without allocating new objects..."
