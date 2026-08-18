@@ -9,47 +9,61 @@
 [![Performance](https://img.shields.io/badge/performance-+30%25_faster-brightgreen.svg)](#zero-allocation--no-ide-lag)
 [![Zero Gen2 GC](https://img.shields.io/badge/Gen2_GC-zero_alloc-blue.svg)](#zero-allocation--no-ide-lag)
 
-A zero-allocation, relentlessly optimized Dependency Property generator engineered for dotnet/runtime-scale codebases, delivering microsecond-tier throughput. Supports WPF, UWP, WinUI, Uno, Avalonia, and MAUI.
+The `Kassyi.Generators.DependencyProperty` is a zero-allocation, highly optimized generator for dotnet/runtime-scale codebases. It delivers microsecond-tier throughput and supports WPF, UWP, WinUI, Uno, Avalonia, and MAUI.
 
 ## Why this fork?
 
-This project is an independently maintained, highly optimized fork of [`HavenDV/DependencyPropertyGenerator`](https://github.com/HavenDV/DependencyPropertyGenerator). The generator has been fundamentally re-architected to eliminate critical silent failures ([HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165): unhandled callback signatures silently emitting `propertyChangedCallback: null` without warning), enforce strict compile-time type safety, and deliver **up to 30% faster code generation (+62.4% overall throughput score) with zero Gen2 allocations**.
+This project is an independently maintained, highly optimized fork of [`HavenDV/DependencyPropertyGenerator`](https://github.com/HavenDV/DependencyPropertyGenerator). We re-architected the generator to eliminate critical silent failures (such as emitting `propertyChangedCallback: null` without warnings, as seen in [HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165)), enforce strict compile-time type safety, and deliver **up to 30% faster code generation (+62.4% overall throughput score) with zero Gen2 allocations**.
 
 ### Zero-Allocation & No IDE Lag
 
-Incremental source generators run continuously in the background on every keystroke. Heavy memory allocations in the original generator often triggered Gen2 garbage collections, causing noticeable typing lag in IDEs like Visual Studio and JetBrains Rider.
+Incremental source generators run continuously in the background on every keystroke. Heavy memory allocations in the original generator triggered Gen2 garbage collections, causing noticeable typing lag in IDEs like Visual Studio and JetBrains Rider.
 
-We rebuilt the pipeline from the ground up for maximum throughput:
+We rebuilt the pipeline to maximize throughput:
 
-- **Zero Gen2 GC Pauses**: Memory allocations are slashed by ~22% (saving ~650 KB per class), entirely eliminating Gen2 GC pauses.
-- **Optimized Pipeline**: Replaced expensive AST round-trips (`NormalizeWhitespace()`) with direct, zero-allocation formatted streaming.
-- **Zero-Allocation Scopes**: Implemented custom `ref struct` scope handlers (`ClassScope`) to eliminate intermediate string allocations.
-- **Declarative Rule Engine**: Shifted from runtime string parsing to compile-time semantic flag analysis.
+- **Zero Gen2 GC Pauses**: Reduces memory allocations by ~22% (saving ~650 KB per class) to completely eliminate Gen2 GC pauses.
+- **Optimized Pipeline**: Replaces expensive AST round-trips (`NormalizeWhitespace()`) with direct, zero-allocation formatted streaming.
+- **Zero-Allocation Scopes**: Implements custom `ref struct` scope handlers (`ClassScope`) to prevent intermediate string allocations.
+- **Declarative Rule Engine**: Shifts from runtime string parsing to compile-time semantic flag analysis.
 
 <details>
 <summary><b>View Benchmark Results (AMD Ryzen 9 7900X / .NET 9)</b></summary>
 
-| Metric                            | Upstream Baseline       | This Fork (Phase 5)         | Improvement                     |
-| :-------------------------------- | :---------------------- | :-------------------------- | :------------------------------ |
-| **Initial Generation (WPF)**      | 5.349 ms (2.87 MB)      | **3.729 ms (2.22 MB)**      | **-30.3% time / -22.6% memory** |
-| **Incremental Gen (WPF)**         | 7.176 ms (3.59 MB)      | **5.663 ms (2.93 MB)**      | **-21.1% time / -18.4% memory** |
-| **Initial Generation (WinUI)**    | 5.720 ms (2.81 MB)      | **4.192 ms (2.21 MB)**      | **-26.7% time / -21.4% memory** |
-| **Incremental Gen (WinUI)**       | 7.412 ms (3.55 MB)      | **5.847 ms (2.94 MB)**      | **-21.1% time / -17.2% memory** |
-| **Initial Generation (Avalonia)** | 5.282 ms (2.86 MB)      | **4.137 ms (2.25 MB)**      | **-21.7% time / -21.3% memory** |
-| **Incremental Gen (Avalonia)**    | 7.103 ms (3.62 MB)      | **5.665 ms (3.01 MB)**      | **-20.2% time / -16.9% memory** |
-| **Initial Generation (MAUI)**     | 5.533 ms (2.90 MB)      | **4.147 ms (2.26 MB)**      | **-25.0% time / -22.1% memory** |
-| **Incremental Gen (MAUI)**        | 7.095 ms (3.67 MB)      | **5.843 ms (3.02 MB)**      | **-17.6% time / -17.7% memory** |
-| **Overall Throughput Score**      | 1,000 pts (1,288 ops/s) | **1,624 pts (1,685 ops/s)** | **+62.4% Score Boost** 🚀       |
-| **GC Gen2 (Initial)**             | 7.8–15.6 / 1k ops       | **0.0000 / 1k ops**         | **100% Eliminated**             |
+| Metric | Upstream Baseline | This Fork (Phase 5) | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Initial Generation (WPF)** | 5.349 ms (2.87 MB) | **3.729 ms (2.22 MB)** | **-30.3% time / -22.6% memory** |
+| **Incremental Gen (WPF)** | 7.176 ms (3.59 MB) | **5.663 ms (2.93 MB)** | **-21.1% time / -18.4% memory** |
+| **Initial Generation (WinUI)** | 5.720 ms (2.81 MB) | **4.192 ms (2.21 MB)** | **-26.7% time / -21.4% memory** |
+| **Incremental Gen (WinUI)** | 7.412 ms (3.55 MB) | **5.847 ms (2.94 MB)** | **-21.1% time / -17.2% memory** |
+| **Initial Generation (Avalonia)** | 5.282 ms (2.86 MB) | **4.137 ms (2.25 MB)** | **-21.7% time / -21.3% memory** |
+| **Incremental Gen (Avalonia)** | 7.103 ms (3.62 MB) | **5.665 ms (3.01 MB)** | **-20.2% time / -16.9% memory** |
+| **Initial Generation (MAUI)** | 5.533 ms (2.90 MB) | **4.147 ms (2.26 MB)** | **-25.0% time / -22.1% memory** |
+| **Incremental Gen (MAUI)** | 7.095 ms (3.67 MB) | **5.843 ms (3.02 MB)** | **-17.6% time / -17.7% memory** |
+| **Overall Throughput Score** | 1,000 pts (1,288 ops/s) | **1,624 pts (1,685 ops/s)** | **+62.4% Score Boost** 🚀 |
+| **GC Gen2 (Initial)** | 7.8–15.6 / 1k ops | **0.0000 / 1k ops** | **100% Eliminated** |
 
 </details>
 
 ### Critical Bug Fixes & Enhancements
 
-- **Strict Type Safety (`#error DPG0001` / `DPG0007`)**: The original generator silently failed ([HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165)), emitting `propertyChangedCallback: null` without diagnostic errors if the `OnChanged` callback signature was invalid. This fork immediately surfaces signature mismatches as compile-time diagnostic errors.
-- **Target-Typed `new(...)` Expansion**: Seamlessly supports C# 9.0+ `DefaultValueExpression = "new(...)"`. The generator automatically expands these into fully-qualified constructors, removing the need for verbose type names.
-- **Modular Architecture**: Decoupled monolithic logic into modular framework strategies (WPF, WinUI, Avalonia, etc.), significantly improving maintainability and testability.
-- **Package Renaming**: Published as `Kassyi.Generators.DependencyProperty` to provide a clean namespace and prevent collisions.
+- **Strict Type Safety (`#error DPG0001` / `DPG0007`)**: The original generator silently failed ([HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165)), emitting `propertyChangedCallback: null` without diagnostic errors for invalid `OnChanged` callbacks. This fork immediately surfaces signature mismatches as compile-time errors.
+- **Target-Typed `new(...)` Expansion**: Supports C# 9.0+ `DefaultValueExpression = "new(...)"`. The generator automatically expands these into fully-qualified constructors to remove verbose type names.
+- **Modular Architecture**: Decouples monolithic logic into modular framework strategies (WPF, WinUI, Avalonia, etc.) to improve maintainability and testability.
+- **Package Renaming**: Publishes as `Kassyi.Generators.DependencyProperty` to provide a clean namespace and prevent collisions.
+
+## Installation
+
+Install the package via the .NET CLI or NuGet Package Manager:
+
+```bash
+dotnet add package Kassyi.Generators.DependencyProperty
+```
+
+Or add the package reference directly to your `.csproj`:
+
+```xml
+<PackageReference Include="Kassyi.Generators.DependencyProperty" Version="0.1.0" PrivateAssets="all" />
+```
 
 ## Quick Start
 
@@ -145,7 +159,7 @@ public readonly record struct Data(int Value);
 
 ### Event Binding
 
-The generator can automatically manage properties tied to UI events:
+The generator automatically manages properties tied to UI events:
 
 ```csharp
 [AttachedDependencyProperty<object, Grid>("BindEventProperty", BindEvent = nameof(Grid.MouseWheel), DefaultValueExpression = "new()")]
@@ -169,6 +183,31 @@ The easiest way to generate XML documentation is via the `Description` property:
 ```
 
 This adds the `[Description]` attribute and embeds the text directly into the generated XML docs. For raw XML, use the `XmlDocumentation` or `PropertyXmlDocumentation` properties.
+
+<details>
+<summary><b>View Generated XML Documentation Code</b></summary>
+
+```csharp
+/// <summary>
+/// Identifies the <see cref="IsSpinning"/> dependency property.<br/>
+/// Default value: default(bool)
+/// </summary>
+public static readonly global::System.Windows.DependencyProperty IsSpinningProperty =
+    global::System.Windows.DependencyProperty.Register(...);
+
+/// <summary>
+/// Indicates whether the element is spinning.<br/>
+/// Default value: default(bool)
+/// </summary>
+[global::System.ComponentModel.Description("Indicates whether the element is spinning.")]
+public bool IsSpinning
+{
+    get => (bool)GetValue(IsSpinningProperty);
+    set => SetValue(IsSpinningProperty, value);
+}
+```
+
+</details>
 
 ### Platform Setup
 
@@ -205,13 +244,14 @@ For UWP, WinUI, and Uno, the generator creates a `RegisterPropertyChangedCallbac
 
 For in-depth architectural blueprints, zero-allocation design patterns, complexity models, and framework-specific code generation rules, refer to our official specifications:
 
-- **[Specification Index (spec/en/intro.md)](./spec/en/intro.md)**
-    - **[01. Foundation & Domain](./spec/en/01_foundation_and_domain.md)**: DTO models & target platforms
-    - **[02. Pipeline & Architecture](./spec/en/02_pipeline_architecture.md)**: Change detection & incremental caching
-    - **[03. Code Synthesis & Performance](./spec/en/03_synthesis_and_performance.md)**: `SourceWriter`, callback resolution & optimization rules
-    - **[04. Complexity Model](./spec/en/04_mathematical_model.md)**: Mathematical analysis of worst-case time & memory
-    - **[05. Test Specification](./spec/en/05_test_specification.md)**: Combinatorial test matrix & verification criteria
-    - **[06. Framework Strategies](./spec/en/06_framework_strategies.md)**: Platform-specific API mappings
+- **[Specification Overview & Index (spec/en/intro.md)](./spec/en/intro.md)**
+    - **[01. Foundation and Domain](./spec/en/01_foundation_and_domain.md)**: DTO structure and supported platforms
+    - **[02. Pipeline Architecture](./spec/en/02_pipeline_architecture.md)**: Delta extraction & cache equivalence strategies
+    - **[03. Code Synthesis & Performance Optimization](./spec/en/03_synthesis_and_performance.md)**: `SourceWriter`, callback resolution, & guidelines
+    - **[04. Mathematical Model](./spec/en/04_mathematical_model.md)**: Worst-case time & memory complexity analysis
+    - **[05. Test Specification](./spec/en/05_test_specification.md)**: Orthogonal matrix and quality assurance criteria
+    - **[06. Framework Strategies](./spec/en/06_framework_strategies.md)**: Platform-specific API mapping
+    - **[07. Diagnostics Reference](./spec/en/07_diagnostics_reference.md)**: Causes and solutions for `DPG0000`-`DPG9999`
 
 ## Support & Feedback
 
