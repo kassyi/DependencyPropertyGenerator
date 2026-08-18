@@ -4,11 +4,11 @@
 
 ## I. Incremental Pipeline Architecture
 
-The Roslyn Incremental Source Generator (ISG) processes compiler events through a LINQ-like pipeline, transforming syntax inputs into source code outputs. This architecture utilizes the `Kassyi.Generators.Extensions` pipeline helpers to enforce lean, zero-allocation transformations.
+The Roslyn Incremental Source Generator (ISG) processes compiler events using a LINQ-like pipeline to transform syntax inputs into source code. This architecture leverages the `Kassyi.Generators.Extensions` pipeline helpers to ensure lean, zero-allocation transformations.
 
 ### Overall Pipeline Flow
 
-The following sequence diagram illustrates the overall pipeline topology. It depicts the chaining of Roslyn's `IncrementalValuesProvider<T>` APIs. For detailed internal class interactions, refer to Section III.
+The following sequence diagram illustrates the pipeline topology, showing the chained Roslyn `IncrementalValuesProvider<T>` APIs. Section III details the internal class interactions.
 
 ```mermaid
 sequenceDiagram
@@ -34,45 +34,45 @@ sequenceDiagram
 
 ### Pipeline Phases
 
-The pipeline execution strictly adheres to the following ordered phases:
+The pipeline executes in the following strict order:
 
-1. **Syntax Filtering:** The pipeline leverages Roslyn 4.3.0+ APIs (`ForAttributeWithMetadataName`) to strictly filter candidate class and record declarations decorated with specific attributes.
-2. **Data Extraction:** The `PrepareData.cs` and `DependencyPropertyDataBuilder` components project raw `AttributeData` and `INamedTypeSymbol` instances into structured DTOs. This phase utilizes dictionary lookups to cache `NamedArguments` and deduplicates syntax searches to maximize extraction velocity.
-3. **Equality Evaluation and Caching:** The Roslyn ISG driver evaluates the output of the `Select` phase. If the output strictly matches the previous compilation step (`Equals` returns `true`), it bypasses downstream source generation and relies on the incremental cache.
-4. **Source Code Generation:** The generator invokes this phase exclusively on cache misses. It transforms DTOs into output `.g.cs` source strings utilizing `SourceWriter` scope management to enforce zero-allocation formatting.
+1. **Syntax Filtering:** The generator uses Roslyn 4.3.0+ APIs (`ForAttributeWithMetadataName`) to filter classes and records decorated with specific attributes.
+2. **Data Extraction:** The `PrepareData.cs` and `DependencyPropertyDataBuilder` components project raw `AttributeData` and `INamedTypeSymbol` instances into structured DTOs. This phase uses dictionary lookups to cache `NamedArguments` and deduplicates syntax searches to maximize extraction speed.
+3. **Equality Evaluation and Caching:** The Roslyn ISG driver evaluates the `Select` phase output. If the output matches the previous compilation step (`Equals` returns `true`), the pipeline bypasses source generation and uses the incremental cache.
+4. **Source Code Generation:** The generator runs this phase only on cache misses. It transforms DTOs into `.g.cs` source strings, using `SourceWriter` scope management to guarantee zero-allocation formatting.
 
 ---
 
 ## II. Model Equality and Caching Strategy
 
-The most critical performance metric for an incremental generator is the incremental cache hit ratio. The data models (`DependencyPropertyData`, `ClassData`, `EventData`, and sub-records) enforce strict value equality semantics to optimize this ratio.
+The incremental cache hit ratio is the most critical performance metric for an ISG. The data models (`DependencyPropertyData`, `ClassData`, `EventData`, and sub-records) enforce strict value equality to optimize this ratio.
 
 > [!IMPORTANT]
 > **Deep Value Comparison with `readonly record struct`**
-> All models are declared as `readonly record struct`. This mandates the C# compiler to automatically generate value-based `Equals()` and `GetHashCode()` implementations that compare all underlying fields, ensuring strict value equality.
+> You must declare all models as `readonly record struct`. This forces the C# compiler to generate value-based `Equals()` and `GetHashCode()` implementations that compare all underlying fields, ensuring strict value equality.
 
 > [!WARNING]
 > **Structural Collection Equality with `EquatableArray<T>`**
-> In Roslyn pipelines, standard arrays (`T[]`) or `ImmutableArray<T>` evaluate equality by reference. Constructing a new array instance with identical items causes reference equality checks to fail, which invalidates the compiler cache.
+> In Roslyn pipelines, standard arrays (`T[]`) or `ImmutableArray<T>` evaluate equality by reference. Creating a new array instance with identical items fails reference equality checks, invalidating the compiler cache.
 
-To mitigate cache invalidation, collections must be wrapped in `EquatableArray<T>`:
+To prevent cache invalidation, wrap all collections in `EquatableArray<T>`:
 - **Usage**: `BindEvents: bindEvents.AsEquatableArray()`
-- **Impact**: This wrapper enforces deep element-by-element equality (`SequenceEqual`). It completely suppresses redundant source regeneration when the underlying data is semantically identical.
+- **Impact**: This wrapper enforces deep element-by-element equality (`SequenceEqual`), completely suppressing redundant source regeneration for semantically identical data.
 
 ---
 
 ## III. Detailed Class Relationships and Data Flow
 
-This section dictates the specific responsibilities of the internal generator classes and enforces the data flow constraints through the Roslyn pipeline.
+This section defines the responsibilities of internal generator classes and the data flow constraints within the Roslyn pipeline.
 
 ### 1. Overall Architecture and Class Relationships
 
-The generator's internal architecture is segmented into four primary layers:
+The generator's internal architecture consists of four primary layers:
 
-1. **Generators:** Registered within the Roslyn pipeline to orchestrate the execution flow.
-2. **Data Extraction:** Responsible for extracting strictly necessary metadata from the Syntax and Semantic models.
-3. **Models (DTOs):** Equatable value-type records that persist the extracted data.
-4. **Sources:** Receives the DTOs and emits the synthesized C# source code strings.
+1. **Generators:** Registered in the Roslyn pipeline to orchestrate execution flow.
+2. **Data Extraction:** Extracts necessary metadata from the Syntax and Semantic models.
+3. **Models (DTOs):** Equatable value-type records that store extracted data.
+4. **Sources:** Receives DTOs and emits synthesized C# source code strings.
 
 #### 1. Single Attribute Generator Base and Implementations (`AttributeGeneratorBase`)
 
@@ -121,7 +121,6 @@ classDiagram
         #PrepareData() Tuple~ClassData, EventData~
     }
 
-
     MultiAttributeGeneratorBase <|-- AttachedDependencyPropertyGenerator
     MultiAttributeGeneratorBase <|-- WeakEventGenerator
 ```
@@ -130,7 +129,6 @@ classDiagram
 
 ```mermaid
 classDiagram
-
     %% Data Extraction
     class PrepareData {
         <<static>>
@@ -180,17 +178,17 @@ classDiagram
 
 ### Roles of Major Classes
 
-- **`AttributeGeneratorBase<TData>` / `MultiAttributeGeneratorBase<TData>`:** The core foundation of the incremental generator. It encapsulates standard logic encompassing syntax filtering, target framework pre-validation (`SupportedFrameworks`), context encapsulation (`GeneratorAttributeContext`), and source output. 
-- **`PrepareData`:** The entry point for the extraction process. It exposes extension methods to isolate pure data from complex Roslyn objects like `INamedTypeSymbol`.
-- **`DependencyPropertyDataBuilder`:** An internal builder that executes the step-by-step extraction logic specific to dependency properties, such as matching callback signatures and extracting XML documentation.
-- **`ClassData` / `DependencyPropertyData`:** Data models persisting extracted metadata. To maximize caching performance, they are structurally implemented as `readonly record struct`.
-- **`SourceGenerationHelper`:** Static helpers that consume data models and assemble the final C# source code utilizing `SourceWriter`.
+- **`AttributeGeneratorBase<TData>` / `MultiAttributeGeneratorBase<TData>`:** The core foundation of the generator. It encapsulates standard logic for syntax filtering, target framework validation (`SupportedFrameworks`), context encapsulation (`GeneratorAttributeContext`), and source output. 
+- **`PrepareData`:** The extraction process entry point. It provides extension methods to isolate pure data from complex Roslyn objects like `INamedTypeSymbol`.
+- **`DependencyPropertyDataBuilder`:** An internal builder executing step-by-step extraction logic for dependency properties, such as matching callback signatures and extracting XML documentation.
+- **`ClassData` / `DependencyPropertyData`:** Data models storing extracted metadata. They are implemented as `readonly record struct` to maximize caching performance.
+- **`SourceGenerationHelper`:** Static helpers that consume data models and assemble the final C# source code using `SourceWriter`.
 
 ---
 
 ### 2. Detailed Data Flow and Internal Method Calls
 
-The following diagram traces the specific internal execution flow. It illustrates the sequence from detecting a `[DependencyProperty]` attribute to generating the final C# code, explicitly detailing instantiated classes and invoked methods.
+The following diagram traces the internal execution flow, illustrating the sequence from detecting a `[DependencyProperty]` attribute to generating the final C# code, and detailing instantiated classes and invoked methods.
 
 #### 1. Data Extraction Phase (Extraction)
 
@@ -249,11 +247,11 @@ sequenceDiagram
 
 > [!CAUTION]
 > **Early Detachment of Roslyn Types (Symbol/Syntax)**
-> Roslyn's syntax trees (`SyntaxNode`) and semantic models (`ISymbol`) are massive objects. Retaining them causes severe memory leaks and fundamentally breaks the compiler's incremental caching. The `PrepareData` layer must forcefully convert them into primitive C# types (DTOs) and detach from them immediately.
+> Roslyn syntax trees (`SyntaxNode`) and semantic models (`ISymbol`) are massive objects. Retaining them causes memory leaks and breaks incremental caching. The `PrepareData` layer must immediately convert them into primitive C# types (DTOs) and discard the original references.
 
 > [!TIP]
 > **Zero-Allocation Generation Phase**
-> Once the extraction phase passes the data to `SourceGenerationHelper`, all Roslyn analysis must cease. The generation phase acts as a pure function that rapidly synthesizes text via `SourceWriter` based solely on the provided DTOs.
+> Once the extraction phase passes data to `SourceGenerationHelper`, all Roslyn analysis must stop. The generation phase acts as a pure function, rapidly synthesizing text via `SourceWriter` based entirely on the provided DTOs.
 
 **Extensibility and Separation of Concerns**
-By isolating the framework-specific mapping logic (within `DependencyPropertyDataBuilder`) from the source generation logic (`SourceGenerationHelper`), the architecture ensures that modifications to parsing logic do not contaminate the zero-allocation generation layer.
+By isolating framework-specific mapping logic (in `DependencyPropertyDataBuilder`) from source generation logic (`SourceGenerationHelper`), the architecture ensures that parsing modifications do not affect the zero-allocation generation layer.
