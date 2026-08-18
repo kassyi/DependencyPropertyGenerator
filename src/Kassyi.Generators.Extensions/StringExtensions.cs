@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -89,46 +90,49 @@ public static class StringExtensions
     public static string RemoveBlankLinesWhereOnlyWhitespaces(this string text)
     {
         text = text ?? throw new ArgumentNullException(nameof(text));
+        if (text.Length == 0)
+        {
+            return text;
+        }
 
-        text = text.NormalizeLineEndings();
         var builder = new StringBuilder(text.Length);
-        
         var start = 0;
+
         while (start < text.Length)
         {
-            var index = text.IndexOf('\n', start);
-            var end = index >= 0 ? index : text.Length;
-            
-            var isWhiteSpaceLine = true;
-            for (var i = start; i < end; i++)
-            {
-                if (char.IsWhiteSpace(text[i]))
-                {
-                    continue;
-                }
+            var end = start;
+            var isAllWhiteSpace = true;
 
-                isWhiteSpaceLine = false;
-                break;
+            // [WHY] Inspect line characters and whitespace status in a single pass without pre-normalizing line endings.
+            while (end < text.Length && text[end] != '\r' && text[end] != '\n')
+            {
+                if (isAllWhiteSpace && !char.IsWhiteSpace(text[end]))
+                {
+                    isAllWhiteSpace = false;
+                }
+                end++;
             }
 
-            if (!isWhiteSpaceLine || start == end)
+            // Keep pure empty lines (start == end) or lines containing non-whitespace characters
+            if (!isAllWhiteSpace || start == end)
             {
                 builder.Append(text, start, end - start);
-                if (index >= 0)
+                if (end < text.Length)
                 {
                     builder.Append('\n');
                 }
             }
 
-            if (index < 0)
+            // Skip past \r\n, \r, or \n
+            if (end < text.Length && text[end] == '\r' && end + 1 < text.Length && text[end + 1] == '\n')
             {
-                break;
+                end++;
             }
 
-            start = index + 1;
+            start = end + 1;
         }
 
-        return builder.ToString();
+        return builder.Length == text.Length ? text : builder.ToString();
     }
 
     /// <summary>Normalizes line endings to the specified newline sequence (defaulting to '\n').</summary>
@@ -183,7 +187,7 @@ public static class StringExtensions
     }
 
 #if NET8_0_OR_GREATER
-    private static readonly System.Buffers.SearchValues<char> s_specialChars = System.Buffers.SearchValues.Create("<>, _@");
+    private static readonly SearchValues<char> s_specialChars = SearchValues.Create("<>, _@");
 #else
     private static readonly char[] s_specialChars = ['<', '>', ',', ' ', '_', '@'];
 #endif

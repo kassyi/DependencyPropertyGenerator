@@ -15,9 +15,12 @@ public sealed class Cs0436Suppressor : DiagnosticSuppressor
 
     public override void ReportSuppressions(SuppressionAnalysisContext context)
     {
-        foreach (var diagnostic in context.ReportedDiagnostics.Where(ShouldSuppress))
+        foreach (var diagnostic in context.ReportedDiagnostics)
         {
-            context.ReportSuppression(Suppression.Create(DiagnosticDescriptors.Cs0436DuplicateInternalAttributeHelper, diagnostic));
+            if (ShouldSuppress(diagnostic))
+            {
+                context.ReportSuppression(Suppression.Create(DiagnosticDescriptors.Cs0436DuplicateInternalAttributeHelper, diagnostic));
+            }
         }
     }
 
