@@ -2,47 +2,68 @@
 
 [English](../en/01_foundation_and_domain.md) | [日本語](./01_foundation_and_domain.md) | [目次 (Intro)](./intro.md)
 
-## Ⅰ. 目的と設計思想
+## Ⅰ. 目的とアーキテクチャ
 
-**DependencyPropertyGenerator** (`Kassyi.Generators.DependencyProperty`) の主な目的は、WPF, UWP, WinUI, Uno, Avalonia, MAUI といった複数の .NET UI フレームワーク向けに、**ボイラープレート（定型コード）が多くなりがちな依存関係プロパティ (DependencyProperty) やルーティングイベント (RoutedEvent)、弱イベント (WeakEvent) の宣言コードを自動生成** することです。
+**DependencyPropertyGenerator** (`Kassyi.Generators.DependencyProperty`) の主要なアーキテクチャ目標は、複数の .NET UI フレームワーク間で、依存関係プロパティ (DependencyProperty)、ルーティングイベント (RoutedEvent)、および弱イベント (WeakEvent) の宣言に関わるボイラープレートコードを自律的に合成することである。サポート対象のプラットフォームには、WPF、UWP、WinUI、Uno、Avalonia、および MAUI が含まれる。
 
-### モジュール構成
+### モジュールトポロジー
 
-- **`Kassyi.Generators.DependencyProperty`**: Roslyn Incremental Source Generator 本体。コンパイル時にメタデータを抽出し、各UIフレームワーク向けのソースコードを生成します。
-- **`Kassyi.Generators.DependencyProperty.Attributes`**: 開発者がコード上で付与する宣言属性 (`[DependencyProperty]`, `[AttachedDependencyProperty]`, `[RoutedEvent]`, `[WeakEvent]` 等) を提供します。
-- **`Kassyi.Generators.Extensions`**: ソースジェネレーター共通のゼロアロケーション基盤（`SourceWriter`, `EquatableArray<T>`, `HashCode` 等）を提供するコアライブラリです。
+- **`Kassyi.Generators.DependencyProperty`**: Roslyn Incremental Source Generator のコア。このモジュールはコンパイル時にメタデータを抽出し、フレームワーク固有の C# ソースコードを出力する。
+- **`Kassyi.Generators.DependencyProperty.Attributes`**: 開発者が利用する宣言属性（`[DependencyProperty]`, `[AttachedDependencyProperty]`, `[RoutedEvent]` 等）を提供する。
+- **`Kassyi.Generators.Extensions`**: ゼロアロケーション基盤を提供するコアユーティリティライブラリ。ソースジェネレーター間で共有される `SourceWriter` や `EquatableArray<T>` などのプリミティブを公開する。
 
-### 技術的制約と方針
+### 技術的制約とポリシー
 
-- **Roslyn Incremental Source Generator**: `.NET Standard 2.0` をターゲットとし、インクリメンタルな変更（タイピング中の差分評価）に対して高速かつ超低アロケーションで動作します。
-- **ターゲットUIフレームワークの吸収**: 複数のUIフレームワーク（`Framework` enum等で管理）ごとのAPI差異をジェネレーター内部で吸収し、単一の属性 (`[DependencyProperty]`) から適切なコードを生成します。
-- **`partial` クラスとメソッドの活用**: 生成するコードを `partial` クラスとして追加し、イベントフック用の `partial void On...Changed(...)` メソッドなどを提供します。
+- **インクリメンタル評価:** Roslyn Incremental Source Generator は `.NET Standard 2.0` をターゲットとする。IDE 内でのインクリメンタルな評価時には、高速な実行と超低メモリ割り当てが強制される。
+- **フレームワークの抽象化:** ジェネレーターは、UI フレームワーク間の API の差異を内部で抽象化する。単一の統合された属性 (`[DependencyProperty]`) から、プラットフォームに準拠したコードを合成する。
+- **Partial クラスによる合成:** 生成されたコードは `partial` クラス修飾子を介して追加されるようアーキテクチャで規定されている。イベントフック専用として `partial void On...Changed(...)` メソッドを公開する。
+
+### 対応 C# 言語バージョンおよびランタイム要件
+
+| 区分                        | バージョン            | 概要およびサポート機能                                                               |
+| :-------------------------- | :-------------------- | :----------------------------------------------------------------------------------- |
+| **ジェネレーター実行基盤**  | **.NET Standard 2.0** | Roslyn 4.3.0 以降（.NET SDK 6.0 ～ 9.0+）環境のコンパイラパイプラインで動作。        |
+| **最小サポート (Base)**     | **C# 8.0+**           | 非ジェネリック属性宣言（`typeof(T)` 引数）、null 許容参照型、標準プロパティの出力。  |
+| **式展開サポート**          | **C# 9.0+**           | `DefaultValueExpression = "new(...)"` による Target-Typed new 式の自動展開。         |
+| **ジェネリック属性 (推奨)** | **C# 11.0+**          | `[DependencyProperty<T>]`, `[RoutedEvent<T>]` などのジェネリック属性構文。           |
+| **最新機能サポート**        | **C# 13.0 (Preview)** | `partial` プロパティ構文 (`public partial int Value { get; set; }`) の完全サポート。 |
 
 ---
 
 ## Ⅱ. ユビキタス言語辞書
 
-ジェネレーターのコードベース全体で統一している用語定義です。
+以下の用語は、ジェネレーターの内部コードベースを厳格に管理する。
 
-| 日本語名                     | 英語名 (Code)                | 説明                                                                             |
-| ---------------------------- | ---------------------------- | -------------------------------------------------------------------------------- |
-| UIフレームワーク             | `Framework`                  | WPF, Uno, MAUI, Avalonia, WinUI などの対象プラットフォームを識別する列挙型       |
-| 依存関係プロパティ           | `DependencyProperty`         | UIコントロールが状態を保持・データバインディングするための拡張プロパティ機構     |
-| 添付プロパティ               | `AttachedDependencyProperty` | 子要素から親要素などに値を設定するためのプロパティ機構                           |
-| クラスデータ                 | `ClassData`                  | 属性を付与した対象クラス（オーナー）のメタデータ（型名、名前空間、修飾子等）     |
-| プロパティデータ             | `DependencyPropertyData`     | 生成するプロパティ固有の完全なメタデータを統括するルートデータモデル             |
-| コンポーネントモデルデータ   | `ComponentModelData`         | `[Description]`, `[Category]`, `[TypeConverter]` などのUI/デザイナ向けメタデータ |
-| フレームワークメタデータ     | `FrameworkMetadataData`      | WPF等の `FrameworkPropertyMetadataOptions`（`AffectsMeasure` 等）の設定          |
-| バリデーション＆コールバック | `ValidationAndCallbackData`  | 検証、型強制 (Coerce)、変更コールバック (`OnChanged`) などの振る舞い設定         |
-| イベントデータ               | `EventData`                  | ルーティングイベント (`RoutedEvent`) や弱イベント (`WeakEvent`) のメタデータ     |
+| 日本語名                     | 英語名 (Code)                | 説明                                                                               |
+| ---------------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
+| UIフレームワーク             | `Framework`                  | WPF, Uno, MAUI, Avalonia, WinUI などの対象プラットフォームを識別する列挙型。       |
+| 依存関係プロパティ           | `DependencyProperty`         | UIコントロールが状態を保持・データバインディングするための拡張プロパティ機構。     |
+| 添付プロパティ               | `AttachedDependencyProperty` | 子要素から親要素などに値を設定するためのプロパティ機構。                           |
+| クラスデータ                 | `ClassData`                  | 属性が付与された対象クラス（オーナー）のメタデータ。                               |
+| プロパティデータ             | `DependencyPropertyData`     | 生成対象プロパティの完全なメタデータをカプセル化するルートデータモデル。           |
+| コンポーネントモデルデータ   | `ComponentModelData`         | `[Description]`, `[Category]`, `[TypeConverter]` などのUI/デザイナ向けメタデータ。 |
+| フレームワークメタデータ     | `FrameworkMetadataData`      | WPF等の `FrameworkPropertyMetadataOptions`（`AffectsMeasure` 等）の設定。          |
+| バリデーション＆コールバック | `ValidationAndCallbackData`  | 検証、型強制 (Coerce)、変更コールバック (`OnChanged`) などの振る舞い構成。         |
+| イベントデータ               | `EventData`                  | ルーティングイベント (`RoutedEvent`) や弱イベント (`WeakEvent`) のメタデータ。     |
 
 ---
 
-## Ⅲ. ドメインデータ構造仕様
+## Ⅲ. ドメインデータモデル
 
-Roslynの `SyntaxNode` や `ISymbol` から情報を抽出し、インクリメンタル・パイプラインを流れる純粋なデータモデル (DTO) です。これらは **キャッシュ効率を高めるため、すべて `readonly record struct` で定義され、`IEquatable<T>` による厳密な等価性比較をサポート** します。
+これらの純粋なデータモデル (DTO) は、Roslyn の `SyntaxNode` および `ISymbol` 構造体から抽出され、インクリメンタルパイプラインを流れる。
+
+> [!IMPORTANT]
+> キャッシュ効率を最大化するため、すべての DTO は厳密に `readonly record struct` として定義されなければならない。また、`IEquatable<T>` を介した厳密な等価性比較をサポートする必要がある。
+
+### データ構造の設計方針
+
+- **責務による構造的分離:** `DependencyPropertyData` は多数のプロパティをカプセル化する。これは、コンポーネントモデル、UI メタデータ、XML ドキュメント、バリデーション/コールバック、およびプロパティ修飾子フラグ (`PropertyModifiersData`) を含むサブモデルに分割される。この分割により保守性が強制される。
+- **早期プリミティブ投影:** Roslyn の `INamedTypeSymbol` や `IPropertySymbol` インスタンスを直接保持するとメモリリークが発生し、ジェネレーターのキャッシュが無効化される。これらのインスタンスは、抽出フェーズ中にプリミティブ型（`string`, `bool` など）または `EquatableArray<T>` に投影されなければならない。
+- **コレクションの等価性:** コレクションデータ（`BindEvents`, `ParentClasses` など）は `EquatableArray<T>` を利用しなければならない。このカスタム実装は、標準の配列や `List<T>` とは異なり構造的な等価性を保証する。
 
 ### メインデータモデル (DTO)
+
+#### 1. クラスおよびイベント構造モデル (`ClassData` / `EventData`)
 
 ```mermaid
 classDiagram
@@ -52,31 +73,89 @@ classDiagram
         +string Name
         +string FullName
         +string Type
+        +string Keyword
+        +string NameWithTypeParameters
         +string Modifiers
         +string Version
         +bool IsStatic
         +Framework Framework
+        +EquatableArray~ParentClassData~ ParentClasses
     }
 
+    class ParentClassData {
+        <<readonly record struct>>
+        +string Keyword
+        +string NameWithTypeParameters
+        +string Modifiers
+    }
+
+    class EventData {
+        <<readonly record struct>>
+        +string Name
+        +string Strategy
+        +string Type
+        +bool IsValueType
+        +bool IsAttached
+        +string? Description
+        +string? Category
+        +string? XmlDocumentation
+        +string? EventXmlDocumentation
+        +bool WinRtEvents
+    }
+
+    ClassData *-- ParentClassData
+```
+
+#### 2. 依存関係プロパティのコア構造 (`DependencyPropertyData`)
+
+```mermaid
+classDiagram
+    direction LR
     class DependencyPropertyData {
         <<readonly record struct>>
         +string Name
         +string Version
         +string Type
         +string ShortType
-        +bool IsValueType
-        +bool IsSpecialType
         +string? DefaultValue
         +string? DefaultValueDocumentation
+        +Framework Framework
+        +PropertyModifiersData Modifiers
+        %% Other SubModels (ComponentModel, FrameworkMetadata, etc.)
+    }
+
+    class PropertyModifiersData {
+        <<readonly record struct>>
+        +bool IsValueType
+        +bool IsSpecialType
         +bool IsReadOnly
         +bool IsDirect
         +bool IsAttached
         +bool IsAddOwner
+        +bool IsPartialProperty
+        +bool HidesBaseProperty
+        +bool IsRequired
+        +bool IsInitOnly
+    }
+    DependencyPropertyData *-- PropertyModifiersData
+```
+
+#### 3. フレームワークメタデータと UI コンポーネントモデル
+
+```mermaid
+classDiagram
+    direction LR
+    class DependencyPropertyData {
+        <<readonly record struct>>
+        +string Name
+        +string Version
+        +string Type
+        +string ShortType
+        +string? DefaultValue
+        +string? DefaultValueDocumentation
         +Framework Framework
-        +ComponentModelData ComponentModel
-        +FrameworkMetadataData FrameworkMetadata
-        +XmlDocumentationData XmlDocumentation
-        +ValidationAndCallbackData ValidationAndCallbacks
+        +PropertyModifiersData Modifiers
+        %% Other SubModels (ComponentModel, FrameworkMetadata, etc.)
     }
 
     class ComponentModelData {
@@ -109,6 +188,27 @@ classDiagram
         +string? DefaultUpdateSourceTrigger
         +string? DefaultBindingMode
     }
+    DependencyPropertyData *-- ComponentModelData
+    DependencyPropertyData *-- FrameworkMetadataData
+```
+
+#### 4. バリデーション、コールバック、XML ドキュメント
+
+```mermaid
+classDiagram
+    direction LR
+    class DependencyPropertyData {
+        <<readonly record struct>>
+        +string Name
+        +string Version
+        +string Type
+        +string ShortType
+        +string? DefaultValue
+        +string? DefaultValueDocumentation
+        +Framework Framework
+        +PropertyModifiersData Modifiers
+        %% Other SubModels (ComponentModel, FrameworkMetadata, etc.)
+    }
 
     class ValidationAndCallbackData {
         <<readonly record struct>>
@@ -128,85 +228,71 @@ classDiagram
         +string? GetterXmlDocumentation
         +string? SetterXmlDocumentation
     }
-
-    class EventData {
-        <<readonly record struct>>
-        +string Name
-        +string Strategy
-        +string Type
-        +bool IsValueType
-        +bool IsAttached
-        +string? Description
-        +string? Category
-        +string? XmlDocumentation
-        +string? EventXmlDocumentation
-        +bool WinRtEvents
-    }
-
-    DependencyPropertyData *-- ComponentModelData
-    DependencyPropertyData *-- FrameworkMetadataData
-    DependencyPropertyData *-- XmlDocumentationData
     DependencyPropertyData *-- ValidationAndCallbackData
+    DependencyPropertyData *-- XmlDocumentationData
 ```
-
-### データ構造の設計方針
-
-- **責務ごとの構造化分割**: 多数のプロパティを持つ `DependencyPropertyData` を、コンポーネントモデル、UIメタデータ、XMLドキュメント、バリデーション＆コールバックといったサブモデルに構造化し、保守性と見通しを向上させます。
-- **プリミティブ型への早期変換**: Roslynの `INamedTypeSymbol` や `IPropertySymbol` をそのまま保持するとメモリリークを引き起こし、ジェネレーターのキャッシュが無効化されます。そのため、抽出フェーズで必ず `string` や `bool` などのプリミティブ型、または `EquatableArray<T>` に変換します。
-- **コレクションの等価性**: コレクションデータ（例: `BindEvents`）は標準の配列や `List<T>` ではなく、構造的な等価性を保証する `EquatableArray<T>` (カスタム実装) を使用します。
 
 ---
 
-## Ⅳ. エージェント向け DTO マッピング仕様 (Agentic Ground Truth)
+## Ⅳ. エージェント向け DTO マッピング仕様
 
-外部エージェントが自律的にコードを調査・修正できるように、C# の属性とそれがどの DTO プロパティに格納されるかの対応関係を明文化します。バグ修正や機能追加時には、このマッピング仕様を地図として活用してください。
+本セクションでは、C# 属性と対応する Data Transfer Object プロパティ間の明示的なマッピングを文書化する。
 
-ユーザーコード上で `[DependencyProperty<string>("Text", DefaultValue = "Foo")]` のように定義された属性は、`DependencyPropertyDataBuilder.cs` や `PrepareData.cs` でパースされ、以下の DTO フィールドに格納されます。
+> [!TIP]
+> 自律型エージェントおよび AI アシスタントは、バグ修正や機能追加を実行する際、この仕様を正とすべき構造的な基準として利用しなければならない。
 
-#### ルート属性 (DependencyPropertyData)
+### `[DependencyProperty]` 属性マッピング
 
-| 属性引数 / プロパティ    | DTO の格納先フィールド                | 型        | 説明                                                                           |
-| ------------------------ | ------------------------------------- | --------- | ------------------------------------------------------------------------------ |
-| 型引数 `<T>`             | `DependencyPropertyData.Type`         | `string`  | プロパティの型（完全修飾名展開済み）                                           |
-| 第1引数 (コンストラクタ) | `DependencyPropertyData.Name`         | `string`  | 依存関係プロパティの名称 (例: `"Text"`)                                        |
-| `DefaultValue`           | `DependencyPropertyData.DefaultValue` | `string?` | 文字列リテラル等のデフォルト値                                                 |
-| `DefaultValueExpression` | `DependencyPropertyData.DefaultValue` | `string?` | `new()` 等のC#式によるデフォルト値                                             |
-| `IsReadOnly`             | `DependencyPropertyData.IsReadOnly`   | `bool`    | `true` の場合 `DependencyPropertyKey` を使って読み取り専用プロパティとして生成 |
-| `IsDirect`               | `DependencyPropertyData.IsDirect`     | `bool`    | Avalonia固有。直接プロパティとして生成するか                                   |
+ユーザーコード内で定義された属性は、`DependencyPropertyDataBuilder.cs` および `PrepareData.cs` によってパースされる。抽出されたデータは対応する DTO フィールドに格納される。
 
-#### ValidationAndCallbackData へのマッピング
+#### 1. ルート属性 (DependencyPropertyData & PropertyModifiersData)
 
-| 属性引数 / プロパティ | DTO の格納先フィールド              | 型                       | 説明                                          |
-| --------------------- | ----------------------------------- | ------------------------ | --------------------------------------------- |
-| `OnChanged`           | `ValidationAndCallbacks.OnChanged`  | `string`                 | カスタム変更コールバックメソッド名            |
-| `Coerce`              | `ValidationAndCallbacks.Coerce`     | `bool`                   | 強制値補正 (CoerceValueCallback) を生成するか |
-| `Validate`            | `ValidationAndCallbacks.Validate`   | `bool`                   | 検証 (ValidateValueCallback) を生成するか     |
-| `BindEvents`          | `ValidationAndCallbacks.BindEvents` | `EquatableArray<string>` | 結線するコントロールイベントのリスト          |
+| 属性引数 / プロパティ       | DTO の格納先フィールド                | 型        | 説明                                                                                 |
+| --------------------------- | ------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| 型引数 `<T>`                | `DependencyPropertyData.Type`         | `string`  | プロパティの型（完全修飾名展開済み）。                                               |
+| 第1引数 (コンストラクタ)    | `DependencyPropertyData.Name`         | `string`  | 依存関係プロパティの名称 (例: `"Text"`)。                                            |
+| `DefaultValue`              | `DependencyPropertyData.DefaultValue` | `string?` | 文字列リテラル等のデフォルト値。                                                     |
+| `DefaultValueExpression`    | `DependencyPropertyData.DefaultValue` | `string?` | `new()` 等のC#式によるデフォルト値。                                                 |
+| `IsReadOnly`                | `Modifiers.IsReadOnly`                | `bool`    | `true` の場合 `DependencyPropertyKey` を使って読み取り専用プロパティとして生成する。 |
+| `IsDirect`                  | `Modifiers.IsDirect`                  | `bool`    | Avalonia固有。直接プロパティとして生成するかを示す。                                 |
+| (プロパティの partial 修飾) | `Modifiers.IsPartialProperty`         | `bool`    | C# 13 partial プロパティ構文のターゲットであるかを示す。                             |
+| (new 修飾の付与)            | `Modifiers.HidesBaseProperty`         | `bool`    | 基本クラスのメンバーを明示的に隠蔽する (`new` キーワード)。                          |
 
-#### ComponentModelData へのマッピング
+#### 2. ValidationAndCallbackData へのマッピング
 
-| 属性引数 / プロパティ | DTO の格納先フィールド         | 型        | 説明                                        |
-| --------------------- | ------------------------------ | --------- | ------------------------------------------- |
-| `Description`         | `ComponentModel.Description`   | `string?` | `[Description("...")]` 属性として生成される |
-| `Category`            | `ComponentModel.Category`      | `string?` | `[Category("...")]` 属性として生成される    |
-| `TypeConverter`       | `ComponentModel.TypeConverter` | `string?` | `typeof(...)` 形式のコンバータ型名          |
+| 属性引数 / プロパティ | DTO の格納先フィールド              | 型                       | 説明                                                  |
+| --------------------- | ----------------------------------- | ------------------------ | ----------------------------------------------------- |
+| `OnChanged`           | `ValidationAndCallbacks.OnChanged`  | `string`                 | カスタム変更コールバックメソッド名。                  |
+| `Coerce`              | `ValidationAndCallbacks.Coerce`     | `bool`                   | 強制値補正 (CoerceValueCallback) を生成するかを示す。 |
+| `Validate`            | `ValidationAndCallbacks.Validate`   | `bool`                   | 検証 (ValidateValueCallback) を生成するかを示す。     |
+| `BindEvents`          | `ValidationAndCallbacks.BindEvents` | `EquatableArray<string>` | 結線するコントロールイベントのリスト。                |
 
-#### FrameworkMetadataData へのマッピング (WPF用)
+#### 3. ComponentModelData へのマッピング
 
-| 属性引数 / プロパティ  | DTO の格納先フィールド                 | 型        | 説明                                          |
-| ---------------------- | -------------------------------------- | --------- | --------------------------------------------- |
-| `AffectsMeasure`       | `FrameworkMetadata.AffectsMeasure`     | `bool`    | メジャーパス（再レイアウト）を要求するか      |
-| `AffectsRender`        | `FrameworkMetadata.AffectsRender`      | `bool`    | レンダリングパス（再描画）を要求するか        |
-| `BindsTwoWayByDefault` | `FrameworkMetadata.DefaultBindingMode` | `string?` | デフォルトのバインディングモード (`TwoWay`等) |
+| 属性引数 / プロパティ | DTO の格納先フィールド         | 型        | 説明                                          |
+| --------------------- | ------------------------------ | --------- | --------------------------------------------- |
+| `Description`         | `ComponentModel.Description`   | `string?` | `[Description("...")]` 属性として生成される。 |
+| `Category`            | `ComponentModel.Category`      | `string?` | `[Category("...")]` 属性として生成される。    |
+| `TypeConverter`       | `ComponentModel.TypeConverter` | `string?` | `typeof(...)` 形式のコンバータ型名。          |
 
-### 2. `ClassData` へのマッピング
+#### 4. FrameworkMetadataData へのマッピング (WPF用)
 
-プロパティが定義されている親クラス自体の情報は、`ClassData` に抽出されます。
+| 属性引数 / プロパティ  | DTO の格納先フィールド                 | 型        | 説明                                            |
+| ---------------------- | -------------------------------------- | --------- | ----------------------------------------------- |
+| `AffectsMeasure`       | `FrameworkMetadata.AffectsMeasure`     | `bool`    | メジャーパス（再レイアウト）を要求する。        |
+| `AffectsRender`        | `FrameworkMetadata.AffectsRender`      | `bool`    | レンダリングパス（再描画）を要求する。          |
+| `BindsTwoWayByDefault` | `FrameworkMetadata.DefaultBindingMode` | `string?` | デフォルトのバインディングモード (`TwoWay`等)。 |
 
-| 抽出対象           | DTO の格納先フィールド             | 型          | 説明                                               |
-| ------------------ | ---------------------------------- | ----------- | -------------------------------------------------- |
-| 所属する名前空間   | `ClassData.Namespace`              | `string`    | 外側の `namespace` 宣言                            |
-| クラス名           | `ClassData.Name`                   | `string`    | `partial class` や `partial record` の名前         |
-| 型引数             | `ClassData.NameWithTypeParameters` | `string`    | `MyControl<T>` などのジェネリクス型シグネチャ      |
-| クラスの修飾子     | `ClassData.Modifiers`              | `string`    | `public`, `internal`, `sealed` などの修飾子        |
-| `[AvaloniaObject]` | `ClassData.Framework`              | `Framework` | 利用フレームワークの種別 (`WPF`, `Avalonia`, etc.) |
+### `ClassData` および `ParentClassData` へのマッピング
+
+親クラスのコンテキストを定義する情報は、`ClassData` および `ParentClasses` レコードに抽出される。
+
+| 抽出対象                 | DTO の格納先フィールド             | 型                                | 説明                                                     |
+| ------------------------ | ---------------------------------- | --------------------------------- | -------------------------------------------------------- |
+| 所属する名前空間         | `ClassData.Namespace`              | `string`                          | 外側の `namespace` 宣言。                                |
+| クラス名                 | `ClassData.Name`                   | `string`                          | `partial class` や `partial record` の名前。             |
+| 型種別キーワード         | `ClassData.Keyword`                | `string`                          | `class`, `struct`, `record class` などの宣言キーワード。 |
+| 型引数付き完全名         | `ClassData.NameWithTypeParameters` | `string`                          | `MyControl<T>` などのジェネリクス型シグネチャ。          |
+| クラスの修飾子           | `ClassData.Modifiers`              | `string`                          | `public`, `internal`, `sealed` などの修飾子。            |
+| `[AvaloniaObject]` 等    | `ClassData.Framework`              | `Framework`                       | 利用フレームワークの種別 (`WPF`, `Avalonia`, etc.)。     |
+| 親クラス階層（ネスト時） | `ClassData.ParentClasses`          | `EquatableArray<ParentClassData>` | 外側を囲むネスト親クラスの型名・修飾子リスト。           |

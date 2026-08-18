@@ -65,8 +65,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "en", "en", "{A1B2C3D4-E5F6-
 	ProjectSection(SolutionItems) = preProject
 		spec\en\01_foundation_and_domain.md = spec\en\01_foundation_and_domain.md
 		spec\en\02_pipeline_architecture.md = spec\en\02_pipeline_architecture.md
-		spec\en\03_generation_and_optimization.md = spec\en\03_generation_and_optimization.md
+		spec\en\03_synthesis_and_performance.md = spec\en\03_synthesis_and_performance.md
 		spec\en\04_mathematical_model.md = spec\en\04_mathematical_model.md
+		spec\en\05_test_specification.md = spec\en\05_test_specification.md
+		spec\en\06_framework_strategies.md = spec\en\06_framework_strategies.md
 		spec\en\intro.md = spec\en\intro.md
 	EndProjectSection
 EndProject
@@ -74,8 +76,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ja", "ja", "{B2C3D4E5-F6A7-
 	ProjectSection(SolutionItems) = preProject
 		spec\ja\01_foundation_and_domain.md = spec\ja\01_foundation_and_domain.md
 		spec\ja\02_pipeline_architecture.md = spec\ja\02_pipeline_architecture.md
-		spec\ja\03_generation_and_optimization.md = spec\ja\03_generation_and_optimization.md
+		spec\ja\03_synthesis_and_performance.md = spec\ja\03_synthesis_and_performance.md
 		spec\ja\04_mathematical_model.md = spec\ja\04_mathematical_model.md
+		spec\ja\05_test_specification.md = spec\ja\05_test_specification.md
+		spec\ja\06_framework_strategies.md = spec\ja\06_framework_strategies.md
 		spec\ja\intro.md = spec\ja\intro.md
 	EndProjectSection
 EndProject

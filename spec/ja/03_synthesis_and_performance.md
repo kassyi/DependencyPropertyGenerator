@@ -1,39 +1,52 @@
-# 03. 生成戦略と最適化
+# 03. コード生成とパフォーマンス最適化
 
-[English](../en/03_generation_and_optimization.md) | [日本語](./03_generation_and_optimization.md) | [目次 (Intro)](./intro.md)
+[English](../en/03_synthesis_and_performance.md) | [日本語](./03_synthesis_and_performance.md) | [目次 (Intro)](./intro.md)
 
 ## Ⅰ. インターフェース仕様と生成コードの構造
 
-ジェネレーターは、抽出したDTO（`DependencyPropertyData`など）をもとに、WPF、MAUI、Avalonia、Uno、WinUIなどのフレームワークに対応したC#コードをテキストとして出力します。生成するコードは、ユーザーが記述したクラスを拡張する形（`partial` クラス）で提供します。
+ジェネレーターは、抽出された Data Transfer Object（`DependencyPropertyData` 等）を入力とし、対象フレームワーク（WPF、MAUI、Avalonia、Uno、WinUI）に最適化されたC#ソースコードを生成する。このコードは、ユーザーが宣言した `partial` クラスを拡張する形で提供される。
 
 ### 境界とコントラクト
-**入力 (User Code)** は、`partial` 修飾子を付けたクラス宣言と `[DependencyProperty]` などの属性です。オプションとして `partial void On...Changed()` の宣言を受け付けます。
-**出力 (Generated Code)** は、以下の要素を含みます。
-- 依存関係プロパティの静的フィールド (`...Property`)
-- CLR プロパティラッパー (`get` / `set`)
-- プロパティ変更時のコールバックメソッドの実装 (`propertyChangedCallback`)
-- XMLドキュメントコメント
+
+**入力制約 (User Code)**
+ジェネレーターは以下の条件を満たすコードを処理対象とする。
+- `partial` 修飾子が付与されたクラス宣言。
+- `[DependencyProperty]` または関連する属性が付与されたクラス。
+- 任意のフック宣言（`partial void On...Changed()`）。
+
+**出力成果物 (Generated Code)**
+生成されるコードは以下の構造要素で構成される。
+- 依存関係プロパティの静的フィールド（通常は `...Property` サフィックスを伴う）。
+- `get` および `set` アクセサを実装する CLR プロパティラッパー。
+- `propertyChangedCallback` にバインドされるプロパティ変更コールバックの実装。
+- 包括的な XML ドキュメントコメント。
 
 ---
 
-## Ⅱ. コード生成エンジン仕様 (`SourceWriter` と `ClassScope`)
+## Ⅱ. コード生成エンジン仕様
 
-生成コードの出力には、`Kassyi.Generators.Extensions` の `SourceWriter` を使用します。本プロジェクトでは、コード生成時の定型ボイラープレートを排除し、かつゼロアロケーションで安全なインデント・スコープ管理を実現するため、以下の機構を採用しています。
+ソースコードの出力フェーズは、`Kassyi.Generators.Extensions` 名前空間の `SourceWriter` によって管理される。本アーキテクチャでは、定型的なボイラープレートを排除し、ゼロアロケーションと安全なインデントスコープのライフサイクルを強制するために、特定の構造パターンを標準化している。
 
-### 1. 外殻スコープの単一化 (`writer.ClassScope(@class)`)
-すべての生成ファイルに共通する定型のボイラープレート（`#nullable enable` → `namespace` → `partial class`）を、`ClassScope` ヘルパーにより1行でカプセル化します。
+### 1. 外殻エンベロープヘルパー
+
+ジェネレーターは、反復的な構造的ボイラープレートを単一のメソッド呼び出しでカプセル化する。このエンベロープには `#nullable enable` ディレクティブ、`namespace` 宣言、外部のネストされた親クラス、および対象の `partial class` 定義が含まれる。
 
 ```csharp
-// 外殻（#nullable enable, namespace, partial class）を1行で生成しスコープを管理する
+// ClassScope ヘルパーにより、完全な外殻エンベロープを1回の操作で生成する。
 using var _ = writer.ClassScope(@class);
 
-// このスコープ内にプロパティやメソッドの生成ロジックを記述する
+// 中核となるメンバーの生成ロジックがこれに続く。
 ```
 
-この手法はゼロアロケーションで機能します。`ref struct SourceWriterClassScope` を返すことで、ヒープアロケーションを発生させずに、スコープ終了時の閉じブレース `}` の出力を保証します。
+> [!TIP]
+> このアプローチは完全に**ゼロアロケーション**で機能する。`ClassScope` メソッドは `ref struct SourceWriterClassScope` を返す。この構造体は破棄時に、開かれたすべてのネストクラスおよび名前空間に対する閉じブレースをヒープ割り当てなしで出力する。
 
-### 2. ブロックヘッダーのスコープ直接渡し (`writer.Scope(...)`)
-メソッドや静的コンストラクタのブロック開始時に、ヘッダー文字列を直接 `Scope` メソッドに渡します。
+> [!NOTE]
+> 対象クラスが `ClassData.ParentClasses` に定義された親クラスの内部にネストされている場合、`ClassScope` は外側から内側のスコープへと順に `partial class` を展開する。その後、破棄時に逆順で自動的にスコープを閉じる。
+
+### 2. ブロックヘッダーのスコープ直接渡し
+
+ブロックのインデントを管理するため、ジェネレーターはメソッドや静的コンストラクタのシグネチャを直接 `Scope` メソッドに渡す。
 
 ```csharp
 using (writer.Scope($"static {@class.Name}()"))
@@ -46,107 +59,124 @@ using (writer.Scope($"static {@class.Name}()"))
 
 ## Ⅲ. プロパティとコールバックの解決仕様
 
-### デフォルト値式 (`DefaultValueExpression`) の自動補完ルール
-`[DependencyProperty<T>("Name", DefaultValueExpression = "...")]` において、`DefaultValueExpression` に指定した文字列が `new(...)` または `new (...)`（C# 9.0+ の target-typed `new` 構文）で始まる場合、ジェネレーター抽出処理（`PrepareData`）時にプロパティの型 `T` の完全修飾型名（`global::...`）へと自動的に置換・展開します。
+### Target-Typed オブジェクト生成の自動展開
 
-- 入力例: `[DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]`
-- 展開後: `new global::MyNamespace.MyProfile(1.5, 48.0)`
+`PrepareData` 抽出フェーズでは、Target-Typed な `new` 式が自動的に展開される。`DefaultValueExpression` が C# 9.0 以降の構文に基づく `new(...)` または `new (...)` で開始される場合、パイプラインはそれを完全修飾されたグローバルな型名へと変換する。
 
-これにより、他の名前空間にある型をデフォルト値としてインスタンス化する際にも、属性の文字列内で手動で冗長な完全修飾名を書く必要がなくなり、コードの保守性と視認性が向上します。
+**変換プロセスの例**
+- **入力:** `[DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]`
+- **出力:** `new global::MyNamespace.MyProfile(1.5, 48.0)`
 
-### コールバックメソッド (`OnChanged` / `OnChanging`) の解決規則と制約
+この展開機構により、文字列リテラル内での冗長な名前空間の手動指定が不要となり、コードの明確性が向上する。同時に、外部の名前空間から型をインスタンス化する際のリファクタリング耐性も高まる。
 
-#### 1. シグネチャ照合ルールエンジン (`IMethodSignatureRule`)
-コールバックシグネチャの照合は、`Rules/Signatures/` 内の個別ルール（`NoParametersRule`, `SingleParameterRule`, `DoubleParameterRule`, `TripleParameterRule`）によって判定します。
+### C# 13 partial プロパティ構文の自動解決
+
+ユーザーコードが `public partial int Value { get; set; }` のように C# 13 の partial プロパティ構文で定義されている場合、ジェネレーターは `Modifiers.IsPartialProperty` を自動検出し、プロパティの getter / setter 実装ブロックを出力する。これにより、従来型のプロパティ生成と partial プロパティ生成の双方が透過的にサポートされる。
+
+
+### コールバックメソッドの照合規則
+
+#### 1. シグネチャ照合ルールエンジン
+
+ジェネレーターは `Rules/Signatures/` ディレクトリに配置された専用のルールクラスを利用してコールバックシグネチャを解決する。このエンジンは、パラメータの上限および型の要件を厳格に適用する。
+
+**サポートされるシグネチャ要件**
+- **0引数:** `NoParametersRule` により処理される。
+- **1引数:** `SingleParameterRule` により処理される。新しい値、または `EventArgs` を許容する。
+- **2引数:** `DoubleParameterRule` により処理される。旧値と新値のペア、送信元と新値のペア、または送信元と `EventArgs` のペアを許容する。
+- **3引数:** `TripleParameterRule` により処理される。送信元、旧値、および新値の組み合わせを許容する。
+
+> [!WARNING]
+> 4つ以上のパラメータを定義するシグネチャはサポートの対象外となる。内部的に提供可能な引数が存在しないため、ルールエンジンによって明示的に無視される。
 
 ```csharp
-// ✅ 0引数 (NoParametersRule)
-partial void OnTextChanged();
-
-// ✅ 1引数 (SingleParameterRule: 新値 または EventArgs)
-partial void OnTextChanged(string newValue);
-partial void OnTextChanged(DependencyPropertyChangedEventArgs e);
-
-// ✅ 2引数 (DoubleParameterRule: 旧値・新値 / sender・新値 / sender・EventArgs)
+// 有効な2引数シグネチャの例:
 partial void OnTextChanged(string oldValue, string newValue);
-partial void OnTextChanged(MyControl sender, string newValue);
-partial void OnTextChanged(MyControl sender, DependencyPropertyChangedEventArgs e);
 
-// ✅ 3引数 (TripleParameterRule: sender・旧値・新値)
-partial void OnTextChanged(MyControl sender, string oldValue, string newValue);
-
-// ❌ 4引数以上はサポート外 (渡せるデータが存在しないため無視される)
+// サポート対象外となる4引数シグネチャの例:
 void OnTextChanged(MyControl sender, string oldValue, string newValue, object extra);
 ```
 
-#### 2. エラー判定と挙動の差異
+#### 2. エラー報告とコンパイル時の安全性
 
-```csharp
-// ----------------------------------------------------------------------------
-// 方式 A: [DependencyProperty] の OnChanged パラメータで明示指定する場合
-// ----------------------------------------------------------------------------
-[DependencyProperty<string>("Text", OnChanged = nameof(OnTextChanged))]
-public partial class MyControl : UserControl
-{
-    // 🚨 未対応のシグネチャ（例: 4引数など）や未定義の場合
-    // ジェネレーターが #error DPG0001 を出力し、明示的にコンパイルエラー（ビルド停止）を報告する。
-    private void OnTextChanged(MyControl sender, string oldValue, string newValue, object extra) { }
-}
+無効なコールバックシグネチャに対して厳格なコンパイルエラーを適用することで、実行時のサイレントな障害を防止する。
 
-// ----------------------------------------------------------------------------
-// 方式 B: 属性指定なしで partial void On...Changed() の自動一致に頼る場合
-// ----------------------------------------------------------------------------
-[DependencyProperty<string>("Text")]
-public partial class MyControl : UserControl
-{
-    // 🚨 未対応のシグネチャ（例: 4引数や (DependencyObject, DependencyPropertyChangedEventArgs)）の場合
-    // 以前は無関係なメソッドとしてサイレントに無視されていましたが、現在はジェネレーターが #error DPG0007 を出力し、
-    // 明示的にコンパイルエラー（ビルド停止）を報告してサイレントバグを防止します。
-    private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
-}
-```
+**明示的な指定時の挙動**
+コールバックが `OnChanged` パラメータを通じて明示的に定義された場合、無効なシグネチャまたはメソッドの欠落は `DPG0001` コンパイルエラーをトリガーし、ビルドプロセスを即座に停止させる。
 
-#### 3. コールバックシグネチャ不一致エラー (DPG0007) のトラブルシューティング (Agentic Ground Truth)
+**規約に基づく自動検出時の挙動**
+`partial void On...Changed()` メソッドの自動検出に依存する場合、一致しないシグネチャは `DPG0007` コンパイルエラーをトリガーする。
 
-メソッド名が `On...Changed` に一致しているにもかかわらず、パラメータのシグネチャが未対応の場合、ジェネレーターは `DPG0007` エラーを出力してビルドを停止させ、イベントがサイレントに無視されるバグ（`propertyChangedCallback: null` の生成）を未然に防ぎます。
+> [!IMPORTANT]
+> **サイレント不具合の根絶 ([HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165))**
+> 元のジェネレーターでは、WPF 標準の `(DependencyObject, DependencyPropertyChangedEventArgs)` などシグネチャが合致しないメソッドを記述した場合に、警告やエラーを出さずに静かに無視（`propertyChangedCallback: null` を出力）し、実行時にコールバックが一切発火しなくなる深刻なサイレントバグが存在していた。本仕様ではこれを厳格なコンパイル時診断（`DPG0001` / `DPG0007`）として即座に通知することで完全に根絶している。
 
-この問題の最も一般的な原因は、WPF開発者が習慣的に `private void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)` というWPF標準のコールバックシグネチャを手動で定義してしまうことにあります。しかし本ジェネレーターのルールエンジンは、より強固な型安全性を保証するため、第1引数に汎用的な `DependencyObject` を取るメソッドを意図的にサポート対象外としています。
+#### 3. シグネチャ不一致のトラブルシューティング
 
-このエラーを解決するには、メソッドの第1引数を `DependencyObject` ではなく、プロパティを定義しているクラス自身の型（例えば `MyControl sender`）に変更してください。また、ジェネレーターが背後で自動的に static なプロキシメソッドを生成して結線を行うため、ユーザーコード側で定義するコールバックは `static` メソッドではなく、通常のインスタンスメソッドとして定義する必要があります。
+`DPG0007` 診断は、イベント登録処理が対象のコールバックを無視し、結果として `propertyChangedCallback` が null になるサイレントバグを防止する。
+
+この診断が発生する最も頻繁な要因は、標準的なWPFシグネチャと汎用的な `DependencyObject` パラメータを用いてコールバックを定義することにある。厳密な型安全性を強制するため、ジェネレーターのルールエンジンは汎用的な `DependencyObject` を引数として受け入れることを明示的に拒否する。
+
+**解決手順:**
+1. コールバックメソッドの第1パラメータを、プロパティを定義するクラスと正確に同一の型を利用するように更新する。
+2. カスタムコールバックが標準的なインスタンスメソッドとして定義されていることを確認する。ジェネレーターはイベントを結線するための静的プロキシメソッドを自動的に生成するため、静的メソッドによる手動定義は不要である。
 
 ---
 
 ## Ⅳ. パフォーマンス最適化ルール
 
-インクリメンタル・ソースジェネレーターのパフォーマンス（特にVisual StudioやRiderなどのIDE上でのタイピング時の応答速度）を極限まで高めるため、以下の最適化プラクティスを厳守します。
+IDE入力時の応答性を最大限に維持するため、アーキテクチャは厳格なパフォーマンスガイドラインを強制する。ジェネレーターを拡張する際は、以下の原則を遵守しなければならない。
+
+> [!NOTE]
+> **過去のベンチマーク実績と最適化レポート**
+> 本アーキテクチャで行われたフェーズ別の詳細なベンチマーク測定結果およびパフォーマンス改善実績は、[`tests/Kassyi.Generators.DependencyProperty.Benchmarks`](../../tests/Kassyi.Generators.DependencyProperty.Benchmarks)（特に `Reports/` ディレクトリ配下の `Phase0` ～ `Phase5` レポート）に記録されている。
 
 ### ベンチマーク実証済みの原則
-- **文字列パースよりASTノード直接走査**: 式の解析において、一度抽出した文字列を再度パース (`SyntaxFactory.ParseExpression()`) する手法に比べ、`ExpressionSyntax` ノードを直接AST走査する手法は、再トークナイズや中間構文木の生成アロケーションを完全に回避できるため大幅に高速かつ省メモリです。ジェネレーターのホットパスでの文字列からの再パースは行わないでください。
-- **SyntaxFactoryよりSourceWriterによるコード生成**: ソース生成のホットパスでは、`SyntaxFactory.NormalizeWhitespace().ToFullString()` による構文木構築よりも、[`SourceWriter`](../../src/Kassyi.Generators.Extensions/SourceWriter.cs) (カスタム補間文字列ハンドラー) による直接出力が推奨されます（※ユニットテストや非ホットパスでの構文解析・検証用途では `SyntaxFactory` の使用も許容されます）。
 
-### Dos (推奨事項)
-- **`ForAttributeWithMetadataName` の使用**: 属性ベースで構文をフィルタリングするRoslyn 4.3以降のAPIを使用し、対象外コードの変更によるジェネレーターの起動を最小化します。
-- **データ抽出の早期実行**: `SyntaxNode` や `ISymbol` を受け取ったら、直ちにプリミティブな型や値レコードに変換してDTOに格納します。
-- **`EquatableArray<T>` の使用**: コレクションを扱う場合は、必ず構造的等価性が保証される `EquatableArray<T>` でラップします。
-- **ホットパスでのLINQ排除**: パイプライン抽出処理や内部ループでは LINQ (`.Select()`, `.Where()`, `.Any()`) を避け、インデックスベースの `for` ループを使用することで不要なイテレータ・アロケーションを完全に排除します。
-- **属性引数の辞書事前キャッシュ**: 属性の `NamedArguments` 解決では、探索ごとにLINQ検索するのではなく、`Dictionary` などへ事前にキャッシュして $O(1)$ でアクセスします。
+> [!TIP]
+> **文字列パースを排除した AST ノード直接走査**
+> 式の解析においては、直接的な `ExpressionSyntax` 抽象構文木走査を利用する。このアプローチは、再トークナイズや中間構文木の生成アロケーションを完全に回避する。抽出された文字列を `SyntaxFactory.ParseExpression()` で再パースする手法と比較して、実行速度が大幅に向上し、メモリ消費量も低減される。ジェネレーターのホットパス内での文字列再パースは厳格に禁止される。
 
-### Don'ts (禁止事項)
-- **`ISymbol` や `SyntaxNode` をDTOに含めない**: これらを保持したまま `Select` を抜けると、メモリリークとキャッシュミスの二重障害を引き起こします。
-- **DTO内で `List<T>` や `T[]` を直接使わない**: 参照比較となるため、中身が同一でもキャッシュが無効化されます。
-- **文字列生成時の中間アロケーション（無駄なヒープ割り当て）**: `string.Split()` や `string.Join()`、不要な `List<string>` の生成などはGCスパイクの原因となります。代わりに `SourceWriter`、`StringBuilder`、インデックススキャン、`stackalloc Span<char>` などを活用します。
+> [!TIP]
+> **コード生成における SyntaxFactory の SourceWriter への置換**
+> コード生成のホットパスにおいては、カスタム補間文字列ハンドラーである `SourceWriter` を利用して直接コードを出力する。この手法は、`SyntaxFactory.NormalizeWhitespace().ToFullString()` を介した重い構文木構築とフォーマット処理をパフォーマンスで凌駕する。
+
+> [!NOTE]
+> `SyntaxFactory` の使用は、非ホットパスまたはユニットテスト環境内でのみ許容される。
+
+### ベストプラクティス
+
+- **対象を絞り込んだ宣言フィルタリング:** `ForAttributeWithMetadataName` を利用して、属性に基づく宣言のフィルタリングを実行する。これによりジェネレーターの呼び出し回数が劇的に制限される。非推奨となった syntax receiver の使用は禁止される。
+- **プリミティブ型への早期投影:** 初期抽出フェーズにおいて、`SyntaxNode` または `ISymbol` インスタンスを、直ちにプリミティブ型または読み取り専用のレコード構造体へと変換する。
+- **コレクションの等価性保証:** Data Transfer Object 内のすべてのコレクション型を `EquatableArray<T>` でラップし、要素ごとの等価性チェックを強制する。
+- **LINQ の排除:** ホットな抽出およびフォーマット処理の内部では、`.Select()`, `.Where()`, `.Any()` などの LINQ 演算子をインデックスベースの `for` ループに置き換える。これによりイテレータのメモリアロケーションを防止する。
+- **属性引数の事前キャッシュ:** `NamedArguments` を辞書データ構造を利用してキャッシュし、$O(1)$ のプロパティ探索を保証する。
+
+### アーキテクチャのアンチパターン
+
+> [!CAUTION]
+> **コンパイル参照の保持**
+> `ISymbol` または `SyntaxNode` を Data Transfer Object 内に保持してはならない。この実装は深刻なメモリリークを引き起こし、インクリメンタルパイプラインにおける 100% のキャッシュミスを誘発する。
+
+> [!CAUTION]
+> **ミュータブルなコレクション型の使用**
+> Data Transfer Object 内で生の `List<T>` または `T[]` を利用してはならない。デフォルトの参照比較がインクリメンタルキャッシュの動作を無効化する。
+
+> [!WARNING]
+> **中間文字列の割り当て**
+> ホットパス内で中間文字列をアロケートしてはならない。`string.Split()` や `string.Join()` などの操作は回避する。ガベージコレクションのスパイクを防ぐため、`SourceWriter`、`StringBuilder`、および `stackalloc Span<char>` を活用する。
 
 ---
 
 ## Ⅴ. プロファイリング手法
 
-ジェネレーターのパフォーマンスやボトルネックを調査する際は、以下の手法を用います。
+ジェネレーターパイプライン内のパフォーマンスボトルネックを調査する際は、以下の診断手法を適用する。
 
-1. **ビルドログ解析 (`.binlog`)**
-   ```bash
-   dotnet build -c Release -bl:msbuild.binlog
-   ```
-   生成した `msbuild.binlog` を MSBuild Structured Log Viewer で開き、Generatorの実行時間をミリ秒単位で確認します。
+**1. MSBuild 構造化ログ解析**
+ビルドプロセス中にバイナリログを生成し、ジェネレーターの実行時間を検査する。生成された `msbuild.binlog` は MSBuild Structured Log Viewer を利用して解析する。
+```bash
+dotnet build -c Release -bl:msbuild.binlog
+```
 
-2. **ジェネレーターのベンチマーク**
-   BenchmarkDotNet を使用し、`CSharpGeneratorDriver` に擬似的なソースコードを流し込んで、実行時間とメモリのアロケーション量 (Gen0/Gen1/Gen2, Allocated Bytes) を計測します。
+**2. BenchmarkDotNet を用いたベンチマーク実行**
+BenchmarkDotNet を利用して、合成されたソースツリーを `CSharpGeneratorDriver` に入力する。この手法により、実行時間と Gen0、Gen1、Gen2 ヒープ全体のアロケーション量が正確に計測される。
