@@ -1,6 +1,7 @@
 # Phase 1: データモデル純粋化と事前面解き (Phase 1 Report)
 
 - **計測日時**: 2026-07-26
+- **Commit ID**: `3dd2035` (最適化過程)
 - **環境**: AMD Ryzen 9 7900X 4.70GHz / .NET 9.0.18 (X64) / Windows 11
 - **測定対象**: `GeneratorBenchmark` (Wpf, WinUi, Avalonia, Maui)
 
@@ -33,7 +34,17 @@
 
 ---
 
-## 3. 総評と次への展開
+## 3. 総合スコア推移 (Performance Score)
+
+| 指標 | Baseline (Phase 0) | Phase 1 | 変化 |
+|---|---|---|---|
+| **スループット合計** | 1,288 ops/s | **1,293 ops/s** | +5 ops/s |
+| **メモリ合計** | 25.87 MB | **25.72 MB** | -0.15 MB |
+| **総合スコア (Baseline=1000)** | 1,000 pts | **1,010 pts** | **+10 pts (+1.0%)** |
+
+---
+
+## 4. 総評と次への展開
 
 - **WPF / WinUI における初回生成速度が大幅向上**:
   - `ToDisplayString()` と文字列パースの削減により、WPF の初回生成速度が **5.35ms → 4.89ms (約8.7%高速化)** されました。
