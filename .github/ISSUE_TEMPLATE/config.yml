@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "💡 Ideas & Feature Discussions"
+    url: "https://github.com/kassyi/DependencyPropertyGenerator/discussions/categories/ideas"
+    about: "Discuss architecture ideas and feature proposals with the community."
+  - name: "🙏 Q&A & Usage Questions"
+    url: "https://github.com/kassyi/DependencyPropertyGenerator/discussions/categories/q-a"
+    about: "Ask usage questions or troubleshooting advice."
