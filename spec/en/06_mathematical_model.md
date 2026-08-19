@@ -1,6 +1,7 @@
-# 06. Complexity Model of the Incremental Generator
+# 06. Mathematical Performance Model
 
-[English](./06_mathematical_model.md) | [日本語](../ja/06_mathematical_model.md) | [Index (Intro)](./intro.md)
+[English](./06_mathematical_model.md) | [日本語](../ja/06_mathematical_model.md)
+Prev: [⬅ 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification ➡](./07_test_specification.md)
 
 To maintain the Roslyn Incremental Source Generator's performance, you must understand the complexity (allocation cost and processing time) of each operation.
 
@@ -98,4 +99,9 @@ To prevent this worst-case complexity from triggering on every keystroke, the ge
 > [!NOTE]
 > **Specific Measures to Prevent Performance Degradation**
 > For detailed rules regarding the prohibition of `ISymbol` in DTOs, strict `EquatableArray<T>` implementations, and allocation-free generation via `SourceWriter`, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
+
+---
+
+Prev: [← 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification →](./07_test_specification.md)
+
 

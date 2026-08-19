@@ -1,5 +1,8 @@
 # Chapter 01: Design Rationale & FAQ
 
+[English](./01_faq_and_rationale.md) | [日本語](../ja/01_faq_and_rationale.md)
+[Index (Intro)](./intro.md) | Next: [02. Foundation & Domain Architecture ➡](./02_foundation_and_domain.md)
+
 This chapter outlines the architectural philosophy behind the zero-allocation v4 generator and answers frequently asked questions regarding API design, code synthesis, and integration with modern .NET features.
 
 ## 1. Design Philosophy
@@ -41,4 +44,9 @@ For end-to-end benchmark measurements and reduction ratios, see **[Section VI. P
 
 ### Does this break XAML Hot Reload, Live Preview, or NativeAOT?
 No. The generator outputs standard, static C# code with explicit `DependencyProperty.Register` calls. There is absolutely zero runtime reflection or `Reflection.Emit` involved, making the output 100% NativeAOT and Trimming safe. Because it generates static fields and property wrappers at compile-time, it plays perfectly with XAML Hot Reload and Language Server Protocol, functioning exactly like hand-written code.
+
+---
+
+[Index (Intro)](./intro.md) | Next: [02. Foundation & Domain Architecture →](./02_foundation_and_domain.md)
+
 

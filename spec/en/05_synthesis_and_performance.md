@@ -1,6 +1,7 @@
-# 05. Code Synthesis and Performance Optimization
+# 05. Code Synthesis & Performance Optimization
 
-[English](./05_synthesis_and_performance.md) | [日本語](../ja/05_synthesis_and_performance.md) | [Index (Intro)](./intro.md)
+[English](./05_synthesis_and_performance.md) | [日本語](../ja/05_synthesis_and_performance.md)
+Prev: [⬅ 04. Framework Generator Strategies](./04_framework_strategies.md) | [Index (Intro)](./intro.md) | Next: [06. Mathematical Performance Model ➡](./06_mathematical_model.md)
 
 ## I. Interface Specification and Generated Code Structure
 
@@ -204,6 +205,10 @@ _Environment: WPF generation, AMD Ryzen 9 7900X_
 | **v4 Pipeline**             | 3.72 ms    | 125.0      | 31.2       | -         | 2.22 MB    |
 | **Improvement**             | **-30.3%** | **-33.3%** | **-50.1%** | **-100%** | **-22.6%** |
 
-> [!NOTE]
 > Gen0/1/2 columns represent GC collections per 1,000 operations. Gen2 full GCs are completely eliminated in both micro and macro runs. Benchmarks for MAUI, Avalonia, and WinUI show similar 20-30% pipeline throughput gains.
+
+---
+
+Prev: [← 04. Framework Generator Strategies](./04_framework_strategies.md) | [Index (Intro)](./intro.md) | Next: [06. Mathematical Performance Model →](./06_mathematical_model.md)
+
 

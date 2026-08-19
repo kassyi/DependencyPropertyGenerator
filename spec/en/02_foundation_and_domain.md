@@ -1,6 +1,7 @@
-# 02. Foundation and Domain
+# 02. Foundation & Domain Architecture
 
-[English](./02_foundation_and_domain.md) | [日本語](../ja/02_foundation_and_domain.md) | [Index (Intro)](./intro.md)
+[English](./02_foundation_and_domain.md) | [日本語](../ja/02_foundation_and_domain.md)
+Prev: [⬅ 01. Design Rationale & FAQ](./01_faq_and_rationale.md) | [Index (Intro)](./intro.md) | Next: [03. Pipeline Architecture ➡](./03_pipeline_architecture.md)
 
 ## I. Purpose and Architecture
 
@@ -323,3 +324,8 @@ Information defining the parent class context is extracted into the `ClassData` 
 | Class Modifiers            | `ClassData.Modifiers`              | `string`                          | Modifiers such as `public`, `internal`, `sealed`.              |
 | `[AvaloniaObject]` etc.    | `ClassData.Framework`              | `Framework`                       | The type of framework used (`WPF`, `Avalonia`, etc.).          |
 | Enclosing Parent Hierarchy | `ClassData.ParentClasses`          | `EquatableArray<ParentClassData>` | Outer nesting parent classes list with keywords and modifiers. |
+
+---
+
+Prev: [← 01. Design Rationale & FAQ](./01_faq_and_rationale.md) | [Index (Intro)](./intro.md) | Next: [03. Pipeline Architecture →](./03_pipeline_architecture.md)
+
