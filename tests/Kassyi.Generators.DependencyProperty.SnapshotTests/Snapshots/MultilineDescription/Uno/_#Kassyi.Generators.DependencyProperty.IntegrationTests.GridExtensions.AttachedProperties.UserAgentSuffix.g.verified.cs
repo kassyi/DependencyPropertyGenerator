@@ -35,7 +35,14 @@ Can be used to identify the web view as belonging to a certain app/version on th
 public static void SetUserAgentSuffix(global::Windows.UI.Xaml.Controls.Grid element, string? value)
 {
 element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+if (value is null || value.Length == 0)
+{
 element.SetValue(UserAgentSuffixProperty, value);
+}
+else
+{
+global::Windows.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromString(element, UserAgentSuffixProperty, value);
+}
 }
 /// <summary>
 /// A suffix that is added to the default user agent, surrounded by square brackets.

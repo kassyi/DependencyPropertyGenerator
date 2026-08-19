@@ -31,7 +31,7 @@ OnMyColumnChanged((global::Windows.UI.Xaml.FrameworkElement)sender, (int)args.Ol
 public static void SetMyColumn(global::Windows.UI.Xaml.FrameworkElement element, int value)
 {
 element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-element.SetValue(MyColumnProperty, value);
+global::Windows.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromInt32(element, MyColumnProperty, value);
 }
 /// <summary>
 /// Default value: default(int)

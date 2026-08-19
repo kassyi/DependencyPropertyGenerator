@@ -42,7 +42,14 @@ callback(sender, args);
 public static void SetAttachedNotNullStringProperty(global::Microsoft.UI.Xaml.Controls.UserControl element, string value)
 {
 element = element ?? throw new global::System.ArgumentNullException(nameof(element));
+if (value is null || value.Length == 0)
+{
 element.SetValue(AttachedNotNullStringPropertyProperty, value);
+}
+else
+{
+global::Microsoft.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromString(element, AttachedNotNullStringPropertyProperty, value);
+}
 }
 /// <summary>
 /// Default value: ""
