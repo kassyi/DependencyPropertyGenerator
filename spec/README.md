@@ -22,3 +22,4 @@ Please select your preferred language:
 | **04** | [Complexity Model](./en/04_mathematical_model.md) | [計算量モデル](./ja/04_mathematical_model.md) | Worst-case complexity analysis & pipeline scaling limits |
 | **05** | [Test Specification](./en/05_test_specification.md) | [テスト仕様書](./ja/05_test_specification.md) | Test architecture, combinatorial matrix, language features & diagnostics |
 | **06** | [Framework Strategies](./en/06_framework_strategies.md) | [フレームワーク別生成マッピング仕様](./ja/06_framework_strategies.md) | Platform API mapping & generator extension guidelines |
+| **07** | [Diagnostics Reference](./en/07_diagnostics_reference.md) | [診断機能リファレンス](./ja/07_diagnostics_reference.md) | Analyzer rules, diagnostic codes & troubleshooting |
