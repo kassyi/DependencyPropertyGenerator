@@ -45,19 +45,10 @@ The pipeline executes in the following strict order:
 
 ## II. Model Equality and Caching Strategy
 
-The incremental cache hit ratio is the most critical performance metric for an ISG. The data models (`DependencyPropertyData`, `ClassData`, `EventData`, and sub-records) enforce strict value equality to optimize this ratio.
+The incremental cache hit ratio is the most critical performance metric for an ISG. The data models (`DependencyPropertyData`, `ClassData`, `EventData`, and sub-records) enforce strict value equality semantics (such as adopting `readonly record struct` and wrapping collections with `EquatableArray<T>`) to optimize this ratio.
 
-> [!IMPORTANT]
-> **Deep Value Comparison with `readonly record struct`**
-> You must declare all models as `readonly record struct`. This forces the C# compiler to generate value-based `Equals()` and `GetHashCode()` implementations that compare all underlying fields, ensuring strict value equality.
-
-> [!WARNING]
-> **Structural Collection Equality with `EquatableArray<T>`**
-> In Roslyn pipelines, standard arrays (`T[]`) or `ImmutableArray<T>` evaluate equality by reference. Creating a new array instance with identical items fails reference equality checks, invalidating the compiler cache.
-
-To prevent cache invalidation, wrap all collections in `EquatableArray<T>`:
-- **Usage**: `BindEvents: bindEvents.AsEquatableArray()`
-- **Impact**: This wrapper enforces deep element-by-element equality (`SequenceEqual`), completely suppressing redundant source regeneration for semantically identical data.
+> [!NOTE]
+> For detailed architectural constraints regarding the equality caching strategy, zero-allocation generation, and early detachment of Roslyn syntax trees, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
 
 ---
 
@@ -245,13 +236,9 @@ sequenceDiagram
 
 ### 3. Architectural Design Intent
 
-> [!CAUTION]
-> **Early Detachment of Roslyn Types (Symbol/Syntax)**
-> Roslyn syntax trees (`SyntaxNode`) and semantic models (`ISymbol`) are massive objects. Retaining them causes memory leaks and breaks incremental caching. The `PrepareData` layer must immediately convert them into primitive C# types (DTOs) and discard the original references.
-
-> [!TIP]
-> **Zero-Allocation Generation Phase**
-> Once the extraction phase passes data to `SourceGenerationHelper`, all Roslyn analysis must stop. The generation phase acts as a pure function, rapidly synthesizing text via `SourceWriter` based entirely on the provided DTOs.
+> [!NOTE]
+> **Consolidation of Performance Optimization Principles**
+> For detailed prohibitions and best practices regarding early detachment of Roslyn types (Symbol/Syntax) and the zero-allocation generation phase, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
 
 **Extensibility and Separation of Concerns**
 By isolating framework-specific mapping logic (in `DependencyPropertyDataBuilder`) from source generation logic (`SourceGenerationHelper`), the architecture ensures that parsing modifications do not affect the zero-allocation generation layer.

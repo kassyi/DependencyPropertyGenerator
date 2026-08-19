@@ -93,17 +93,9 @@ This triggers the following compiler events:
 
 ## III. Architectural Ingenuity to Prevent Degradation
 
-To prevent this worst-case complexity from triggering on every keystroke, the generator enforces the following architectural rules:
+To prevent this worst-case complexity from triggering on every keystroke, the generator enforces strict architectural rules.
 
-> [!CAUTION]
-> **1. Prohibition of `ISymbol` or `SyntaxNode` within DTOs**
-> If Roslyn reference objects pollute the data model, the underlying instance mutates on every keystroke, forcing `Equals()` to return `false`. This immediately invalidates caches for unrelated files, repeatedly triggering the worst-case complexity $O(S \times P)$ and freezing the IDE.
-
-> [!IMPORTANT]
-> **2. Strict Implementation of `IEquatable` (`EquatableArray<T>`)**
-> Enforcing deep value-based comparisons for array data mathematically guarantees that semantically identical code yields cache hits, maintaining $H \approx 1$.
-
-> [!TIP]
-> **3. Allocation-Free Generation via `SourceWriter`**
-> Even during a full pipeline flush (the worst-case scenario), aggressive `StringBuilder` pooling and zero-allocation `ref struct` wrappers prevent secondary performance degradation from GC spikes.
+> [!NOTE]
+> **Specific Measures to Prevent Performance Degradation**
+> For detailed rules regarding the prohibition of `ISymbol` in DTOs, strict `EquatableArray<T>` implementations, and allocation-free generation via `SourceWriter`, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
 

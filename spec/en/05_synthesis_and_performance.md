@@ -113,13 +113,10 @@ If you rely on the auto-discovery of `partial void On...Changed()` methods, an u
 
 #### 3. Resolving Callback Signature Mismatches 
 
-The `DPG0007` diagnostic prevents a silent bug where event registration ignores the target callback, resulting in a null `propertyChangedCallback`.
+A common cause of the `DPG0007` diagnostic is defining a callback using the standard WPF signature with a generic `DependencyObject` parameter. To enforce type safety, the rule engine explicitly rejects generic `DependencyObject` arguments.
 
-A common cause of this diagnostic is defining a callback using the standard WPF signature with a generic `DependencyObject` parameter. To enforce type safety, the rule engine explicitly rejects generic `DependencyObject` arguments.
-
-**Resolution Steps:**
-1. Update the callback's first parameter to use the exact type of the class defining the property.
-2. Ensure the custom callback is an instance method; the generator automatically emits a static proxy method to wire up the event.
+> [!NOTE]
+> For specific causes and code examples of how to resolve each diagnostic error (`DPG0001` through `DPG0008`), see **[08. Diagnostics Reference](./08_diagnostics_reference.md)**.
 
 ---
 
@@ -185,7 +182,7 @@ Feed synthetic source trees into `CSharpGeneratorDriver` using BenchmarkDotNet. 
 
 ## VI. Performance Metrics
 
-To validate these architectural shifts, we run continuous benchmarks comparing standard Roslyn techniques against our token streaming approach.
+To validate these architectural shifts, we run continuous benchmarks comparing standard Roslyn techniques against our token streaming approach. For the benchmark source code and detailed measurement methodologies, see the [`tests/Kassyi.Generators.DependencyProperty.Benchmarks`](../../tests/Kassyi.Generators.DependencyProperty.Benchmarks) project.
 
 ### 1. Micro-Benchmark: AST Mutation vs. Token Streaming
 _Scenario:_ Converting a target-typed default expression (`new(1, 2, 3)`) into an explicit instantiation (`new global::System.Collections.Generic.List<string>(1, 2, 3)`).

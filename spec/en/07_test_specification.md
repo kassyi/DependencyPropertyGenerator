@@ -41,7 +41,12 @@ flowchart TD
 
 ### 2.1 Target Platforms and Runtimes
 
-Tests run on Windows (Windows Server / Windows 11 with `CRLF` and `\`), Linux (Ubuntu Latest with `LF` and `/`), and macOS (macOS Latest with `LF` and `/`).
+The target host OS and environment conditions are as follows:
+
+- **Windows**: Windows Server or Windows 11 (Line endings: `CRLF`, Path separator: `\` or entity reference &#92;)
+- **Linux**: Ubuntu Latest (Line endings: `LF`, Path separator: `/`)
+- **macOS**: macOS Latest (Line endings: `LF`, Path separator: `/`)
+
 The build requires the .NET 9.0 SDK and uses C# 13.0 Preview language features.
 The generator targets WPF (.NET Framework 4.8 / .NET Core 3.1 / .NET 5–9), Uno Platform (UWP/WinUI), .NET MAUI (.NET 7.0+), and Avalonia UI (11.0+).
 
