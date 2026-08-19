@@ -225,5 +225,45 @@ public static class StringExtensions
 
         return sb.ToString();
     }
+
+    /// <summary>Resolves the corresponding XamlBindingHelper.SetPropertyFrom* method name for a given type, or null if unsupported.</summary>
+    public static string? GetXamlBindingHelperSetMethodName(this string? type)
+    {
+        if (string.IsNullOrWhiteSpace(type))
+        {
+            return null;
+        }
+
+        // Nullable value types are not supported by SetPropertyFrom*
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        if (type.EndsWith('?') &&
+#else
+        if (type![type.Length - 1] == '?' &&
+#endif
+            type is not ("string?" or "String?" or "System.String?" or "global::System.String?"))
+        {
+            return null;
+        }
+
+        return type.ExtractSimpleName() switch
+        {
+            "bool" or "Boolean" => "SetPropertyFromBoolean",
+            "byte" or "Byte" => "SetPropertyFromByte",
+            "char" or "Char" => "SetPropertyFromChar16",
+            "double" or "Double" => "SetPropertyFromDouble",
+            "int" or "Int32" => "SetPropertyFromInt32",
+            "long" or "Int64" => "SetPropertyFromInt64",
+            "float" or "Single" => "SetPropertyFromSingle",
+            "string" or "String" or "string?" or "String?" => "SetPropertyFromString",
+            "uint" or "UInt32" => "SetPropertyFromUInt32",
+            "ulong" or "UInt64" => "SetPropertyFromUInt64",
+            "TimeSpan" => "SetPropertyFromTimeSpan",
+            "DateTimeOffset" => "SetPropertyFromDateTime",
+            "Point" => "SetPropertyFromPoint",
+            "Rect" => "SetPropertyFromRect",
+            "Size" => "SetPropertyFromSize",
+            _ => null
+        };
+    }
 }
 

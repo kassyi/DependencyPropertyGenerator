@@ -22,4 +22,8 @@ internal interface IDependencyPropertyGeneratorStrategy
     void GenerateAdditionalFieldForDirectProperties(ref SourceWriter writer, DependencyPropertyData property);
     /// <summary>Generates read-only property accessors if required by the dependency property configuration.</summary>
     void GenerateAdditionalPropertyForReadOnlyProperties(ref SourceWriter writer, DependencyPropertyData property);
+    /// <summary>Generates the property setter implementation.</summary>
+    void GenerateSetter(ref SourceWriter writer, ClassData @class, DependencyPropertyData property);
+    /// <summary>Generates the attached property setter method body implementation.</summary>
+    void GenerateAttachedSetterBody(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string dependencyPropertyName);
 }

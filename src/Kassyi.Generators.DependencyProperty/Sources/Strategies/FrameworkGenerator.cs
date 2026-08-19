@@ -168,6 +168,17 @@ internal abstract class FrameworkGenerator :
     public abstract string GeneratePropertyType(ClassData @class, DependencyPropertyData property);
     public abstract string GenerateManagerType(ClassData @class);
 
+    public virtual void GenerateSetter(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        var setOrInit = property.Modifiers.IsInitOnly ? "init" : "set";
+        var modifier = SourceGenerationHelper.GenerateAdditionalSetterModifier(property);
+        var propName = SourceGenerationHelper.GenerateDependencyPropertyName(property);
+        writer.AppendLine($"{modifier}{setOrInit} => SetValue({propName}, value);");
+    }
+
+    public virtual void GenerateAttachedSetterBody(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string dependencyPropertyName) 
+        => writer.AppendLine($"element.SetValue({dependencyPropertyName}, value);");
+
     public virtual void GenerateStaticConstructor(
         ref SourceWriter writer,
         ClassData @class,
@@ -245,13 +256,9 @@ internal abstract class FrameworkGenerator :
         }
     }
 
-    public virtual void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
-    }
+    public virtual void GenerateAttachedRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) { }
 
-    public virtual void GenerateWeakEvent(ref SourceWriter writer, ClassData @class, EventData @event)
-    {
-    }
+    public virtual void GenerateWeakEvent(ref SourceWriter writer, ClassData @class, EventData @event) { }
 
     protected static string GenerateEventHandlerType(EventData @event, bool nullable = true, bool nullableType = true)
     {
