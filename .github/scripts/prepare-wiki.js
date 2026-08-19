@@ -83,6 +83,9 @@ const LINK_REPLACEMENTS = [
 
 function transformContent(content, context) {
   let result = content;
+  // Convert main repository relative links (../../path) to full GitHub URLs
+  result = result.replace(/\(\.\.\/\.\.\/([^)]+)\)/g, '(https://github.com/kassyi/DependencyPropertyGenerator/tree/main/$1)');
+
   for (const item of LINK_REPLACEMENTS) {
     if (item.from === context) {
       result = result.split(`(${item.src})`).join(`(${item.dest})`);

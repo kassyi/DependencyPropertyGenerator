@@ -6,9 +6,13 @@ on:
       - main
     paths:
       - "spec/**"
-      - ".github/scripts/prepare_wiki.py"
+      - ".github/scripts/prepare-wiki.js"
       - ".github/workflows/wiki-sync.yml"
   workflow_dispatch:
+
+concurrency:
+  group: wiki-sync
+  cancel-in-progress: false
 
 permissions:
   contents: write
