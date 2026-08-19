@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -13,7 +13,7 @@ public class Program
             .WithOptions(ConfigOptions.DisableOptimizationsValidator)
             .AddJob(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
 
-        BenchmarkRunner.Run<GeneratorBenchmark>(config, args);
+        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
     }
 }
 
