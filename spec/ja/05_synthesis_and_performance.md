@@ -1,6 +1,6 @@
-# 03. コード生成とパフォーマンス最適化
+# 05. コード生成とパフォーマンス最適化
 
-[English](../en/03_synthesis_and_performance.md) | [日本語](./03_synthesis_and_performance.md) | [目次 (Intro)](./intro.md)
+[English](../en/05_synthesis_and_performance.md) | [日本語](./05_synthesis_and_performance.md) | [目次 (Intro)](./intro.md)
 
 ## Ⅰ. インターフェース仕様と生成コードの構造
 
@@ -178,5 +178,35 @@ IDE入力時の応答性を最大限に維持するため、アーキテクチ�
 dotnet build -c Release -bl:msbuild.binlog
 ```
 
-**2. BenchmarkDotNet を用いたベンチマーク実行**
-BenchmarkDotNet を利用して、合成されたソースツリーを `CSharpGeneratorDriver` に入力する。この手法により、実行時間と Gen0、Gen1、Gen2 ヒープ全体のアロケーション量が正確に計測される。
+**2. BenchmarkDotNet 実行 (Execution)**
+人工的なソースツリーを BenchmarkDotNet を使って `CSharpGeneratorDriver` に入力する手法。実行時間だけでなく、Gen0 / Gen1 / Gen2 ヒープにおける正確なメモリアロケーションを測定できる。
+
+---
+
+## Ⅵ. パフォーマンス指標 (Performance Metrics)
+
+これらのアーキテクチャ変更を検証するため、標準的な Roslyn の手法（SyntaxFactory）と、我々のトークンストリーミング手法を比較する継続的なベンチマークを実施しています。
+
+### 1. マイクロベンチマーク: AST Mutation vs. Token Streaming
+_シナリオ:_ ターゲット型のデフォルト式 (`new(1, 2, 3)`) を明示的なインスタンス化 (`new global::System.Collections.Generic.List<string>(1, 2, 3)`) へと変換する処理。
+
+| 方式 | 実行時間 (Mean) | 速度比 | Gen0 | Gen1 | Gen2 | メモリアロケーション | アロケーション比 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Roslyn AST Mutation** (`SyntaxFactory`) | 16,718.6 ns | 1.00x | 0.6409 | 0.2441 | **0.0610** | 9,712 B | 1.00 |
+| **Direct Token Streaming** (`SourceWriter`) | **365.4 ns** | **0.02x (約46倍 高速)** | 0.0143 | **-** | **-** | **240 B** | **0.02 (97.5%削減)** |
+
+- _Roslyn AST Mutation:_ `SyntaxFactory.ParseTypeName` → `SyntaxFactory.ObjectCreationExpression` → `.NormalizeWhitespace().ToFullString()` と処理を進めます。この過程で、ヒープ上に再帰的な AST ノードツリーと Trivia（空白やコメントなどの構文要素）リストがアロケーションされます。
+- _Direct Token Streaming:_ 解析済みの AST から既存のトークンや Trivia (`ArgumentList`, `Initializer`) を直接切り出し、中間の構文ツリーを一切アロケーションすることなく出力バッファへと直接流し込みます。
+
+### 2. エンドツーエンドのジェネレーターパイプライン
+_実行環境: WPF 向け生成, AMD Ryzen 9 7900X_
+
+| フェーズ | 実行時間 (ms) | Gen0 | Gen1 | Gen2 | メモリアロケーション |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **ベースライン (旧パイプライン)** | 5.34 ms | 187.5 | 62.5 | 7.8 | 2.87 MB |
+| **v4 パイプライン** | 3.72 ms | 125.0 | 31.2 | - | 2.22 MB |
+| **改善効果** | **-30.3%** | **-33.3%** | **-50.1%** | **-100%** | **-22.6%** |
+
+> [!NOTE]
+> Gen0 / Gen1 / Gen2 カラムは、1,000 操作あたりの GC 発生回数を示しています。最も重い Gen2 GC は、マイクロ／マクロ両方のベンチマークで完全に排除（0回）されています。MAUI, Avalonia, WinUI 向けのベンチマークでも、概ね 20〜30% のスループット向上が確認されています。
+

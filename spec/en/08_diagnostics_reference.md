@@ -1,6 +1,6 @@
-# 07. Diagnostics Reference
+# 08. Diagnostics Reference
 
-[English](./07_diagnostics_reference.md) | [日本語](../ja/07_diagnostics_reference.md) | [Index (Intro)](./intro.md)
+[English](./08_diagnostics_reference.md) | [日本語](../ja/08_diagnostics_reference.md) | [Index (Intro)](./intro.md)
 
 This document provides a comprehensive list of diagnostic errors emitted by the `DependencyPropertyGenerator` during source code analysis, along with detailed troubleshooting guidelines.
 It details the cause of each error and provides concrete Before / After code examples to help you quickly resolve build issues.
@@ -242,3 +242,4 @@ public partial class MyControl : UserControl
 {
 }
 ```
+

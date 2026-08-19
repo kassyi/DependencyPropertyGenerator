@@ -1,6 +1,6 @@
-# 02. Pipeline and Architecture
+# 03. Pipeline and Architecture
 
-[English](./02_pipeline_architecture.md) | [日本語](../ja/02_pipeline_architecture.md) | [Index (Intro)](./intro.md)
+[English](./03_pipeline_architecture.md) | [日本語](../ja/03_pipeline_architecture.md) | [Index (Intro)](./intro.md)
 
 ## I. Incremental Pipeline Architecture
 
@@ -255,3 +255,4 @@ sequenceDiagram
 
 **Extensibility and Separation of Concerns**
 By isolating framework-specific mapping logic (in `DependencyPropertyDataBuilder`) from source generation logic (`SourceGenerationHelper`), the architecture ensures that parsing modifications do not affect the zero-allocation generation layer.
+

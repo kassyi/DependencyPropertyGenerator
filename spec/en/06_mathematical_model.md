@@ -1,6 +1,6 @@
-# 04. Complexity Model of the Incremental Generator
+# 06. Complexity Model of the Incremental Generator
 
-[English](./04_mathematical_model.md) | [日本語](../ja/04_mathematical_model.md) | [Index (Intro)](./intro.md)
+[English](./06_mathematical_model.md) | [日本語](../ja/06_mathematical_model.md) | [Index (Intro)](./intro.md)
 
 To maintain the Roslyn Incremental Source Generator's performance, you must understand the complexity (allocation cost and processing time) of each operation.
 
@@ -106,3 +106,4 @@ To prevent this worst-case complexity from triggering on every keystroke, the ge
 > [!TIP]
 > **3. Allocation-Free Generation via `SourceWriter`**
 > Even during a full pipeline flush (the worst-case scenario), aggressive `StringBuilder` pooling and zero-allocation `ref struct` wrappers prevent secondary performance degradation from GC spikes.
+

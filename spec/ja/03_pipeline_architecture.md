@@ -1,6 +1,6 @@
-# 02. パイプラインとアーキテクチャ
+# 03. パイプラインとアーキテクチャ
 
-[English](../en/02_pipeline_architecture.md) | [日本語](./02_pipeline_architecture.md) | [目次](./intro.md)
+[English](../en/03_pipeline_architecture.md) | [日本語](./03_pipeline_architecture.md) | [目次](./intro.md)
 
 ## Ⅰ. インクリメンタルパイプライン構造
 
@@ -258,3 +258,4 @@ sequenceDiagram
 
 **拡張性と関心事の分離**
 フレームワーク固有のマッピングロジック（`DependencyPropertyDataBuilder` 内）をソース生成ロジック（`SourceGenerationHelper`）から隔離することで、パースロジックの変更がゼロアロケーションの生成レイヤーを汚染しないアーキテクチャが保証される。
+

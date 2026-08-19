@@ -1,6 +1,6 @@
-# 04. インクリメンタル・ジェネレーターの計算量モデル
+# 06. インクリメンタル・ジェネレーターの計算量モデル
 
-[English](../en/04_mathematical_model.md) | [日本語](./04_mathematical_model.md) | [目次 (Intro)](./intro.md)
+[English](../en/06_mathematical_model.md) | [日本語](./06_mathematical_model.md) | [目次 (Intro)](./intro.md)
 
 Roslyn Incremental Source Generator のパフォーマンスを維持するためには、どの操作がどれだけの計算量（アロケーションコストと処理時間）を発生させるかを厳密に理解しなければならない。
 
@@ -106,3 +106,4 @@ $$ T \approx (1 - H) \times O(S \times P \times (N + K)) $$
 > [!TIP]
 > **3. `SourceWriter` によるアロケーションフリーな生成**
 > パイプラインの完全なフラッシュ（最悪ケース）が発生した場合でも、積極的な `StringBuilder` プーリングとゼロアロケーションの `ref struct` ラッパーにより、GC スパイクによる二次的なパフォーマンス低下を防ぐ。
+

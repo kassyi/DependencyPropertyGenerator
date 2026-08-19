@@ -1,6 +1,6 @@
-# 06. Framework Strategies
+# 04. Framework Strategies
 
-[English](./06_framework_strategies.md) | [日本語](../ja/06_framework_strategies.md) | [Index (Intro)](./intro.md)
+[English](./04_framework_strategies.md) | [日本語](../ja/04_framework_strategies.md) | [Index (Intro)](./intro.md)
 
 The `DependencyPropertyGenerator` generates framework-specific boilerplate code for WPF, UWP, WinUI, Uno, Avalonia, and MAUI based on a single `[DependencyProperty]` attribute.
 
@@ -89,3 +89,4 @@ During Roslyn pipeline initialization, the generator automatically resolves the 
 
 3. **Unrecognized Framework Fallback (`Framework.None`)**
    If no framework matches, the generator assigns `Framework.None`. In this state, it emits the `DPG0000` (Framework is not recognized) diagnostic and skips platform-specific `using` imports and registrations. It safely emits only the raw attribute definitions to prevent compilation failure.
+

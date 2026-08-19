@@ -1,6 +1,6 @@
-# 05. Test Specification
+# 07. Test Specification
 
-[English](./05_test_specification.md) | [日本語](../ja/05_test_specification.md) | [Index (Intro)](./intro.md)
+[English](./07_test_specification.md) | [日本語](../ja/07_test_specification.md) | [Index (Intro)](./intro.md)
 
 This document specifies the formal testing standards for the `DependencyPropertyGenerator` (`Kassyi.Generators.DependencyProperty`). It defines the multi-tier testing strategy, quality targets, combinatorial matrix parameters, test case catalogs, execution environments, and strict verification criteria. All test IDs map directly to the C# `TestCategoryNames` constants.
 
@@ -195,3 +195,4 @@ PRs must pass `CombinatorialMatrixTests` (576 cases) and all `IntegrationTests`.
 - **Runtime / Event Failures:** Add a test to `IntegrationTests`. Instantiate the actual UI control and assert `GetValue`/`SetValue` behaviors directly.
 - **New Language Features / Attributes:** Expand the `CombinatorialMatrixTests` factors. Apply `yield break` constraints if permutations explode redundantly.
 - **Diagnostics Modifications:** Add tests to `ErrorTests.cs`. Verify only the emitted `Diagnostic` count and message; **do not** assert source generation, as generation is structurally bypassed upon errors.
+

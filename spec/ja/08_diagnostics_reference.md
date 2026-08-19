@@ -1,4 +1,4 @@
-# 07. 診断エラーコード一覧 (Diagnostics Reference)
+# 08. 診断エラーコード一覧 (Diagnostics Reference)
 
 本ドキュメントは、DependencyPropertyGenerator がソースコード解析中に発行する診断エラー（Diagnostics）の一覧と、そのトラブルシューティングガイドです。
 Microsoft Docs のように、各エラーの発生原因と具体的な解決策（Before / After のコード例）を記載しています。
@@ -240,3 +240,4 @@ public partial class MyControl : UserControl
 {
 }
 ```
+

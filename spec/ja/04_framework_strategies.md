@@ -1,6 +1,6 @@
-# 06. フレームワーク別生成マッピング仕様
+# 04. フレームワーク別生成マッピング仕様
 
-[English](../en/06_framework_strategies.md) | [日本語](./06_framework_strategies.md) | [目次 (Intro)](./intro.md)
+[English](../en/04_framework_strategies.md) | [日本語](./04_framework_strategies.md) | [目次 (Intro)](./intro.md)
 
 DependencyPropertyGenerator は、単一の `[DependencyProperty]` 属性から、ターゲットとする UI フレームワーク（WPF、UWP、WinUI、Uno、Avalonia、MAUI）に最適化されたボイラープレートコードを動的に生成する。
 
@@ -89,3 +89,4 @@ Roslyn パイプラインの初期化中、ジェネレーターは以下の厳�
 
 3. **未認識フレームワークのフォールバック (`Framework.None`)**
    どのフレームワークも一致しない場合、ジェネレーターは安全に `Framework.None` を割り当てる。この状態では、プラットフォーム固有の `using` インポートと登録を選択的にスキップしながら、診断 `DPG0000`（Framework is not recognized）を発行する。コンパイルの失敗を完全に防ぐために、生の属性定義のみを安全に出力する。
+

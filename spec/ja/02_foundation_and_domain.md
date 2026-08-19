@@ -1,6 +1,6 @@
-# 01. 基盤とドメイン
+# 02. 基盤とドメイン
 
-[English](../en/01_foundation_and_domain.md) | [日本語](./01_foundation_and_domain.md) | [目次 (Intro)](./intro.md)
+[English](../en/02_foundation_and_domain.md) | [日本語](./02_foundation_and_domain.md) | [目次 (Intro)](./intro.md)
 
 ## Ⅰ. 目的とアーキテクチャ
 
@@ -296,3 +296,4 @@ classDiagram
 | クラスの修飾子           | `ClassData.Modifiers`              | `string`                          | `public`, `internal`, `sealed` などの修飾子。            |
 | `[AvaloniaObject]` 等    | `ClassData.Framework`              | `Framework`                       | 利用フレームワークの種別 (`WPF`, `Avalonia`, etc.)。     |
 | 親クラス階層（ネスト時） | `ClassData.ParentClasses`          | `EquatableArray<ParentClassData>` | 外側を囲むネスト親クラスの型名・修飾子リスト。           |
+
