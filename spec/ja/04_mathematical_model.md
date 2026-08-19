@@ -61,12 +61,10 @@ context.ExtractData(framework, version, attributeName, prepareData, id, selectMa
 
 $$ T \approx (1 - H) \times O(S \times P \times (N + K)) $$
 
-- **通常編集時（キャッシュヒット $H \to 1$）:**
-  $$ T = (1 - 1) \times O(S \times P \times (N + K)) + O(1) = O(1) \approx 0 $$
-  モデルの等価性比較（`Equals()`）のみでパイプラインが早期終了するため、全体計算量 $T$ は実質的に $O(1) \approx 0$ へと縮退する。
-- **構造変更時（キャッシュミス $H \to 0$）:**
-  $$ T = (1 - 0) \times O(S \times P \times (N + K)) = O(S \times P \times (N + K)) $$
-  全ファイルの抽出とソース生成が再実行され、全体計算量 $T$ は理論上の最悪値に達する。
+| シナリオ | キャッシュ状態 | 全体計算量 $T$ の近似 | パイプラインへの影響 |
+| :--- | :--- | :--- | :--- |
+| **通常編集時** (メソッド内編集など) | **ヒット** ($H \to 1$) | **$O(1) \approx 0$** | モデルの等価性比較（`Equals()`）のみで早期終了するため、負荷は実質ゼロに縮退する。 |
+| **構造変更時** (基底クラスの変更など) | **ミス** ($H \to 0$) | **$O(S \times P \times (N + K))$** | 全ファイルの再解析・ソース生成が走り、理論上の最悪値に達する。 |
 
 > [!NOTE]
 > **実効パフォーマンスの概算値（日常的な編集・タイピング時: $T \approx 0$）**

@@ -61,12 +61,10 @@ Assuming an incremental cache hit ratio of $H$ ($0 \le H \le 1$), the total comp
 
 $$T \approx (1 - H) \times O(S \times P \times (N + K))$$
 
-- **Routine Editing (Cache Hit $H \to 1$):**
-  $$T = (1 - 1) \times O(S \times P \times (N + K)) + O(1) = O(1) \approx 0$$
-  The pipeline terminates early via value equality comparison (`Equals()`), reducing total computational complexity $T$ effectively to $O(1) \approx 0$.
-- **Structural Changes (Cache Miss $H \to 0$):**
-  $$T = (1 - 0) \times O(S \times P \times (N + K)) = O(S \times P \times (N + K))$$
-  Extraction and source generation re-execute across all files, pushing the total computational complexity $T$ to its theoretical worst case.
+| Scenario | Cache State | Total Complexity $T$ | Impact on Pipeline |
+| :--- | :--- | :--- | :--- |
+| **Routine Editing** (e.g., method bodies) | **Hit** ($H \to 1$) | **$O(1) \approx 0$** | Terminates early via `Equals()` comparison. Computational overhead is effectively zero. |
+| **Structural Changes** (e.g., base classes) | **Miss** ($H \to 0$) | **$O(S \times P \times (N + K))$** | Extraction and generation re-execute across all files, reaching the theoretical worst case. |
 
 > [!NOTE]
 > **Estimated Real-World Performance (Daily Editing & Typing: $T \approx 0$)**
