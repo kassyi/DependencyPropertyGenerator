@@ -22,13 +22,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
       - name: Prepare Wiki Content
-        run: python .github/scripts/prepare_wiki.py
+        run: node .github/scripts/prepare-wiki.js
 
       - name: Clone and Update Wiki
         env:
