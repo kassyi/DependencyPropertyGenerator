@@ -1,4 +1,7 @@
-# 05. テスト仕様書 (Test Specification)
+# 07. テスト仕様書 (Test Specification)
+
+[English](../en/07_test_specification.md) | [日本語](./07_test_specification.md)
+前へ: [⬅ 06. 計算量モデル](./06_mathematical_model.md) | [目次 (Intro)](./intro.md) | 次へ: [08. 診断機能リファレンス ➡](./08_diagnostics_reference.md)
 
 本ドキュメントは、DependencyPropertyGenerator におけるテスト戦略、品質目標、直交表パラメータ、テストケース一覧、実行環境、および合否判定基準を定義した正式なテスト仕様書です。テストIDはコード側の `TestCategoryNames` 定数と1対1で対応しています。
 
@@ -38,7 +41,12 @@ Source Generator はホスト環境の差異（OS、ファイルパス区切り�
 
 ### 2.1 対象プラットフォーム・ランタイム
 
-ホスト OS として、Windows（Windows Server / Windows 11、`CRLF`、`\` パス区切り）、Linux（Ubuntu Latest、`LF`、`/` パス区切り）、macOS（macOS Latest、`LF`、`/` パス区切り）を対象とします。
+対象のホスト OS および各環境の仕様は以下の通りです。
+
+- **Windows**: Windows Server または Windows 11（改行コード: `CRLF`、パス区切り文字: `\` または実体参照 &#92;）
+- **Linux**: Ubuntu Latest（改行コード: `LF`、パス区切り文字: `/`）
+- **macOS**: macOS Latest（改行コード: `LF`、パス区切り文字: `/`）
+
 .NET SDK は、C# 13.0 Preview 構文を含む .NET 9.0 SDK を使用します。
 対象の UI フレームワークは以下の通りです。
 
@@ -253,20 +261,20 @@ dotnet test --filter TestCategory=Error
 
 すべての Pull Request は `CombinatorialMatrixTests` (576件) および全統合テストを Pass する必要があります。`.verified.cs` のスナップショット差分が発生した場合は、レビュアーが生成コードの意図した変更であることを目視で確認し、明示的に承認することを義務付けます。
 
-## 12. エージェント向け テスト・トラブルシューティングガイドライン (Agentic Ground Truth)
+## 12. エージェント向け テスト・トラブルシューティングガイドライン
 
 外部エージェント（AIアシスタント）が自律的にテストを修正・追加する際は、以下の境界と手順に従って判断してください。
 
-### 12.1 バグ修正時のテスト追加基準 (Snapshot vs Integration)
+### 12.1 バグ修正時のテスト追加基準
 
 バグを修正した際、その修正を担保するテストをどこに追加すべきかは「バグの性質」によって決定します。
 
-1. **SnapshotTests (構文生成テスト) に追加すべきケース**
+1. **SnapshotTestsに追加すべきケース**
     - **症状**: コンパイルエラーが発生する、生成されるコードの形がおかしい、メソッドのシグネチャが異なる。
     - **理由**: ジェネレーターの出力文字列の正確性を担保するため。
     - **方法**: `Kassyi.Generators.DependencyProperty.SnapshotTests` 内の適切なファイル（`AttachedTests.cs`, `RoutedTests.cs` など）にテストを追加し、`.verified.cs` を更新する。
 
-2. **IntegrationTests (ランタイム統合テスト) に追加すべきケース**
+2. **IntegrationTestsに追加すべきケース**
     - **症状**: コードは生成される（コンパイルは通る）が、実際にアプリを動かすとイベントが発火しない、バインディングが機能しない、実行時に例外が出る。
     - **理由**: WPF や Avalonia などの実フレームワークのランタイム挙動を担保するため。
     - **方法**: `Kassyi.Generators.DependencyProperty.IntegrationTests` 内で実際の UI コントロールをインスタンス化し、`GetValue`/`SetValue` やコールバック発火を検証するテストを追加する。
@@ -285,3 +293,7 @@ C# 14 などの新しい言語仕様や、全く新しい属性を追加する�
 
 `DPG0001` などのジェネレーターエラー通知を修正・追加した場合は、必ず `ErrorTests.cs` にテストを追加します。
 エラー出力時のジェネレーターは「中途半端なソースコードを生成しない（生成をスキップする）」設計になっているため、テストでは `Diagnostic` の発報件数と内容だけを検証し、ソースコードの生成結果はアサートしません。
+
+---
+
+前へ: [⬅ 06. 計算量モデル](./06_mathematical_model.md) | [目次 (Intro)](./intro.md) | 次へ: [08. 診断機能リファレンス →](./08_diagnostics_reference.md)

@@ -1,6 +1,7 @@
-# 04. Complexity Model of the Incremental Generator
+# 06. Mathematical Performance Model
 
-[English](./04_mathematical_model.md) | [日本語](../ja/04_mathematical_model.md) | [Index (Intro)](./intro.md)
+[English](./06_mathematical_model.md) | [日本語](../ja/06_mathematical_model.md)
+Prev: [⬅ 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification ➡](./07_test_specification.md)
 
 To maintain the Roslyn Incremental Source Generator's performance, you must understand the complexity (allocation cost and processing time) of each operation.
 
@@ -61,12 +62,10 @@ Assuming an incremental cache hit ratio of $H$ ($0 \le H \le 1$), the total comp
 
 $$T \approx (1 - H) \times O(S \times P \times (N + K))$$
 
-- **Routine Editing (Cache Hit $H \to 1$):**
-  $$T = (1 - 1) \times O(S \times P \times (N + K)) + O(1) = O(1) \approx 0$$
-  The pipeline terminates early via value equality comparison (`Equals()`), reducing total computational complexity $T$ effectively to $O(1) \approx 0$.
-- **Structural Changes (Cache Miss $H \to 0$):**
-  $$T = (1 - 0) \times O(S \times P \times (N + K)) = O(S \times P \times (N + K))$$
-  Extraction and source generation re-execute across all files, pushing the total computational complexity $T$ to its theoretical worst case.
+| Scenario | Cache State | Total Complexity $T$ | Impact on Pipeline |
+| :--- | :--- | :--- | :--- |
+| **Routine Editing** (e.g., method bodies) | **Hit** ($H \to 1$) | **$O(1) \approx 0$** | Terminates early via `Equals()` comparison. Computational overhead is effectively zero. |
+| **Structural Changes** (e.g., base classes) | **Miss** ($H \to 0$) | **$O(S \times P \times (N + K))$** | Extraction and generation re-execute across all files, reaching the theoretical worst case. |
 
 > [!NOTE]
 > **Estimated Real-World Performance (Daily Editing & Typing: $T \approx 0$)**
@@ -95,16 +94,14 @@ This triggers the following compiler events:
 
 ## III. Architectural Ingenuity to Prevent Degradation
 
-To prevent this worst-case complexity from triggering on every keystroke, the generator enforces the following architectural rules:
+To prevent this worst-case complexity from triggering on every keystroke, the generator enforces strict architectural rules.
 
-> [!CAUTION]
-> **1. Prohibition of `ISymbol` or `SyntaxNode` within DTOs**
-> If Roslyn reference objects pollute the data model, the underlying instance mutates on every keystroke, forcing `Equals()` to return `false`. This immediately invalidates caches for unrelated files, repeatedly triggering the worst-case complexity $O(S \times P)$ and freezing the IDE.
+> [!NOTE]
+> **Specific Measures to Prevent Performance Degradation**
+> For detailed rules regarding the prohibition of `ISymbol` in DTOs, strict `EquatableArray<T>` implementations, and allocation-free generation via `SourceWriter`, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
 
-> [!IMPORTANT]
-> **2. Strict Implementation of `IEquatable` (`EquatableArray<T>`)**
-> Enforcing deep value-based comparisons for array data mathematically guarantees that semantically identical code yields cache hits, maintaining $H \approx 1$.
+---
 
-> [!TIP]
-> **3. Allocation-Free Generation via `SourceWriter`**
-> Even during a full pipeline flush (the worst-case scenario), aggressive `StringBuilder` pooling and zero-allocation `ref struct` wrappers prevent secondary performance degradation from GC spikes.
+Prev: [← 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification →](./07_test_specification.md)
+
+

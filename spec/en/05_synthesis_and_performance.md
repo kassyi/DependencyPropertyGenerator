@@ -1,6 +1,7 @@
-# 03. Code Synthesis and Performance Optimization
+# 05. Code Synthesis & Performance Optimization
 
-[English](./03_synthesis_and_performance.md) | [日本語](../ja/03_synthesis_and_performance.md) | [Index (Intro)](./intro.md)
+[English](./05_synthesis_and_performance.md) | [日本語](../ja/05_synthesis_and_performance.md)
+Prev: [⬅ 04. Framework Generator Strategies](./04_framework_strategies.md) | [Index (Intro)](./intro.md) | Next: [06. Mathematical Performance Model ➡](./06_mathematical_model.md)
 
 ## I. Interface Specification and Generated Code Structure
 
@@ -113,13 +114,10 @@ If you rely on the auto-discovery of `partial void On...Changed()` methods, an u
 
 #### 3. Resolving Callback Signature Mismatches 
 
-The `DPG0007` diagnostic prevents a silent bug where event registration ignores the target callback, resulting in a null `propertyChangedCallback`.
+A common cause of the `DPG0007` diagnostic is defining a callback using the standard WPF signature with a generic `DependencyObject` parameter. To enforce type safety, the rule engine explicitly rejects generic `DependencyObject` arguments.
 
-A common cause of this diagnostic is defining a callback using the standard WPF signature with a generic `DependencyObject` parameter. To enforce type safety, the rule engine explicitly rejects generic `DependencyObject` arguments.
-
-**Resolution Steps:**
-1. Update the callback's first parameter to use the exact type of the class defining the property.
-2. Ensure the custom callback is an instance method; the generator automatically emits a static proxy method to wire up the event.
+> [!NOTE]
+> For specific causes and code examples of how to resolve each diagnostic error (`DPG0001` through `DPG0008`), see **[08. Diagnostics Reference](./08_diagnostics_reference.md)**.
 
 ---
 
@@ -180,3 +178,37 @@ dotnet build -c Release -bl:msbuild.binlog
 
 **2. BenchmarkDotNet Execution**
 Feed synthetic source trees into `CSharpGeneratorDriver` using BenchmarkDotNet. This accurately measures execution duration and memory allocation across the Gen0, Gen1, and Gen2 heaps.
+
+---
+
+## VI. Performance Metrics
+
+To validate these architectural shifts, we run continuous benchmarks comparing standard Roslyn techniques against our token streaming approach. For the benchmark source code and detailed measurement methodologies, see the [`tests/Kassyi.Generators.DependencyProperty.Benchmarks`](../../tests/Kassyi.Generators.DependencyProperty.Benchmarks) project.
+
+### 1. Micro-Benchmark: AST Mutation vs. Token Streaming
+_Scenario:_ Converting a target-typed default expression (`new(1, 2, 3)`) into an explicit instantiation (`new global::System.Collections.Generic.List<string>(1, 2, 3)`).
+
+| Method | Mean | Ratio | Gen0 | Gen1 | Gen2 | Allocated | Alloc Ratio |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Roslyn AST Mutation** (`SyntaxFactory`) | 16,718.6 ns | 1.00x | 0.6409 | 0.2441 | **0.0610** | 9,712 B | 1.00 |
+| **Direct Token Streaming** (`SourceWriter`) | **365.4 ns** | **0.02x (~46x faster)** | 0.0143 | **-** | **-** | **240 B** | **0.02 (-97.5%)** |
+
+- _Roslyn AST Mutation:_ `SyntaxFactory.ParseTypeName` → `SyntaxFactory.ObjectCreationExpression` → `.NormalizeWhitespace().ToFullString()`. Allocates recursive AST node trees and trivia lists on the heap.
+- _Direct Token Streaming:_ Slices existing tokens/trivia (`ArgumentList`, `Initializer`) directly from the parsed AST and streams them straight into the output buffer without allocating intermediate syntax trees.
+
+### 2. End-to-End Generator Pipeline
+_Environment: WPF generation, AMD Ryzen 9 7900X_
+
+| Phase                       | Time (ms)  | Gen0       | Gen1       | Gen2      | Allocated  |
+| :-------------------------- | :--------- | :--------- | :--------- | :-------- | :--------- |
+| **Baseline (Old Pipeline)** | 5.34 ms    | 187.5      | 62.5       | 7.8       | 2.87 MB    |
+| **v4 Pipeline**             | 3.72 ms    | 125.0      | 31.2       | -         | 2.22 MB    |
+| **Improvement**             | **-30.3%** | **-33.3%** | **-50.1%** | **-100%** | **-22.6%** |
+
+> Gen0/1/2 columns represent GC collections per 1,000 operations. Gen2 full GCs are completely eliminated in both micro and macro runs. Benchmarks for MAUI, Avalonia, and WinUI show similar 20-30% pipeline throughput gains.
+
+---
+
+Prev: [← 04. Framework Generator Strategies](./04_framework_strategies.md) | [Index (Intro)](./intro.md) | Next: [06. Mathematical Performance Model →](./06_mathematical_model.md)
+
+

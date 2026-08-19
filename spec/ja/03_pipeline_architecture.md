@@ -1,6 +1,7 @@
-# 02. パイプラインとアーキテクチャ
+# 03. パイプライン構造
 
-[English](../en/02_pipeline_architecture.md) | [日本語](./02_pipeline_architecture.md) | [目次](./intro.md)
+[English](../en/03_pipeline_architecture.md) | [日本語](./03_pipeline_architecture.md)
+前へ: [⬅ 02. 基盤とドメイン](./02_foundation_and_domain.md) | [目次 (Intro)](./intro.md) | 次へ: [04. フレームワーク別生成マッピング仕様 ➡](./04_framework_strategies.md)
 
 ## Ⅰ. インクリメンタルパイプライン構造
 
@@ -45,20 +46,10 @@ sequenceDiagram
 
 ## Ⅱ. モデルの等価性キャッシュ戦略
 
-インクリメンタルジェネレーターにおける最重要パフォーマンス指標は、インクリメンタルキャッシュのヒット率である。このヒット率を最適化するため、データモデル（`DependencyPropertyData`, `ClassData`, `EventData` およびサブレコード）には厳格な値の等価性セマンティクスが強制される。
+インクリメンタルジェネレーターにおける最重要パフォーマンス指標は、インクリメンタルキャッシュのヒット率である。このヒット率を最適化するため、データモデル（`DependencyPropertyData`, `ClassData`, `EventData` およびサブレコード）には厳格な値の等価性セマンティクス（`readonly record struct` の採用や `EquatableArray<T>` によるコレクションラップ）が強制される。
 
-> [!IMPORTANT]
-> **`readonly record struct` によるディープバリュー比較**
-> すべてのモデルは `readonly record struct` として宣言される。これにより、C# コンパイラは基礎となるすべてのフィールドを比較する値ベースの `Equals()` および `GetHashCode()` 実装を自動生成し、厳密な値の等価性が保証される。
-
-> [!WARNING]
-> **`EquatableArray<T>` によるコレクションの構造的等価性**
-> Roslyn パイプラインにおいて、標準の配列（`T[]`）や `ImmutableArray<T>` は参照による等価性評価を行う。同一のアイテムを持つ新しい配列インスタンスを生成すると、参照等価性チェックが失敗し、コンパイラキャッシュが無効化される。
-
-キャッシュの無効化を回避するため、コレクションは必ず `EquatableArray<T>` でラップされなければならない。
-
-- **実装箇所**: `BindEvents: bindEvents.AsEquatableArray()`
-- **効果**: このラッパーは要素ごとのディープな等価性（`SequenceEqual`）を強制する。基盤となるデータが意味的に同一である場合、不要なソース再生成を完全に抑制する。
+> [!NOTE]
+> 等価性キャッシュ戦略、ゼロアロケーション生成、および Roslyn 構文ツリーの早期切り離しに関する詳細なアーキテクチャ制約については、**[05. コード生成とパフォーマンス最適化 (Ⅳ. パフォーマンス最適化ルール)](./05_synthesis_and_performance.md#ⅳ-パフォーマンス最適化ルール)** を参照のこと。
 
 ---
 
@@ -248,13 +239,13 @@ sequenceDiagram
 
 ### 3. アーキテクチャの設計意図
 
-> [!CAUTION]
-> **Roslyn 型（Symbol/Syntax）の早期切り離し**
-> Roslyn の構文ツリー (`SyntaxNode`) と意味モデル (`ISymbol`) は巨大なオブジェクトである。これらを保持すると深刻なメモリリークが発生し、コンパイラのインクリメンタルキャッシュが根本的に破壊される。`PrepareData` レイヤーはこれらを強制的に C# プリミティブ型 (DTO) に変換し、直ちに切り離さなければならない。
-
-> [!TIP]
-> **ゼロアロケーション生成フェーズ**
-> 抽出フェーズがデータを `SourceGenerationHelper` に渡した後、すべての Roslyn 解析処理は停止しなければならない。生成フェーズは、提供された DTO のみに基づいて `SourceWriter` を介してテキストを高速に合成する純粋な関数として機能する。
+> [!NOTE]
+> **パフォーマンス最適化原則の集約**
+> Roslyn 型（Symbol/Syntax）の早期切り離しや、ゼロアロケーション生成フェーズに関する具体的な禁止事項・ベストプラクティスについては、**[05. コード生成とパフォーマンス最適化 (Ⅳ. パフォーマンス最適化ルール)](./05_synthesis_and_performance.md#ⅳ-パフォーマンス最適化ルール)** を参照のこと。
 
 **拡張性と関心事の分離**
 フレームワーク固有のマッピングロジック（`DependencyPropertyDataBuilder` 内）をソース生成ロジック（`SourceGenerationHelper`）から隔離することで、パースロジックの変更がゼロアロケーションの生成レイヤーを汚染しないアーキテクチャが保証される。
+
+---
+
+前へ: [⬅ 02. 基盤とドメイン](./02_foundation_and_domain.md) | [目次 (Intro)](./intro.md) | 次へ: [04. フレームワーク別生成マッピング仕様 ➡](./04_framework_strategies.md)

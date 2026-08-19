@@ -1,6 +1,7 @@
-# 05. Test Specification
+# 07. Test Specification
 
-[English](./05_test_specification.md) | [日本語](../ja/05_test_specification.md) | [Index (Intro)](./intro.md)
+[English](./07_test_specification.md) | [日本語](../ja/07_test_specification.md)
+Prev: [⬅ 06. Mathematical Performance Model](./06_mathematical_model.md) | [Index (Intro)](./intro.md) | Next: [08. Diagnostics Reference ➡](./08_diagnostics_reference.md)
 
 This document specifies the formal testing standards for the `DependencyPropertyGenerator` (`Kassyi.Generators.DependencyProperty`). It defines the multi-tier testing strategy, quality targets, combinatorial matrix parameters, test case catalogs, execution environments, and strict verification criteria. All test IDs map directly to the C# `TestCategoryNames` constants.
 
@@ -41,7 +42,12 @@ flowchart TD
 
 ### 2.1 Target Platforms and Runtimes
 
-Tests run on Windows (Windows Server / Windows 11 with `CRLF` and `\`), Linux (Ubuntu Latest with `LF` and `/`), and macOS (macOS Latest with `LF` and `/`).
+The target host OS and environment conditions are as follows:
+
+- **Windows**: Windows Server or Windows 11 (Line endings: `CRLF`, Path separator: `\` or entity reference &#92;)
+- **Linux**: Ubuntu Latest (Line endings: `LF`, Path separator: `/`)
+- **macOS**: macOS Latest (Line endings: `LF`, Path separator: `/`)
+
 The build requires the .NET 9.0 SDK and uses C# 13.0 Preview language features.
 The generator targets WPF (.NET Framework 4.8 / .NET Core 3.1 / .NET 5–9), Uno Platform (UWP/WinUI), .NET MAUI (.NET 7.0+), and Avalonia UI (11.0+).
 
@@ -195,3 +201,9 @@ PRs must pass `CombinatorialMatrixTests` (576 cases) and all `IntegrationTests`.
 - **Runtime / Event Failures:** Add a test to `IntegrationTests`. Instantiate the actual UI control and assert `GetValue`/`SetValue` behaviors directly.
 - **New Language Features / Attributes:** Expand the `CombinatorialMatrixTests` factors. Apply `yield break` constraints if permutations explode redundantly.
 - **Diagnostics Modifications:** Add tests to `ErrorTests.cs`. Verify only the emitted `Diagnostic` count and message; **do not** assert source generation, as generation is structurally bypassed upon errors.
+
+---
+
+Prev: [← 06. Mathematical Performance Model](./06_mathematical_model.md) | [Index (Intro)](./intro.md) | Next: [08. Diagnostics Reference →](./08_diagnostics_reference.md)
+
+

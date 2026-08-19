@@ -1,6 +1,7 @@
-# 03. コード生成とパフォーマンス最適化
+# 05. コード生成とパフォーマンス最適化
 
-[English](../en/03_synthesis_and_performance.md) | [日本語](./03_synthesis_and_performance.md) | [目次 (Intro)](./intro.md)
+[English](../en/05_synthesis_and_performance.md) | [日本語](./05_synthesis_and_performance.md)
+前へ: [⬅ 04. フレームワーク別生成マッピング仕様](./04_framework_strategies.md) | [目次 (Intro)](./intro.md) | 次へ: [06. 計算量モデル ➡](./06_mathematical_model.md)
 
 ## Ⅰ. インターフェース仕様と生成コードの構造
 
@@ -10,12 +11,14 @@
 
 **入力制約 (User Code)**
 ジェネレーターは以下の条件を満たすコードを処理対象とする。
+
 - `partial` 修飾子が付与されたクラス宣言。
 - `[DependencyProperty]` または関連する属性が付与されたクラス。
 - 任意のフック宣言（`partial void On...Changed()`）。
 
 **出力成果物 (Generated Code)**
 生成されるコードは以下の構造要素で構成される。
+
 - 依存関係プロパティの静的フィールド（通常は `...Property` サフィックスを伴う）。
 - `get` および `set` アクセサを実装する CLR プロパティラッパー。
 - `propertyChangedCallback` にバインドされるプロパティ変更コールバックの実装。
@@ -27,7 +30,7 @@
 
 ソースコードの出力フェーズは、`Kassyi.Generators.Extensions` 名前空間の `SourceWriter` によって管理される。本アーキテクチャでは、定型的なボイラープレートを排除し、ゼロアロケーションと安全なインデントスコープのライフサイクルを強制するために、特定の構造パターンを標準化している。
 
-### 1. 外殻エンベロープヘルパー
+### 1. クラス全体を囲むスコープヘルパー
 
 ジェネレーターは、反復的な構造的ボイラープレートを単一のメソッド呼び出しでカプセル化する。このエンベロープには `#nullable enable` ディレクティブ、`namespace` 宣言、外部のネストされた親クラス、および対象の `partial class` 定義が含まれる。
 
@@ -64,6 +67,7 @@ using (writer.Scope($"static {@class.Name}()"))
 `PrepareData` 抽出フェーズでは、Target-Typed な `new` 式が自動的に展開される。`DefaultValueExpression` が C# 9.0 以降の構文に基づく `new(...)` または `new (...)` で開始される場合、パイプラインはそれを完全修飾されたグローバルな型名へと変換する。
 
 **変換プロセスの例**
+
 - **入力:** `[DependencyProperty<MyProfile>("Profile", DefaultValueExpression = "new(1.5, 48.0)")]`
 - **出力:** `new global::MyNamespace.MyProfile(1.5, 48.0)`
 
@@ -73,7 +77,6 @@ using (writer.Scope($"static {@class.Name}()"))
 
 ユーザーコードが `public partial int Value { get; set; }` のように C# 13 の partial プロパティ構文で定義されている場合、ジェネレーターは `Modifiers.IsPartialProperty` を自動検出し、プロパティの getter / setter 実装ブロックを出力する。これにより、従来型のプロパティ生成と partial プロパティ生成の双方が透過的にサポートされる。
 
-
 ### コールバックメソッドの照合規則
 
 #### 1. シグネチャ照合ルールエンジン
@@ -81,6 +84,7 @@ using (writer.Scope($"static {@class.Name}()"))
 ジェネレーターは `Rules/Signatures/` ディレクトリに配置された専用のルールクラスを利用してコールバックシグネチャを解決する。このエンジンは、パラメータの上限および型の要件を厳格に適用する。
 
 **サポートされるシグネチャ要件**
+
 - **0引数:** `NoParametersRule` により処理される。
 - **1引数:** `SingleParameterRule` により処理される。新しい値、または `EventArgs` を許容する。
 - **2引数:** `DoubleParameterRule` により処理される。旧値と新値のペア、送信元と新値のペア、または送信元と `EventArgs` のペアを許容する。
@@ -100,26 +104,18 @@ void OnTextChanged(MyControl sender, string oldValue, string newValue, object ex
 #### 2. エラー報告とコンパイル時の安全性
 
 無効なコールバックシグネチャに対して厳格なコンパイルエラーを適用することで、実行時のサイレントな障害を防止する。
-
-**明示的な指定時の挙動**
-コールバックが `OnChanged` パラメータを通じて明示的に定義された場合、無効なシグネチャまたはメソッドの欠落は `DPG0001` コンパイルエラーをトリガーし、ビルドプロセスを即座に停止させる。
-
-**規約に基づく自動検出時の挙動**
-`partial void On...Changed()` メソッドの自動検出に依存する場合、一致しないシグネチャは `DPG0007` コンパイルエラーをトリガーする。
+明示的なメソッド指定が不正な場合は `DPG0001`、規約に基づく自動検出メソッドのシグネチャが不正な場合は `DPG0007` が発生する。
 
 > [!IMPORTANT]
 > **サイレント不具合の根絶 ([HavenDV#165](https://github.com/HavenDV/DependencyPropertyGenerator/issues/165))**
-> 元のジェネレーターでは、WPF 標準の `(DependencyObject, DependencyPropertyChangedEventArgs)` などシグネチャが合致しないメソッドを記述した場合に、警告やエラーを出さずに静かに無視（`propertyChangedCallback: null` を出力）し、実行時にコールバックが一切発火しなくなる深刻なサイレントバグが存在していた。本仕様ではこれを厳格なコンパイル時診断（`DPG0001` / `DPG0007`）として即座に通知することで完全に根絶している。
+> 古いジェネレーターにおける「シグネチャが合わない場合に警告なしで無視する」というサイレントバグは、本アーキテクチャでは厳格なコンパイル時診断として即座に通知され、完全に根絶されている。
 
 #### 3. シグネチャ不一致のトラブルシューティング
 
-`DPG0007` 診断は、イベント登録処理が対象のコールバックを無視し、結果として `propertyChangedCallback` が null になるサイレントバグを防止する。
+`DPG0001` や `DPG0007` などの診断が発生する最も頻繁な要因は、標準的なWPFシグネチャと汎用的な `DependencyObject` パラメータを用いてコールバックを定義することにある。厳密な型安全性を強制するため、ジェネレーターのルールエンジンは汎用的な `DependencyObject` を引数として受け入れることを明示的に拒否する。
 
-この診断が発生する最も頻繁な要因は、標準的なWPFシグネチャと汎用的な `DependencyObject` パラメータを用いてコールバックを定義することにある。厳密な型安全性を強制するため、ジェネレーターのルールエンジンは汎用的な `DependencyObject` を引数として受け入れることを明示的に拒否する。
-
-**解決手順:**
-1. コールバックメソッドの第1パラメータを、プロパティを定義するクラスと正確に同一の型を利用するように更新する。
-2. カスタムコールバックが標準的なインスタンスメソッドとして定義されていることを確認する。ジェネレーターはイベントを結線するための静的プロキシメソッドを自動的に生成するため、静的メソッドによる手動定義は不要である。
+> [!NOTE]
+> 各診断エラー（`DPG0001`〜`DPG0008`）の具体的な発生原因と解決策のコード例については、**[08. 診断エラーコード一覧 (Diagnostics Reference)](./08_diagnostics_reference.md)** を参照のこと。
 
 ---
 
@@ -174,9 +170,45 @@ IDE入力時の応答性を最大限に維持するため、アーキテクチ�
 
 **1. MSBuild 構造化ログ解析**
 ビルドプロセス中にバイナリログを生成し、ジェネレーターの実行時間を検査する。生成された `msbuild.binlog` は MSBuild Structured Log Viewer を利用して解析する。
+
 ```bash
 dotnet build -c Release -bl:msbuild.binlog
 ```
 
-**2. BenchmarkDotNet を用いたベンチマーク実行**
-BenchmarkDotNet を利用して、合成されたソースツリーを `CSharpGeneratorDriver` に入力する。この手法により、実行時間と Gen0、Gen1、Gen2 ヒープ全体のアロケーション量が正確に計測される。
+**2. BenchmarkDotNet 実行 (Execution)**
+人工的なソースツリーを BenchmarkDotNet を使って `CSharpGeneratorDriver` に入力する手法。実行時間だけでなく、Gen0 / Gen1 / Gen2 ヒープにおける正確なメモリアロケーションを測定できる。
+
+---
+
+## Ⅵ. パフォーマンス指標 (Performance Metrics)
+
+これらのアーキテクチャ変更を検証するため、標準的な Roslyn の手法（SyntaxFactory）と独自のトークンストリーミング手法を比較する継続的なベンチマークを実施しています。ベンチマークのソースコードや詳細な計測手法については、[`tests/Kassyi.Generators.DependencyProperty.Benchmarks`](../../tests/Kassyi.Generators.DependencyProperty.Benchmarks) プロジェクトを参照してください。
+
+### 1. マイクロベンチマーク: AST Mutation vs. Token Streaming
+
+_シナリオ:_ ターゲット型のデフォルト式 (`new(1, 2, 3)`) を明示的なインスタンス化 (`new global::System.Collections.Generic.List<string>(1, 2, 3)`) へと変換する処理。
+
+| 方式                                        | 実行時間 (Mean) | 速度比                  | Gen0   | Gen1   | Gen2       | メモリアロケーション | アロケーション比     |
+| :------------------------------------------ | :-------------- | :---------------------- | :----- | :----- | :--------- | :------------------- | :------------------- |
+| **Roslyn AST Mutation** (`SyntaxFactory`)   | 16,718.6 ns     | 1.00x                   | 0.6409 | 0.2441 | **0.0610** | 9,712 B              | 1.00                 |
+| **Direct Token Streaming** (`SourceWriter`) | **365.4 ns**    | **0.02x (約46倍 高速)** | 0.0143 | **-**  | **-**      | **240 B**            | **0.02 (97.5%削減)** |
+
+- _Roslyn AST Mutation:_ `SyntaxFactory.ParseTypeName` → `SyntaxFactory.ObjectCreationExpression` → `.NormalizeWhitespace().ToFullString()` と処理を進めます。この過程で、ヒープ上に再帰的な AST ノードツリーと Trivia（空白やコメントなどの構文要素）リストがアロケーションされます。
+- _Direct Token Streaming:_ 解析済みの AST から既存のトークンや Trivia (`ArgumentList`, `Initializer`) を直接切り出し、中間の構文ツリーを一切アロケーションすることなく出力バッファへと直接流し込みます。
+
+### 2. エンドツーエンドのジェネレーターパイプライン
+
+_実行環境: WPF 向け生成, AMD Ryzen 9 7900X_
+
+| フェーズ                          | 実行時間 (ms) | Gen0       | Gen1       | Gen2      | メモリアロケーション |
+| :-------------------------------- | :------------ | :--------- | :--------- | :-------- | :------------------- |
+| **ベースライン (旧パイプライン)** | 5.34 ms       | 187.5      | 62.5       | 7.8       | 2.87 MB              |
+| **v4 パイプライン**               | 3.72 ms       | 125.0      | 31.2       | -         | 2.22 MB              |
+| **改善効果**                      | **-30.3%**    | **-33.3%** | **-50.1%** | **-100%** | **-22.6%**           |
+
+> [!NOTE]
+> Gen0 / Gen1 / Gen2 カラムは、1,000 操作あたりの GC 発生回数を示しています。最も重い Gen2 GC は、マイクロ／マクロ両方のベンチマークで完全に排除（0回）されています。MAUI, Avalonia, WinUI 向けのベンチマークでも、概ね 20〜30% のスループット向上が確認されています。
+
+---
+
+前へ: [⬅ 04. フレームワーク別生成マッピング仕様](./04_framework_strategies.md) | [目次 (Intro)](./intro.md) | 次へ: [06. 計算量モデル ➡](./06_mathematical_model.md)
