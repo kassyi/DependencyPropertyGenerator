@@ -107,6 +107,26 @@ internal sealed class AvaloniaFrameworkGenerator : FrameworkGenerator
         writer.AppendLine($"private {SourceGenerationHelper.GenerateType(property)} _{property.Name.ToParameterName()} = {SourceGenerationHelper.GenerateDefaultValue(property)};");
     }
 
+    public override void GenerateSetter(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        if (property.Modifiers.IsDirect)
+        {
+            using (writer.Scope("private set"))
+            {
+                var type = SourceGenerationHelper.GenerateType(property);
+                writer.AppendLine($"var oldValue = _{property.Name.ToParameterName()};");
+                writer.AppendLine($"SetAndRaise({property.Name}Property, ref _{property.Name.ToParameterName()}, value);");
+                writer.AppendLine($"On{property.Name}Changed();");
+                writer.AppendLine($"On{property.Name}Changed(({type})value);");
+                writer.AppendLine($"On{property.Name}Changed(({type})oldValue, ({type})value);");
+            }
+        }
+        else
+        {
+            base.GenerateSetter(ref writer, @class, property);
+        }
+    }
+
     public override void GenerateRoutedEvent(ref SourceWriter writer, ClassData @class, EventData @event) =>
         GenerateRoutedEventInternal(ref writer, @class, @event);
 
