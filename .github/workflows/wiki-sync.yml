@@ -1,0 +1,55 @@
+name: Sync Specifications to GitHub Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "spec/**"
+      - ".github/scripts/prepare-wiki.js"
+      - ".github/workflows/wiki-sync.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: wiki-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync-wiki:
+    name: Build and Sync Wiki
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Wiki Content
+        run: node .github/scripts/prepare-wiki.js
+
+      - name: Clone and Update Wiki
+        env:
+          WIKI_REPO: "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git clone "$WIKI_REPO" wiki_git; then
+            echo "Wiki repository cloned successfully."
+            rm -f wiki_git/*.md
+            cp -r wiki_dist/* wiki_git/
+            cd wiki_git
+            git add .
+            if git diff --staged --quiet; then
+              echo "No changes to commit in wiki."
+            else
+              git commit -m "docs(wiki): sync specifications from main repo"
+              git push origin HEAD
+              echo "Wiki successfully synchronized!"
+            fi
+          else
+            echo "::error::GitHub Wiki repository is not initialized yet. Please open https://github.com/${{ github.repository }}/wiki and click 'Create the first page' to initialize the wiki repository."
+            exit 1
+          fi
