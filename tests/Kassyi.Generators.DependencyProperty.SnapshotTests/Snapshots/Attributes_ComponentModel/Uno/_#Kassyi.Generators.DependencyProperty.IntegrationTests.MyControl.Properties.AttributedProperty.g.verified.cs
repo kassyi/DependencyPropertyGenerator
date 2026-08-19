@@ -39,7 +39,17 @@ typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(
 public string? AttributedProperty
 {
 get => (string?)GetValue(AttributedPropertyProperty);
-set => SetValue(AttributedPropertyProperty, value);
+set
+{
+if (value is null || value.Length == 0)
+{
+SetValue(AttributedPropertyProperty, value);
+}
+else
+{
+global::Windows.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromString(this, AttributedPropertyProperty, value);
+}
+}
 
 }
 

@@ -146,7 +146,7 @@ internal static partial class SourceGenerationHelper
         }
     }
 
-    private static string GenerateAdditionalSetterModifier(DependencyPropertyData property)
+    internal static string GenerateAdditionalSetterModifier(DependencyPropertyData property)
     {
         return property is { Modifiers.IsDirect: true, Framework: Framework.Avalonia }
             ? "private "

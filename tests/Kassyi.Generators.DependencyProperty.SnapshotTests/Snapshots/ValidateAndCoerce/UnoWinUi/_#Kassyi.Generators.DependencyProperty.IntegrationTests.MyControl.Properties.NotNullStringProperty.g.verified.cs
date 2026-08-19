@@ -43,7 +43,17 @@ callback(sender, args);
 public string NotNullStringProperty
 {
 get => (string)GetValue(NotNullStringPropertyProperty);
-set => SetValue(NotNullStringPropertyProperty, value);
+set
+{
+if (value is null || value.Length == 0)
+{
+SetValue(NotNullStringPropertyProperty, value);
+}
+else
+{
+global::Microsoft.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromString(this, NotNullStringPropertyProperty, value);
+}
+}
 
 }
 

@@ -9,12 +9,8 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
     public override string GeneratePropertyChangedCallback(ClassData @class, DependencyPropertyData property)
     {
         var baseCallback = base.GeneratePropertyChangedCallback(@class, property);
-        if (!property.ValidationAndCallbacks.Coerce)
-        {
-            return baseCallback;
-        }
-
-        return GenerateCoercionWrappingCallback(@class, property, baseCallback);
+        return !property.ValidationAndCallbacks.Coerce 
+            ? baseCallback : GenerateCoercionWrappingCallback(@class, property, baseCallback);
     }
 
     private static string GenerateCoercionWrappingCallback(
@@ -49,11 +45,13 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
                 writer.AppendLine("return;");
             }
 
-            if (baseCallback != "null")
+            if (baseCallback == "null")
             {
-                writer.AppendLine($"var callback = new {propCallbackType}({baseCallback});");
-                writer.AppendLine("callback(sender, args);");
+                return writer.ToString();
             }
+
+            writer.AppendLine($"var callback = new {propCallbackType}({baseCallback});");
+            writer.AppendLine("callback(sender, args);");
         }
 
         return writer.ToString();
@@ -120,4 +118,66 @@ internal sealed class UwpFrameworkGenerator : FrameworkGenerator
 
     public override string GenerateManagerType(ClassData @class) =>
         SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "DependencyProperty");
+
+    public override void GenerateSetter(ref SourceWriter writer, ClassData @class, DependencyPropertyData property)
+    {
+        var setMethodName = property.Type.GetXamlBindingHelperSetMethodName();
+        if (setMethodName == null)
+        {
+            base.GenerateSetter(ref writer, @class, property);
+            return;
+        }
+
+        var setOrInit = property.Modifiers.IsInitOnly ? "init" : "set";
+        var modifier = SourceGenerationHelper.GenerateAdditionalSetterModifier(property);
+        var propName = SourceGenerationHelper.GenerateDependencyPropertyName(property);
+        var helperType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "Markup.XamlBindingHelper");
+
+        if (setMethodName == "SetPropertyFromString")
+        {
+            using (writer.Scope($"{modifier}{setOrInit}"))
+            {
+                using (writer.Scope("if (value is null || value.Length == 0)"))
+                {
+                    writer.AppendLine($"SetValue({propName}, value);");
+                }
+                using (writer.Scope("else"))
+                {
+                    writer.AppendLine($"{helperType}.SetPropertyFromString(this, {propName}, value);");
+                }
+            }
+        }
+        else
+        {
+            writer.AppendLine($"{modifier}{setOrInit} => {helperType}.{setMethodName}(this, {propName}, value);");
+        }
+    }
+
+    public override void GenerateAttachedSetterBody(ref SourceWriter writer, ClassData @class, DependencyPropertyData property, string dependencyPropertyName)
+    {
+        var setMethodName = property.Type.GetXamlBindingHelperSetMethodName();
+        if (setMethodName == null)
+        {
+            base.GenerateAttachedSetterBody(ref writer, @class, property, dependencyPropertyName);
+            return;
+        }
+
+        var helperType = SourceGenerationHelper.GenerateTypeByPlatform(@class.Framework, "Markup.XamlBindingHelper");
+
+        if (setMethodName == "SetPropertyFromString")
+        {
+            using (writer.Scope("if (value is null || value.Length == 0)"))
+            {
+                writer.AppendLine($"element.SetValue({dependencyPropertyName}, value);");
+            }
+            using (writer.Scope("else"))
+            {
+                writer.AppendLine($"{helperType}.SetPropertyFromString(element, {dependencyPropertyName}, value);");
+            }
+        }
+        else
+        {
+            writer.AppendLine($"{helperType}.{setMethodName}(element, {dependencyPropertyName}, value);");
+        }
+    }
 }

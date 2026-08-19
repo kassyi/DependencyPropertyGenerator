@@ -226,9 +226,26 @@ public static class E2EAssertionPipeline
         if (expr is InvocationExpressionSyntax invocation)
         {
             var methodName = GetMethodName(invocation);
-            if (methodName is KnownMethodNames.SetValue or KnownMethodNames.SetAndRaise)
+            if (methodName is KnownMethodNames.SetValue or KnownMethodNames.SetAndRaise ||
+                (methodName != null && methodName.StartsWith("SetPropertyFrom", StringComparison.Ordinal)))
             {
                 return true;
+            }
+        }
+
+        // Handle string fallback: if (...) SetValue(...) else SetPropertyFromString(...)
+        if (expr == null && expression.Parent is AccessorDeclarationSyntax accessor && accessor.Body != null)
+        {
+            // Simple check: if there's any invocation of SetPropertyFromString or SetValue in the body
+            var descendantNodes = accessor.Body.DescendantNodes().OfType<InvocationExpressionSyntax>();
+            foreach (var innerInvocation in descendantNodes)
+            {
+                var methodName = GetMethodName(innerInvocation);
+                if (methodName is KnownMethodNames.SetValue or KnownMethodNames.SetAndRaise ||
+                    (methodName != null && methodName.StartsWith("SetPropertyFrom", StringComparison.Ordinal)))
+                {
+                    return true;
+                }
             }
         }
 

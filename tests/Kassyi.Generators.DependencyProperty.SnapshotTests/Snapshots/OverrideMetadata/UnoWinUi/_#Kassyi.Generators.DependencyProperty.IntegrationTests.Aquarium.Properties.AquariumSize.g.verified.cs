@@ -32,7 +32,7 @@ typeMetadata: new global::Microsoft.UI.Xaml.PropertyMetadata(
 public int AquariumSize
 {
 get => (int)GetValue(AquariumSizeProperty);
-set => SetValue(AquariumSizeProperty, value);
+set => global::Microsoft.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromInt32(this, AquariumSizeProperty, value);
 
 }
 

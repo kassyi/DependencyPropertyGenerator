@@ -46,7 +46,7 @@ internal static partial class SourceGenerationHelper
         using (writer.Scope($"{setterVisibility} static void Set{property.Name}({browsableForType} element, {type} value)"))
         {
             writer.AppendLine("element = element ?? throw new global::System.ArgumentNullException(nameof(element));");
-            writer.AppendLine($"element.SetValue({dependencyPropertyName}, value);");
+            strategy.GenerateAttachedSetterBody(ref writer, @class, property, dependencyPropertyName);
         }
 
         GenerateXmlDocumentationFrom(ref writer, property.XmlDocumentation.GetterXmlDocumentation, property, isProperty: true);
@@ -61,8 +61,6 @@ internal static partial class SourceGenerationHelper
 
         GeneratePropertyFooter(ref writer, @class, property);
     }
-    
-
 
     internal static string GenerateModifiers(ClassData @class)
     {

@@ -28,7 +28,7 @@ OnRowCountChanged((global::Microsoft.UI.Xaml.Controls.Grid)sender, (int)args.New
 public static void SetRowCount(global::Microsoft.UI.Xaml.Controls.Grid element, int value)
 {
 element = element ?? throw new global::System.ArgumentNullException(nameof(element));
-element.SetValue(RowCountProperty, value);
+global::Microsoft.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromInt32(element, RowCountProperty, value);
 }
 /// <summary>
 /// Default value: -1

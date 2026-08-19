@@ -225,5 +225,46 @@ public static class StringExtensions
 
         return sb.ToString();
     }
+
+    /// <summary>Resolves the corresponding XamlBindingHelper.SetPropertyFrom* method name for a given type, or null if unsupported.</summary>
+    public static string? GetXamlBindingHelperSetMethodName(this string? type)
+    {
+        if (string.IsNullOrWhiteSpace(type))
+        {
+            return null;
+        }
+
+        // Nullable value types are not supported by SetPropertyFrom*
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        if (type.EndsWith('?') &&
+#else
+        if (type![type.Length - 1] == '?' &&
+#endif
+            type is not ("string?" or "String?" or "System.String?" or "global::System.String?"))
+        {
+            return null;
+        }
+
+        return type switch
+        {
+            "bool" or "Boolean" or "System.Boolean" or "global::System.Boolean" => "SetPropertyFromBoolean",
+            "byte" or "Byte" or "System.Byte" or "global::System.Byte" => "SetPropertyFromByte",
+            "char" or "Char" or "System.Char" or "global::System.Char" => "SetPropertyFromChar16",
+            "double" or "Double" or "System.Double" or "global::System.Double" => "SetPropertyFromDouble",
+            "int" or "Int32" or "System.Int32" or "global::System.Int32" => "SetPropertyFromInt32",
+            "long" or "Int64" or "System.Int64" or "global::System.Int64" => "SetPropertyFromInt64",
+            "float" or "Single" or "System.Single" or "global::System.Single" => "SetPropertyFromSingle",
+            "string" or "String" or "System.String" or "global::System.String" => "SetPropertyFromString",
+            "string?" or "String?" or "System.String?" or "global::System.String?" => "SetPropertyFromString",
+            "uint" or "UInt32" or "System.UInt32" or "global::System.UInt32" => "SetPropertyFromUInt32",
+            "ulong" or "UInt64" or "System.UInt64" or "global::System.UInt64" => "SetPropertyFromUInt64",
+            "TimeSpan" or "System.TimeSpan" or "global::System.TimeSpan" => "SetPropertyFromTimeSpan",
+            "DateTimeOffset" or "System.DateTimeOffset" or "global::System.DateTimeOffset" => "SetPropertyFromDateTime",
+            "Point" or "Windows.Foundation.Point" or "global::Windows.Foundation.Point" => "SetPropertyFromPoint",
+            "Rect" or "Windows.Foundation.Rect" or "global::Windows.Foundation.Rect" => "SetPropertyFromRect",
+            "Size" or "Windows.Foundation.Size" or "global::Windows.Foundation.Size" => "SetPropertyFromSize",
+            _ => null
+        };
+    }
 }
 

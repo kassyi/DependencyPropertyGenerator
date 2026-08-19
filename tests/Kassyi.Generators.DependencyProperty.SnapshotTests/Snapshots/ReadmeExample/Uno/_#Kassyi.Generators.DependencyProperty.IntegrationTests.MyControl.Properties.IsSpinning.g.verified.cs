@@ -35,7 +35,7 @@ typeMetadata: new global::Windows.UI.Xaml.PropertyMetadata(
 public bool IsSpinning
 {
 get => (bool)GetValue(IsSpinningProperty);
-set => SetValue(IsSpinningProperty, value);
+set => global::Windows.UI.Xaml.Markup.XamlBindingHelper.SetPropertyFromBoolean(this, IsSpinningProperty, value);
 
 }
 

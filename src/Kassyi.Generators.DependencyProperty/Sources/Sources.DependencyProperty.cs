@@ -54,7 +54,7 @@ internal static partial class SourceGenerationHelper
             writer.AppendLine();
             if (!property.Modifiers.IsReadOnly)
             {
-                GenerateSetter(ref writer, property);
+                strategy.GenerateSetter(ref writer, @class, property);
                 writer.AppendLine();
             }
         }
@@ -72,28 +72,6 @@ internal static partial class SourceGenerationHelper
             writer.Append($"get => ({GenerateType(property)})GetValue({property.Name}Property);");
         }
     }
-
-    private static void GenerateSetter(ref SourceWriter writer, DependencyPropertyData property)
-    {
-        if (property is { Modifiers.IsDirect: true, Framework: Framework.Avalonia })
-        {
-            using (writer.Scope("private set"))
-            {
-                var type = GenerateType(property);
-                writer.AppendLine($"var oldValue = _{property.Name.ToParameterName()};");
-                writer.AppendLine($"SetAndRaise({property.Name}Property, ref _{property.Name.ToParameterName()}, value);");
-                writer.AppendLine($"On{property.Name}Changed();");
-                writer.AppendLine($"On{property.Name}Changed(({type})value);");
-                writer.AppendLine($"On{property.Name}Changed(({type})oldValue, ({type})value);");
-            }
-        }
-        else
-        {
-            var setOrInit = property.Modifiers.IsInitOnly ? "init" : "set";
-            writer.AppendLine($"{GenerateAdditionalSetterModifier(property)}{setOrInit} => SetValue({GenerateDependencyPropertyName(property)}, value);");
-        }
-    }
-
 
     private static void GenerateCoercePartialMethod(ref SourceWriter writer, DependencyPropertyData property)
     {
