@@ -58,10 +58,44 @@
 ### データ構造の設計方針
 
 - **責務による構造的分離:** `DependencyPropertyData` は多数のプロパティをカプセル化する。これは、コンポーネントモデル、UI メタデータ、XML ドキュメント、バリデーション/コールバック、およびプロパティ修飾子フラグ (`PropertyModifiersData`) を含むサブモデルに分割される。この分割により保守性が強制される。
-- **早期プリミティブ投影:** Roslyn の `INamedTypeSymbol` や `IPropertySymbol` インスタンスを直接保持するとメモリリークが発生し、ジェネレーターのキャッシュが無効化される。これらのインスタンスは、抽出フェーズ中にプリミティブ型（`string`, `bool` など）または `EquatableArray<T>` に投影されなければならない。
-- **コレクションの等価性:** コレクションデータ（`BindEvents`, `ParentClasses` など）は `EquatableArray<T>` を利用しなければならない。このカスタム実装は、標準の配列や `List<T>` とは異なり構造的な等価性を保証する。
+- **早期プリミティブ投影とコレクション等価性:** メモリリーク防止とキャッシュヒット率最大化のため、Roslyn 型を直接保持せずプリミティブ型や `EquatableArray<T>` へ投影する。詳細なパフォーマンス要件は **[05. コード生成とパフォーマンス最適化 (Ⅳ. パフォーマンス最適化ルール)](./05_synthesis_and_performance.md#ⅳ-パフォーマンス最適化ルール)** を参照のこと。
 
 ### メインデータモデル (DTO)
+
+#### 0. 全体アーキテクチャモデル (Comprehensive Architecture Model)
+
+ジェネレーターを構成する全体的なクラスの依存関係を示す。個別のモデルの詳細は後述のサブセクションを参照。
+
+```mermaid
+classDiagram
+    direction LR
+    class ClassData {
+        +string Name
+        +EquatableArray~ParentClassData~ ParentClasses
+    }
+    class DependencyPropertyData {
+        +string Name
+        +PropertyModifiersData Modifiers
+        %% ComponentModel, FrameworkMetadata, ValidationAndCallbackData, XmlDocumentationData
+    }
+    class EventData {
+        +string Name
+        +string Strategy
+    }
+    class PropertyModifiersData { }
+    class ComponentModelData { }
+    class FrameworkMetadataData { }
+    class ValidationAndCallbackData { }
+    class XmlDocumentationData { }
+
+    ClassData *-- DependencyPropertyData
+    ClassData *-- EventData
+    DependencyPropertyData *-- PropertyModifiersData
+    DependencyPropertyData *-- ComponentModelData
+    DependencyPropertyData *-- FrameworkMetadataData
+    DependencyPropertyData *-- ValidationAndCallbackData
+    DependencyPropertyData *-- XmlDocumentationData
+```
 
 #### 1. クラスおよびイベント構造モデル (`ClassData` / `EventData`)
 
@@ -104,6 +138,7 @@ classDiagram
     }
 
     ClassData *-- ParentClassData
+    ClassData *-- EventData
 ```
 
 #### 2. 依存関係プロパティのコア構造 (`DependencyPropertyData`)
@@ -296,4 +331,3 @@ classDiagram
 | クラスの修飾子           | `ClassData.Modifiers`              | `string`                          | `public`, `internal`, `sealed` などの修飾子。            |
 | `[AvaloniaObject]` 等    | `ClassData.Framework`              | `Framework`                       | 利用フレームワークの種別 (`WPF`, `Avalonia`, etc.)。     |
 | 親クラス階層（ネスト時） | `ClassData.ParentClasses`          | `EquatableArray<ParentClassData>` | 外側を囲むネスト親クラスの型名・修飾子リスト。           |
-

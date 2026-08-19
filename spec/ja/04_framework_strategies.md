@@ -65,9 +65,9 @@ UWP と Uno は `Windows.UI.Xaml.DependencyProperty` に依存するが、WinUI 
 > **2. シグネチャの差異を吸収するためのメソッド抽出**
 > メソッド抽出を活用して API シグネチャの差異を解決する。例えば、`GenerateRegisterMethodArguments` メソッドを使用して `Register` メソッドに渡される引数の正確な文字列を構築し、さまざまな引数構成に柔軟に対応する。
 
-> [!CAUTION]
-> **3. 厳密なゼロアロケーション**
-> ベンチマークスコアを維持するため、文字列生成パス（`SourceWriter`）内での LINQ または不要な `string.Join` 呼び出しの使用を厳しく禁止する。
+> [!NOTE]
+> **3. ゼロアロケーション生成規則**
+> 文字列生成パス（`SourceWriter`）内での LINQ や不要な `string.Join` の禁止など、厳格なパフォーマンス最適化ルールについては、**[05. コード生成とパフォーマンス最適化 (Ⅳ. パフォーマンス最適化ルール)](./05_synthesis_and_performance.md#ⅳ-パフォーマンス最適化ルール)** を参照のこと。
 
 ---
 
@@ -89,4 +89,5 @@ Roslyn パイプラインの初期化中、ジェネレーターは以下の厳�
 
 3. **未認識フレームワークのフォールバック (`Framework.None`)**
    どのフレームワークも一致しない場合、ジェネレーターは安全に `Framework.None` を割り当てる。この状態では、プラットフォーム固有の `using` インポートと登録を選択的にスキップしながら、診断 `DPG0000`（Framework is not recognized）を発行する。コンパイルの失敗を完全に防ぐために、生の属性定義のみを安全に出力する。
+   （※ `DPG0000` の発生原因とプロジェクト設定での解決手順については **[08. 診断エラーコード一覧 (DPG0000)](./08_diagnostics_reference.md#dpg0000-framework-is-not-recognized)** を参照）
 
