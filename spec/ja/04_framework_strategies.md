@@ -13,7 +13,7 @@ DependencyPropertyGenerator は、単一の `[DependencyProperty]` 属性から�
 ```mermaid
 flowchart TD
     subgraph Input ["1. ユーザーコード"]
-        Code["[DependencyProperty~bool~('IsActive')]"]
+        Code["[DependencyProperty&lt;bool&gt;('IsActive')]"]
     end
 
     subgraph Core ["2. 共通 Model (純粋な DTO)"]
