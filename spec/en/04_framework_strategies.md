@@ -1,15 +1,12 @@
-# 04. Framework Generator Strategies
-
-[English](./04_framework_strategies.md) | [日本語](../ja/04_framework_strategies.md)
-Prev: [⬅ 03. Pipeline Architecture](./03_pipeline_architecture.md) | [Index (Intro)](./intro.md) | Next: [05. Code Synthesis & Performance Optimization ➡](./05_synthesis_and_performance.md)
+# 04. Framework generator strategies
 
 The `DependencyPropertyGenerator` generates framework-specific boilerplate code for WPF, UWP, WinUI, Uno, Avalonia, and MAUI based on a single `[DependencyProperty]` attribute.
 
-This document serves as the API mapping dictionary for implementing framework-specific bug fixes or feature extensions. The `IFrameworkGeneratorStrategy` implementation classes in the `Sources/Strategies/` directory abstract away all architectural differences between platforms.
+Use this document as the API mapping dictionary when you implement framework-specific bug fixes or feature extensions. The `IFrameworkGeneratorStrategy` implementation classes in the `Sources/Strategies/` directory abstract away all architectural differences between platforms.
 
 ---
 
-## I. Property Registration API Mapping
+## I. Property registration API mapping
 
 ### WPF (`WpfFrameworkGenerator`)
 
@@ -21,7 +18,7 @@ WPF uses `System.Windows.DependencyProperty` and `DependencyPropertyKey` as the 
 - **Callbacks**: Wires callbacks using dedicated delegate types (`PropertyChangedCallback`, `CoerceValueCallback`, `ValidateValueCallback`).
 
 > [!NOTE]
-> The WPF `FrameworkPropertyMetadata` contains an extensive set of layout and data binding flags (e.g., `AffectsMeasure`, `BindsTwoWayByDefault`). The generator relies on the `FrameworkMetadataData` fields to securely emit these WPF-specific flags.
+> The WPF `FrameworkPropertyMetadata` contains an extensive set of layout and data binding flags (for example, `AffectsMeasure`, `BindsTwoWayByDefault`). The generator relies on the `FrameworkMetadataData` fields to securely emit these WPF-specific flags.
 
 ### Avalonia (`AvaloniaFrameworkGenerator`)
 
@@ -50,50 +47,44 @@ UWP and Uno rely on `Windows.UI.Xaml.DependencyProperty`, while WinUI 3 relies o
 - **Callbacks**: Natively provides only the `PropertyChangedCallback`.
 
 > [!WARNING]
-> These platforms lack native API support for coercion and validation. The generator emits fallback implementations that manually clamp or correct values inside the property's getter/setter or within the PropertyChanged event itself.
+> These platforms lack native API support for coercion and validation. The generator emits fallback implementations that manually clamp or correct values inside the property's getter and setter, or within the PropertyChanged event itself.
 
 ---
 
-## II. Strategy Extension Guidelines
+## II. Strategy extension guidelines
 
-Follow these architectural principles when adding support for new UI frameworks or addressing breaking API changes (e.g., Avalonia v12):
+Follow these architectural principles when you add support for new UI frameworks or address breaking API changes (for example, Avalonia v12):
 
 > [!IMPORTANT]
 > **1. Preserve the DTOs**
-> Never mutate the shared DTO models (e.g., `DependencyPropertyData`). You must isolate all platform-specific differences by overriding methods in the corresponding generator class (e.g., `XxxFrameworkGenerator.cs`) under the `Sources/Strategies/` directory.
+> Never mutate the shared DTO models (for example, `DependencyPropertyData`). You must isolate all platform-specific differences by overriding methods in the corresponding generator class (for example, `XxxFrameworkGenerator.cs`) under the `Sources/Strategies/` directory.
 
 > [!TIP]
-> **2. Method Extraction for Signature Variances**
+> **2. Method extraction for signature variances**
 > Extract methods to resolve API signature differences. For example, use the `GenerateRegisterMethodArguments` method to construct the exact argument string passed to the `Register` method, gracefully accommodating varying parameter configurations.
 
 > [!NOTE]
-> **3. Zero-Allocation Generation Rules**
-> For strict performance optimization rules, including the prohibition of LINQ or unnecessary `string.Join` calls within string generation paths (`SourceWriter`), see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
+> **3. Zero-allocation generation rules**
+> For strict performance optimization rules, including the prohibition of LINQ or unnecessary `string.Join` calls within string generation paths (`SourceWriter`), see **[05. Code synthesis and performance](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
 
 ---
 
-## III. Automatic Framework Detection and Fallback
+## III. Automatic framework detection and fallback
 
 During Roslyn pipeline initialization, the generator automatically resolves the target UI framework using the following priority cascade:
 
-1. **High-Precision Symbol Inspection (`Compilation.TryRecognizeFramework`)**
+1. **High-precision symbol inspection (`Compilation.TryRecognizeFramework`)**
    The generator inspects the compilation context for core framework type symbols:
     - `Microsoft.Maui.Controls.BindableObject` $\rightarrow$ `Framework.Maui`
     - `Avalonia.AvaloniaObject` $\rightarrow$ `Framework.Avalonia`
-    - `Uno.UI.FeatureConfiguration` $\rightarrow$ `Framework.Uno` / `Framework.UnoWinUi`
+    - `Uno.UI.FeatureConfiguration` $\rightarrow$ `Framework.Uno` or `Framework.UnoWinUi`
     - `Microsoft.UI.Xaml.DependencyObject` $\rightarrow$ `Framework.WinUi`
     - `Windows.UI.Xaml.DependencyObject` $\rightarrow$ `Framework.Uwp`
     - `System.Windows.DependencyObject` $\rightarrow$ `Framework.Wpf`
 
-2. **MSBuild Property / Compilation Constant Fallback (`AnalyzerConfigOptionsProvider`)**
+2. **MSBuild property and compilation constant fallback (`AnalyzerConfigOptionsProvider`)**
    If the generator cannot resolve symbols, it inspects `DefineConstants` (`HAS_WPF`, `HAS_WINUI`, `HAS_UWP`, `HAS_UNO`, `HAS_UNO_WINUI`, `HAS_AVALONIA`, `HAS_MAUI`) or the `UseMaui` property in project files.
 
-3. **Unrecognized Framework Fallback (`Framework.None`)**
+3. **Unrecognized framework fallback (`Framework.None`)**
    If no framework matches, the generator assigns `Framework.None`. In this state, it emits the `DPG0000` (Framework is not recognized) diagnostic and skips platform-specific `using` imports and registrations. It safely emits only the raw attribute definitions to prevent compilation failure.
-   (For detailed causes and project configuration remedies for `DPG0000`, see **[08. Diagnostics Reference (DPG0000)](./08_diagnostics_reference.md#dpg0000-framework-is-not-recognized)**).
-
----
-
-Prev: [← 03. Pipeline Architecture](./03_pipeline_architecture.md) | [Index (Intro)](./intro.md) | Next: [05. Code Synthesis & Performance Optimization →](./05_synthesis_and_performance.md)
-
-
+   For detailed causes and project configuration remedies for `DPG0000`, see **[08. Diagnostics reference](./08_diagnostics_reference.md#dpg0000-framework-is-not-recognized)**.

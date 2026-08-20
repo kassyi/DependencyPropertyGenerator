@@ -1,20 +1,17 @@
-# 06. Mathematical Performance Model
-
-[English](./06_mathematical_model.md) | [日本語](../ja/06_mathematical_model.md)
-Prev: [⬅ 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification ➡](./07_test_specification.md)
+# 06. Mathematical performance model
 
 To maintain the Roslyn Incremental Source Generator's performance, you must understand the complexity (allocation cost and processing time) of each operation.
 
 This document details the worst-case complexity of the generator's architecture and the design policies that mitigate it.
 
-## I. Basic Complexity Model
+## I. Basic complexity model
 
 The generator processes data in two primary phases:
 
-1. **`PrepareData` (Data Extraction Phase)**: Extracts structural data from attributes and class definitions.
-2. **`SourceWriter` (Source Generation Phase)**: Synthesizes C# source code strings using the extracted data.
+1. **`PrepareData` (Data extraction phase)**: Extracts structural data from attributes and class definitions.
+2. **`SourceWriter` (Source generation phase)**: Synthesizes C# source code strings using the extracted data.
 
-Let $S$ represent the number of source files to compile, $P$ represent the average number of target properties per file, and $N$ represent the maximum number of `NamedArguments` specified in a target attribute.
+Assume $S$ represents the number of source files to compile, $P$ represents the average number of target properties per file, and $N$ represents the maximum number of `NamedArguments` specified in a target attribute.
 
 ### 1. Complexity of `PrepareData`
 
@@ -39,7 +36,7 @@ Because this loop executes for each target configuration ($M$ items) against $N$
 
 ### 2. Complexity of `SourceWriter`
 
-Let $K$ represent the character count of the generated source code.
+Assume $K$ represents the character count of the generated source code.
 For string concatenation, the generator mandates using `SourceWriter`—which encapsulates a thread-static `StringBuilder` pool—to write linearly and suppress memory reallocation. The time complexity is exactly **$O(K)$**.
 
 > [!TIP]
@@ -47,7 +44,7 @@ For string concatenation, the generator mandates using `SourceWriter`—which en
 
 ---
 
-## II. Optimization via Incremental Cache and the "Worst-Case"
+## II. Optimization via incremental cache and the worst-case
 
 The Incremental Generator caches past compilation outputs and calculates only delta changes.
 In `GeneratorHelper.cs`, the pipeline executes the following chain:
@@ -62,46 +59,40 @@ Assuming an incremental cache hit ratio of $H$ ($0 \le H \le 1$), the total comp
 
 $$T \approx (1 - H) \times O(S \times P \times (N + K))$$
 
-| Scenario | Cache State | Total Complexity $T$ | Impact on Pipeline |
+| Scenario | Cache state | Total complexity $T$ | Impact on pipeline |
 | :--- | :--- | :--- | :--- |
-| **Routine Editing** (e.g., method bodies) | **Hit** ($H \to 1$) | **$O(1) \approx 0$** | Terminates early via `Equals()` comparison. Computational overhead is effectively zero. |
-| **Structural Changes** (e.g., base classes) | **Miss** ($H \to 0$) | **$O(S \times P \times (N + K))$** | Extraction and generation re-execute across all files, reaching the theoretical worst case. |
+| **Routine editing** (for example, method bodies) | **Hit** ($H \to 1$) | **$O(1) \approx 0$** | Terminates early via `Equals()` comparison. Computational overhead is effectively zero. |
+| **Structural changes** (for example, base classes) | **Miss** ($H \to 0$) | **$O(S \times P \times (N + K))$** | Extraction and generation re-execute across all files, reaching the theoretical worst case. |
 
 > [!NOTE]
-> **Estimated Real-World Performance (Daily Editing & Typing: $T \approx 0$)**
-> - **Execution Latency:** **Virtually 0 ms (Measured $\le 0.1 \sim 0.5 \text{ ms}$)**
-> - **GC Heap Allocation:** **0 Bytes**
-> - **Developer Experience Impact:** During method-body logic edits or keystrokes, the Roslyn pipeline terminates early via value equality comparison (`Equals()`). Generator CPU and memory overhead remain effectively zero, eliminating IDE lag even in large codebases.
+> **Estimated real-world performance (daily editing and typing: $T \approx 0$)**
+> - **Execution latency**: **Virtually 0 ms (Measured $\le 0.1 \sim 0.5 \text{ ms}$)**
+> - **GC heap allocation**: **0 bytes**
+> - **Developer experience impact**: During method-body logic edits or keystrokes, the Roslyn pipeline terminates early via value equality comparison (`Equals()`). Generator CPU and memory overhead remain effectively zero, eliminating IDE lag even in large codebases.
 
-### Worst-Case Scenario
+### Worst-case scenario
 
 The most severe computational load occurs when widespread architectural changes force the cache hit ratio to $H=0$.
 
 **Scenario:**
-Modifying the name, type, or attribute parameters (e.g., `DefaultValue`) of a `[DependencyProperty]` defined in a widely consumed base class.
+Modifying the name, type, or attribute parameters (for example, `DefaultValue`) of a `[DependencyProperty]` defined in a widely consumed base class.
 
 This triggers the following compiler events:
 1. Roslyn identifies that all files depending on the base class are structurally affected.
 2. The incremental cache completely invalidates ($H=0$) across all $S$ target files.
 3. For all $S \times P$ properties, the $O(N)$ syntax analysis and $O(K)$ source generation execute synchronously.
 
-**Worst-Case Complexity:** **$O(S \times P \times (N + K))$**
+**Worst-case complexity**: **$O(S \times P \times (N + K))$**
 
 > [!WARNING]
-> In enterprise-scale solutions (where $S$ is in the thousands), triggering this worst-case scenario will cause the IDE to freeze for several seconds.
+> In enterprise-scale solutions (where $S$ is in the thousands), triggering this worst-case scenario freezes the IDE for several seconds.
 
 ---
 
-## III. Architectural Ingenuity to Prevent Degradation
+## III. Architectural ingenuity to prevent degradation
 
 To prevent this worst-case complexity from triggering on every keystroke, the generator enforces strict architectural rules.
 
 > [!NOTE]
-> **Specific Measures to Prevent Performance Degradation**
-> For detailed rules regarding the prohibition of `ISymbol` in DTOs, strict `EquatableArray<T>` implementations, and allocation-free generation via `SourceWriter`, see **[05. Code Synthesis and Performance (IV. Performance Optimization Rules)](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
-
----
-
-Prev: [← 05. Code Synthesis & Performance Optimization](./05_synthesis_and_performance.md) | [Index (Intro)](./intro.md) | Next: [07. Test Specification →](./07_test_specification.md)
-
-
+> **Specific measures to prevent performance degradation**
+> For detailed rules regarding the prohibition of `ISymbol` in DTOs, strict `EquatableArray<T>` implementations, and allocation-free generation via `SourceWriter`, see **[05. Code synthesis and performance](./05_synthesis_and_performance.md#iv-performance-optimization-rules)**.
