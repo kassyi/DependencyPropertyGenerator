@@ -5,6 +5,7 @@
 [![Nuget package](https://img.shields.io/nuget/vpre/Kassyi.Generators.DependencyProperty)](https://www.nuget.org/packages/Kassyi.Generators.DependencyProperty/)
 [![CI/CD](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml)
 [![License: MIT](https://img.shields.io/github/license/kassyi/DependencyPropertyGenerator)](https://github.com/kassyi/DependencyPropertyGenerator/blob/main/LICENSE)
+[![Wiki](https://img.shields.io/badge/docs-Wiki-blue.svg)](https://github.com/kassyi/DependencyPropertyGenerator/wiki)
 [![Specifications](https://img.shields.io/badge/docs-specifications-blue.svg)](./spec/en/intro.md)
 [![Performance](https://img.shields.io/badge/performance-+30%25_faster-brightgreen.svg)](#zero-allocation--no-ide-lag)
 [![Zero Gen2 GC](https://img.shields.io/badge/Gen2_GC-zero_alloc-blue.svg)](#zero-allocation--no-ide-lag)
@@ -242,16 +243,21 @@ For UWP, WinUI, and Uno, the generator creates a `RegisterPropertyChangedCallbac
 
 ## Architecture & Specifications
 
-For in-depth architectural blueprints, zero-allocation design patterns, complexity models, and framework-specific code generation rules, refer to our official specifications:
+Detailed architectural blueprints, zero-allocation design patterns, complexity models, and framework-specific code generation rules are available on the **[GitHub Wiki](https://github.com/kassyi/DependencyPropertyGenerator/wiki)** (or under the [`spec/`](./spec) directory for local offline reading):
 
-- **[Specification Overview & Index (spec/en/intro.md)](./spec/en/intro.md)**
-    - **[01. Foundation and Domain](./spec/en/01_foundation_and_domain.md)**: DTO structure and supported platforms
-    - **[02. Pipeline Architecture](./spec/en/02_pipeline_architecture.md)**: Delta extraction & cache equivalence strategies
-    - **[03. Code Synthesis & Performance Optimization](./spec/en/03_synthesis_and_performance.md)**: `SourceWriter`, callback resolution, & guidelines
-    - **[04. Mathematical Model](./spec/en/04_mathematical_model.md)**: Worst-case time & memory complexity analysis
-    - **[05. Test Specification](./spec/en/05_test_specification.md)**: Orthogonal matrix and quality assurance criteria
-    - **[06. Framework Strategies](./spec/en/06_framework_strategies.md)**: Platform-specific API mapping
-    - **[07. Diagnostics Reference](./spec/en/07_diagnostics_reference.md)**: Causes and solutions for `DPG0000`-`DPG9999`
+- 🌐 **[📖 Read on GitHub Wiki (Recommended)](https://github.com/kassyi/DependencyPropertyGenerator/wiki)**
+- 🇺🇸 **English Specifications (`spec/en/`)**:
+    - **[Overview & Index](./spec/en/intro.md)**
+    - **[01. FAQ & Design Rationale](./spec/en/01_faq_and_rationale.md)**: Architectural philosophy & zero-allocation rationale
+    - **[02. Foundation & Domain](./spec/en/02_foundation_and_domain.md)**: DTO structure, ubiquitous language & supported platforms
+    - **[03. Pipeline Architecture](./spec/en/03_pipeline_architecture.md)**: Incremental generator pipeline & caching strategy
+    - **[04. Framework Strategies](./spec/en/04_framework_strategies.md)**: Platform API mapping & generator extension guidelines
+    - **[05. Code Synthesis & Performance](./spec/en/05_synthesis_and_performance.md)**: `SourceWriter` (`ClassScope`), zero-allocation synthesis, & profiling
+    - **[06. Mathematical Model](./spec/en/06_mathematical_model.md)**: Worst-case complexity analysis & scaling limits
+    - **[07. Test Specification](./spec/en/07_test_specification.md)**: Test architecture, combinatorial matrix, & diagnostics
+    - **[08. Diagnostics Reference](./spec/en/08_diagnostics_reference.md)**: Causes and solutions for `DPG0000`-`DPG9999`
+- 🇯🇵 **日本語仕様書 (`spec/ja/`)**:
+    - **[仕様書概要・インデックス](./spec/ja/intro.md)**
 
 ## Support & Feedback
 
