@@ -6,7 +6,40 @@ DependencyPropertyGenerator は、単一の `[DependencyProperty]` 属性から�
 
 ---
 
-## Ⅰ. プロパティ登録 API マッピング
+## I. 統合 DTO と Strategy パターン（Write Once, Run Everywhere）
+
+本ジェネレーターの最大の価値は、「1つの `[DependencyProperty]` 属性を書くだけで、あらゆる XAML UI フレームワーク向けのネイティブコードを自動生成できる」ことにあります。このクロスプラットフォーム性は、データ抽出（解析）とコード出力（生成）を完全に分離するアーキテクチャによって実現されています。
+
+```mermaid
+flowchart TD
+    subgraph Input ["1. ユーザーコード"]
+        Code["[DependencyProperty<bool>('IsActive')]"]
+    end
+
+    subgraph Core ["2. 共通 Model (純粋な DTO)"]
+        DTO["DependencyPropertyData<br>・Name: 'IsActive'<br>・Type: 'bool'<br>・OnChanged: 'OnIsActiveChanged'"]
+    end
+
+    subgraph Strategies ["3. Framework Strategies (生成器)"]
+        WPF["WpfFrameworkGenerator ➡ WPF用コード"]
+        AVA["AvaloniaFrameworkGenerator ➡ Avalonia用コード"]
+        MAUI["MauiFrameworkGenerator ➡ MAUI用コード"]
+        WINUI["UwpFrameworkGenerator ➡ WinUI/Uno用コード"]
+    end
+
+    Input --> DTO
+    DTO --> WPF
+    DTO --> AVA
+    DTO --> MAUI
+    DTO --> WINUI
+```
+
+1. **抽出 (Model)**: Roslyn パイプラインは属性を解析し、フレームワークに依存しない純粋な値型 DTO（例: `DependencyPropertyData`）に変換します。
+2. **出力 (Strategy)**: `IFrameworkGeneratorStrategy` クラス群は共通 DTO を受け取り、ターゲットプラットフォーム固有のボイラープレートを合成します。
+
+---
+
+## Ⅱ. プロパティ登録 API マッピング
 
 ### WPF (`WpfFrameworkGenerator`)
 

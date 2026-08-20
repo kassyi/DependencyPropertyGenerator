@@ -6,7 +6,40 @@ Use this document as the API mapping dictionary when you implement framework-spe
 
 ---
 
-## I. Property registration API mapping
+## I. Unified DTO & Strategy Architecture
+
+The core value of this generator is the ability to write a single C# syntax `[DependencyProperty]` and deploy it natively across any XAML UI framework. This "Write Once, Run Everywhere" capability is achieved by strictly separating data extraction from code emission:
+
+```mermaid
+flowchart TD
+    subgraph Input ["1. User Code"]
+        Code["[DependencyProperty<bool>('IsActive')]"]
+    end
+
+    subgraph Core ["2. Unified Model (Pure DTOs)"]
+        DTO["DependencyPropertyData<br>・Name: 'IsActive'<br>・Type: 'bool'<br>・OnChanged: 'OnIsActiveChanged'"]
+    end
+
+    subgraph Strategies ["3. Framework Strategies"]
+        WPF["WpfFrameworkGenerator ➡ WPF Code"]
+        AVA["AvaloniaFrameworkGenerator ➡ Avalonia Code"]
+        MAUI["MauiFrameworkGenerator ➡ MAUI Code"]
+        WINUI["UwpFrameworkGenerator ➡ WinUI/Uno Code"]
+    end
+
+    Input --> DTO
+    DTO --> WPF
+    DTO --> AVA
+    DTO --> MAUI
+    DTO --> WINUI
+```
+
+1. **Extraction (Model)**: The Roslyn pipeline parses attributes into pure value-type DTOs (e.g., `DependencyPropertyData`).
+2. **Emission (Strategy)**: The `IFrameworkGeneratorStrategy` classes read the unified DTOs and synthesize native boilerplate for the detected target platform.
+
+---
+
+## II. Property registration API mapping
 
 ### WPF (`WpfFrameworkGenerator`)
 

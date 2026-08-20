@@ -28,7 +28,17 @@
 > [!NOTE]
 > トークンストリーミングの詳細なコード仕様、`SourceWriter` / `ClassScope` の実装規約、および AST Mutation 比較のマイクロベンチマーク測定結果については、**[05. コード生成とパフォーマンス最適化](./05_synthesis_and_performance.md)** を参照してください。
 
-## 2. よくある質問
+## 2. よくある質問 (FAQ)
+
+### そもそも、なぜ単一の属性で複数の UI フレームワーク（WPF, MAUI, Avalonia 等）に対応しているのですか？
+
+**「Write Once, Run on Any XAML Platform（一度書けば、どの XAML プラットフォームでも動く）」** を実現するためです。
+データ抽出フェーズを純粋な DTO に隔離し、出力をプラットフォーム固有の Strategy に委譲することで、全く同じ `[DependencyProperty]` 属性から `DependencyProperty.Register` (WPF)、`AvaloniaProperty.Register` (Avalonia)、`BindableProperty.Create` (MAUI) を自動で出し分けることができます。これにより、マルチプラットフォーム向け OSS ライブラリ作者や、フレームワーク移行中の企業チームにおける `#if` のボイラープレート地獄を解消します。
+
+### Avalonia 12.2 などで公式の Source Generator が登場した場合、本ライブラリのサポートはどうなりますか？
+
+Avalonia 12.2 で公式のジェネレーターが登場した際は、その仕様と普及状況を評価します。
+公式ジェネレーターはプラットフォーム固有の最適化に優れますが、**「WPF や MAUI とコードベースを共有するための単一属性」としての需要がある限り、本ライブラリは `AvaloniaFrameworkGenerator` を維持します**。コミュニティが完全に公式へ移行し、マルチターゲットの需要が消滅したと判断できた場合にのみ、段階的な非推奨化を検討します。
 
 ### なぜ MVVM Toolkit で見られるようなフィールド単位の属性や C# 13 の `partial property` ではなく、クラス単位の属性を採用しているのですか？
 
