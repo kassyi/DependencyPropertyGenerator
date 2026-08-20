@@ -13,7 +13,7 @@ The core value of this generator is the ability to write a single C# syntax `[De
 ```mermaid
 flowchart TD
     subgraph Input ["1. User Code"]
-        Code["[DependencyProperty<bool>('IsActive')]"]
+        Code["[DependencyProperty~bool~('IsActive')]"]
     end
 
     subgraph Core ["2. Unified Model (Pure DTOs)"]
