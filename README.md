@@ -253,7 +253,7 @@ Detailed architectural blueprints, zero-allocation design patterns, complexity m
     - **[03. Pipeline Architecture](./spec/en/03_pipeline_architecture.md)**: Incremental generator pipeline & caching strategy
     - **[04. Framework Strategies](./spec/en/04_framework_strategies.md)**: Platform API mapping & generator extension guidelines
     - **[05. Code Synthesis & Performance](./spec/en/05_synthesis_and_performance.md)**: `SourceWriter` (`ClassScope`), zero-allocation synthesis, & profiling
-    - **[06. Mathematical Model](./spec/en/06_mathematical_model.md)**: Worst-case complexity analysis & scaling limits
+    - **[06. Complexity Model](./spec/en/06_mathematical_model.md)**: Worst-case complexity analysis & scaling limits
     - **[07. Test Specification](./spec/en/07_test_specification.md)**: Test architecture, combinatorial matrix, & diagnostics
     - **[08. Diagnostics Reference](./spec/en/08_diagnostics_reference.md)**: Causes and solutions for `DPG0000`-`DPG9999`
 - 🇯🇵 **日本語仕様書 (`spec/ja/`)**:
