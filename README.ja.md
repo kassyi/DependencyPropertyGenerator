@@ -5,6 +5,7 @@
 [![Nuget package](https://img.shields.io/nuget/vpre/Kassyi.Generators.DependencyProperty)](https://www.nuget.org/packages/Kassyi.Generators.DependencyProperty/)
 [![CI/CD](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/kassyi/DependencyPropertyGenerator/actions/workflows/main.yml)
 [![License: MIT](https://img.shields.io/github/license/kassyi/DependencyPropertyGenerator)](https://github.com/kassyi/DependencyPropertyGenerator/blob/main/LICENSE)
+[![Wiki](https://img.shields.io/badge/docs-Wiki-blue.svg)](https://github.com/kassyi/DependencyPropertyGenerator/wiki)
 [![Specifications](https://img.shields.io/badge/docs-specifications-blue.svg)](./spec/ja/intro.md)
 [![Performance](https://img.shields.io/badge/performance-+30%25_faster-brightgreen.svg)](#完全なゼロアロケーションとideタイピング遅延の排除)
 [![Zero Gen2 GC](https://img.shields.io/badge/Gen2_GC-zero_alloc-blue.svg)](#完全なゼロアロケーションとideタイピング遅延の排除)
@@ -242,16 +243,21 @@ UWP、WinUI、Uno では、ジェネレーターが `RegisterPropertyChangedCall
 
 ## アーキテクチャと公式仕様書
 
-パイプライン内部構造、ゼロアロケーション設計、計算量モデル、フレームワーク別生成仕様についての詳細は、仕様書をご覧ください：
+パイプライン内部構造、ゼロアロケーション設計、計算量モデル、フレームワーク別生成仕様についての詳細は、**[GitHub Wiki](https://github.com/kassyi/DependencyPropertyGenerator/wiki)**（またはローカル閲覧用の [`spec/`](./spec) ディレクトリ）をご覧ください：
 
-- **[仕様書概要・インデックス (spec/ja/intro.md)](./spec/ja/intro.md)**
-    - **[01. 基盤とドメインデータ](./spec/ja/01_foundation_and_domain.md)**: DTO構造と対象プラットフォーム
-    - **[02. パイプラインとアーキテクチャ](./spec/ja/02_pipeline_architecture.md)**: 差分検出・等価性キャッシュ戦略
-    - **[03. コード生成とパフォーマンス最適化](./spec/ja/03_synthesis_and_performance.md)**: `SourceWriter`、コールバック照合、最適化ガイドライン
-    - **[04. 計算量モデル](./spec/ja/04_mathematical_model.md)**: 最悪時間・メモリ計算量の数理分析
-    - **[05. テスト仕様書](./spec/ja/05_test_specification.md)**: 直交表マトリクスと品質保証基準
-    - **[06. フレームワーク別生成仕様](./spec/ja/06_framework_strategies.md)**: プラットフォーム固有APIマッピング
-    - **[07. 診断エラーコード一覧](./spec/ja/07_diagnostics_reference.md)**: `DPG0000`〜`DPG9999` の原因と解決策
+- 🌐 **[📖 GitHub Wiki で読む（推奨）](https://github.com/kassyi/DependencyPropertyGenerator/wiki)**
+- 🇯🇵 **日本語仕様書 (`spec/ja/`)**:
+    - **[仕様書概要・インデックス](./spec/ja/intro.md)**
+    - **[01. 設計思想と FAQ](./spec/ja/01_faq_and_rationale.md)**: アーキテクチャ思想とゼロアロケーション設計
+    - **[02. 基盤とドメインデータ](./spec/ja/02_foundation_and_domain.md)**: DTO構造、ユビキタス言語、対象プラットフォーム
+    - **[03. パイプライン構造](./spec/ja/03_pipeline_architecture.md)**: 差分検出・等価性キャッシュ戦略
+    - **[04. フレームワーク別生成仕様](./spec/ja/04_framework_strategies.md)**: プラットフォーム固有APIマッピングと拡張指針
+    - **[05. コード生成とパフォーマンス最適化](./spec/ja/05_synthesis_and_performance.md)**: `SourceWriter`、コールバック照合、最適化ガイドライン
+    - **[06. 計算量モデル](./spec/ja/06_mathematical_model.md)**: 最悪時間・メモリ計算量の数理分析
+    - **[07. テスト仕様書](./spec/ja/07_test_specification.md)**: 直交表マトリクスと品質保証基準
+    - **[08. 診断機能リファレンス](./spec/ja/08_diagnostics_reference.md)**: `DPG0000`〜`DPG9999` の原因と解決策
+- 🇺🇸 **English Specifications (`spec/en/`)**:
+    - **[Overview & Index](./spec/en/intro.md)**
 
 ## サポートとフィードバック
 

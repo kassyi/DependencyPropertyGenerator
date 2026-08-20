@@ -16,7 +16,7 @@ Please select your preferred language:
 | Chapter | English | 日本語 | Description |
 |---|---|---|---|
 | **Intro** | [Introduction](./en/intro.md) | [概要](./ja/intro.md) | Overview and high-level structure |
-| **01** | [FAQ & Design Rationale](./en/01_faq_and_rationale.md) | [建築設計思想と FAQ](./ja/01_faq_and_rationale.md) | Architectural philosophy, zero-allocation strategies, and common questions |
+| **01** | [FAQ & Design Rationale](./en/01_faq_and_rationale.md) | [設計思想と FAQ](./ja/01_faq_and_rationale.md) | Architectural philosophy, zero-allocation strategies, and common questions |
 | **02** | [Foundation & Domain](./en/02_foundation_and_domain.md) | [基盤とドメイン](./ja/02_foundation_and_domain.md) | Modular structure, ubiquitous language & DTO models |
 | **03** | [Pipeline & Architecture](./en/03_pipeline_architecture.md) | [パイプライン構造](./ja/03_pipeline_architecture.md) | Incremental generator pipeline & caching strategy |
 | **04** | [Framework Strategies](./en/04_framework_strategies.md) | [フレームワーク別生成マッピング仕様](./ja/04_framework_strategies.md) | Platform API mapping & generator extension guidelines |
