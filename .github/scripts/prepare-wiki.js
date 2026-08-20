@@ -64,7 +64,9 @@ function transformContent(content, context, filename = null) {
 
   const replacements = LINK_REPLACEMENTS[context] || [];
   for (const { src, dest } of replacements) {
-    result = result.split(`(${src})`).join(`(${dest})`);
+    const escapedSrc = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`\\(${escapedSrc}(#[^)]*)?\\)`, "g");
+    result = result.replace(regex, (match, anchor) => `(${dest}${anchor || ""})`);
   }
 
   if (filename && (context === "en" || context === "ja")) {
