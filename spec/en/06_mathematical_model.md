@@ -1,4 +1,4 @@
-# 06. Mathematical performance model
+# 06. Complexity model
 
 To maintain the Roslyn Incremental Source Generator's performance, you must understand the complexity (allocation cost and processing time) of each operation.
 
