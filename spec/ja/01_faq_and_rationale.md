@@ -1,7 +1,4 @@
-# Chapter 01: 建築設計思想と FAQ
-
-[English](../en/01_faq_and_rationale.md) | [日本語](./01_faq_and_rationale.md)
-[目次 (Intro)](./intro.md) | 次へ: [02. 基盤とドメイン ➡](./02_foundation_and_domain.md)
+# Chapter 01: 設計思想と FAQ
 
 本章では、ゼロアロケーションを実現する v4 ジェネレーターのアーキテクチャ上の設計哲学について解説するとともに、API設計やコード合成、最新の .NET 機能との統合に関するよくある質問に回答します。
 
@@ -54,7 +51,3 @@
 ### XAML Hot Reload, Live Preview, NativeAOT は壊れませんか？
 
 壊れません。このジェネレーターは、実行時のリフレクションや `Reflection.Emit` を一切使わず、完全に標準的で静的な C# コードを出力します。したがって、NativeAOT や Trimming に対して 100% 安全です。コンパイル時に静的フィールドとプロパティラッパーを生成する仕組みのため、XAML Hot Reload や Language Server Protocol とも完璧に連動し、手書きのコードと全く同じように動作します。
-
----
-
-[目次 (Intro)](./intro.md) | 次へ: [02. 基盤とドメイン →](./02_foundation_and_domain.md)

@@ -1,8 +1,5 @@
 # 02. 基盤とドメイン
 
-[English](../en/02_foundation_and_domain.md) | [日本語](./02_foundation_and_domain.md)
-前へ: [⬅ 01. 建築設計思想と FAQ](./01_faq_and_rationale.md) | [目次 (Intro)](./intro.md) | 次へ: [03. パイプライン構造 ➡](./03_pipeline_architecture.md)
-
 ## Ⅰ. 目的とアーキテクチャ
 
 **DependencyPropertyGenerator** (`Kassyi.Generators.DependencyProperty`) の主要なアーキテクチャ目標は、複数の .NET UI フレームワーク間で、依存関係プロパティ (DependencyProperty)、ルーティングイベント (RoutedEvent)、および弱イベント (WeakEvent) の宣言に関わるボイラープレートコードを自律的に合成することである。サポート対象のプラットフォームには、WPF、UWP、WinUI、Uno、Avalonia、および MAUI が含まれる。
@@ -332,7 +329,3 @@ classDiagram
 | クラスの修飾子           | `ClassData.Modifiers`              | `string`                          | `public`, `internal`, `sealed` などの修飾子。            |
 | `[AvaloniaObject]` 等    | `ClassData.Framework`              | `Framework`                       | 利用フレームワークの種別 (`WPF`, `Avalonia`, etc.)。     |
 | 親クラス階層（ネスト時） | `ClassData.ParentClasses`          | `EquatableArray<ParentClassData>` | 外側を囲むネスト親クラスの型名・修飾子リスト。           |
-
----
-
-前へ: [⬅ 01. 建築設計思想と FAQ](./01_faq_and_rationale.md) | [目次 (Intro)](./intro.md) | 次へ: [03. パイプライン構造 →](./03_pipeline_architecture.md)

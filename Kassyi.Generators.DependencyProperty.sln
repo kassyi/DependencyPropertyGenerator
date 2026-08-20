@@ -54,6 +54,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F}"
 	ProjectSection(SolutionItems) = preProject
 		.github\ISSUE_TEMPLATE\bug-report.yaml = .github\ISSUE_TEMPLATE\bug-report.yaml
+		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
+		.github\ISSUE_TEMPLATE\feature-request.yaml = .github\ISSUE_TEMPLATE\feature-request.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DISCUSSION_TEMPLATE", "DISCUSSION_TEMPLATE", "{4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A}"

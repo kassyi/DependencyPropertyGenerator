@@ -1,0 +1,52 @@
+name: "Feature request"
+description: "Suggest an idea or enhancement for Kassyi.Generators.DependencyProperty"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature!
+        For broader architectural proposals and open discussions, feel free to also check out [GitHub Discussions](https://github.com/kassyi/DependencyPropertyGenerator/discussions).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem or Use Case"
+      description: "Describe the problem or limitation you are facing."
+      placeholder: "e.g., I'm always frustrated when writing..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target-framework
+    attributes:
+      label: "Target UI Framework"
+      description: "Which framework is this feature for?"
+      multiple: true
+      options:
+        - "All Frameworks"
+        - "WPF"
+        - "Avalonia UI"
+        - ".NET MAUI"
+        - "Uno Platform (WinUI / UWP)"
+        - "WinUI 3 / Windows App SDK"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: "Proposed Solution / Syntax"
+      description: "Describe the proposed API or behavior."
+      render: csharp
+      placeholder: |
+        // Example usage
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternative Approaches"
+      description: "Describe any alternative solutions or features you've considered."

@@ -1,8 +1,5 @@
 # 06. インクリメンタル・ジェネレーターの計算量モデル
 
-[English](../en/06_mathematical_model.md) | [日本語](./06_mathematical_model.md)
-前へ: [⬅ 05. コード生成とパフォーマンス最適化](./05_synthesis_and_performance.md) | [目次 (Intro)](./intro.md) | 次へ: [07. テスト仕様書 ➡](./07_test_specification.md)
-
 Roslyn Incremental Source Generator のパフォーマンスを維持するためには、どの操作がどれだけの計算量（アロケーションコストと処理時間）を発生させるかを厳密に理解しなければならない。
 
 本文書では、本プロジェクトのジェネレーターアーキテクチャに基づく最悪計算量（Worst-Case Complexity）と、それを抑止するために適用されている設計ポリシーを規定する。
@@ -99,7 +96,3 @@ $$ T \approx (1 - H) \times O(S \times P \times (N + K)) $$
 この最悪計算量がキーストロークのたびにトリガーされるのを完全に防ぐため、ジェネレーターは厳格なアーキテクチャルールを施行する。
 
 > DTO 内での `ISymbol` 保持禁止、`EquatableArray<T>` による等価性の厳格な実装、および `SourceWriter` によるアロケーションフリーな生成に関する詳細は、**[05. コード生成とパフォーマンス最適化 (Ⅳ. パフォーマンス最適化ルール)](./05_synthesis_and_performance.md#ⅳ-パフォーマンス最適化ルール)** を参照のこと。
-
----
-
-前へ: [⬅ 05. コード生成とパフォーマンス最適化](./05_synthesis_and_performance.md) | [目次 (Intro)](./intro.md) | 次へ: [07. テスト仕様書 ➡](./07_test_specification.md)

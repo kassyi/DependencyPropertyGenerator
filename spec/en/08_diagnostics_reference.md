@@ -1,40 +1,37 @@
-# 08. Diagnostics Reference
-
-[English](./08_diagnostics_reference.md) | [日本語](../ja/08_diagnostics_reference.md)
-Prev: [⬅ 07. Test Specification](./07_test_specification.md) | [Index (Intro)](./intro.md)
+# 08. Diagnostics reference
 
 This document provides a comprehensive list of diagnostic errors emitted by the `DependencyPropertyGenerator` during source code analysis, along with detailed troubleshooting guidelines.
-It details the cause of each error and provides concrete Before / After code examples to help you quickly resolve build issues.
+It details the cause of each error and provides concrete code examples to help you quickly resolve build issues.
 
 ---
 
-## Diagnostic IDs Quick Reference
+## Diagnostic IDs quick reference
 
-| Diagnostic ID                                                     | Severity | Title                          | Overview                                                                    |
-| :---------------------------------------------------------------- | :------- | :----------------------------- | :-------------------------------------------------------------------------- |
-| [`DPG0000`](#dpg0000-framework-is-not-recognized)                 | Error    | Framework is not recognized    | The generator cannot automatically detect the target UI framework.          |
-| [`DPG0001`](#dpg0001-onchanged-method-not-found-or-unsupported)   | Error    | OnChanged Method Not Found     | The specified callback method is missing or has an invalid signature.       |
-| [`DPG0002`](#dpg0002-invalid-type-modifier-file-scoped)           | Error    | Invalid Type Modifier          | You cannot apply the generator to classes with the `file` scope modifier.   |
-| [`DPG0003`](#dpg0003-invalid-property-type-ref-struct)            | Error    | Invalid Property Type          | You cannot use `ref struct` types as DependencyProperties.                  |
-| [`DPG0004`](#dpg0004-reference-type-default-value-sharing)        | Error    | Reference Type Sharing         | Prevents sharing reference type instances across all control instances.     |
-| [`DPG0005`](#dpg0005-invalid-callback-signature-overridemetadata) | Error    | Invalid Callback Signature     | The callback requests the old value on a platform that does not support it. |
-| [`DPG0007`](#dpg0007-unsupported-callback-signature)              | Error    | Unsupported Callback Signature | An auto-discovered callback method has an invalid signature.                |
-| [`DPG0008`](#dpg0008-invalid-default-value-expression)            | Error    | Invalid Default Expression     | The Roslyn parser cannot parse the C# string in `DefaultValueExpression`.   |
-| `DPG0009`                                                         | Info     | Duplicate Attribute Helper     | Suppresses CS0436 duplicate attribute helper warnings.                      |
-| `DPG9999`                                                         | Error    | Unhandled Exception            | An unexpected internal generator exception occurred.                        |
+| Diagnostic ID | Severity | Title | Overview |
+| :--- | :--- | :--- | :--- |
+| [`DPG0000`](#dpg0000-framework-is-not-recognized) | Error | Framework is not recognized | The generator cannot automatically detect the target UI framework. |
+| [`DPG0001`](#dpg0001-onchanged-method-not-found-or-unsupported) | Error | OnChanged Method Not Found | The specified callback method is missing or has an invalid signature. |
+| [`DPG0002`](#dpg0002-invalid-type-modifier-file-scoped) | Error | Invalid Type Modifier | You cannot apply the generator to classes with the `file` scope modifier. |
+| [`DPG0003`](#dpg0003-invalid-property-type-ref-struct) | Error | Invalid Property Type | You cannot use `ref struct` types as DependencyProperties. |
+| [`DPG0004`](#dpg0004-reference-type-default-value-sharing) | Error | Reference Type Sharing | Prevents sharing reference type instances across all control instances. |
+| [`DPG0005`](#dpg0005-invalid-callback-signature-overridemetadata) | Error | Invalid Callback Signature | The callback requests the old value on a platform that does not support it. |
+| [`DPG0007`](#dpg0007-unsupported-callback-signature) | Error | Unsupported Callback Signature | An auto-discovered callback method has an invalid signature. |
+| [`DPG0008`](#dpg0008-invalid-default-value-expression) | Error | Invalid Default Expression | The Roslyn parser cannot parse the C# string in `DefaultValueExpression`. |
+| `DPG0009` | Info | Duplicate Attribute Helper | Suppresses CS0436 duplicate attribute helper warnings. |
+| `DPG9999` | Error | Unhandled Exception | An unexpected internal generator exception occurred. |
 
 ---
 
-## Error Details and Solutions
+## Error details and solutions
 
 ### DPG0000: Framework is not recognized
 
 The generator cannot automatically detect the target UI framework (WPF, WinUI, Uno, Avalonia, or MAUI) from your project references.
 
-❌ **Cause (Before):**
-Your project (`.csproj`) lacks the required UI framework packages (e.g., `Avalonia` or `Microsoft.WindowsAppSDK`), or you are using the generator in a pure class library without defining the target platform.
+❌ **Cause:**
+Your project (`.csproj`) lacks the required UI framework packages (for example, `Avalonia` or `Microsoft.WindowsAppSDK`), or you are using the generator in a pure class library without defining the target platform.
 
-✅ **Solution (After):**
+✅ **Solution:**
 Install the necessary NuGet packages or explicitly define the target framework compiler constant in your library.
 
 ```xml
@@ -50,7 +47,7 @@ Install the necessary NuGet packages or explicitly define the target framework c
 
 The method specified in the `OnChanged` attribute argument either does not exist in the class or has an unsupported signature.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 [DependencyProperty<int>("Count", OnChanged = nameof(OnCountChanged))]
@@ -63,7 +60,7 @@ public partial class MyControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 [DependencyProperty<int>("Count", OnChanged = nameof(OnCountChanged))]
@@ -82,7 +79,7 @@ public partial class MyControl : UserControl
 
 You applied the generator to a class using the C# 11 `file` scope modifier. Roslyn Source Generators cannot generate code for file-scoped types.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 [DependencyProperty<string>("Text")]
@@ -91,7 +88,7 @@ file partial class LocalControl : UserControl // Error: file scoped
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 [DependencyProperty<string>("Text")]
@@ -106,7 +103,7 @@ internal partial class LocalControl : UserControl // Solution: Use internal or p
 
 `ref struct` types (such as `ReadOnlySpan<T>`) cannot reside on the managed heap. Consequently, you cannot use them as a DependencyProperty type, which relies on boxing or object dictionaries.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 // Error: ReadOnlySpan<char> cannot be boxed.
@@ -116,7 +113,7 @@ public partial class MyControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 // Solution: Use a normal struct, array, or Memory<T>.
@@ -133,7 +130,7 @@ public partial class MyControl : UserControl
 You assigned an instance of a reference type (such as a `class` or `List<T>`) directly to `DefaultValue`.
 In frameworks like WPF, all control instances share reference type default values, causing memory leaks and shared-state bugs. The generator strictly blocks this to prevent such issues.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 // Error: A single List instance will be shared by all MyControl instances.
@@ -143,7 +140,7 @@ public partial class MyControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 // Solution: Use CreateDefaultValueCallback = true.
@@ -162,10 +159,10 @@ public partial class MyControl : UserControl
 
 ### DPG0005: Invalid Callback Signature (OverrideMetadata)
 
-Non-WPF platforms (such as UWP, WinUI, Uno, and MAUI) **do not provide the "old value"** when overriding property metadata (`OverrideMetadata`).
+Non-WPF platforms (such as UWP, WinUI, Uno, and MAUI) **do not provide the "old value"** when you override property metadata (`OverrideMetadata`).
 This error occurs when your callback signature attempts to receive `oldValue` on a platform that does not support it.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 // Error: The underlying framework (WinUI/Uno) cannot provide the old value.
@@ -176,7 +173,7 @@ public partial class MyWinUIControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 [OverrideMetadata<int>("Count", OnChanged = nameof(OnCountChanged))]
@@ -191,9 +188,9 @@ public partial class MyWinUIControl : UserControl
 
 ### DPG0007: Unsupported Callback Signature
 
-The generator found a method matching the `partial void On{PropertyName}Changed(...)` naming convention, but its argument signature is invalid (e.g., it uses the generic `DependencyObject`).
+The generator found a method matching the `partial void On{PropertyName}Changed(...)` naming convention, but its argument signature is invalid (for example, it uses the generic `DependencyObject`).
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 [DependencyProperty<string>("Text")]
@@ -204,7 +201,7 @@ public partial class MyControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 [DependencyProperty<string>("Text")]
@@ -224,7 +221,7 @@ public partial class MyControl : UserControl
 
 The C# string expression provided in `DefaultValueExpression` contains syntax errors, causing the Roslyn parser to fail.
 
-❌ **Incorrect Code (Before):**
+❌ **Incorrect code:**
 
 ```csharp
 // Error: Missing closing parenthesis, typo, etc.
@@ -234,7 +231,7 @@ public partial class MyControl : UserControl
 }
 ```
 
-✅ **Correct Code (After):**
+✅ **Correct code:**
 
 ```csharp
 // Solution: Provide a valid C# expression string.
@@ -243,9 +240,3 @@ public partial class MyControl : UserControl
 {
 }
 ```
-
----
-
-Prev: [← 07. Test Specification](./07_test_specification.md) | [Index (Intro)](./intro.md)
-
-

@@ -1,7 +1,5 @@
 # DependencyPropertyGenerator 仕様書概要
 
-[English](../en/intro.md) | [日本語](./intro.md)
-
 このドキュメント群は、C# Incremental Source Generator である **DependencyPropertyGenerator (`Kassyi.Generators.DependencyProperty`)** の全体アーキテクチャ、ドメイン仕様、インクリメンタルパイプライン構造、コード生成エンジン、およびパフォーマンス最適化戦略をまとめた公式仕様書です。
 
 ソースジェネレーターのパフォーマンス（ビルド時間、メモリ消費、IDE応答速度）の改善や新機能を追加する際に、システム全体の設計方針や Roslyn API との連携、キャッシュ戦略を正しく理解するためのリファレンスとして活用します。
@@ -26,4 +24,3 @@
   本プロジェクトにおけるテスト戦略、品質目標、直交表パラメータ（576件）、テストケース一覧、および合否判定基準を定義しています。
 - **[08. 診断エラーコード一覧](./08_diagnostics_reference.md)**
   ジェネレーターが発行する診断エラー（`DPG0000` ～ `DPG9999`）の発生原因と具体的な解決策をまとめたリファレンスです。
-
