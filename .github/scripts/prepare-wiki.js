@@ -12,7 +12,7 @@ const CHAPTERS = [
   { name: "03_pipeline_architecture", en: "03. Pipeline Architecture", ja: "03. パイプライン構造" },
   { name: "04_framework_strategies", en: "04. Framework Strategies", ja: "04. フレームワーク別生成仕様" },
   { name: "05_synthesis_and_performance", en: "05. Synthesis & Performance", ja: "05. コード生成と最適化" },
-  { name: "06_mathematical_model", en: "06. Mathematical Complexity", ja: "06. 計算量モデル" },
+  { name: "06_mathematical_model", en: "06. Complexity Model", ja: "06. 計算量モデル" },
   { name: "07_test_specification", en: "07. Test Specification", ja: "07. テスト仕様書" },
   { name: "08_diagnostics_reference", en: "08. Diagnostics Reference", ja: "08. 診断機能リファレンス" },
 ].map((c) => ({

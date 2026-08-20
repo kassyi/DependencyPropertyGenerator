@@ -18,7 +18,7 @@ The following documents explain the system's internal architecture:
   Details the property registration API mappings across UI frameworks (WPF, WinUI, Uno, Avalonia, MAUI) and framework auto-detection cascade.
 - **[05. Code synthesis and performance optimization](./05_synthesis_and_performance.md)**
   Details the zero-allocation code synthesis engine (`SourceWriter` / `ClassScope`), performance optimization guidelines (AST traversal, LINQ elimination), and benchmark metrics.
-- **[06. Complexity model of Incremental Generator](./06_mathematical_model.md)**
+- **[06. Complexity model](./06_mathematical_model.md)**
   Analyzes worst-case time and memory complexities. It explains pipeline cache scaling limits and architectural mitigations.
 - **[07. Test specification](./07_test_specification.md)**
   Defines the testing strategy, quality targets, combinatorial matrix parameters (576 cases), test cases, and pass criteria.
