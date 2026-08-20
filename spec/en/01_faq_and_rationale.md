@@ -30,6 +30,16 @@ Generation logic runs on stack-allocated `SourceWriter` and `ClassScope` wrapper
 
 ## 2. Frequently Asked Questions
 
+### Why support multi-platform XAML with a single attribute?
+
+To enable **"Write Once, Run on Any XAML Platform"**. 
+By isolating the data extraction phase into pure DTOs and delegating output to platform-specific strategies, a single `[DependencyProperty]` attribute can synthesize `DependencyProperty.Register` for WPF, `AvaloniaProperty.Register` for Avalonia, and `BindableProperty.Create` for MAUI. This drastically reduces `#if` boilerplate for OSS library authors and enterprise teams migrating between UI frameworks.
+
+### What happens if Avalonia releases an official source generator? (e.g., Avalonia 12.2)
+
+When Avalonia 12.2 introduces official source generator support, we will evaluate its adoption and community consensus. 
+While official generators provide platform-native excellence, **this library will continue to maintain `AvaloniaFrameworkGenerator`** as long as there is value in a unified, multi-targeted `[DependencyProperty]` attribute shared across WPF, MAUI, and Avalonia codebases. Deprecation will only be considered if the community fully standardizes on the official generator and multi-target demand diminishes.
+
 ### Why use class-level attributes instead of field-level attributes like in MVVM Toolkit or C# 13 partial properties?
 
 Class-level attributes provide a unified mental model for declaring both standard Dependency Properties and Attached Properties, which do not map cleanly to backing fields. However, C# 13 `partial property` support is natively implemented and works seamlessly alongside class-level attributes, utilizing the same underlying AST parsing logic.
