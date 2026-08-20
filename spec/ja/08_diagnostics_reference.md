@@ -1,8 +1,5 @@
 # 08. 診断エラーコード一覧 (Diagnostics Reference)
 
-[English](../en/08_diagnostics_reference.md) | [日本語](./08_diagnostics_reference.md)
-前へ: [⬅ 07. テスト仕様書](./07_test_specification.md) | [目次 (Intro)](./intro.md)
-
 本ドキュメントは、DependencyPropertyGenerator がソースコード解析中に発行する診断エラー（Diagnostics）の一覧と、そのトラブルシューティングガイドです。
 Microsoft Docs のように、各エラーの発生原因と具体的な解決策（Before / After のコード例）を記載しています。
 
@@ -243,7 +240,3 @@ public partial class MyControl : UserControl
 {
 }
 ```
-
----
-
-前へ: [⬅ 07. テスト仕様書](./07_test_specification.md) | [目次 (Intro)](./intro.md)

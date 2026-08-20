@@ -1,8 +1,5 @@
 # 07. テスト仕様書 (Test Specification)
 
-[English](../en/07_test_specification.md) | [日本語](./07_test_specification.md)
-前へ: [⬅ 06. 計算量モデル](./06_mathematical_model.md) | [目次 (Intro)](./intro.md) | 次へ: [08. 診断機能リファレンス ➡](./08_diagnostics_reference.md)
-
 本ドキュメントは、DependencyPropertyGenerator におけるテスト戦略、品質目標、直交表パラメータ、テストケース一覧、実行環境、および合否判定基準を定義した正式なテスト仕様書です。テストIDはコード側の `TestCategoryNames` 定数と1対1で対応しています。
 
 ---
@@ -293,7 +290,3 @@ C# 14 などの新しい言語仕様や、全く新しい属性を追加する�
 
 `DPG0001` などのジェネレーターエラー通知を修正・追加した場合は、必ず `ErrorTests.cs` にテストを追加します。
 エラー出力時のジェネレーターは「中途半端なソースコードを生成しない（生成をスキップする）」設計になっているため、テストでは `Diagnostic` の発報件数と内容だけを検証し、ソースコードの生成結果はアサートしません。
-
----
-
-前へ: [⬅ 06. 計算量モデル](./06_mathematical_model.md) | [目次 (Intro)](./intro.md) | 次へ: [08. 診断機能リファレンス →](./08_diagnostics_reference.md)

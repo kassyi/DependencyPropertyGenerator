@@ -1,8 +1,5 @@
 # 05. コード生成とパフォーマンス最適化
 
-[English](../en/05_synthesis_and_performance.md) | [日本語](./05_synthesis_and_performance.md)
-前へ: [⬅ 04. フレームワーク別生成マッピング仕様](./04_framework_strategies.md) | [目次 (Intro)](./intro.md) | 次へ: [06. 計算量モデル ➡](./06_mathematical_model.md)
-
 ## Ⅰ. インターフェース仕様と生成コードの構造
 
 ジェネレーターは、抽出された Data Transfer Object（`DependencyPropertyData` 等）を入力とし、対象フレームワーク（WPF、MAUI、Avalonia、Uno、WinUI）に最適化されたC#ソースコードを生成する。このコードは、ユーザーが宣言した `partial` クラスを拡張する形で提供される。
@@ -208,7 +205,3 @@ _実行環境: WPF 向け生成, AMD Ryzen 9 7900X_
 
 > [!NOTE]
 > Gen0 / Gen1 / Gen2 カラムは、1,000 操作あたりの GC 発生回数を示しています。最も重い Gen2 GC は、マイクロ／マクロ両方のベンチマークで完全に排除（0回）されています。MAUI, Avalonia, WinUI 向けのベンチマークでも、概ね 20〜30% のスループット向上が確認されています。
-
----
-
-前へ: [⬅ 04. フレームワーク別生成マッピング仕様](./04_framework_strategies.md) | [目次 (Intro)](./intro.md) | 次へ: [06. 計算量モデル ➡](./06_mathematical_model.md)
