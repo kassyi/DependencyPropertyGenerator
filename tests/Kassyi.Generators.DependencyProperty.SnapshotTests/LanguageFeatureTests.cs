@@ -661,12 +661,10 @@ public class LanguageFeatureTests : SnapshotTestBase
     {
         return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
 
-            using System;
-
-            [DependencyProperty<Uri>("CardBackground", CreateDefaultValueCallback = true)]
+            [DependencyProperty<System.Uri>("CardBackground", CreateDefaultValueCallback = true)]
             public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
             {
-                private static partial Uri GetCardBackgroundDefaultValue() => null!;
+                private static partial System.Uri GetCardBackgroundDefaultValue() => null!;
             }
             """, framework);
     }
