@@ -649,4 +649,25 @@ public class LanguageFeatureTests : SnapshotTestBase
             }
             """, framework);
     }
+
+    [TestMethod]
+    [TestCategory($"{TestCategoryNames.Language}-035")]
+    [DataRow(Framework.Wpf)]
+    [DataRow(Framework.Uno)]
+    [DataRow(Framework.UnoWinUi)]
+    [DataRow(Framework.Maui)]
+    [DataRow(Framework.Avalonia)]
+    public Task CreateDefaultValueCallback_ShouldNotForceNullableOnReferenceTypes(Framework framework)
+    {
+        return CheckSourceAsync<DependencyPropertyGenerator>(GetHeader(framework, "Controls") + $$"""
+
+            using System;
+
+            [DependencyProperty<Uri>("CardBackground", CreateDefaultValueCallback = true)]
+            public partial class MyControl : {{FrameworkTestData.GetUserControl(framework)}}
+            {
+                private static partial Uri GetCardBackgroundDefaultValue() => null!;
+            }
+            """, framework);
+    }
 }

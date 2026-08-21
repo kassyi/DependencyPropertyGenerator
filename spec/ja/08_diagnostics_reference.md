@@ -148,10 +148,7 @@ public partial class MyControl : UserControl
 public partial class MyControl : UserControl
 {
     // ジェネレーターが呼び出す部分メソッドを通じて、インスタンスごとに個別の new を行う
-    static partial void GetItemsDefaultValue(ref List<string> defaultValue)
-    {
-        defaultValue = new List<string>();
-    }
+    private static partial List<string> GetItemsDefaultValue() => new List<string>();
 }
 ```
 

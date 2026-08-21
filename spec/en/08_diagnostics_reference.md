@@ -148,10 +148,7 @@ public partial class MyControl : UserControl
 public partial class MyControl : UserControl
 {
     // The generator will wire up this partial method to instantiate a new object per instance.
-    static partial void GetItemsDefaultValue(ref List<string> defaultValue)
-    {
-        defaultValue = new List<string>();
-    }
+    private static partial List<string> GetItemsDefaultValue() => new List<string>();
 }
 ```
 
