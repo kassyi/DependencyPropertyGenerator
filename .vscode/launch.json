@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DpgShowcaseCart.Wpf (Windows Only)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-sample",
+      "args": [],
+      "cwd": "${workspaceFolder}/samples/DpgShowcaseCart.Wpf",
+      "windows": {
+        "program": "${workspaceFolder}/samples/DpgShowcaseCart.Wpf/bin/Debug/net9.0-windows/DpgShowcaseCart.Wpf.exe"
+      }
+    }
+  ]
+}
