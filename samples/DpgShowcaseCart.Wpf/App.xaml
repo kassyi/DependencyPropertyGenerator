@@ -1,0 +1,56 @@
+<Application x:Class="DpgShowcaseCart.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Color Palette -->
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0F0F16" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="White" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#888888" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#AAAAAA" />
+        <SolidColorBrush x:Key="TextHintBrush" Color="#666666" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#6C5CE7" />
+        <SolidColorBrush x:Key="AccentLightBrush" Color="#7AA2F7" />
+        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#1A1A26" />
+        <SolidColorBrush x:Key="InputBorderBrush" Color="#444455" />
+        <SolidColorBrush x:Key="ErrorBrush" Color="#FF5252" />
+        <SolidColorBrush x:Key="SuccessBrush" Color="#00FF88" />
+
+        <!-- Presets -->
+        <SolidColorBrush x:Key="PresetVisaBgBrush" Color="#1E2A4A" />
+        <SolidColorBrush x:Key="PresetVisaBorderBrush" Color="#3D59A1" />
+        <SolidColorBrush x:Key="PresetVisaFgBrush" Color="#7AA2F7" />
+        <SolidColorBrush x:Key="PresetMasterBgBrush" Color="#3A1E24" />
+        <SolidColorBrush x:Key="PresetMasterBorderBrush" Color="#9E3048" />
+        <SolidColorBrush x:Key="PresetMasterFgBrush" Color="#F7768E" />
+        <SolidColorBrush x:Key="PresetInvalidBgBrush" Color="#2A2A38" />
+        <SolidColorBrush x:Key="PresetInvalidBorderBrush" Color="#44445A" />
+        <SolidColorBrush x:Key="PresetInvalidFgBrush" Color="#A9B1D6" />
+        <!-- Card Elements -->
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#19FFFFFF" />
+        <SolidColorBrush x:Key="ChipBackgroundBrush" Color="#CCA934" />
+        <SolidColorBrush x:Key="CardLabelBrush" Color="#B3FFFFFF" />
+        
+        <!-- Status Badges -->
+        <SolidColorBrush x:Key="StatusProcessingBgBrush" Color="#30388BFD" />
+        <SolidColorBrush x:Key="StatusProcessingBorderBrush" Color="#388BFD" />
+        <SolidColorBrush x:Key="StatusProcessingTextBrush" Color="#58A6FF" />
+        <SolidColorBrush x:Key="StatusApprovedBgBrush" Color="#3000FF88" />
+        <SolidColorBrush x:Key="StatusFailedBgBrush" Color="#30FF5252" />
+
+        <!-- DPG Inspector -->
+        <SolidColorBrush x:Key="InspectorBackgroundBrush" Color="#13131D" />
+        <SolidColorBrush x:Key="InspectorBorderBrush" Color="#2A2A38" />
+        
+        <!-- Inspector Badges -->
+        <SolidColorBrush x:Key="BadgeBlueBgBrush" Color="#30388BFD" />
+        <SolidColorBrush x:Key="BadgeBlueBorderBrush" Color="#388BFD" />
+        <SolidColorBrush x:Key="BadgeBlueFgBrush" Color="#7AA2F7" />
+        <SolidColorBrush x:Key="BadgeGreenBgBrush" Color="#3000FF88" />
+        <SolidColorBrush x:Key="BadgeGreenBorderBrush" Color="#00FF88" />
+        <SolidColorBrush x:Key="BadgeGreenFgBrush" Color="#8CE5A4" />
+        <SolidColorBrush x:Key="BadgePurpleBgBrush" Color="#309D5CE7" />
+        <SolidColorBrush x:Key="BadgePurpleBorderBrush" Color="#9D5CE7" />
+        <SolidColorBrush x:Key="BadgePurpleFgBrush" Color="#CBA5F5" />
+    </Application.Resources>
+</Application>
