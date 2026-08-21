@@ -1,0 +1,113 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:DpgShowcaseCart.Wpf.Controls">
+
+    <!-- Drop Shadow Effects -->
+    <DropShadowEffect x:Key="CardShadow" BlurRadius="24" ShadowDepth="10" Direction="270" Color="#000000" Opacity="0.5"/>
+    <DropShadowEffect x:Key="TextShadow" BlurRadius="4" ShadowDepth="2" Direction="315" Color="#000000" Opacity="0.25"/>
+    <DropShadowEffect x:Key="GlowSuccessEffect" BlurRadius="12" ShadowDepth="0" Color="#00FF88" Opacity="0.6"/>
+
+    <Style TargetType="{x:Type local:PaymentCardView}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:PaymentCardView}">
+                    <Border Width="380" Height="240" 
+                            CornerRadius="16" 
+                            BorderThickness="1" 
+                            BorderBrush="{DynamicResource CardBorderBrush}" 
+                            Background="{TemplateBinding CardBackground}"
+                            Effect="{StaticResource CardShadow}"
+                            ClipToBounds="True">
+
+                        <Grid Margin="32,28,32,28">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 1. Top row: EMV chip + brand logo -->
+                            <Grid Grid.Row="0">
+                                <!-- EMV IC chip -->
+                                <Border HorizontalAlignment="Left" VerticalAlignment="Center"
+                                        Width="44" Height="32" CornerRadius="6" 
+                                        Background="{DynamicResource ChipBackgroundBrush}" />
+
+                                <!-- Card brand (Visa / Mastercard) -->
+                                <Grid HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <!-- Visa logo (SVG) -->
+                                    <Path x:Name="VisaLogo" 
+                                          Fill="{DynamicResource TextPrimaryBrush}" 
+                                          Stretch="Uniform" 
+                                          Width="52" Height="28" 
+                                          Effect="{StaticResource TextShadow}"
+                                          Data="M15.854 11.329l-2.003 9.367h-2.424l2.006-9.367zM26.051 17.377l1.275-3.518 0.735 3.518zM28.754 20.696h2.242l-1.956-9.367h-2.069c-0.003-0-0.007-0-0.010-0-0.459 0-0.853 0.281-1.019 0.68l-0.003 0.007-3.635 8.68h2.544l0.506-1.4h3.109zM22.429 17.638c0.010-2.473-3.419-2.609-3.395-3.714 0.008-0.336 0.327-0.694 1.027-0.785 0.13-0.013 0.28-0.021 0.432-0.021 0.711 0 1.385 0.162 1.985 0.452l-0.027-0.012 0.425-1.987c-0.673-0.261-1.452-0.413-2.266-0.416h-0.001c-2.396 0-4.081 1.275-4.096 3.098-0.015 1.348 1.203 2.099 2.122 2.549 0.945 0.459 1.262 0.754 1.257 1.163-0.006 0.63-0.752 0.906-1.45 0.917-0.032 0.001-0.071 0.001-0.109 0.001-0.871 0-1.691-0.219-2.407-0.606l0.027 0.013-0.439 2.052c0.786 0.315 1.697 0.497 2.651 0.497 0.015 0 0.030-0 0.045-0h-0.002c2.546 0 4.211-1.257 4.22-3.204zM12.391 11.329l-3.926 9.367h-2.562l-1.932-7.477c-0.037-0.364-0.26-0.668-0.57-0.82l-0.006-0.003c-0.688-0.338-1.488-0.613-2.325-0.786l-0.066-0.011 0.058-0.271h4.124c0 0 0.001 0 0.001 0 0.562 0 1.028 0.411 1.115 0.948l0.001 0.006 1.021 5.421 2.522-6.376z" 
+                                          Visibility="Collapsed"/>
+
+                                    <!-- Mastercard logo (SVG) -->
+                                    <Path x:Name="MastercardLogo" 
+                                          Fill="{DynamicResource TextPrimaryBrush}" 
+                                          Stretch="Uniform" 
+                                          Width="48" Height="28" 
+                                          Effect="{StaticResource TextShadow}"
+                                          Data="M12 6.654a6.786 6.786 0 0 1 2.596 5.344A6.786 6.786 0 0 1 12 17.34a6.786 6.786 0 0 1-2.596-5.343A6.786 6.786 0 0 1 12 6.654zm-.87-.582A7.783 7.783 0 0 0 8.4 12a7.783 7.783 0 0 0 2.728 5.926 6.798 6.798 0 1 1 .003-11.854zm1.742 11.854A7.783 7.783 0 0 0 15.6 12a7.783 7.783 0 0 0-2.73-5.928 6.798 6.798 0 1 1 .003 11.854z" 
+                                          Visibility="Collapsed"/>
+                                </Grid>
+                            </Grid>
+
+                            <!-- 2. Center: Card number -->
+                            <TextBlock Grid.Row="1" 
+                                       Text="{TemplateBinding CardNumber}" 
+                                       Foreground="{DynamicResource TextPrimaryBrush}" 
+                                       FontSize="28" 
+                                       FontWeight="SemiBold"
+                                       FontFamily="Segoe UI, Arial" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,16,0,0"
+                                       Effect="{StaticResource TextShadow}"/>
+
+                            <!-- 3. Bottom row: Cardholder, expiration date, and status -->
+                            <Grid Grid.Row="2" VerticalAlignment="Bottom">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Cardholder -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CARD HOLDER" Foreground="{DynamicResource CardLabelBrush}" FontSize="11" FontFamily="Segoe UI, Arial" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{TemplateBinding CardHolder}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI, Arial" Margin="0,2,0,0" Effect="{StaticResource TextShadow}"/>
+
+                                <!-- Expiration date -->
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="EXPIRES" Foreground="{DynamicResource CardLabelBrush}" FontSize="11" FontFamily="Segoe UI, Arial" />
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{TemplateBinding ExpiryDate}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI, Arial" Margin="0,2,0,0" Effect="{StaticResource TextShadow}"/>
+
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Property triggers -->
+                    <ControlTemplate.Triggers>
+                        <!-- Brand logo switching -->
+                        <Trigger Property="Brand" Value="Visa">
+                            <Setter TargetName="VisaLogo" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="MastercardLogo" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Brand" Value="Mastercard">
+                            <Setter TargetName="VisaLogo" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="MastercardLogo" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
