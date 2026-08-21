@@ -16,17 +16,9 @@
                             CornerRadius="16" 
                             BorderThickness="1" 
                             BorderBrush="{DynamicResource CardBorderBrush}" 
+                            Background="{TemplateBinding CardBackground}"
                             Effect="{StaticResource CardShadow}"
                             ClipToBounds="True">
-                        
-                        <!-- Navy to magenta background gradient -->
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#28265A" Offset="0.0"/>
-                                <GradientStop Color="#772061" Offset="0.5"/>
-                                <GradientStop Color="#BE2265" Offset="1.0"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
 
                         <Grid Margin="32,28,32,28">
                             <Grid.RowDefinitions>
