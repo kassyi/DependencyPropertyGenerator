@@ -192,7 +192,7 @@ internal static partial class SourceGenerationHelper
             return;
         }
 
-        writer.AppendLine($"private static partial {GenerateType(property)} Get{property.Name}DefaultValue();");
+        writer.AppendLine($"private static partial {property.Type} Get{property.Name}DefaultValue();");
     }
 
     private static string GenerateOnChangedMethodDeclaration(string name, DependencyPropertyData property)
